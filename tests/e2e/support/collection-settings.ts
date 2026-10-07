@@ -40,6 +40,31 @@ export class CollectionSettings {
 		return this.field( key ).locator( 'input, textarea, select' ).first();
 	}
 
+	/** Token labels in a token select, in their saved order. */
+	tokens( key: string ): Promise< string[] > {
+		return this.field( key )
+			.locator( '.fotogrids-token-select__token-label' )
+			.allTextContents();
+	}
+
+	async removeToken( key: string, label: string ): Promise< void > {
+		await this.field( key )
+			.getByRole( 'button', { name: `Remove ${ label }`, exact: true } )
+			.click();
+	}
+
+	/** Drag a token onto the left edge of another, placing it before that one. */
+	async moveTokenBefore( key: string, label: string, before: string ): Promise< void > {
+		const token = ( text: string ) =>
+			this.field( key )
+				.locator( '.fotogrids-token-select__token' )
+				.filter( { hasText: text } );
+
+		await token( label ).dragTo( token( before ), {
+			targetPosition: { x: 4, y: 8 },
+		} );
+	}
+
 	/**
 	 * Switch tabs through the panel's own API rather than by clicking.
 	 *
@@ -54,6 +79,17 @@ export class CollectionSettings {
 			( id ) => window.FotoGridsCollectionSettings.switchTab( id ),
 			tabId
 		);
+	}
+
+	/**
+	 * Open a tab by clicking its label, as a user does. Unlike `switchTab`,
+	 * this cannot be undone by the panel restoring its last tab on mount.
+	 */
+	async openTab( label: string ): Promise< void > {
+		await this.page
+			.locator( '.fotogrids-settings-tab__label' )
+			.filter( { hasText: new RegExp( `^${ label }$` ) } )
+			.click();
 	}
 
 	/** Visible tab labels, for asserting conditional visibility. */
