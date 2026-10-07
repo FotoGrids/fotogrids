@@ -556,6 +556,11 @@ class Public_Render {
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
 
+		// Statistics count published albums only.
+		if ( 'publish' !== $album->post_status ) {
+			$album_settings['enable_statistics'] = false;
+		}
+
 		// Allow the shortcode's `template` attribute to override the
 		// layout (e.g. [fotogrids_album id=42 template=masonry]).
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
