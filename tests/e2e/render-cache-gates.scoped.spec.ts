@@ -59,6 +59,15 @@ async function visit(
 	return shown;
 }
 
+/** Load a page in a context and return its Cache-Control header. */
+async function cacheControl( context: BrowserContext, url: string ): Promise< string > {
+	const page = await context.newPage();
+	const response = await page.goto( url );
+	const header = ( await response?.headerValue( 'cache-control' ) ) ?? '';
+	await page.close();
+	return header;
+}
+
 async function anonymous( browser: Browser ): Promise< BrowserContext > {
 	return browser.newContext();
 }
@@ -164,5 +173,30 @@ test.describe( 'a password-protected gallery', () => {
 		expect( afterUnlock.items ).toBeGreaterThan( 0 );
 
 		await visitor.close();
+	} );
+} );
+
+test.describe( 'page caches in front of the site', () => {
+	test( 'a password gallery page asks page caches not to store it, locked or unlocked', { tag: [ '@critical', '@cache', '@gate' ] }, async ( {
+		browser,
+	} ) => {
+		const { id, url } = passwordGallery();
+		const visitor = await anonymous( browser );
+
+		expect( await cacheControl( visitor, url ), 'locked visitor' ).toContain( 'no-store' );
+
+		await unlock( visitor, id );
+		expect( await cacheControl( visitor, url ), 'unlocked visitor' ).toContain( 'no-store' );
+
+		await visitor.close();
+	} );
+
+	test( 'an ungated gallery page stays cacheable', { tag: [ '@critical', '@cache', '@gate' ] }, async ( { browser } ) => {
+		const { url } = galleryPage( { enable_cache: true } );
+		const guest = await anonymous( browser );
+
+		expect( await cacheControl( guest, url ) ).not.toContain( 'no-store' );
+
+		await guest.close();
 	} );
 } );
