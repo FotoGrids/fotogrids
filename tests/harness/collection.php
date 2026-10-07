@@ -10,6 +10,8 @@
  *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
  *   wp eval-file collection.php op=album author=fg-author status=draft
  *   wp eval-file collection.php op=page gallery=13
+ *   wp eval-file collection.php op=page gallery=41 atts='template="masonry"'
+ *   wp eval-file collection.php op=page album=42 atts='template="grid"'
  *   wp eval-file collection.php op=adopt id=57
  *   wp eval-file collection.php op=purge
  *
@@ -106,18 +108,22 @@ function fg_col_author( string $login ): int {
 }
 
 /**
- * A post whose content renders one gallery through the shortcode.
+ * A post whose content renders one collection through its shortcode.
  *
- * @param int $gallery_id Gallery to embed.
+ * @param int    $collection_id Gallery or album to embed.
+ * @param string $atts          Extra shortcode attributes, written verbatim.
+ * @param string $tag           Shortcode tag.
  * @return int
  */
-function fg_col_render_page( int $gallery_id ): int {
+function fg_col_render_page( int $collection_id, string $atts = '', string $tag = 'fotogrids_gallery' ): int {
+	$atts    = '' === $atts ? '' : ' ' . $atts;
+	$kind    = 'fotogrids_album' === $tag ? 'album' : 'gallery';
 	$page_id = wp_insert_post(
 		array(
 			'post_type'    => 'post',
-			'post_title'   => 'Renders gallery ' . $gallery_id,
+			'post_title'   => 'Renders ' . $kind . ' ' . $collection_id,
 			'post_status'  => 'publish',
-			'post_content' => '[fotogrids_gallery id="' . $gallery_id . '"]',
+			'post_content' => '[' . $tag . ' id="' . $collection_id . '"' . $atts . ']',
 		),
 		true
 	);
@@ -203,15 +209,17 @@ if ( 'album' === $op ) {
 }
 
 if ( 'page' === $op ) {
-	// A rendering page for a gallery the spec did not create - a seeded
-	// fixture it only reads. The page is scoped; the gallery is untouched.
-	$gallery_id = (int) fg_col_arg( $args, 'gallery' );
+	// A rendering page for a collection that already exists. The page is
+	// scoped; the collection is untouched.
+	$album_id = (int) fg_col_arg( $args, 'album' );
+	$id       = $album_id ? $album_id : (int) fg_col_arg( $args, 'gallery' );
+	$tag      = $album_id ? 'fotogrids_album' : 'fotogrids_gallery';
 
 	WP_CLI::log(
 		(string) wp_json_encode(
 			array(
-				'id'  => $gallery_id,
-				'url' => get_permalink( fg_col_render_page( $gallery_id ) ),
+				'id'  => $id,
+				'url' => get_permalink( fg_col_render_page( $id, fg_col_arg( $args, 'atts' ), $tag ) ),
 			)
 		)
 	);

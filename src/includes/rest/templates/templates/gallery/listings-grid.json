@@ -20,7 +20,6 @@
       "tablet": 10,
       "mobile": 6
     },
-    "captions": true,
     "caption_placement": "bottom",
     "watermark_apply_to_collection": true,
     "item_click_behavior": "lightbox",
