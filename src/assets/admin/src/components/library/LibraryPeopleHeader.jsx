@@ -23,7 +23,11 @@ const FG_RED = '#f01e32';
  * so the count of people appearing in at least one item (usage_count > 0)
  * is shown as a proxy and labelled clearly.
  */
-const LibraryPeopleHeader = ({ entityType, total: externalTotal }) => {
+const LibraryPeopleHeader = ({
+	entityType,
+	total: externalTotal,
+	refreshKey,
+}) => {
 	const {
 		topItems,
 		total: fetchedTotal,
@@ -31,6 +35,7 @@ const LibraryPeopleHeader = ({ entityType, total: externalTotal }) => {
 	} = useLibraryStats({
 		entitySlug: entityType?.slug || 'people',
 		limit: 7,
+		refreshKey,
 	});
 
 	const total = externalTotal != null ? externalTotal : fetchedTotal;

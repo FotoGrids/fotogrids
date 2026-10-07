@@ -181,6 +181,8 @@ final class Exif_Reader {
 			return $tags;
 		}
 
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
 		$image_meta = wp_read_image_metadata( $file_path );
 
 		if ( ! is_array( $image_meta ) ) {
