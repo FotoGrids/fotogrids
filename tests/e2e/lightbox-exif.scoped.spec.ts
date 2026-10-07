@@ -85,11 +85,11 @@ test( 'a paginated lightbox loads EXIF for an item beyond the first page', { tag
 
 	await page.goto( url );
 	await gallery.waitFor();
-	await lightbox.openFrom( gallery );
 
 	const slides = page.waitForResponse( ( response ) =>
 		decodeURIComponent( response.url() ).includes( '/fotogrids/v1/gallery/lightbox/slides' )
 	);
+	await lightbox.openFrom( gallery );
 	await lightbox.goNext();
 	expect( ( await slides ).status() ).toBe( 200 );
 	await expect( lightbox.image() ).toHaveJSProperty( 'complete', true );
