@@ -405,7 +405,9 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' not found.</div>';
 		}
 
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'read_post', $gallery_id ) ) {
+		$readable = 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) );
+		if ( ! $readable ) {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' is not published (status: ' . esc_html( $gallery->post_status ) . ').</div>';
 		}
 

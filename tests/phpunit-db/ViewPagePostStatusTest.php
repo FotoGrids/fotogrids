@@ -89,6 +89,16 @@ class ViewPagePostStatusTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'data-fg-gallery-id', $html );
 	}
 
+	public function test_a_draft_gallery_does_not_render_for_its_editor(): void {
+		$gallery = $this->collection( 'fotogrids_gallery', 'draft' );
+		wp_set_current_user( $this->admin );
+
+		$html = Public_Render::gallery_shortcode( array( 'id' => $gallery ) );
+
+		$this->assertStringContainsString( 'fotogrids-error', $html );
+		$this->assertStringNotContainsString( 'data-fg-gallery-id', $html );
+	}
+
 	public function test_a_private_album_keeps_stats_and_a_draft_album_does_not(): void {
 		$child = $this->collection( 'fotogrids_gallery', 'publish' );
 		wp_set_current_user( $this->admin );
