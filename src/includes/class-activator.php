@@ -240,7 +240,7 @@ class Activator {
 		dbDelta( $sql );
 
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
-		\FotoGrids\Settings\List_Setting_Repair::run();
+		\FotoGrids\Migrations\List_Setting_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 

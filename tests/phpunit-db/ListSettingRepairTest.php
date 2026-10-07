@@ -7,7 +7,7 @@
 
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Settings\Collection_Defaults_Seeder;
-use FotoGrids\Settings\List_Setting_Repair;
+use FotoGrids\Migrations\List_Setting_Repair;
 
 class ListSettingRepairTest extends WP_UnitTestCase {
 

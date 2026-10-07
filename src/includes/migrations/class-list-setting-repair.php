@@ -2,15 +2,16 @@
 /**
  * Repair of list settings stored as a single value.
  *
- * @package FotoGrids\Settings
- * @since   1.1.5
+ * @package FotoGrids\Migrations
+ * @since   1.2.0
  */
 
 declare(strict_types=1);
 
-namespace FotoGrids\Settings;
+namespace FotoGrids\Migrations;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Settings\Collection_Defaults_Seeder;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -25,14 +26,14 @@ if ( ! defined( 'WPINC' ) ) {
  * replaced with the default. Runs on upgrade and after an import, which can
  * carry values exported by an earlier version.
  *
- * @since 1.1.5
+ * @since 1.2.0
  */
 final class List_Setting_Repair {
 
 	/**
 	 * Run the repair.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return void
 	 */
 	public static function run(): void {
@@ -53,7 +54,7 @@ final class List_Setting_Repair {
 	/**
 	 * Collection defaults whose value is a non-empty list.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return array<string, array<int, mixed>>
 	 */
 	private static function list_defaults(): array {
@@ -74,7 +75,7 @@ final class List_Setting_Repair {
 	/**
 	 * Whether a stored value holds a list.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  mixed $value Stored value.
 	 * @return bool
 	 */
@@ -89,7 +90,7 @@ final class List_Setting_Repair {
 	/**
 	 * Replace non-list values in gallery and album post meta.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  array<string, array<int, mixed>> $defaults List defaults keyed by setting.
 	 * @return int Number of values replaced.
 	 */
@@ -130,7 +131,7 @@ final class List_Setting_Repair {
 	/**
 	 * Store list values in the saved defaults option as arrays.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  array<string, array<int, mixed>> $defaults List defaults keyed by setting.
 	 * @return int Number of values changed.
 	 */
