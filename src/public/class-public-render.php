@@ -66,7 +66,35 @@ class Public_Render {
 		add_shortcode( 'fotogrids_album', array( __CLASS__, 'album_shortcode' ) );
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_scripts' ) );
-		add_action( 'wp', array( __CLASS__, 'bypass_page_cache_for_queried_post' ) );
+
+		if ( function_exists( 'wp_start_template_enhancement_output_buffer' ) ) {
+			add_action( 'wp_before_include_template', array( __CLASS__, 'hold_template_output' ), 1001 );
+		} else {
+			add_filter( 'template_include', array( __CLASS__, 'hold_template_output' ), PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * Buffer the template output when WordPress does not.
+	 *
+	 * Output starts before a collection renders - the page head on a classic
+	 * theme, everything ahead of wp_footer on a block theme - so a header set
+	 * while rendering, such as the page-cache bypass, would arrive after the
+	 * response headers have gone out. WordPress 6.9+ buffers classic-theme
+	 * templates itself; this covers every other case.
+	 *
+	 * @since  1.1.5
+	 * @param  string $template Template path, passed through unchanged.
+	 * @return string
+	 */
+	public static function hold_template_output( $template = '' ) {
+		if ( did_action( 'wp_template_enhancement_output_buffer_started' ) ) {
+			return $template;
+		}
+
+		ob_start();
+
+		return $template;
 	}
 
 	/**
@@ -92,13 +120,13 @@ class Public_Render {
 	 * @since  1.0.0
 	 * @param  array $settings   Gallery settings.
 	 * @param  int   $gallery_id Gallery ID.
-	 * @return bool Whether the bypass was applied.
+	 * @return void
 	 */
-	private static function maybe_bypass_page_cache( array $settings, int $gallery_id ): bool {
+	private static function maybe_bypass_page_cache( array $settings, int $gallery_id ): void {
 		$bypass = Random_Sorter::is_server_randomized( $settings );
 
 		if ( ! apply_filters( Filters_Cache::BYPASS_PAGE_CACHE, $bypass, $settings, $gallery_id ) ) {
-			return false;
+			return;
 		}
 
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
@@ -108,73 +136,6 @@ class Public_Render {
 		if ( ! headers_sent() ) {
 			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
 		}
-
-		return true;
-	}
-
-	/**
-	 * Apply the page-cache bypass before output starts, for the galleries
-	 * the queried post renders.
-	 *
-	 * The bypass applied during rendering arrives after the page head on
-	 * themes that send it before the content, which leaves the
-	 * `Cache-Control` header unsent.
-	 *
-	 * @since  1.1.5
-	 * @return void
-	 */
-	public static function bypass_page_cache_for_queried_post(): void {
-		if ( is_admin() || ! is_singular() ) {
-			return;
-		}
-
-		$post = get_queried_object();
-		if ( ! $post instanceof \WP_Post ) {
-			return;
-		}
-
-		$gallery_ids = self::shortcode_gallery_ids( (string) $post->post_content );
-		if ( 'fotogrids_gallery' === $post->post_type ) {
-			$gallery_ids[] = (int) $post->ID;
-		}
-
-		$gallery_ids = (array) apply_filters( Filters_Page_Builders::GALLERY_IDS, $gallery_ids, $post );
-
-		foreach ( array_unique( array_map( 'absint', $gallery_ids ) ) as $gallery_id ) {
-			$gallery = $gallery_id ? \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id ) : null;
-			if ( ! $gallery || 'publish' !== $gallery->post_status ) {
-				continue;
-			}
-
-			if ( self::maybe_bypass_page_cache( self::get_gallery_settings( $gallery_id ), $gallery_id ) ) {
-				return;
-			}
-		}
-	}
-
-	/**
-	 * IDs of the galleries embedded through `[fotogrids_gallery]` shortcodes.
-	 *
-	 * @since  1.1.5
-	 * @param  string $content Post content.
-	 * @return int[]
-	 */
-	private static function shortcode_gallery_ids( string $content ): array {
-		if ( ! has_shortcode( $content, 'fotogrids_gallery' ) ) {
-			return array();
-		}
-
-		preg_match_all( '/' . get_shortcode_regex( array( 'fotogrids_gallery' ) ) . '/', $content, $matches, PREG_SET_ORDER );
-
-		$ids = array();
-		foreach ( $matches as $match ) {
-			$atts = shortcode_parse_atts( $match[3] );
-			if ( is_array( $atts ) && ! empty( $atts['id'] ) ) {
-				$ids[] = absint( $atts['id'] );
-			}
-		}
-
-		return $ids;
 	}
 
 	/**
