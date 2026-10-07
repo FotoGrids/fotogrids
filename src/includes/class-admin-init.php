@@ -80,6 +80,17 @@ class Admin_Init {
 	}
 
 	/**
+	 * Menu capability for a screen gated through Permission_Check, which
+	 * WordPress's own menu check does not consult.
+	 *
+	 * @param string $capability FotoGrids capability that gates the screen.
+	 * @return string 'read' when granted, 'do_not_allow' otherwise.
+	 */
+	private static function screen_capability( string $capability ): string {
+		return Permissions\Permission_Check::can( $capability ) ? 'read' : 'do_not_allow';
+	}
+
+	/**
 	 * Refuses the top-level Dashboard to users who reach the menu only
 	 * through a post-type capability.
 	 */
@@ -144,7 +155,7 @@ class Admin_Init {
 			'fotogrids',
 			__( 'Library', 'fotogrids' ),
 			__( 'Library', 'fotogrids' ),
-			'manage_fotogrids_library',
+			self::screen_capability( 'manage_fotogrids_library' ),
 			'fotogrids-library',
 			array( __CLASS__, 'library_page' )
 		);
