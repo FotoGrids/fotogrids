@@ -7,9 +7,6 @@ import { apiAnonymous, apiAs } from './support/roles';
  * Who may read gallery data over REST, and what a refusal hands back.
  *
  * readonly: every request reads or is rejected.
- *
- * `test.fail` rows assert what the route should do; they fail until the linked
- * fix lands, then report an unexpected pass.
  */
 
 function route( path: string, query: Record< string, string | number > = {} ) {

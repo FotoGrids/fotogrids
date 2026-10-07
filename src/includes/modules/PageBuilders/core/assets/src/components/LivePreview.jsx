@@ -19,6 +19,7 @@
  *   - restUrl:     string  base rest URL ending in `fotogrids/v1/`
  *   - restNonce:   string
  *   - refreshToken: any    bump to force a re-fetch
+ *   - placementKey: string host element ID, keeps instance IDs unique per placement
  *   - onResponse:  (data) => void  optional, called with the parsed response
  */
 
@@ -38,6 +39,7 @@ const LivePreview = ({
 	onResponse,
 	clickBehavior = false,
 	pagination = false,
+	placementKey = '',
 }) => {
 	const containerRef = useRef(null);
 	const requestSeqRef = useRef(0);
@@ -99,6 +101,7 @@ const LivePreview = ({
 							click_behavior: !!clickBehavior,
 							pagination: !!pagination,
 						},
+						placement_key: placementKey,
 					}),
 				});
 
@@ -156,6 +159,7 @@ const LivePreview = ({
 		onResponse,
 		pagination,
 		clickBehavior,
+		placementKey,
 	]);
 
 	// Wrapper-class strategy:

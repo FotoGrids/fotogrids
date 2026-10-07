@@ -481,8 +481,13 @@ LibraryTableHead.displayName = 'LibraryTableHead';
  * differences (extra columns, create-form fields, inline-edit fields) come in
  * via the `config` prop. Keeping it shared means a bug-fix in one place
  * applies to every tab.
+ *
+ * @param {Object}     props
+ * @param {Object}     props.entityType Entity type descriptor from the registry.
+ * @param {() => void} [props.onChange] Called after an entry is created, saved,
+ *                                      deleted, merged or recounted.
  */
-const LibraryTabBase = ({ entityType }) => {
+const LibraryTabBase = ({ entityType, onChange }) => {
 	const library = window.fotogridsLibrary || {};
 	const restBase = library.restBase || 'fotogrids/v1/library';
 	const canManage = Boolean(library.canManage);
@@ -673,6 +678,7 @@ const LibraryTabBase = ({ entityType }) => {
 					prev.map((it) => (it.id === editingId ? updated : it))
 				);
 				cancelEdit();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -709,6 +715,7 @@ const LibraryTabBase = ({ entityType }) => {
 		restBase,
 		cancelEdit,
 		flashNotice,
+		onChange,
 	]);
 
 	const requestDelete = useCallback((item) => {
@@ -736,6 +743,7 @@ const LibraryTabBase = ({ entityType }) => {
 				setItems((prev) => prev.filter((it) => it.id !== id));
 				setTotal((t) => Math.max(0, t - 1));
 				cancelDelete();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -769,6 +777,7 @@ const LibraryTabBase = ({ entityType }) => {
 		restBase,
 		cancelDelete,
 		flashNotice,
+		onChange,
 	]);
 
 	const confirmBulkDelete = () => {
@@ -784,6 +793,7 @@ const LibraryTabBase = ({ entityType }) => {
 		})
 			.then((response) => {
 				loadList();
+				onChange?.();
 				setBulkConfirmOpen(false);
 				const deleted = response.deleted || 0;
 				flashNotice(
@@ -865,6 +875,7 @@ const LibraryTabBase = ({ entityType }) => {
 			.then((created) => {
 				setCreateOpen(false);
 				loadList();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -899,6 +910,7 @@ const LibraryTabBase = ({ entityType }) => {
 			data: { target_id: targetId, source_ids: sourceIds },
 		}).then((response) => {
 			loadList();
+			onChange?.();
 			setMergeOpen(false);
 			const merged = response.merged || 0;
 			const typeLabel = (
@@ -946,6 +958,7 @@ const LibraryTabBase = ({ entityType }) => {
 		})
 			.then((response) => {
 				loadList();
+				onChange?.();
 				const touched = response.touched || 0;
 				flashNotice(
 					'success',

@@ -26,6 +26,7 @@
 			"@visual"
 		],
 		"src/public/render/lightbox/**": "@lightbox",
+		"src/includes/exif/**": "@lightbox",
 		"src/public/render/gates/**": "@gate",
 		"src/public/render/filters/**": "*",
 		"src/includes/rest/**": "@api",
