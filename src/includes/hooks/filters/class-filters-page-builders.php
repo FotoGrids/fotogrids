@@ -43,6 +43,21 @@ final class Filters_Page_Builders {
 	public const HAS_CONTENT = 'fotogrids/page_builders/has_content';
 
 	/**
+	 * IDs of the galleries a post renders, read before the page is output.
+	 *
+	 * Lets the page-cache bypass reach the response headers before a theme
+	 * starts sending the page. Default detection reads `[fotogrids_gallery]`
+	 * shortcodes in `$post->post_content`, plus the post itself on a gallery
+	 * view page. Builder sub-modules add the galleries their own content
+	 * holds.
+	 *
+	 * @since 1.1.5
+	 * @param int[]    $gallery_ids Gallery IDs found so far.
+	 * @param \WP_Post $post        The queried post.
+	 */
+	public const GALLERY_IDS = 'fotogrids/page_builders/gallery_ids';
+
+	/**
 	 * Lets Pro and third parties mutate (or add fields to) a picker
 	 * item before it's returned by the shared `/picker/items` REST
 	 * endpoint. Common use: append a Pro Stats "Views" column.

@@ -114,6 +114,7 @@ final class Module {
 		// stylesheet). Mirrors the Elementor sub-module's hook into the
 		// same filter; keeps Public_Render free of per-builder branches.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_gutenberg' ), 10, 2 );
+		add_filter( Filters_Page_Builders::GALLERY_IDS, array( self::class, 'gallery_ids_in_blocks' ), 10, 2 );
 	}
 
 	/**
@@ -138,6 +139,34 @@ final class Module {
 			return true;
 		}
 		return $detected;
+	}
+
+	/**
+	 * Filter callback: add the galleries held by FotoGrids gallery blocks
+	 * in a post's block tree.
+	 *
+	 * @since 1.1.5
+	 * @param int[]    $gallery_ids Gallery IDs found so far.
+	 * @param \WP_Post $post        The queried post.
+	 * @return int[]
+	 */
+	public static function gallery_ids_in_blocks( array $gallery_ids, \WP_Post $post ): array {
+		if ( ! has_block( 'fotogrids/gallery', $post ) ) {
+			return $gallery_ids;
+		}
+
+		$blocks = parse_blocks( $post->post_content );
+		while ( $blocks ) {
+			$block = array_shift( $blocks );
+			if ( 'fotogrids/gallery' === $block['blockName'] && ! empty( $block['attrs']['galleryId'] ) ) {
+				$gallery_ids[] = absint( $block['attrs']['galleryId'] );
+			}
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				array_push( $blocks, ...$block['innerBlocks'] );
+			}
+		}
+
+		return $gallery_ids;
 	}
 
 	/**
