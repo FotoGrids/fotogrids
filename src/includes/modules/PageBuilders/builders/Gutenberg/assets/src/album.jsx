@@ -78,7 +78,7 @@ const LayoutModePanel = ({ layoutMode, editUrl }) => {
 	);
 };
 
-const Edit = ({ attributes, setAttributes, isSelected }) => {
+const Edit = ({ attributes, setAttributes, isSelected, clientId }) => {
 	const {
 		albumId,
 		align,
@@ -250,6 +250,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					)}
 					<LivePreview
 						kind="album"
+						placementKey={clientId}
 						id={albumId}
 						restUrl={restUrl}
 						restNonce={restNonce}

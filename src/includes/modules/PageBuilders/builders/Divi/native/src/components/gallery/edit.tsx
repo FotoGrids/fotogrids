@@ -88,6 +88,7 @@ const FotoGridsGalleryEdit = (
 			body: JSON.stringify({
 				version: 2,
 				preview_options: { click_behavior: clickOn, pagination: pagOn },
+				placement_key: id ?? '',
 			}),
 			signal: abortRef.current.signal,
 		})
@@ -134,7 +135,7 @@ const FotoGridsGalleryEdit = (
 				abortRef.current.abort();
 			}
 		};
-	}, [galleryId, clickOn, pagOn]);
+	}, [galleryId, clickOn, pagOn, id]);
 
 	// Capture-phase pagination guard: when the pagination toggle is OFF,
 	// the preview wrapper carries `is-fg-pb-pagination-frozen` and we
