@@ -16,9 +16,9 @@
  *          for every slide the lightbox shows.
  *   Share: listens for the document-level `fotogrids:share` event
  *          (dispatched by the Sharing module when a user shares an
- *          item) and fires the share ping. Sharing itself never calls
- *          fetch - the Stats module is the only place that talks to
- *          the REST API.
+ *          item, gallery or album) and fires the share ping. Sharing
+ *          itself never calls fetch - the Stats module is the only
+ *          place that talks to the REST API.
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
@@ -141,38 +141,76 @@
 	 * Handle a fotogrids:share event by sending a share ping. The event
 	 * fires from the Sharing module when the user clicks a share button.
 	 *
-	 * The REST URL comes from the first stats-enabled gallery on the page.
+	 * An item share takes the REST URL from the first stats-enabled
+	 * collection on the page. A gallery or album share is sent only when
+	 * that collection has statistics enabled.
 	 *
 	 * @param {CustomEvent} e
 	 */
 	function trackShare(e) {
 		const detail = e && e.detail;
-		if (!detail || !detail.itemId || !detail.network) {
+		if (!detail || !detail.network) {
 			return;
 		}
 
-		// Any stats-enabled gallery supplies the restUrl.
-		const anyGallery = document.querySelector(
-			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
+		const objectType = detail.objectType || 'item';
+		const objectId = parseInt(
+			objectType === 'item' ? detail.itemId : detail.objectId,
+			10
 		);
-		if (!anyGallery) {
+		if (!objectId) {
 			return;
 		}
-		const cfg = readConfig(anyGallery);
+
+		const cfg =
+			objectType === 'item'
+				? firstConfig()
+				: configFor(objectType, objectId);
 		if (!cfg) {
 			return;
 		}
 
-		const itemId = parseInt(detail.itemId, 10);
-		if (!itemId) {
-			return;
-		}
-
 		ping(cfg.restUrl + 'stats/share', {
-			object_type: 'item',
-			object_id: itemId,
+			object_type: objectType,
+			object_id: objectId,
 			network: detail.network,
 		});
+	}
+
+	/**
+	 * Stats config of the first stats-enabled collection on the page.
+	 *
+	 * @returns {Object|null}
+	 */
+	function firstConfig() {
+		const el = document.querySelector(
+			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
+		);
+		return el ? readConfig(el) : null;
+	}
+
+	/**
+	 * Stats config of the collection wrapper for one gallery or album.
+	 *
+	 * @param {string} objectType 'gallery' or 'album'.
+	 * @param {number} objectId
+	 * @returns {Object|null}
+	 */
+	function configFor(objectType, objectId) {
+		const els = document.querySelectorAll(
+			'.fotogrids-collection[data-fg-stats]'
+		);
+		for (let i = 0; i < els.length; i++) {
+			const cfg = readConfig(els[i]);
+			if (
+				cfg &&
+				cfg.objectType === objectType &&
+				parseInt(cfg.objectId, 10) === objectId
+			) {
+				return cfg;
+			}
+		}
+		return null;
 	}
 
 	function init() {
