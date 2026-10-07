@@ -79,22 +79,21 @@ class Public_Render {
 	}
 
 	/**
-	 * Opt the current page out of host, page-builder and CDN caching when a
-	 * randomly-sorted gallery is set to randomize on the server.
+	 * Opt the current page out of host, page-builder and CDN caching when the
+	 * fotogrids/cache/bypass_page_cache filter asks for it.
 	 *
-	 * The other random_mode values keep the page cacheable and resolve in the
-	 * browser, so this does nothing for them. Server mode promises a new order
-	 * per request, which only holds if nothing downstream stores the response.
-	 * The fotogrids/cache/bypass_page_cache filter has the final say either
-	 * way; it covers only the caches FotoGrids does not own, so it cannot
-	 * re-enable the render cache that should_cache() already skipped.
+	 * The filter starts from true for random sort in server mode, and the
+	 * render pipeline turns it on for any gallery with an active gate, whose
+	 * output depends on the visitor. It covers only the caches FotoGrids does
+	 * not own, so it cannot re-enable the render cache that should_cache()
+	 * already skipped.
 	 *
 	 * @since  1.0.0
 	 * @param  array $settings   Gallery settings.
 	 * @param  int   $gallery_id Gallery ID.
 	 * @return void
 	 */
-	private static function maybe_bypass_page_cache_for_random( array $settings, int $gallery_id ): void {
+	private static function maybe_bypass_page_cache( array $settings, int $gallery_id ): void {
 		$bypass = Random_Sorter::is_server_randomized( $settings );
 
 		if ( ! apply_filters( Filters_Cache::BYPASS_PAGE_CACHE, $bypass, $settings, $gallery_id ) ) {
@@ -416,7 +415,7 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
 		}
 
-		self::maybe_bypass_page_cache_for_random( $settings, $gallery_id );
+		self::maybe_bypass_page_cache( $settings, $gallery_id );
 
 		$source = Request_Source::SHORTCODE;
 		if ( Request_Source::BLOCK === $atts['_source'] ) {
