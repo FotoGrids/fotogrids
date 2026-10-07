@@ -1440,12 +1440,17 @@ class FotoGridsLightbox {
 		const randomSeed = parseInt(gEl.dataset.fgRandomSeed || '0', 10);
 		const filters = readActiveFilters(gEl);
 
+		const headers = {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': nonce,
+		};
+		if (gEl.dataset.fgUnlockToken) {
+			headers['X-FotoGrids-Unlock'] = gEl.dataset.fgUnlockToken;
+		}
+
 		const promise = fetch(url, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': nonce,
-			},
+			headers,
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
@@ -3007,6 +3012,10 @@ class FotoGridsLightbox {
 		if (nonce) {
 			headers['X-WP-Nonce'] = nonce;
 		}
+		const unlockToken = this.galleryEl?.dataset.fgUnlockToken;
+		if (unlockToken) {
+			headers['X-FotoGrids-Unlock'] = unlockToken;
+		}
 
 		fetch(url, {
 			credentials: 'same-origin',
@@ -4011,12 +4020,6 @@ class FotoGridsLightboxInit {
 			const items = collectItems(galleryEl);
 			const index = items.findIndex((item) => item.triggerEl === trigger);
 			lb.open(galleryEl, index >= 0 ? index : 0);
-		});
-
-		galleryEl.querySelectorAll('.fg-item').forEach((figure) => {
-			if (!figure.hasAttribute('tabindex')) {
-				figure.setAttribute('tabindex', '0');
-			}
 		});
 	}
 }
