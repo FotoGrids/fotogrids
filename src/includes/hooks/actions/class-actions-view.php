@@ -96,12 +96,4 @@ final class Actions_View {
 	 * @param \WP_Post $post Post being viewed.
 	 */
 	public const INTEGRATED_AFTER_GALLERY = 'fotogrids/view/integrated/after_gallery';
-
-	/**
-	 * Fires after a view page render is tracked in the stats table.
-	 *
-	 * @since 1.0.0
-	 * @param \WP_Post $post Post that was viewed.
-	 */
-	public const TRACKED = 'fotogrids/view/tracked';
 }

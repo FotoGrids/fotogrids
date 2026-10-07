@@ -405,7 +405,7 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' not found.</div>';
 		}
 
-		if ( 'publish' !== $gallery->post_status ) {
+		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'read_post', $gallery_id ) ) {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' is not published (status: ' . esc_html( $gallery->post_status ) . ').</div>';
 		}
 
@@ -543,8 +543,7 @@ class Public_Render {
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
 
-		// Statistics count published albums only.
-		if ( 'publish' !== $album->post_status ) {
+		if ( ! in_array( $album->post_status, array( 'publish', 'private' ), true ) ) {
 			$album_settings['enable_statistics'] = false;
 		}
 

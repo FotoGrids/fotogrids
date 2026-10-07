@@ -8,7 +8,6 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
-use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Responsive_Var;
@@ -87,11 +86,13 @@ class Renderer {
 	/**
 	 * Whether the collection is being previewed as a draft by an editor.
 	 *
+	 * Published and private collections render as normal view pages.
+	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	public function is_draft_preview(): bool {
-		return 'publish' !== $this->post->post_status;
+		return ! in_array( $this->post->post_status, array( 'publish', 'private' ), true );
 	}
 
 	/**
@@ -955,30 +956,5 @@ class Renderer {
 			FOTOGRIDS_VERSION,
 			true
 		);
-	}
-
-	/**
-	 * Record a view against the collection's statistics.
-	 *
-	 * Draft previews are not counted.
-	 *
-	 * @since 1.0.0
-	 * @return void
-	 */
-	public function track_view(): void {
-		if ( $this->is_draft_preview() ) {
-			return;
-		}
-
-		$object_type = $this->is_album() ? 'album' : 'gallery';
-		\FotoGrids\Statistics::increment( $object_type, (int) $this->post->ID, 'views' );
-
-		/**
-		 * Fires after a view page visit is recorded.
-		 *
-		 * @since 1.0.0
-		 * @param \WP_Post $post
-		 */
-		do_action( Actions_View::TRACKED, $this->post );
 	}
 }
