@@ -1,6 +1,6 @@
 <?php
 /**
- * One-time repair of list settings stored as a single value.
+ * Repair of list settings stored as a single value.
  *
  * @package FotoGrids\Settings
  * @since   1.1.5
@@ -22,7 +22,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * A list setting is any setting whose default is a non-empty list. Its admin
  * control always saves a JSON array, so a stored value that is not one is
- * replaced with the default.
+ * replaced with the default. Runs on upgrade and after an import, which can
+ * carry values exported by an earlier version.
  *
  * @since 1.1.5
  */
