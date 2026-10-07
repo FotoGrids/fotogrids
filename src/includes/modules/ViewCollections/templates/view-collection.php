@@ -21,6 +21,7 @@ if ( ! $fotogrids_post instanceof \WP_Post ) {
 
 $fotogrids_view = Renderer::for_post( $fotogrids_post );
 $fotogrids_view->enqueue_assets();
+$fotogrids_view->track_view();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>

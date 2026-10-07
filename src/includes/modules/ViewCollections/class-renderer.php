@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Responsive_Var;
@@ -956,5 +957,29 @@ class Renderer {
 			FOTOGRIDS_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Announce a view page visit.
+	 *
+	 * The view itself is recorded by the Stats feature's view request, so
+	 * it follows the collection's Enable Statistics Tracking setting. Draft
+	 * previews are not announced.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function track_view(): void {
+		if ( $this->is_draft_preview() ) {
+			return;
+		}
+
+		/**
+		 * Fires when a published or private collection's view page is visited.
+		 *
+		 * @since 1.0.0
+		 * @param \WP_Post $post
+		 */
+		do_action( Actions_View::TRACKED, $this->post );
 	}
 }

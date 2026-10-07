@@ -57,6 +57,13 @@ class Integrated_Renderer {
 	private static int $enqueued_for = 0;
 
 	/**
+	 * Per-request cache: posts whose view stat is already recorded.
+	 *
+	 * @var int 0 when not yet tracked, post id when tracked.
+	 */
+	private static int $tracked_for = 0;
+
+	/**
 	 * Register all the WordPress hooks.
 	 *
 	 * Called once from Module::init() (on every request, not gated by mode).
@@ -78,6 +85,7 @@ class Integrated_Renderer {
 		add_action( 'wp_head', array( __CLASS__, 'emit_head_meta' ), 5 );
 		add_filter( 'body_class', array( __CLASS__, 'filter_body_classes' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'track_view' ), 20 );
 
 		// Five behavioural toggles.
 		add_filter( 'post_thumbnail_html', array( __CLASS__, 'maybe_hide_featured_image' ), 10, 2 );
@@ -389,6 +397,34 @@ class Integrated_Renderer {
 		self::$enqueued_for = (int) $post->ID;
 
 		Renderer::for_post( $post )->enqueue_assets();
+	}
+
+	/**
+	 * Record a view against the collection's statistics in integrated mode.
+	 *
+	 * `template_redirect` fires after the query but before output starts,
+	 * which is exactly when the standalone shell would call track_view().
+	 * Idempotency-guarded against the same request triggering twice.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function track_view(): void {
+		if ( ! self::should_run() ) {
+			return;
+		}
+
+		$post = get_queried_object();
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		if ( self::$tracked_for === (int) $post->ID ) {
+			return;
+		}
+		self::$tracked_for = (int) $post->ID;
+
+		Renderer::for_post( $post )->track_view();
 	}
 
 	/**

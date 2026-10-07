@@ -96,4 +96,12 @@ final class Actions_View {
 	 * @param \WP_Post $post Post being viewed.
 	 */
 	public const INTEGRATED_AFTER_GALLERY = 'fotogrids/view/integrated/after_gallery';
+
+	/**
+	 * Fires when a published or private collection's view page is visited.
+	 *
+	 * @since 1.0.0
+	 * @param \WP_Post $post Post that was viewed.
+	 */
+	public const TRACKED = 'fotogrids/view/tracked';
 }

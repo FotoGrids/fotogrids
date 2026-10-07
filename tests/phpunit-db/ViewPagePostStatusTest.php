@@ -9,6 +9,7 @@
  */
 
 use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Modules\ViewCollections\Renderer;
 use FotoGrids\Public_Render;
@@ -103,6 +104,32 @@ class ViewPagePostStatusTest extends WP_UnitTestCase {
 
 			$this->assertStringContainsString( 'data-fg-album-id="' . $album . '"', $html, $status );
 			$this->assertSame( $has_stats, str_contains( $html, 'data-fg-stats' ), $status );
+		}
+	}
+
+	public function test_track_view_fires_the_tracked_action_without_writing_a_view(): void {
+		global $wpdb;
+
+		foreach ( array(
+			'private' => 1,
+			'draft'   => 0,
+		) as $status => $fired ) {
+			$gallery = $this->collection( 'fotogrids_gallery', $status );
+			$before  = did_action( Actions_View::TRACKED );
+
+			Renderer::for_post( get_post( $gallery ) )->track_view();
+
+			$this->assertSame( $fired, did_action( Actions_View::TRACKED ) - $before, $status );
+			$this->assertSame(
+				0,
+				(int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT COUNT(*) FROM {$wpdb->prefix}fotogrids_statistics WHERE object_type = 'gallery' AND object_id = %d",
+						$gallery
+					)
+				),
+				$status
+			);
 		}
 	}
 }
