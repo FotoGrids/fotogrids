@@ -17,7 +17,7 @@ class Register_Metadata_Routes {
 	/**
 	 * Register all metadata-related REST API routes
 	 *
-	 * Registers endpoints for tags, people, locations, and item metadata.
+	 * Registers endpoints for tags, people, locations, and reading item metadata.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -145,47 +145,6 @@ class Register_Metadata_Routes {
 						'id' => array(
 							'required'          => true,
 							'sanitize_callback' => 'absint',
-						),
-					),
-					'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),
-				),
-				array(
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => array( '\FotoGrids\REST\Metadata\Metadata_Data', 'save_item_metadata' ),
-					'args'                => array(
-						'id'        => array(
-							'required'          => true,
-							'sanitize_callback' => 'absint',
-						),
-						'tags'      => array(
-							'default' => array(),
-							'type'    => 'array',
-							'items'   => array( 'type' => 'integer' ),
-						),
-						'people'    => array(
-							'default' => array(),
-							'type'    => 'array',
-							'items'   => array(
-								'type'       => 'object',
-								'properties' => array(
-									'id'      => array( 'type' => 'integer' ),
-									'name'    => array( 'type' => 'string' ),
-									'details' => array( 'type' => 'string' ),
-								),
-							),
-						),
-						'locations' => array(
-							'default' => array(),
-							'type'    => 'array',
-							'items'   => array(
-								'type'       => 'object',
-								'properties' => array(
-									'id'        => array( 'type' => 'integer' ),
-									'name'      => array( 'type' => 'string' ),
-									'latitude'  => array( 'type' => array( 'number', 'null' ) ),
-									'longitude' => array( 'type' => array( 'number', 'null' ) ),
-								),
-							),
 						),
 					),
 					'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),

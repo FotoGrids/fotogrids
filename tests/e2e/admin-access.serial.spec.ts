@@ -40,6 +40,16 @@ async function reach(
 	return 403 === response?.status() ? 'refused' : 'served';
 }
 
+/** The same question for a post type's list screen. */
+async function reachList(
+	page: import( '@playwright/test' ).Page,
+	postType: 'fotogrids_gallery' | 'fotogrids_album'
+): Promise< 'served' | 'refused' > {
+	const response = await page.goto( `/wp-admin/edit.php?post_type=${ postType }` );
+
+	return 403 === response?.status() ? 'refused' : 'served';
+}
+
 test.describe( 'an administrator', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
@@ -79,6 +89,10 @@ test.describe( 'an editor', () => {
 
 		expect( await reach( page, 'fotogrids-library' ) ).toBe( 'served' );
 		expect( await reach( page, 'fotogrids-stats' ) ).toBe( 'served' );
+		expect( await reachList( page, 'fotogrids_gallery' ) ).toBe( 'served' );
+		expect( await reachList( page, 'fotogrids_album' ) ).toBe( 'served' );
+
+		expect( await reach( page, 'fotogrids' ) ).toBe( 'refused' );
 
 		expect( await reach( page, 'fotogrids-settings' ) ).toBe( 'refused' );
 		expect( await reach( page, 'fotogrids-tools' ) ).toBe( 'refused' );
@@ -91,8 +105,8 @@ test.describe( 'an author', () => {
 		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 	} );
 
-	// The parent needs a cap an author lacks, so WordPress promotes the first
-	// submenu they can reach, under the plugin's name.
+	// The Dashboard needs a cap an author lacks, so WordPress promotes the
+	// first submenu they can reach, under the plugin's name.
 	test( 'ROLE-03: the promoted menu entry points at Galleries', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		await page.goto( '/wp-admin/' );
 
@@ -101,15 +115,11 @@ test.describe( 'an author', () => {
 		).toHaveAttribute( 'href', /post_type=fotogrids_gallery/ );
 	} );
 
-	test( 'ROLE-03: reaches the gallery list that entry links to', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
-		test.fail(
-			true,
-			'the screen an author is offered answers 403 — FotoGrids/backstage#382'
-		);
+	test( 'ROLE-03: reaches the gallery and album lists, not the Dashboard', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+		expect( await reachList( page, 'fotogrids_gallery' ) ).toBe( 'served' );
+		expect( await reachList( page, 'fotogrids_album' ) ).toBe( 'served' );
 
-		const response = await page.goto( '/wp-admin/edit.php?post_type=fotogrids_gallery' );
-
-		expect( response?.status() ).toBe( 200 );
+		expect( await reach( page, 'fotogrids' ) ).toBe( 'refused' );
 	} );
 
 	test( 'ROLE-04: cannot open a gallery someone else owns', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {

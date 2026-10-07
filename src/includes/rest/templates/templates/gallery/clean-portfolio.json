@@ -22,7 +22,6 @@
     },
     "hover_effect": "spotlight",
     "item_click_behavior": "lightbox",
-    "captions": true,
     "caption_placement": "overlay",
     "caption_title_source": "title"
   }

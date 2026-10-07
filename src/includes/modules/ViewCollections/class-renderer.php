@@ -448,7 +448,7 @@ class Renderer {
 		$title = (string) get_the_title( $this->post );
 
 		if ( $this->is_album() ) {
-			$count = count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) );
+			$count = count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) );
 			if ( $count <= 0 ) {
 				return '';
 			}
@@ -732,7 +732,7 @@ class Renderer {
 	 */
 	public function header_html(): string {
 		$count = $this->is_album()
-			? count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) )
+			? count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) )
 			: \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
 
 		$meta_label = $this->is_album()

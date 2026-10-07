@@ -12,7 +12,6 @@
     "layout": "featured-item",
     "featured_image_side": "right",
     "featured_thumbs_count": 8,
-    "captions": true,
     "item_click_behavior": "lightbox"
   }
 }

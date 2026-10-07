@@ -6,9 +6,8 @@
 # know would schedule an event that never fires.
 #
 # The uninstaller clears the same events before it checks whether data may be
-# deleted, but a delete reaches that code only after a deactivation that already
-# cleared them, so there is nothing left to assert there. Why a delete can run
-# no plugin code at all is life-09's subject.
+# deleted. The delete that follows a deactivation which ran no plugin code, and
+# so left them scheduled, is in life-09.
 
 scratch_install life10
 

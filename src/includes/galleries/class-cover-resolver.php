@@ -276,7 +276,7 @@ final class Cover_Resolver {
 			return $featured;
 		}
 
-		$galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id );
+		$galleries = Gallery_Album_Relations::get_visible_galleries_for_album( $album_id );
 		if ( empty( $galleries ) ) {
 			return 0;
 		}
@@ -389,7 +389,7 @@ final class Cover_Resolver {
 			}
 		}
 
-		$galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id );
+		$galleries = Gallery_Album_Relations::get_visible_galleries_for_album( $album_id );
 		if ( empty( $galleries ) ) {
 			return $none;
 		}

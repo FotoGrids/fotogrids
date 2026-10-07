@@ -29,6 +29,7 @@ const AREA_TAGS = [
 	'@lifecycle',
 	'@permissions',
 	'@settings',
+	'@visual',
 ];
 
 /**
@@ -103,7 +104,7 @@ for ( const tag of AREA_TAGS ) {
 
 const routed = new Set(
 	loadMap()
-		.map( ( rule ) => rule.tag )
+		.flatMap( ( rule ) => rule.tags )
 		.filter( ( tag ) => EVERYTHING !== tag )
 );
 

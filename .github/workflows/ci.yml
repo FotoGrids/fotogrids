@@ -95,8 +95,8 @@ jobs:
 
   # ---------------------------------------------------------------------------
   # PHPUnit: WordPress-independent unit tests across the supported PHP range.
-  # The current suite is isolated (no WP harness, no DB). When DB-backed WP
-  # tests are added, give them their own job with a MySQL service container.
+  # The isolated suite: no WP harness, no DB. The DB-backed suite is the
+  # phpunit-db job below.
   # ---------------------------------------------------------------------------
   phpunit:
     name: PHPUnit (${{ matrix.php }})
@@ -129,6 +129,80 @@ jobs:
 
       - name: Run PHPUnit
         run: composer test:php
+
+  # ---------------------------------------------------------------------------
+  # The DB-backed suite: real WordPress, real $wpdb, real capabilities.
+  # ---------------------------------------------------------------------------
+  phpunit-db:
+    name: PHPUnit DB (${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.4', '8.1', '8.3' ]
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: fotogrids_phpunit
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+
+    env:
+      FG_TESTS_DB_HOST: 127.0.0.1
+      FG_TESTS_DB_NAME: fotogrids_phpunit
+      FG_TESTS_DB_USER: root
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, gd, exif, zip, mbstring
+          tools: composer
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v6
+        with:
+          path: vendor
+          key: composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ matrix.php }}-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Build and stage plugin
+        # The staged copy must be a directory named fotogrids: Freemius derives
+        # WP_FS__DIR from the plugin directory's real name.
+        run: |
+          npm run build:dev
+          rsync -a --delete --exclude fotogrids/ dist/ dist/fotogrids/
+
+      - name: Cache WordPress and the core test includes
+        uses: actions/cache@v6
+        with:
+          path: tests/phpunit-db/.wp
+          key: wp-tests-${{ hashFiles('tests/phpunit-db/install-wp.sh') }}
+
+      - name: Install WordPress and the core test includes
+        run: ./tests/phpunit-db/install-wp.sh
+
+      - name: Run the DB-backed suite
+        run: composer test:php:db
 
   # ---------------------------------------------------------------------------
   # Build verification: a clean webpack production build must succeed.
