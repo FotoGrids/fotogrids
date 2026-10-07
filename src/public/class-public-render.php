@@ -75,13 +75,8 @@ class Public_Render {
 	}
 
 	/**
-	 * Buffer the template output when WordPress does not.
-	 *
-	 * Output starts before a collection renders - the page head on a classic
-	 * theme, everything ahead of wp_footer on a block theme - so a header set
-	 * while rendering, such as the page-cache bypass, would arrive after the
-	 * response headers have gone out. WordPress 6.9+ buffers classic-theme
-	 * templates itself; this covers every other case.
+	 * Buffer the template output when WordPress does not, so headers set
+	 * while a collection renders still reach the response.
 	 *
 	 * @since  1.1.5
 	 * @return void
@@ -95,8 +90,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Start the template output buffer from template_include, on WordPress
-	 * versions without the wp_before_include_template action.
+	 * template_include callback for WordPress before 6.9.
 	 *
 	 * @since  1.1.5
 	 * @param  string $template Template path, passed through unchanged.
@@ -121,12 +115,6 @@ class Public_Render {
 	/**
 	 * Opt the current page out of host, page-builder and CDN caching when the
 	 * fotogrids/cache/bypass_page_cache filter asks for it.
-	 *
-	 * The filter starts from true for random sort in server mode, and the
-	 * render pipeline turns it on for any gallery with an active gate, whose
-	 * output depends on the visitor. It covers only the caches FotoGrids does
-	 * not own, so it cannot re-enable the render cache that should_cache()
-	 * already skipped.
 	 *
 	 * @since  1.0.0
 	 * @param  array $settings   Gallery settings.
