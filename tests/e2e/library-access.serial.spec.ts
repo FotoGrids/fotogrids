@@ -5,9 +5,10 @@ import type { Role } from './support/roles';
 import { restoreRoles, snapshotRoles } from './support/site';
 
 /**
- * LIB-01 to LIB-08. Who is shown the Library screen and who can open it, when
+ * LIB-01 to LIB-09. Who is shown the Library screen and who can open it, when
  * access comes from the fotogrids/permissions/check filter, from a role's
- * capabilities, or from the manage_fotogrids fallback.
+ * capabilities, or from the manage_fotogrids fallback. LIB-09 covers the
+ * other screens a role can hold on its own, Statistics and Settings.
  *
  * Serial: installs a mu-plugin, edits roles and creates a user.
  */
@@ -56,7 +57,7 @@ async function follow( page: Page, click: () => Promise< void > ): Promise< Resp
 }
 
 async function submenu( page: Page ): Promise< string[] > {
-	await page.goto( '/wp-admin/' );
+	await page.goto( '/wp-admin/profile.php' );
 	return fotogridsMenu( page ).locator( '.wp-submenu a' ).allInnerTexts();
 }
 
@@ -71,7 +72,7 @@ async function expectLibrary( page: Page, response: Response ) {
 }
 
 async function openLibraryFromMenu( page: Page ): Promise< Response > {
-	await page.goto( '/wp-admin/' );
+	await page.goto( '/wp-admin/profile.php' );
 	const menu = fotogridsMenu( page );
 	await menu.hover();
 	return follow( page, () =>
@@ -258,4 +259,41 @@ if ( $id ) { wp_delete_user( $id ); }` );
 			await expectLibrary( page, await openLibraryFromMenu( page ) );
 		} );
 	} );
+
+	for ( const [ label, capability, slug ] of [
+		[ 'Statistics', 'view_fotogrids_stats', 'fotogrids-stats' ],
+		[ 'Settings', 'manage_fotogrids_settings', 'fotogrids-settings' ],
+	] as const ) {
+		test.describe( `a contributor given only ${ label }`, () => {
+			test.use( { storageState: storageStateFor( 'contributor' ) } );
+
+			let roles: string;
+
+			test.beforeAll( () => {
+				roles = snapshotRoles();
+				wpEval( `get_role( 'contributor' )->add_cap( '${ capability }' );` );
+			} );
+
+			test.afterAll( () => {
+				restoreRoles( roles );
+			} );
+
+			test( `LIB-09: the menu leads to ${ label } and the Dashboard stays refused`, { tag: [ '@admin', '@permissions' ] }, async ( {
+				page,
+			} ) => {
+				expect( await submenu( page ) ).toEqual( [ label ] );
+
+				const top = fotogridsMenu( page ).locator( 'a.menu-top' );
+				const response = await follow( page, () => top.click() );
+				expect( response.status() ).toBe( 200 );
+				expect( page.url() ).toContain( `page=${ slug }` );
+				await expect(
+					fotogridsMenu( page ).locator( '.wp-submenu li.current a' )
+				).toHaveText( label );
+
+				const dashboard = await page.goto( '/wp-admin/admin.php?page=fotogrids' );
+				expect( dashboard?.status() ).toBe( 403 );
+			} );
+		} );
+	}
 } );
