@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { galleryPage, type Settings } from './support/collections';
-import { fixture } from './support/fixtures';
+import { twelveItems } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 
@@ -23,7 +23,7 @@ function paginated( settings: Settings = {} ): { id: number; url: string } {
 			items_per_page: { desktop: 6, tablet: 6, mobile: 6 },
 			...settings,
 		},
-		fixture< number[] >( 'F-large', 'items' ).slice( 0, 12 )
+		twelveItems()
 	);
 }
 

@@ -1,6 +1,6 @@
 import { test, expect } from './support/test';
 import { galleryPage } from './support/collections';
-import { firstItem, fixture } from './support/fixtures';
+import { firstItem, twelveItems } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 
@@ -70,7 +70,7 @@ test( 'an item added by Load More is one Tab stop, shows focus, and opens on Ent
 			pagination_method: 'load_more',
 			items_per_page: { desktop: 6, tablet: 6, mobile: 6 },
 		},
-		fixture< number[] >( 'F-large', 'items' ).slice( 0, 12 )
+		twelveItems()
 	);
 	const gallery = new GalleryRender( page, id );
 	const lightbox = new Lightbox( page );

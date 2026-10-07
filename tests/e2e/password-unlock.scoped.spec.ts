@@ -1,7 +1,7 @@
 import type { Page, Response } from '@playwright/test';
 import { test, expect } from './support/test';
 import { album, galleryPage, type Settings } from './support/collections';
-import { fixture } from './support/fixtures';
+import { fixture, twelveItems } from './support/fixtures';
 import { wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
@@ -34,7 +34,7 @@ function setPassword( galleryId: number, password: string ): void {
 /** Twelve items, six per page, behind a password that is not remembered. */
 function passwordGallery(
 	settings: Settings = {},
-	items: number[] = fixture< number[] >( 'F-large', 'items' ).slice( 0, 12 )
+	items: number[] = twelveItems()
 ): { id: number; url: string } {
 	const created = galleryPage(
 		{ ...PAGINATED, password_protect: true, password_remember: false, ...settings },
