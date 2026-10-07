@@ -3,7 +3,7 @@
  * Uninstall entry point.
  *
  * @package FotoGrids
- * @since   1.1.5
+ * @since   1.2.0
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {

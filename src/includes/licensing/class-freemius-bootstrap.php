@@ -191,7 +191,7 @@ class Freemius_Bootstrap {
 	 * registers, so that callback is fired here on the per-plugin action
 	 * WordPress would have used. Does nothing when the SDK is not loaded.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return void
 	 */
 	public static function report_uninstall(): void {
