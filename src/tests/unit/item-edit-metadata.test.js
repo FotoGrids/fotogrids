@@ -134,6 +134,37 @@ describe('ItemEditModal metadata', () => {
 		unmount();
 	});
 
+	it('adds no chip and shows the server message when creating is refused', async () => {
+		const { unmount } = await mount();
+		const message = '"Sunset" is not in the library, and you do not have permission to add it.';
+		window.fotogridsToast = { error: jest.fn() };
+		const answer = global.fetch.getMockImplementation();
+		global.fetch.mockImplementation((url, options = {}) =>
+			options.method === 'POST'
+				? Promise.resolve({
+						ok: false,
+						json: () =>
+							Promise.resolve({
+								code: 'fotogrids_library_forbidden',
+								message,
+								data: { status: 403 },
+							}),
+				  })
+				: answer(url, options)
+		);
+
+		const input = document.body.querySelector('.fotogrids-item-edit-metadata-input input');
+		typeInto(input, 'Sunset');
+		pressEnter(input);
+		await flush();
+
+		expect(tagChips()).toHaveLength(1);
+		expect(window.fotogridsToast.error).toHaveBeenCalledWith(message);
+		expect(input.value).toBe('Sunset');
+		delete window.fotogridsToast;
+		unmount();
+	});
+
 	it('suggests a tag found by searching as the user types', async () => {
 		const { unmount } = await mount();
 

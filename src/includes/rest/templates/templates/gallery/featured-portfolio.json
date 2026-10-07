@@ -12,7 +12,6 @@
     "layout": "featured-item",
     "featured_image_side": "left",
     "featured_thumbs_count": 6,
-    "captions": true,
     "caption_title_source": "title",
     "item_click_behavior": "lightbox"
   }

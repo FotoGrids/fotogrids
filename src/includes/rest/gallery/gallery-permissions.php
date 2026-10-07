@@ -48,9 +48,9 @@ class Gallery_Permissions {
 	/**
 	 * Decides whether the current visitor may see a gallery's items.
 	 *
-	 * The gallery must be published, or editable by the current user, and
-	 * every gate that would run on a public render (password, view
-	 * permissions, and any add-on gates) must pass.
+	 * A user who can edit the gallery always may. Anyone else needs the
+	 * gallery to be published and every gate that would run on a public
+	 * render (password, view permissions, and any add-on gates) to pass.
 	 *
 	 * @since 1.1.2
 	 * @param int $gallery_id Gallery post ID.
@@ -66,7 +66,11 @@ class Gallery_Permissions {
 			);
 		}
 
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
+		if ( current_user_can( 'edit_post', $gallery_id ) ) {
+			return true;
+		}
+
+		if ( 'publish' !== $gallery->post_status ) {
 			return new \WP_Error(
 				'gallery_not_published',
 				__( 'Gallery is not published.', 'fotogrids' ),

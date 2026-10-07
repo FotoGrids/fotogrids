@@ -8,7 +8,6 @@ import VideoEmbedModal from './VideoEmbedModal.jsx';
 import FolderImportModal from './FolderImportModal.jsx';
 import ZipImportModal from './ZipImportModal.jsx';
 import { Confirm } from './shared/Modal';
-import Checkbox from './shared/Checkbox';
 import DangerZone from './shared/DangerZone.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
 import MetaboxHeader from './gallery-metabox/components/MetaboxHeader.jsx';
@@ -48,8 +47,6 @@ const GalleryMetabox = ({
 	const [showZipImportModal, setShowZipImportModal] = useState(false);
 	const [editingEmbed, setEditingEmbed] = useState(null);
 	const [showClearAllModal, setShowClearAllModal] = useState(false);
-	const [clearAllDeleteCustomData, setClearAllDeleteCustomData] =
-		useState(false);
 	const [currentItemId, setCurrentItemId] = useState(null);
 	const [currentItemData, setCurrentItemData] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -74,13 +71,11 @@ const GalleryMetabox = ({
 	useItemDragSort({ items, strings, onReorder: reorderItems });
 
 	const openClearAllModal = useCallback(() => {
-		setClearAllDeleteCustomData(false);
 		setShowClearAllModal(true);
 	}, []);
 
 	const closeClearAllModal = useCallback(() => {
 		setShowClearAllModal(false);
-		setClearAllDeleteCustomData(false);
 	}, []);
 
 	// Shared by openItemModal and navigateItem.
@@ -417,13 +412,6 @@ const GalleryMetabox = ({
 					title={strings.removeAllModalWarning}
 					description={strings.removeAllModalBody}
 					icon="trash"
-				/>
-				<Checkbox
-					checked={clearAllDeleteCustomData}
-					onChange={(next) => setClearAllDeleteCustomData(next)}
-					label={strings.removeAllModalDeleteCustomDataLabel}
-					labelStronger
-					description={strings.removeAllModalDeleteCustomDataHelp}
 				/>
 			</Confirm>
 		</div>

@@ -35,14 +35,14 @@ class Items_Data {
 		if ( $gallery_id ) {
 			$gallery_id = (int) $gallery_id;
 
-			if ( 'publish' !== get_post_status( $gallery_id ) && ! current_user_can( 'edit_post', $gallery_id ) ) {
+			if ( true !== \FotoGrids\REST\Gallery\Gallery_Permissions::authorize_gallery_view( $gallery_id ) ) {
 				return self::empty_items_response( $limit, $offset );
 			}
 
 			$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
 		} elseif ( current_user_can( 'edit_posts' ) ) {
 			$gallery_id = 0;
-			$item_ids   = \FotoGrids\Galleries\Gallery_Repository::all_item_ids( array( 'publish', 'future', 'draft', 'pending', 'private' ) );
+			$item_ids   = self::editable_item_ids();
 		} else {
 			return self::empty_items_response( $limit, $offset );
 		}
@@ -81,6 +81,43 @@ class Items_Data {
 				'offset' => $offset,
 			)
 		);
+	}
+
+	/**
+	 * Collect the item IDs of every gallery the current user can edit.
+	 *
+	 * @since 1.2.0
+	 * @return int[] Unique item IDs, newest gallery first.
+	 */
+	private static function editable_item_ids(): array {
+		$gallery_ids = get_posts(
+			array(
+				'post_type'      => 'fotogrids_gallery',
+				'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
+				'fields'         => 'ids',
+				'posts_per_page' => -1,
+				'orderby'        => array(
+					'date' => 'DESC',
+					'ID'   => 'DESC',
+				),
+				'no_found_rows'  => true,
+			)
+		);
+		update_meta_cache( 'post', $gallery_ids );
+
+		$item_ids = array();
+		foreach ( $gallery_ids as $id ) {
+			if ( ! current_user_can( 'edit_post', $id ) ) {
+				continue;
+			}
+			foreach ( \FotoGrids\Galleries\Gallery_Repository::get_item_ids( (int) $id ) as $item_id ) {
+				if ( $item_id > 0 ) {
+					$item_ids[ $item_id ] = true;
+				}
+			}
+		}
+
+		return array_keys( $item_ids );
 	}
 
 	/**
