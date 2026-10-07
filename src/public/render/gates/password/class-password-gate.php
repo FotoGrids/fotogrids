@@ -34,6 +34,10 @@ if ( ! defined( 'WPINC' ) ) {
  * render; if it is present and its HMAC matches the stored ciphertext, the gate
  * passes without any extra DB query.
  *
+ * When the gallery does not remember visitors, no cookie is set. The unlock
+ * response carries a short-lived token instead, which the page sends back in
+ * the X-FotoGrids-Unlock header on its own follow-up requests.
+ *
  * Preview bypass
  * --------------
  * The gate never blocks admin previews ($render_context->meta->is_preview).
@@ -94,9 +98,8 @@ final class Password_Gate implements Gate {
 	/**
 	 * Evaluates whether the current visitor has unlocked this gallery.
 	 *
-	 * Checks the unlock cookie set by POST /gallery/{id}/unlock. If the cookie
-	 * is present and its HMAC matches the current stored ciphertext the gate
-	 * passes. Otherwise it returns the lock screen HTML.
+	 * Passes on a valid unlock cookie or a valid X-FotoGrids-Unlock token, both
+	 * issued by POST /gallery/{id}/unlock. Otherwise returns the lock screen.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
@@ -120,6 +123,11 @@ final class Password_Gate implements Gate {
 					$cookie_val
 				)
 			) {
+				return Gate_Result::pass();
+			}
+
+			$token = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FOTOGRIDS_UNLOCK'] ?? '' ) );
+			if ( '' !== $token && Gallery_Data::verify_unlock_token( $gallery_id, $stored, $token ) ) {
 				return Gate_Result::pass();
 			}
 		}
