@@ -76,10 +76,6 @@ class Admin_Init {
 			}
 		}
 
-		if ( Permissions\Permission_Check::can( 'manage_fotogrids_library' ) ) {
-			return 'read';
-		}
-
 		return 'manage_fotogrids';
 	}
 
