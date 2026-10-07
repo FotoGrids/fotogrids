@@ -11,7 +11,11 @@ const FG_GREEN = '#46b450';
 const FG_YELLOW = '#ffb914';
 const FG_RED = '#f01e32';
 
-const LibraryTagsHeader = ({ entityType, total: externalTotal }) => {
+const LibraryTagsHeader = ({
+	entityType,
+	total: externalTotal,
+	refreshKey,
+}) => {
 	const {
 		topItems,
 		total: fetchedTotal,
@@ -19,6 +23,7 @@ const LibraryTagsHeader = ({ entityType, total: externalTotal }) => {
 	} = useLibraryStats({
 		entitySlug: entityType?.slug || 'tags',
 		limit: 7,
+		refreshKey,
 	});
 
 	// Use the total from parent (already loaded list) when available,

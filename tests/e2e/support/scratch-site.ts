@@ -77,6 +77,10 @@ export class ScratchSite {
 		cpSync( path.join( STATE, 'wp' ), this.dir, { recursive: true } );
 		rmSync( path.join( this.dir, 'wp-config.php' ), { force: true } );
 
+		// The shared install's log came with the copy. Left there, every line
+		// another test or an earlier session wrote counts as this site's.
+		rmSync( path.join( this.dir, 'wp-content', 'debug.log' ), { force: true } );
+
 		// The harness links the plugin into the shared build; a delete through
 		// the link would remove the build itself.
 		const plugin = path.join( this.dir, 'wp-content', 'plugins', 'fotogrids' );
