@@ -70,7 +70,7 @@ class Public_Render {
 		if ( function_exists( 'wp_start_template_enhancement_output_buffer' ) ) {
 			add_action( 'wp_before_include_template', array( __CLASS__, 'hold_template_output' ), 1001 );
 		} else {
-			add_filter( 'template_include', array( __CLASS__, 'hold_template_output' ), PHP_INT_MAX );
+			add_filter( 'template_include', array( __CLASS__, 'hold_template_output_on_include' ), PHP_INT_MAX );
 		}
 	}
 
@@ -84,15 +84,26 @@ class Public_Render {
 	 * templates itself; this covers every other case.
 	 *
 	 * @since  1.1.5
-	 * @param  string $template Template path, passed through unchanged.
-	 * @return string
+	 * @return void
 	 */
-	public static function hold_template_output( $template = '' ) {
+	public static function hold_template_output(): void {
 		if ( did_action( 'wp_template_enhancement_output_buffer_started' ) ) {
-			return $template;
+			return;
 		}
 
 		ob_start();
+	}
+
+	/**
+	 * Start the template output buffer from template_include, on WordPress
+	 * versions without the wp_before_include_template action.
+	 *
+	 * @since  1.1.5
+	 * @param  string $template Template path, passed through unchanged.
+	 * @return string
+	 */
+	public static function hold_template_output_on_include( $template ) {
+		self::hold_template_output();
 
 		return $template;
 	}
