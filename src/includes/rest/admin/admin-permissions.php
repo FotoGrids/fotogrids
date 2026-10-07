@@ -51,7 +51,7 @@ class Admin_Permissions {
 	 *
 	 * Covers both the `album_ids` body param and the `album_id` route param.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param \WP_REST_Request $request Request object.
 	 * @return bool
 	 */
@@ -73,7 +73,7 @@ class Admin_Permissions {
 	 *
 	 * Covers both the `gallery_ids` body param and the `gallery_id` route param.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param \WP_REST_Request $request Request object.
 	 * @return bool
 	 */
@@ -93,7 +93,7 @@ class Admin_Permissions {
 	/**
 	 * Checks that every ID is a post of the given type the user can edit.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param array  $ids       Post IDs.
 	 * @param string $post_type Expected post type.
 	 * @return bool False when the list is empty.

@@ -970,7 +970,7 @@ class Admin_Init {
 	/**
 	 * Returns the albums the current user can edit, ordered by title.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @return \WP_Post[]
 	 */
 	private static function get_editable_albums(): array {
