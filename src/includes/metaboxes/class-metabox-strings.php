@@ -107,19 +107,17 @@ final class Metabox_Strings {
 	 */
 	private static function item_list_strings(): array {
 		return array(
-			'manageItems'                         => __( 'Manage Items', 'fotogrids' ),
-			'previewGallery'                      => __( 'Preview Gallery', 'fotogrids' ),
-			'addNew'                              => __( 'Add New', 'fotogrids' ),
-			'removeAll'                           => __( 'Remove All', 'fotogrids' ),
-			'removeAllItems'                      => __( 'Remove all items', 'fotogrids' ),
-			'removeAllModalTitle'                 => __( 'Remove all gallery items?', 'fotogrids' ),
-			'removeAllModalWarning'               => __( 'This action cannot be undone.', 'fotogrids' ),
-			'removeAllModalBody'                  => __( 'You are about to remove every item from this gallery. The gallery will become empty, and the removed items will no longer appear here.', 'fotogrids' ),
-			'removeAllModalDeleteCustomDataLabel' => __( 'Also delete custom data saved for these items', 'fotogrids' ),
-			'removeAllModalDeleteCustomDataHelp'  => __( 'This includes item-specific FotoGrids data such as custom titles, descriptions, links, captions, alt text overrides, sorting data, tags, filters, and other custom fields. This data will be deleted for these items everywhere they are used in FotoGrids, including other galleries where the same items appear.', 'fotogrids' ),
-			'removeAllModalConfirmPrompt'         => __( 'To confirm, type REMOVE ALL below.', 'fotogrids' ),
-			'removeAllModalConfirmPlaceholder'    => __( 'Type REMOVE ALL', 'fotogrids' ),
-			'bulkEditor'                          => __( 'Bulk Editor', 'fotogrids' ),
+			'manageItems'                      => __( 'Manage Items', 'fotogrids' ),
+			'previewGallery'                   => __( 'Preview Gallery', 'fotogrids' ),
+			'addNew'                           => __( 'Add New', 'fotogrids' ),
+			'removeAll'                        => __( 'Remove All', 'fotogrids' ),
+			'removeAllItems'                   => __( 'Remove all items', 'fotogrids' ),
+			'removeAllModalTitle'              => __( 'Remove all gallery items?', 'fotogrids' ),
+			'removeAllModalWarning'            => __( 'This action cannot be undone.', 'fotogrids' ),
+			'removeAllModalBody'               => __( 'You are about to remove every item from this gallery. The gallery will become empty, and the removed items will no longer appear here.', 'fotogrids' ),
+			'removeAllModalConfirmPrompt'      => __( 'To confirm, type REMOVE ALL below.', 'fotogrids' ),
+			'removeAllModalConfirmPlaceholder' => __( 'Type REMOVE ALL', 'fotogrids' ),
+			'bulkEditor'                       => __( 'Bulk Editor', 'fotogrids' ),
 		);
 	}
 
