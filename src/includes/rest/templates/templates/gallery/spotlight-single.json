@@ -10,7 +10,6 @@
   "thumbnail": "",
   "settings": {
     "layout": "single-item",
-    "captions": true,
     "caption_placement": "bottom",
     "caption_title_source": "title",
     "item_click_behavior": "lightbox"

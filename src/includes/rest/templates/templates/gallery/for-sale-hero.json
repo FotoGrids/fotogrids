@@ -20,7 +20,6 @@
       "tablet": 0,
       "mobile": 0
     },
-    "captions": true,
     "layout_autoplay": false,
     "item_click_behavior": "lightbox"
   }

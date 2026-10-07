@@ -85,6 +85,15 @@ export class GalleryEditor {
 		return this.item( attachmentId ).locator( '.fotogrids-edit-item' );
 	}
 
+	removeAllButton(): Locator {
+		return this.page.locator( '.fotogrids-items-remove-all' );
+	}
+
+	/** The Remove All confirmation, once open. */
+	removeAllDialog(): Locator {
+		return this.page.getByRole( 'dialog', { name: 'Remove all gallery items?' } );
+	}
+
 	addNewMenu(): Locator {
 		return this.page.locator( '.fotogrids-add-new-toggle' );
 	}

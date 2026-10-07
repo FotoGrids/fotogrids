@@ -22,9 +22,14 @@ class Uninstaller {
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall cleanup of custom tables and plugin rows; no core API or object cache applies.
 
 	/**
-	 * Uninstall the plugin completely
+	 * Uninstall the plugin completely.
+	 *
+	 * Called from uninstall.php. The uninstall is reported to Freemius before
+	 * any data is removed.
 	 */
 	public static function uninstall() {
+		\FotoGrids\Licensing\Freemius_Bootstrap::report_uninstall();
+
 		self::clear_scheduled_events();
 
 		if ( ! self::should_delete_data() ) {
@@ -56,7 +61,7 @@ class Uninstaller {
 	 * Runs before the data-deletion check: a scheduled event is not site data,
 	 * and one left in the cron option fires into a plugin that is no longer
 	 * installed. Deactivation clears the same events, so the work left here is
-	 * events stranded by a version that did not.
+	 * events stranded by a deactivation that ran no plugin code.
 	 *
 	 * @since  1.1.2
 	 * @return void
