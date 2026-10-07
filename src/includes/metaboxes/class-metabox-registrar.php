@@ -410,7 +410,7 @@ final class Metabox_Registrar {
 	 * @param int $featured_item_id The gallery's featured attachment ID, or 0.
 	 * @return array<string, mixed>|null Item payload, or null if the attachment no longer exists.
 	 */
-	private static function build_attachment_item_data( int $item_id, int $featured_item_id ): ?array {
+	public static function build_attachment_item_data( int $item_id, int $featured_item_id ): ?array {
 		$attachment = get_post( $item_id );
 		if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
 			return null;

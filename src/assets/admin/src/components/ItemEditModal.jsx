@@ -364,7 +364,9 @@ const ItemEditModal = ({
 
 				setHasChanges(false);
 				setSaving(false);
-				onSaved?.(itemId, { title: formData.title, alt: formData.alt });
+				if (data.item) {
+					onSaved?.(itemId, data.item);
+				}
 
 				if (window.fotogridsToast) {
 					window.fotogridsToast.success(
