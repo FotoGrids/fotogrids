@@ -66,6 +66,40 @@ class Public_Render {
 		add_shortcode( 'fotogrids_album', array( __CLASS__, 'album_shortcode' ) );
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_scripts' ) );
+
+		if ( function_exists( 'wp_start_template_enhancement_output_buffer' ) ) {
+			add_action( 'wp_before_include_template', array( __CLASS__, 'hold_template_output' ), 1001 );
+		} else {
+			add_filter( 'template_include', array( __CLASS__, 'hold_template_output_on_include' ), PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * Buffer the template output when WordPress does not, so headers set
+	 * while a collection renders still reach the response.
+	 *
+	 * @since  1.2.0
+	 * @return void
+	 */
+	public static function hold_template_output(): void {
+		if ( did_action( 'wp_template_enhancement_output_buffer_started' ) ) {
+			return;
+		}
+
+		ob_start();
+	}
+
+	/**
+	 * template_include callback for WordPress before 6.9.
+	 *
+	 * @since  1.2.0
+	 * @param  string $template Template path, passed through unchanged.
+	 * @return string
+	 */
+	public static function hold_template_output_on_include( $template ) {
+		self::hold_template_output();
+
+		return $template;
 	}
 
 	/**
@@ -79,22 +113,15 @@ class Public_Render {
 	}
 
 	/**
-	 * Opt the current page out of host, page-builder and CDN caching when a
-	 * randomly-sorted gallery is set to randomize on the server.
-	 *
-	 * The other random_mode values keep the page cacheable and resolve in the
-	 * browser, so this does nothing for them. Server mode promises a new order
-	 * per request, which only holds if nothing downstream stores the response.
-	 * The fotogrids/cache/bypass_page_cache filter has the final say either
-	 * way; it covers only the caches FotoGrids does not own, so it cannot
-	 * re-enable the render cache that should_cache() already skipped.
+	 * Opt the current page out of host, page-builder and CDN caching when the
+	 * fotogrids/cache/bypass_page_cache filter asks for it.
 	 *
 	 * @since  1.0.0
 	 * @param  array $settings   Gallery settings.
 	 * @param  int   $gallery_id Gallery ID.
 	 * @return void
 	 */
-	private static function maybe_bypass_page_cache_for_random( array $settings, int $gallery_id ): void {
+	private static function maybe_bypass_page_cache( array $settings, int $gallery_id ): void {
 		$bypass = Random_Sorter::is_server_randomized( $settings );
 
 		if ( ! apply_filters( Filters_Cache::BYPASS_PAGE_CACHE, $bypass, $settings, $gallery_id ) ) {
@@ -418,7 +445,7 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
 		}
 
-		self::maybe_bypass_page_cache_for_random( $settings, $gallery_id );
+		self::maybe_bypass_page_cache( $settings, $gallery_id );
 
 		$source = Request_Source::SHORTCODE;
 		if ( Request_Source::BLOCK === $atts['_source'] ) {

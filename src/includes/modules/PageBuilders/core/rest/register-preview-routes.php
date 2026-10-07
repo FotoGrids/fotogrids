@@ -114,6 +114,10 @@ final class Register_Preview_Routes {
 								return is_array( $value ) ? $value : array();
 							},
 						),
+						'placement_key'   => array(
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_key',
+						),
 					),
 				),
 			)
@@ -146,6 +150,10 @@ final class Register_Preview_Routes {
 							'sanitize_callback' => static function ( $value ) {
 								return is_array( $value ) ? $value : array();
 							},
+						),
+						'placement_key'   => array(
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_key',
 						),
 					),
 				),

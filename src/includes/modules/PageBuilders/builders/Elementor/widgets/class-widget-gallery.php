@@ -268,7 +268,8 @@ class Widget_Gallery extends Widget_Base {
 			}
 
 			$preview_options = Preview_Options::normalise( $settings );
-			$html            = Preview_Renderer::render_gallery_html( $gallery_id, $preview_options );
+			$html            = Preview_Renderer::render_gallery_html( $gallery_id, $preview_options, (string) $this->get_id() );
+			$inline_css      = Preview_Renderer::take_ajax_inline_css();
 
 			// Wrap so the editor.js capture-phase pagination guard has a
 			// stable hook to bind to; the class signals "this output
@@ -277,6 +278,9 @@ class Widget_Gallery extends Widget_Base {
 			$fg_markup      = '<div class="fg-pb-elementor-preview' . $pagination_off . '">'
 				. $html
 				. '</div>';
+			if ( '' !== $inline_css ) {
+				echo '<style>' . str_replace( '</', '<\\/', $inline_css ) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS built by the render pipeline from sanitised settings; closing tags are neutralised.
+			}
 			echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 			return;
 		}

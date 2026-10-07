@@ -14,9 +14,11 @@ use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Preview_Options;
 use FotoGrids\Modules\PageBuilders\Preview_Renderer;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Render\Internal\Render_Controller;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -122,7 +124,8 @@ final class Preview_Data {
 
 		$render_context = self::flip_to_preview_context(
 			$render_context,
-			Request_Source::PREVIEW_SAVED
+			Request_Source::PREVIEW_SAVED,
+			(string) $request->get_param( 'placement_key' )
 		);
 
 		$render_result = Render_Controller::factory()->render( $render_context );
@@ -145,18 +148,29 @@ final class Preview_Data {
 	 * @since 1.0.0
 	 * @param \FotoGrids\Render\Api\Render_Context $context
 	 * @param value-of<\FotoGrids\Render\Api\Request_Source::ALL> $source
+	 * @param string $placement_key Builder element ID; empty keeps the counter-based instance ID.
 	 * @return \FotoGrids\Render\Api\Render_Context
 	 */
 	private static function flip_to_preview_context(
 		\FotoGrids\Render\Api\Render_Context $context,
-		string $source
+		string $source,
+		string $placement_key = ''
 	): \FotoGrids\Render\Api\Render_Context {
-		$preview_meta = $context->meta->with(
-			array(
-				'is_preview' => true,
-				'source'     => $source,
-			)
+		$meta_changes = array(
+			'is_preview' => true,
+			'source'     => $source,
 		);
+
+		$collection_id = Collection_Kind::ALBUM === $context->meta->collection_kind
+			? (int) $context->meta->album_id
+			: $context->meta->gallery_id;
+		$placement_id  = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+
+		if ( null !== $placement_id ) {
+			$meta_changes['instance_id'] = $placement_id;
+		}
+
+		$preview_meta = $context->meta->with( $meta_changes );
 
 		$preview_settings = array_merge(
 			$context->settings,
@@ -273,7 +287,8 @@ final class Preview_Data {
 
 		$render_context = self::flip_to_preview_context(
 			$render_context,
-			Request_Source::PREVIEW_SAVED
+			Request_Source::PREVIEW_SAVED,
+			(string) $request->get_param( 'placement_key' )
 		);
 
 		$render_result = Render_Controller::factory()->render( $render_context );
