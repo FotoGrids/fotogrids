@@ -6,14 +6,19 @@ const apiFetch = wp.apiFetch;
  * Fetches top-N library entries sorted by usage_count descending, plus the
  * total entry count. Used by the per-tab header charts.
  *
+ * A new `refreshKey` refetches in place, keeping the current values on
+ * screen until the response arrives.
+ *
  * Returns { topItems, total, loading }.
  * topItems: array of { id, name, usage_count, ... }
  */
-const useLibraryStats = ({ entitySlug, limit = 7 }) => {
+const useLibraryStats = ({ entitySlug, limit = 7, refreshKey = 0 }) => {
 	const [topItems, setTopItems] = useState([]);
 	const [total, setTotal] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const mountedRef = useRef(true);
+	const reqIdRef = useRef(0);
+	const queryRef = useRef('');
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -26,7 +31,12 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 		if (!entitySlug) {
 			return;
 		}
-		setLoading(true);
+		const query = `${entitySlug}|${limit}`;
+		if (query !== queryRef.current) {
+			queryRef.current = query;
+			setLoading(true);
+		}
+		const reqId = ++reqIdRef.current;
 
 		const library = window.fotogridsLibrary || {};
 		const restBase = library.restBase || 'fotogrids/v1/library';
@@ -42,7 +52,7 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 
 		apiFetch({ path: `/${restBase}/${entitySlug}?${params}` })
 			.then((res) => {
-				if (!mountedRef.current) {
+				if (!mountedRef.current || reqId !== reqIdRef.current) {
 					return;
 				}
 				setTopItems(Array.isArray(res.items) ? res.items : []);
@@ -50,12 +60,12 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 				setLoading(false);
 			})
 			.catch(() => {
-				if (!mountedRef.current) {
+				if (!mountedRef.current || reqId !== reqIdRef.current) {
 					return;
 				}
 				setLoading(false);
 			});
-	}, [entitySlug, limit]);
+	}, [entitySlug, limit, refreshKey]);
 
 	return { topItems, total, loading };
 };

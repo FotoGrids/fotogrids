@@ -21,7 +21,11 @@ const FG_BLUE_SOFT = 'rgba(60,70,240,0.08)';
  * projection onto a world bounding box. Precise accuracy is not the goal; it
  * gives an instant at-a-glance sense of where items are clustered.
  */
-const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
+const LibraryLocationsHeader = ({
+	entityType,
+	total: externalTotal,
+	refreshKey,
+}) => {
 	const {
 		topItems,
 		total: fetchedTotal,
@@ -29,6 +33,7 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
 	} = useLibraryStats({
 		entitySlug: entityType?.slug || 'locations',
 		limit: 7,
+		refreshKey,
 	});
 
 	const total = externalTotal != null ? externalTotal : fetchedTotal;
