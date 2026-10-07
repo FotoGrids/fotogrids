@@ -968,9 +968,12 @@ class Admin_Init {
 	}
 
 	/**
-	 * Add bulk actions for galleries
+	 * Returns the albums the current user can edit, ordered by title.
+	 *
+	 * @since 1.1.5
+	 * @return \WP_Post[]
 	 */
-	public static function gallery_bulk_actions( $bulk_actions ) {
+	private static function get_editable_albums(): array {
 		$albums = get_posts(
 			array(
 				'post_type'   => 'fotogrids_album',
@@ -980,6 +983,22 @@ class Admin_Init {
 				'order'       => 'ASC',
 			)
 		);
+
+		return array_values(
+			array_filter(
+				$albums,
+				static function ( $album ) {
+					return current_user_can( 'edit_post', $album->ID );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Add bulk actions for galleries
+	 */
+	public static function gallery_bulk_actions( $bulk_actions ) {
+		$albums = self::get_editable_albums();
 
 		if ( ! empty( $albums ) ) {
 			$bulk_actions['assign_to_album']    = __( 'Assign to Album', 'fotogrids' );
@@ -1025,14 +1044,15 @@ class Admin_Init {
 					break;
 				}
 
-				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== 'fotogrids_album' ) {
+				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== 'fotogrids_album' || ! current_user_can( 'edit_post', $album_id ) ) {
 					$redirect_to = add_query_arg( 'bulk_error', 'invalid_album', $redirect_to );
 					break;
 				}
 
 				foreach ( $post_ids as $post_id ) {
 					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
-						$result = \FotoGrids\Gallery_Album_Relations::add_gallery_to_album( $post_id, $album_id );
+						$result = current_user_can( 'edit_post', $post_id )
+							&& \FotoGrids\Gallery_Album_Relations::add_gallery_to_album( $post_id, $album_id );
 						if ( $result ) {
 							++$processed;
 						} else {
@@ -1054,10 +1074,15 @@ class Admin_Init {
 			case 'remove_from_albums':
 				foreach ( $post_ids as $post_id ) {
 					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
-						$albums        = \FotoGrids\Gallery_Album_Relations::get_albums_for_gallery( $post_id );
+						$albums        = current_user_can( 'edit_post', $post_id )
+							? \FotoGrids\Gallery_Album_Relations::get_albums_for_gallery( $post_id )
+							: array();
 						$removed_count = 0;
 
 						foreach ( $albums as $album ) {
+							if ( ! current_user_can( 'edit_post', $album->ID ) ) {
+								continue;
+							}
 							$result = \FotoGrids\Gallery_Album_Relations::remove_gallery_from_album( $post_id, $album->ID );
 							if ( $result ) {
 								++$removed_count;
@@ -1241,15 +1266,7 @@ class Admin_Init {
 			return;
 		}
 
-		$albums = get_posts(
-			array(
-				'post_type'   => 'fotogrids_album',
-				'numberposts' => -1,
-				'post_status' => array( 'publish', 'draft', 'private' ),
-				'orderby'     => 'title',
-				'order'       => 'ASC',
-			)
-		);
+		$albums = self::get_editable_albums();
 
 		if ( empty( $albums ) ) {
 			return;

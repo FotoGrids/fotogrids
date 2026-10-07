@@ -47,6 +47,39 @@ class Admin_Permissions {
 	}
 
 	/**
+	 * Checks that the user can edit the gallery and every album the request names.
+	 *
+	 * Covers both the `album_ids` body param and the `album_id` route param.
+	 *
+	 * @since 1.1.5
+	 * @param \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_gallery_album_write( $request ) {
+		if ( ! self::check_gallery_edit( $request ) ) {
+			return false;
+		}
+
+		$album_ids = (array) $request->get_param( 'album_ids' );
+		if ( $request->get_param( 'album_id' ) ) {
+			$album_ids[] = $request->get_param( 'album_id' );
+		}
+
+		if ( empty( $album_ids ) ) {
+			return false;
+		}
+
+		foreach ( $album_ids as $album_id ) {
+			$album_id = absint( $album_id );
+			if ( ! $album_id || 'fotogrids_album' !== get_post_type( $album_id ) || ! current_user_can( 'edit_post', $album_id ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Check if user can edit specific album
 	 *
 	 * @param \WP_REST_Request $request Request object
