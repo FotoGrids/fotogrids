@@ -30,10 +30,10 @@ function cachedRows( galleryId: number ): number {
 	);
 }
 
-/** A page whose content is given verbatim. */
-function pageWith( content: string ): string {
+/** A post whose content is given verbatim. Not a page: pages join the theme's menu. */
+function postWith( content: string ): string {
 	return wpEval(
-		`$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Google Fonts page', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
+		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Google Fonts post', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
 	).trim();
 }
 
@@ -76,7 +76,7 @@ test( 'a cached gallery loads its Google Fonts on every visit', { tag: '@cache' 
 test( 'galleries sharing a page get one combined stylesheet, cached or not', { tag: '@cache' }, async ( { page } ) => {
 	const cached = galleryPage( ROBOTO_AND_LATO );
 	const uncached = galleryPage( { enable_cache: false, caption_title_font_family: 'Poppins' } );
-	const url = pageWith( `[fotogrids_gallery id="${ cached.id }"][fotogrids_gallery id="${ uncached.id }"]` );
+	const url = postWith( `[fotogrids_gallery id="${ cached.id }"][fotogrids_gallery id="${ uncached.id }"]` );
 
 	await fontStylesheets( page, cached.url, [ cached.id ] );
 
@@ -92,7 +92,7 @@ test( 'a gallery cached next to one using the same font still loads it on its ow
 } ) => {
 	const first = galleryPage( { enable_cache: true, caption_title_font_family: 'Roboto' } );
 	const second = galleryPage( { enable_cache: true, caption_title_font_family: 'Roboto' } );
-	const shared = pageWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
+	const shared = postWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
 
 	await fontStylesheets( page, shared, [ first.id, second.id ] );
 	expect( cachedRows( second.id ) ).toBeGreaterThan( 0 );
@@ -110,7 +110,7 @@ test( 'a cached gallery on a system font loads no Google Fonts', { tag: '@cache'
 
 test( 'the block and the view page load the fonts from the cache too', { tag: '@cache' }, async ( { page } ) => {
 	const { id } = galleryPage( ROBOTO_AND_LATO );
-	const block = pageWith( `<!-- wp:fotogrids/gallery {"galleryId":${ id }} /-->` );
+	const block = postWith( `<!-- wp:fotogrids/gallery {"galleryId":${ id }} /-->` );
 	const view = wpEval( `echo get_permalink( ${ id } );` ).trim();
 
 	for ( const url of [ block, view ] ) {
