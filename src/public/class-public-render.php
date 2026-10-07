@@ -78,7 +78,7 @@ class Public_Render {
 	 * Buffer the template output when WordPress does not, so headers set
 	 * while a collection renders still reach the response.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return void
 	 */
 	public static function hold_template_output(): void {
@@ -92,7 +92,7 @@ class Public_Render {
 	/**
 	 * template_include callback for WordPress before 6.9.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string $template Template path, passed through unchanged.
 	 * @return string
 	 */
