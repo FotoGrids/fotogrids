@@ -507,11 +507,11 @@ class Public_Render {
 		}
 
 		$album = \FotoGrids\Albums\Album_Repository::get( $album_id );
-		if ( ! $album || 'publish' !== $album->post_status ) {
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
 			return '';
 		}
 
-		$child_galleries = Gallery_Album_Relations::get_galleries_for_album(
+		$child_galleries = Gallery_Album_Relations::get_visible_galleries_for_album(
 			$album_id,
 			array(
 				'orderby' => 'position',
@@ -542,6 +542,11 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+
+		// Statistics count published albums only.
+		if ( 'publish' !== $album->post_status ) {
+			$album_settings['enable_statistics'] = false;
+		}
 
 		// Allow the shortcode's `template` attribute to override the
 		// layout (e.g. [fotogrids_album id=42 template=masonry]).
