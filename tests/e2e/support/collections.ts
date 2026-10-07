@@ -73,6 +73,23 @@ export function pageFor( galleryId: number ): { id: number; url: string } {
 	return JSON.parse( collection( [ 'op=page', `gallery=${ galleryId }` ] ) );
 }
 
+/**
+ * A page embedding a collection through its shortcode with extra attributes.
+ *
+ * @param id   Gallery or album id.
+ * @param atts Attributes appended to the shortcode verbatim, e.g. `cols="2"`.
+ * @param kind Which shortcode to write.
+ */
+export function shortcodePage(
+	id: number,
+	atts: string,
+	kind: 'gallery' | 'album' = 'gallery'
+): { id: number; url: string } {
+	return JSON.parse(
+		collection( [ 'op=page', `${ kind }=${ id }`, `atts=${ atts }` ] )
+	);
+}
+
 /** Change settings on a collection this spec created, and drop its cache. */
 export function setSettings( id: number, settings: Settings ): void {
 	collection( [ 'op=settings', `id=${ id }`, `settings=${ JSON.stringify( settings ) }` ] );
