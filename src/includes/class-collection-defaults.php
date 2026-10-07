@@ -27,8 +27,7 @@ class Collection_Defaults {
 	 * of composing `get_base_defaults()` + `get_gallery_defaults()` themselves.
 	 *
 	 * @since 1.0.0
-	 * @param bool $is_defaults_page If true, use second item from array defaults
-	 *                               (for settings with isGlobalDefault options).
+	 * @param bool $is_defaults_page Whether the defaults are read for the defaults page.
 	 * @return array Default gallery settings.
 	 */
 	public static function resolve_gallery( $is_defaults_page = false ) {
@@ -45,7 +44,7 @@ class Collection_Defaults {
 	 * Resolve the full default settings for an album (base + album-specific + filter).
 	 *
 	 * @since 1.0.0
-	 * @param bool $is_defaults_page If true, use second item from array defaults.
+	 * @param bool $is_defaults_page Whether the defaults are read for the defaults page.
 	 * @return array Default album settings.
 	 */
 	public static function resolve_album( $is_defaults_page = false ) {
@@ -61,7 +60,7 @@ class Collection_Defaults {
 	/**
 	 * Get base defaults (shared by both galleries and albums)
 	 *
-	 * @param bool $is_defaults_page If true, use second item from array defaults
+	 * @param bool $is_defaults_page Whether the defaults are read for the defaults page.
 	 * @return array Base default settings
 	 */
 	public static function get_base_defaults( $is_defaults_page = false ) {
@@ -1030,7 +1029,7 @@ class Collection_Defaults {
 				'tablet'  => 8,
 				'mobile'  => 8,
 			),
-			'caption_alignment'                            => array( 'left' ),
+			'caption_alignment'                            => 'left',
 			'caption_vertical_alignment'                   => 'bottom',
 			'caption_padding'                              => array(
 				'desktop' => array(
@@ -1089,7 +1088,7 @@ class Collection_Defaults {
 				),
 			),
 			'caption_hide_title'                           => false,
-			'caption_title_source'                         => array( 'item_title' ),
+			'caption_title_source'                         => 'item_title',
 			'caption_title_font_family'                    => 'default',
 			'caption_title_font_weight'                    => 'default',
 			'caption_title_font_size'                      => array(
@@ -1099,7 +1098,7 @@ class Collection_Defaults {
 			),
 			'caption_title_color'                          => 'rgba(255, 255, 255, 1)',
 			'caption_hide_description'                     => false,
-			'caption_description_source'                   => array( 'item_caption' ),
+			'caption_description_source'                   => 'item_caption',
 			'caption_description_font_family'              => 'default',
 			'caption_description_font_weight'              => 'default',
 			'caption_description_font_size'                => array(
@@ -1207,15 +1206,13 @@ class Collection_Defaults {
 			'exif_fields'                                  => \FotoGrids\Exif\Exif_Fields::DEFAULT_FIELDS,
 		);
 
-		$defaults = self::process_defaults_array( $defaults, $is_defaults_page );
-
 		return apply_filters( Filters_Settings::DEFAULTS_BASE, $defaults, $is_defaults_page );
 	}
 
 	/**
 	 * Get gallery-specific defaults
 	 *
-	 * @param bool $is_defaults_page If true, use second item from array defaults
+	 * @param bool $is_defaults_page Whether the defaults are read for the defaults page.
 	 * @return array Gallery-specific default settings
 	 */
 	public static function get_gallery_defaults( $is_defaults_page = false ) {
@@ -1230,32 +1227,12 @@ class Collection_Defaults {
 	/**
 	 * Get album-specific defaults
 	 *
-	 * @param bool $is_defaults_page If true, use second item from array defaults
+	 * @param bool $is_defaults_page Whether the defaults are read for the defaults page.
 	 * @return array Album-specific default settings
 	 */
 	public static function get_album_defaults( $is_defaults_page = false ) {
 		$defaults = array();
 
 		return apply_filters( Filters_Settings::DEFAULTS_ALBUM, $defaults, $is_defaults_page );
-	}
-
-	/**
-	 * Process defaults array values based on is_defaults_page flag
-	 *
-	 * @param array $defaults The defaults array to process
-	 * @param bool $is_defaults_page If true, use second item from array defaults
-	 * @return array Processed defaults
-	 */
-	private static function process_defaults_array( $defaults, $is_defaults_page ) {
-		foreach ( $defaults as $key => $value ) {
-			if ( is_array( $value ) && ! isset( $value['desktop'] ) && ! isset( $value['value'] ) && ! isset( $value['unit'] ) ) {
-				if ( $is_defaults_page && isset( $value[1] ) ) {
-					$defaults[ $key ] = $value[1];
-				} elseif ( ! $is_defaults_page && isset( $value[0] ) ) {
-					$defaults[ $key ] = $value[0];
-				}
-			}
-		}
-		return $defaults;
 	}
 }

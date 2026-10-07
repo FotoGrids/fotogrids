@@ -240,10 +240,11 @@ class Activator {
 		dbDelta( $sql );
 
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
+		\FotoGrids\Settings\List_Setting_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.5' );
+		update_option( 'fotogrids_db_version', '1.6' );
 	}
 
 	/**
@@ -258,7 +259,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.5', '<' ) ) {
+		if ( version_compare( $current, '1.6', '<' ) ) {
 			self::create_tables();
 		}
 
