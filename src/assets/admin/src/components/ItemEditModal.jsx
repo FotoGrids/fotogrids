@@ -55,6 +55,7 @@ const ItemEditModal = ({
 	items,
 	onClose,
 	onNavigate,
+	onSaved,
 	strings,
 }) => {
 	const [activeTab, setActiveTab] = useState('details');
@@ -363,6 +364,9 @@ const ItemEditModal = ({
 
 				setHasChanges(false);
 				setSaving(false);
+				if (data.item) {
+					onSaved?.(itemId, data.item);
+				}
 
 				if (window.fotogridsToast) {
 					window.fotogridsToast.success(

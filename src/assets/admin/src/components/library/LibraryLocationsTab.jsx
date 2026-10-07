@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import LibraryTabBase from './LibraryTabBase';
 import LibraryLocationsHeader from './LibraryLocationsHeader';
 
@@ -8,11 +8,18 @@ import LibraryLocationsHeader from './LibraryLocationsHeader';
  * the shared table. LibraryTabBase reads `entityType.supports_extra_fields` to
  * show the Lat/Lng column and inline editor.
  */
-const LibraryLocationsTab = ({ entityType }) => (
-	<>
-		<LibraryLocationsHeader entityType={entityType} />
-		<LibraryTabBase entityType={entityType} />
-	</>
-);
+const LibraryLocationsTab = ({ entityType }) => {
+	const [statsVersion, bumpStats] = useReducer((n) => n + 1, 0);
+
+	return (
+		<>
+			<LibraryLocationsHeader
+				entityType={entityType}
+				refreshKey={statsVersion}
+			/>
+			<LibraryTabBase entityType={entityType} onChange={bumpStats} />
+		</>
+	);
+};
 
 export default LibraryLocationsTab;

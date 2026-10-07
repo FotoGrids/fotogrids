@@ -2,6 +2,7 @@
 namespace FotoGrids\REST\Items;
 
 use FotoGrids\Hooks\Filters_Save;
+use FotoGrids\Metaboxes\Metabox_Registrar;
 use FotoGrids\REST\Metadata\Metadata_Data;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -267,11 +268,17 @@ class Save_Item_Data {
 		 */
 		$meta_results = apply_filters( Filters_Save::ITEM_METADATA, $meta_results, $item_id, $request );
 
+		$grid_item = Metabox_Registrar::build_attachment_item_data( $item_id, 0 );
+
 		return rest_ensure_response(
 			array(
 				'success'  => true,
 				'message'  => __( 'Item saved successfully.', 'fotogrids' ),
 				'metadata' => $meta_results,
+				'item'     => $grid_item ? array(
+					'title' => $grid_item['title'],
+					'alt'   => $grid_item['alt'],
+				) : null,
 			)
 		);
 	}
