@@ -1002,7 +1002,7 @@ class Admin_Init {
 
 		if ( ! empty( $albums ) ) {
 			$bulk_actions['assign_to_album']    = __( 'Assign to Album', 'fotogrids' );
-			$bulk_actions['remove_from_albums'] = __( 'Remove from All Albums', 'fotogrids' );
+			$bulk_actions['remove_from_albums'] = __( 'Remove from Albums', 'fotogrids' );
 		}
 
 		return $bulk_actions;
@@ -1190,10 +1190,10 @@ class Admin_Init {
 
 			if ( $removed > 0 ) {
 				$message = sprintf(
-					/* translators: %d: number of galleries removed from all albums. */
+					/* translators: %d: number of galleries removed from albums. */
 					_n(
-						'%d gallery removed from all albums.',
-						'%d galleries removed from all albums.',
+						'%d gallery removed from its albums.',
+						'%d galleries removed from their albums.',
 						$removed,
 						'fotogrids'
 					),

@@ -662,8 +662,32 @@ final class Metabox_Registrar {
 			return;
 		}
 
-		$assigned_galleries  = Gallery_Album_Relations::get_galleries_for_album( $post->ID );
-		$all_galleries       = Gallery_Album_Relations::get_all_galleries();
+		$assigned_galleries  = array_map(
+			static function ( $gallery ) {
+				return array(
+					'ID'             => (int) $gallery->ID,
+					'post_title'     => $gallery->post_title,
+					'post_status'    => $gallery->post_status,
+					'status_display' => $gallery->status_display,
+					'item_count'     => $gallery->item_count,
+					'layout'         => $gallery->layout,
+					'featured_item'  => $gallery->featured_item,
+					'sample_items'   => $gallery->sample_items,
+					'permalink'      => $gallery->permalink,
+					'position'       => (int) $gallery->position,
+					'editable'       => current_user_can( 'edit_post', $gallery->ID ),
+				);
+			},
+			Gallery_Album_Relations::get_galleries_for_album( $post->ID )
+		);
+		$all_galleries       = array_values(
+			array_filter(
+				Gallery_Album_Relations::get_all_galleries(),
+				static function ( $gallery ) {
+					return current_user_can( 'edit_post', $gallery['id'] );
+				}
+			)
+		);
 		$featured_gallery_id = (int) get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
 
 		wp_localize_script(

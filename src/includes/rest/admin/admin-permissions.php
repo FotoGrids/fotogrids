@@ -65,13 +65,47 @@ class Admin_Permissions {
 			$album_ids[] = $request->get_param( 'album_id' );
 		}
 
-		if ( empty( $album_ids ) ) {
+		return self::can_edit_all( $album_ids, 'fotogrids_album' );
+	}
+
+	/**
+	 * Checks that the user can edit the album and every gallery the request names.
+	 *
+	 * Covers both the `gallery_ids` body param and the `gallery_id` route param.
+	 *
+	 * @since 1.1.5
+	 * @param \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_album_gallery_write( $request ) {
+		if ( ! self::check_album_edit( $request ) ) {
 			return false;
 		}
 
-		foreach ( $album_ids as $album_id ) {
-			$album_id = absint( $album_id );
-			if ( ! $album_id || 'fotogrids_album' !== get_post_type( $album_id ) || ! current_user_can( 'edit_post', $album_id ) ) {
+		$gallery_ids = (array) $request->get_param( 'gallery_ids' );
+		if ( $request->get_param( 'gallery_id' ) ) {
+			$gallery_ids[] = $request->get_param( 'gallery_id' );
+		}
+
+		return self::can_edit_all( $gallery_ids, 'fotogrids_gallery' );
+	}
+
+	/**
+	 * Checks that every ID is a post of the given type the user can edit.
+	 *
+	 * @since 1.1.5
+	 * @param array  $ids       Post IDs.
+	 * @param string $post_type Expected post type.
+	 * @return bool False when the list is empty.
+	 */
+	private static function can_edit_all( array $ids, string $post_type ): bool {
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		foreach ( $ids as $id ) {
+			$id = absint( $id );
+			if ( ! $id || get_post_type( $id ) !== $post_type || ! current_user_can( 'edit_post', $id ) ) {
 				return false;
 			}
 		}
