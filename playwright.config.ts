@@ -52,6 +52,20 @@ export default defineConfig( {
 	reporter: process.env.CI
 		? [ [ 'github' ], [ 'html', { open: 'never' } ] ]
 		: 'list',
+	// Baselines are generated on CI's Linux runner and committed from there, so
+	// the platform goes in the path: a shot taken on another OS rasterises text
+	// with that host's fonts and would be compared against the wrong file.
+	snapshotPathTemplate: '{testDir}/__screenshots__/{platform}/{arg}{ext}',
+	expect: {
+		toHaveScreenshot: {
+			// A render that settled is identical, not merely close. Anything
+			// above zero here hides the drift this exists to catch.
+			maxDiffPixels: 0,
+			animations: 'disabled',
+			caret: 'hide',
+			scale: 'css',
+		},
+	},
 	use: {
 		baseURL,
 		trace: 'on-first-retry',

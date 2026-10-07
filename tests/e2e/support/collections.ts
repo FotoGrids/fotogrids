@@ -52,25 +52,61 @@ export function galleryPage(
 	);
 }
 
-/** An album holding galleries this spec created. */
+/**
+ * An album holding galleries this spec created, and a post that renders it
+ * through the shortcode.
+ *
+ * @param galleries Gallery ids, in album order.
+ * @param settings  Catalog key to value.
+ * @param title     Album title.
+ * @param author    Login of the user who should own it.
+ * @param status    Post status; defaults to publish.
+ * @return The album id, the rendering post's URL and the album's view page URL.
+ */
 export function album(
 	galleries: number[],
 	settings: Settings = {},
-	title?: string
-): { id: number } {
+	title?: string,
+	author?: string,
+	status?: string
+): { id: number; url: string; view: string } {
 	return JSON.parse(
 		collection( [
 			'op=album',
 			`galleries=${ galleries.join( ',' ) }`,
 			`settings=${ JSON.stringify( settings ) }`,
 			...( undefined === title ? [] : [ `title=${ title }` ] ),
+			...( undefined === author ? [] : [ `author=${ author }` ] ),
+			...( undefined === status ? [] : [ `status=${ status }` ] ),
 		] )
 	);
+}
+
+/** Mark a collection made through the UI so the purge removes it too. */
+export function adopt( id: number ): void {
+	collection( [ 'op=adopt', `id=${ id }` ] );
 }
 
 /** A page rendering a gallery the spec did not create. */
 export function pageFor( galleryId: number ): { id: number; url: string } {
 	return JSON.parse( collection( [ 'op=page', `gallery=${ galleryId }` ] ) );
+}
+
+/**
+ * A page embedding a collection through its shortcode with extra attributes.
+ *
+ * @param id   Gallery or album id.
+ * @param atts Attributes appended to the shortcode verbatim, e.g. `cols="2"`.
+ * @param kind Which shortcode to write.
+ */
+export function shortcodePage(
+	id: number,
+	atts: string,
+	kind: 'gallery' | 'album' = 'gallery'
+): { id: number; url: string } {
+	return JSON.parse(
+		collection( [ 'op=page', `${ kind }=${ id }`, `atts=${ atts }` ] )
+	);
 }
 
 /** Change settings on a collection this spec created, and drop its cache. */

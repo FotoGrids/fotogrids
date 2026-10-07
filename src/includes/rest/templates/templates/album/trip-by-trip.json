@@ -21,7 +21,6 @@
       "mobile": 5
     },
     "display_exif": true,
-    "captions": true,
     "default_sort_order": "date",
     "date_sort_direction": "asc",
     "item_click_behavior": "lightbox"

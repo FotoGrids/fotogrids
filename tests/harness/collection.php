@@ -8,7 +8,11 @@
  *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
  *   wp eval-file collection.php op=render items=4 author=fg-author
  *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
+ *   wp eval-file collection.php op=album author=fg-author status=draft
  *   wp eval-file collection.php op=page gallery=13
+ *   wp eval-file collection.php op=page gallery=41 atts='template="masonry"'
+ *   wp eval-file collection.php op=page album=42 atts='template="grid"'
+ *   wp eval-file collection.php op=adopt id=57
  *   wp eval-file collection.php op=purge
  *
  * Every post carries FG_COLLECTION_MARKER, so `op=purge` removes the lot.
@@ -104,18 +108,22 @@ function fg_col_author( string $login ): int {
 }
 
 /**
- * A post whose content renders one gallery through the shortcode.
+ * A post whose content renders one collection through its shortcode.
  *
- * @param int $gallery_id Gallery to embed.
+ * @param int    $collection_id Gallery or album to embed.
+ * @param string $atts          Extra shortcode attributes, written verbatim.
+ * @param string $tag           Shortcode tag.
  * @return int
  */
-function fg_col_render_page( int $gallery_id ): int {
+function fg_col_render_page( int $collection_id, string $atts = '', string $tag = 'fotogrids_gallery' ): int {
+	$atts    = '' === $atts ? '' : ' ' . $atts;
+	$kind    = 'fotogrids_album' === $tag ? 'album' : 'gallery';
 	$page_id = wp_insert_post(
 		array(
 			'post_type'    => 'post',
-			'post_title'   => 'Renders gallery ' . $gallery_id,
+			'post_title'   => 'Renders ' . $kind . ' ' . $collection_id,
 			'post_status'  => 'publish',
-			'post_content' => '[fotogrids_gallery id="' . $gallery_id . '"]',
+			'post_content' => '[' . $tag . ' id="' . $collection_id . '"' . $atts . ']',
 		),
 		true
 	);
@@ -174,7 +182,8 @@ if ( 'album' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_album',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped album' ),
-			'post_status' => 'publish',
+			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
+			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
 		true
 	);
@@ -195,20 +204,46 @@ if ( 'album' === $op ) {
 		fg_col_settings( (int) $album_id, $settings );
 	}
 
-	WP_CLI::log( (string) wp_json_encode( array( 'id' => (int) $album_id ) ) );
-	return;
-}
+	$page_id = wp_insert_post(
+		array(
+			'post_type'    => 'post',
+			'post_title'   => 'Renders album ' . $album_id,
+			'post_status'  => 'publish',
+			'post_content' => '[fotogrids_album id="' . $album_id . '"]',
+		),
+		true
+	);
 
-if ( 'page' === $op ) {
-	// A rendering page for a gallery the spec did not create - a seeded
-	// fixture it only reads. The page is scoped; the gallery is untouched.
-	$gallery_id = (int) fg_col_arg( $args, 'gallery' );
+	if ( is_wp_error( $page_id ) ) {
+		WP_CLI::error( $page_id->get_error_message() );
+	}
+
+	update_post_meta( $page_id, FG_COLLECTION_MARKER, 1 );
 
 	WP_CLI::log(
 		(string) wp_json_encode(
 			array(
-				'id'  => $gallery_id,
-				'url' => get_permalink( fg_col_render_page( $gallery_id ) ),
+				'id'   => (int) $album_id,
+				'url'  => get_permalink( $page_id ),
+				'view' => get_permalink( $album_id ),
+			)
+		)
+	);
+	return;
+}
+
+if ( 'page' === $op ) {
+	// A rendering page for a collection that already exists. The page is
+	// scoped; the collection is untouched.
+	$album_id = (int) fg_col_arg( $args, 'album' );
+	$id       = $album_id ? $album_id : (int) fg_col_arg( $args, 'gallery' );
+	$tag      = $album_id ? 'fotogrids_album' : 'fotogrids_gallery';
+
+	WP_CLI::log(
+		(string) wp_json_encode(
+			array(
+				'id'  => $id,
+				'url' => get_permalink( fg_col_render_page( $id, fg_col_arg( $args, 'atts' ), $tag ) ),
 			)
 		)
 	);
@@ -218,6 +253,12 @@ if ( 'page' === $op ) {
 if ( 'settings' === $op ) {
 	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
 	fg_col_settings( (int) fg_col_arg( $args, 'id' ), is_array( $settings ) ? $settings : array() );
+	return;
+}
+
+if ( 'adopt' === $op ) {
+	// A collection the spec made through the UI, claimed so the purge finds it.
+	update_post_meta( (int) fg_col_arg( $args, 'id' ), FG_COLLECTION_MARKER, 1 );
 	return;
 }
 

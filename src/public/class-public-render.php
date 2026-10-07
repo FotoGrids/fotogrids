@@ -208,14 +208,6 @@ class Public_Render {
 			}
 		}
 
-		if ( isset( $atts['captions'] ) ) {
-			$settings_overlay['captions'] = 'true' === $atts['captions'];
-		}
-
-		if ( isset( $atts['lightbox'] ) ) {
-			$settings_overlay['lightbox'] = 'true' === $atts['lightbox'];
-		}
-
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
 
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
@@ -344,8 +336,6 @@ class Public_Render {
 			'album_id' => 0,
 			'template' => '',
 			'cols'     => 0,
-			'captions' => 'true',
-			'lightbox' => 'true',
 		);
 
 		return (string) self::render_gallery_with_pipeline(
@@ -371,9 +361,6 @@ class Public_Render {
 				'id'                => 0,
 				'template'          => '',
 				'cols'              => 0,
-				'lazy'              => 'true',
-				'lightbox'          => 'true',
-				'captions'          => 'true',
 				'template_preview'  => 'false', // Template preview mode
 				'template_settings' => '', // JSON-encoded template settings
 				'template_items'    => '', // JSON-encoded template items
@@ -520,11 +507,11 @@ class Public_Render {
 		}
 
 		$album = \FotoGrids\Albums\Album_Repository::get( $album_id );
-		if ( ! $album || 'publish' !== $album->post_status ) {
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
 			return '';
 		}
 
-		$child_galleries = Gallery_Album_Relations::get_galleries_for_album(
+		$child_galleries = Gallery_Album_Relations::get_visible_galleries_for_album(
 			$album_id,
 			array(
 				'orderby' => 'position',
@@ -555,6 +542,11 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+
+		// Statistics count published albums only.
+		if ( 'publish' !== $album->post_status ) {
+			$album_settings['enable_statistics'] = false;
+		}
 
 		// Allow the shortcode's `template` attribute to override the
 		// layout (e.g. [fotogrids_album id=42 template=masonry]).
@@ -641,16 +633,6 @@ class Public_Render {
 
 		$settings = self::get_gallery_settings( $gallery_id );
 
-		$atts = shortcode_atts(
-			array(
-				'lazy'     => 'true',
-				'lightbox' => 'true',
-				'captions' => 'true',
-			),
-			$atts,
-			'fotogrids_gallery'
-		);
-
 		$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
 		if ( empty( $item_ids ) ) {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
@@ -682,8 +664,6 @@ class Public_Render {
 			array(
 				'template' => '',
 				'cols'     => 0,
-				'captions' => 'true',
-				'lightbox' => 'true',
 				'album_id' => 0,
 			),
 			$atts,
@@ -711,12 +691,6 @@ class Public_Render {
 					'mobile'  => $col_count,
 				);
 			}
-		}
-		if ( isset( $atts['captions'] ) ) {
-			$settings_overlay['captions'] = 'true' === $atts['captions'];
-		}
-		if ( isset( $atts['lightbox'] ) ) {
-			$settings_overlay['lightbox'] = 'true' === $atts['lightbox'];
 		}
 		if ( isset( $atts['lazy'] ) ) {
 			$settings_overlay['lazy_load'] = 'true' === $atts['lazy'];

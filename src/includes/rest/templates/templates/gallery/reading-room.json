@@ -10,7 +10,6 @@
   "thumbnail": "",
   "settings": {
     "layout": "image-viewer",
-    "captions": true,
     "caption_title_source": "title",
     "caption_description_source": "description",
     "layout_height_mode": "auto",

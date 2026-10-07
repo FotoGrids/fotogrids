@@ -63,7 +63,7 @@ class Element_Album extends Element_Base {
 	 */
 	protected function get_item_count( int $collection_id ): int {
 		return class_exists( '\FotoGrids\Gallery_Album_Relations' )
-			? count( (array) \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $collection_id ) )
+			? count( (array) \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( $collection_id ) )
 			: 0;
 	}
 

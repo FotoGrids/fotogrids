@@ -9,15 +9,25 @@
 		"src/includes/class-post-types.php": "*",
 		"src/includes/class-kses.php": "*",
 		"src/public/render/boot.php": "*",
-
-		"src/public/render/**": "@layout",
-		"src/public/render/layouts/**": "@layout",
-		"src/public/render/decorators/**": "@layout",
-		"src/public/render/sorters/**": "@layout",
+		"src/public/render/**": [
+			"@layout",
+			"@visual"
+		],
+		"src/public/render/layouts/**": [
+			"@layout",
+			"@visual"
+		],
+		"src/public/render/decorators/**": [
+			"@layout",
+			"@visual"
+		],
+		"src/public/render/sorters/**": [
+			"@layout",
+			"@visual"
+		],
 		"src/public/render/lightbox/**": "@lightbox",
 		"src/public/render/gates/**": "@gate",
 		"src/public/render/filters/**": "*",
-
 		"src/includes/rest/**": "@api",
 		"src/includes/class-rest.php": "@api",
 		"src/includes/permissions/**": "@permissions",
@@ -26,13 +36,13 @@
 		"src/includes/cache/**": "@cache",
 		"src/includes/class-fotogrids-cache.php": "@cache",
 		"src/includes/class-uninstaller.php": "@lifecycle",
+		"src/uninstall.php": "@lifecycle",
 		"src/includes/admin/**": "@admin",
 		"src/includes/metaboxes/**": "@admin",
 		"src/includes/modules/Metaboxes/**": "@admin",
 		"src/includes/class-admin-init.php": "@admin",
 		"src/assets/admin/**": "@admin",
 		"src/includes/watermark/**": "*",
-
 		"tests/**": "*",
 		"playwright.config.ts": "*",
 		"package.json": "*",
