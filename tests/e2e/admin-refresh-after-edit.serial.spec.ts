@@ -152,10 +152,11 @@ test.describe( 'library stat cards', () => {
 } );
 
 test.describe( 'gallery items grid', () => {
-	const itemId = fixture< number[] >( 'F-small', 'items' )[ 0 ];
+	let itemId: number;
 	let original: string;
 
 	test.beforeAll( () => {
+		itemId = fixture< number[] >( 'F-small', 'items' )[ 0 ];
 		original = wpEval(
 			`echo wp_json_encode( array( get_post_field( 'post_title', ${ itemId } ), get_post_meta( ${ itemId }, '_wp_attachment_image_alt', true ) ) );`
 		).trim();
@@ -163,9 +164,9 @@ test.describe( 'gallery items grid', () => {
 
 	test.afterAll( () => {
 		wpEval( `
-			$o = json_decode( '${ original.replace( /'/g, "\\'" ) }', true );
-			wp_update_post( array( 'ID' => ${ itemId }, 'post_title' => $o[0] ) );
-			update_post_meta( ${ itemId }, '_wp_attachment_image_alt', $o[1] );
+			$o = json_decode( base64_decode( '${ Buffer.from( original ).toString( 'base64' ) }' ), true );
+			wp_update_post( wp_slash( array( 'ID' => ${ itemId }, 'post_title' => $o[0] ) ) );
+			update_post_meta( ${ itemId }, '_wp_attachment_image_alt', wp_slash( $o[1] ) );
 		` );
 	} );
 
