@@ -62,18 +62,47 @@ class Admin_Init {
 	}
 
 	/**
+	 * Capability for the top-level menu entry.
+	 *
+	 * WordPress checks a post-type list screen in this menu against the
+	 * top-level capability, so it must be one the user holds.
+	 *
+	 * @return string
+	 */
+	private static function menu_parent_capability(): string {
+		foreach ( array( 'manage_fotogrids', 'edit_fotogrids_galleries', 'edit_fotogrids_albums' ) as $capability ) {
+			if ( current_user_can( $capability ) ) {
+				return $capability;
+			}
+		}
+
+		return 'manage_fotogrids';
+	}
+
+	/**
+	 * Refuses the top-level Dashboard to users who reach the menu only
+	 * through a post-type capability.
+	 */
+	public static function require_manage_capability(): void {
+		if ( ! current_user_can( 'manage_fotogrids' ) ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'fotogrids' ), '', array( 'response' => 403 ) );
+		}
+	}
+
+	/**
 	 * Add admin menu and submenus
 	 */
 	public static function add_admin_menu() {
-		add_menu_page(
+		$dashboard_hook = add_menu_page(
 			__( 'FotoGrids', 'fotogrids' ),
 			__( 'FotoGrids', 'fotogrids' ),
-			'manage_fotogrids',
+			self::menu_parent_capability(),
 			'fotogrids',
 			array( __CLASS__, 'dashboard_page' ),
 			self::get_menu_icon(),
 			30
 		);
+		add_action( 'load-' . $dashboard_hook, array( __CLASS__, 'require_manage_capability' ) );
 
 		add_submenu_page(
 			'fotogrids',
