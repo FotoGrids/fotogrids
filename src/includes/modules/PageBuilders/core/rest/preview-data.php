@@ -161,11 +161,13 @@ final class Preview_Data {
 			'source'     => $source,
 		);
 
-		if ( '' !== $placement_key ) {
-			$collection_id               = Collection_Kind::ALBUM === $context->meta->collection_kind
-				? (int) $context->meta->album_id
-				: $context->meta->gallery_id;
-			$meta_changes['instance_id'] = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+		$collection_id = Collection_Kind::ALBUM === $context->meta->collection_kind
+			? (int) $context->meta->album_id
+			: $context->meta->gallery_id;
+		$placement_id  = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+
+		if ( null !== $placement_id ) {
+			$meta_changes['instance_id'] = $placement_id;
 		}
 
 		$preview_meta = $context->meta->with( $meta_changes );

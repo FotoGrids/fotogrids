@@ -47,6 +47,13 @@ if ( ! defined( 'WPINC' ) ) {
 final class Preview_Renderer {
 
 	/**
+	 * Inline CSS from renders made during an AJAX request, which Inline_Asset_Emitter does not enqueue.
+	 *
+	 * @var string
+	 */
+	private static string $ajax_inline_css = '';
+
+	/**
 	 * Render a gallery preview to HTML.
 	 *
 	 * @since 1.0.0
@@ -91,6 +98,7 @@ final class Preview_Renderer {
 		do_action( Actions_Render::LATE_ASSETS, $context );
 
 		Inline_Asset_Emitter::enqueue( $result );
+		self::hold_ajax_inline_css( $result->inline_css );
 
 		return (string) $result->html;
 	}
@@ -150,8 +158,38 @@ final class Preview_Renderer {
 		do_action( Actions_Render::LATE_ASSETS, $context );
 
 		Inline_Asset_Emitter::enqueue( $result );
+		self::hold_ajax_inline_css( $result->inline_css );
 
 		return (string) $result->html;
+	}
+
+	/**
+	 * Return and clear the inline CSS held from renders made during an AJAX request.
+	 *
+	 * Elementor renders its editor preview over admin-ajax; its widgets print this
+	 * next to the preview markup.
+	 *
+	 * @since 1.2.0
+	 * @return string Bare CSS, or empty string.
+	 */
+	public static function take_ajax_inline_css(): string {
+		$css                   = self::$ajax_inline_css;
+		self::$ajax_inline_css = '';
+
+		return $css;
+	}
+
+	/**
+	 * Hold a render's inline CSS when the request is an AJAX request.
+	 *
+	 * @since 1.2.0
+	 * @param string $inline_css Bare CSS.
+	 * @return void
+	 */
+	private static function hold_ajax_inline_css( string $inline_css ): void {
+		if ( '' !== $inline_css && wp_doing_ajax() ) {
+			self::$ajax_inline_css .= $inline_css;
+		}
 	}
 
 	/**
@@ -176,11 +214,13 @@ final class Preview_Renderer {
 			'source'     => $source,
 		);
 
-		if ( '' !== $placement_key ) {
-			$collection_id               = Collection_Kind::ALBUM === $context->meta->collection_kind
-				? (int) $context->meta->album_id
-				: $context->meta->gallery_id;
-			$meta_changes['instance_id'] = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+		$collection_id = Collection_Kind::ALBUM === $context->meta->collection_kind
+			? (int) $context->meta->album_id
+			: $context->meta->gallery_id;
+		$placement_id  = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+
+		if ( null !== $placement_id ) {
+			$meta_changes['instance_id'] = $placement_id;
 		}
 
 		$preview_meta = $context->meta->with( $meta_changes );

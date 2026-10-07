@@ -60,7 +60,11 @@ final class InstanceIdFactoryTest extends TestCase {
 		$this->assertSame( 'fg-7-p' . str_repeat( 'a', 32 ), $id );
 	}
 
-	public function test_unusable_placement_key_falls_back_to_the_counter(): void {
-		$this->assertSame( 'fg-7-1', Instance_Id_Factory::instance()->generate_for_placement( 7, '--__' ) );
+	public function test_unusable_placement_key_returns_null(): void {
+		$factory = Instance_Id_Factory::instance();
+
+		$this->assertNull( $factory->generate_for_placement( 7, '--__' ) );
+		$this->assertNull( $factory->generate_for_placement( 7, '' ) );
+		$this->assertSame( 'fg-7-1', $factory->generate( 7 ) );
 	}
 }

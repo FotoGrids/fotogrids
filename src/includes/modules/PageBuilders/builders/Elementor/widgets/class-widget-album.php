@@ -207,11 +207,15 @@ class Widget_Album extends Widget_Base {
 
 			$preview_options = Preview_Options::normalise( $settings );
 			$html            = Preview_Renderer::render_album_html( $album_id, $preview_options, (string) $this->get_id() );
+			$inline_css      = Preview_Renderer::take_ajax_inline_css();
 
 			$pagination_off = ( ! $preview_options['pagination'] ) ? ' is-fg-pb-pagination-frozen' : '';
 			$fg_markup      = '<div class="fg-pb-elementor-preview' . $pagination_off . '">'
 				. $html
 				. '</div>';
+			if ( '' !== $inline_css ) {
+				echo '<style>' . str_replace( '</', '<\\/', $inline_css ) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS built by the render pipeline from sanitised settings; closing tags are neutralised.
+			}
 			echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 			return;
 		}
