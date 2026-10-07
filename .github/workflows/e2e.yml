@@ -90,7 +90,7 @@ jobs:
           # embed handling - so they keep being built. Not the whole catalogue:
           # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
           # global setup runs the seeder itself, so there is no separate step.
-          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft,F-tagged
           # Empty outside a pull request, which widens to the whole tier.
           FG_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -169,7 +169,7 @@ jobs:
 
       - name: Write the baselines
         env:
-          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft,F-tagged
         run: |
           set -a; . ./tests/harness/.env; set +a
           npx playwright test --project=serial --no-deps --grep @visual --update-snapshots
@@ -251,7 +251,7 @@ jobs:
           # embed handling - so they keep being built. Not the whole catalogue:
           # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
           # global setup runs the seeder itself, so there is no separate step.
-          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft,F-tagged
         run: |
           set -a; . ./tests/harness/.env; set +a
           npm run test:e2e
@@ -350,7 +350,7 @@ jobs:
           # embed handling - so they keep being built. Not the whole catalogue:
           # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
           # global setup runs the seeder itself, so there is no separate step.
-          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft,F-tagged
         run: |
           set -a; . ./tests/harness/.env; set +a
           npm run test:e2e:quarantine -- --reporter=json || true

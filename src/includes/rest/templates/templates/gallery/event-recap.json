@@ -20,7 +20,6 @@
       "tablet": 10,
       "mobile": 6
     },
-    "captions": true,
     "caption_placement": "bottom",
     "default_sort_order": "date",
     "date_sort_direction": "asc",

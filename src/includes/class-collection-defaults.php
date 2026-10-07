@@ -316,8 +316,6 @@ class Collection_Defaults {
 			'loading_icon'                                 => '12-dots',
 			'loading_icon_color'                           => 'rgba(0, 0, 0, 0.2)',
 			'loaded_effect'                                => 'fade',
-			'lightbox'                                     => true,
-			'captions'                                     => true,
 			'lazy_load'                                    => true,
 			'lightbox_preload_slides'                      => 2,
 			// Thumbnail background (regular / hover / loading).
