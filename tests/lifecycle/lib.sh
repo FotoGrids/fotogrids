@@ -40,18 +40,6 @@ assert_eq() {
 	fi
 }
 
-# Current behaviour that is wrong but not this change's to fix. Passes while the
-# defect stands and fails once it is fixed, so the fix cannot land silently.
-assert_defect() {
-	local expected="$1" actual="$2" what="$3" issue="$4"
-
-	if [ "$expected" = "$actual" ]; then
-		pass "$what (known defect, $issue)"
-	else
-		fail "$what changed — $issue may be fixed; update this row"
-	fi
-}
-
 assert_contains() {
 	local haystack="$1" needle="$2" what="$3"
 
@@ -63,9 +51,12 @@ assert_contains() {
 
 # --- the scratch install ----------------------------------------------------
 
-# A WordPress of its own, with the plugin active. Reuses the core already
-# downloaded by boot.sh rather than fetching one per scenario.
-scratch_install() {
+SCRATCH_URL="http://127.0.0.1:8899"
+
+# The files, the database and wp-config, up to the point where a single site and
+# a network diverge. Reuses the core already downloaded by boot.sh rather than
+# fetching one per scenario.
+scratch_stage() {
 	local name="$1"
 	local source_wp="$FG_WP_SOURCE"
 
@@ -94,9 +85,41 @@ scratch_install() {
 
 	$WP config create --force --dbname="$SCRATCH_DB" --dbuser="$FG_DB_USER" \
 		--dbpass="$FG_DB_PASS" --dbhost="$FG_DB_HOST_ARG" --skip-check --quiet
-	$WP core install --url=http://127.0.0.1:8899 --title="FotoGrids lifecycle" \
+}
+
+# A WordPress of its own, with the plugin ready to activate.
+scratch_install() {
+	scratch_stage "$1"
+
+	$WP core install --url="$SCRATCH_URL" --title="FotoGrids lifecycle" \
 		--admin_user=admin --admin_password=password \
 		--admin_email=test@example.com --skip-email --quiet
+}
+
+# A subdirectory network of three sites. Sites 2 and 3 are created and never
+# visited, which is the state the network rows are about: WordPress runs the
+# activation hook once, in site 1.
+#
+# `$WP_SITE2` addresses the second. There is deliberately no handle for the third:
+# addressing a site boots WordPress there, which is the first request the rows
+# assert has not happened yet.
+scratch_install_multisite() {
+	scratch_stage "$1"
+
+	$WP core multisite-install --url="$SCRATCH_URL" --subdomains=0 \
+		--title="FotoGrids lifecycle network" \
+		--admin_user=admin --admin_password=password \
+		--admin_email=test@example.com --skip-email --quiet
+
+	$WP site create --slug=two --quiet
+	$WP site create --slug=three --quiet
+
+	WP_SITE2="$WP --url=$SCRATCH_URL/two"
+}
+
+# Network-activate, the way a network admin does from the network plugins screen.
+scratch_activate_network() {
+	$WP plugin activate fotogrids --network --quiet
 }
 
 # Separate from the install, so a scenario can assert on the before state.
