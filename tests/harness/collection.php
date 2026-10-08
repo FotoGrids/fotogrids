@@ -108,22 +108,32 @@ function fg_col_author( string $login ): int {
 }
 
 /**
- * A post whose content renders one collection through its shortcode.
+ * A post whose content renders one or more collections through their shortcodes.
  *
- * @param int    $collection_id Gallery or album to embed.
- * @param string $atts          Extra shortcode attributes, written verbatim.
- * @param string $tag           Shortcode tag.
+ * Several ids put several shortcodes on one page, in the order given - the same
+ * id twice embeds the same collection twice.
+ *
+ * @param int|int[] $collection_id Gallery or album to embed, or a list of them.
+ * @param string    $atts          Extra shortcode attributes, written verbatim on each.
+ * @param string    $tag           Shortcode tag.
  * @return int
  */
-function fg_col_render_page( int $collection_id, string $atts = '', string $tag = 'fotogrids_gallery' ): int {
+function fg_col_render_page( $collection_id, string $atts = '', string $tag = 'fotogrids_gallery' ): int {
+	$ids     = array_map( 'intval', is_array( $collection_id ) ? $collection_id : array( $collection_id ) );
 	$atts    = '' === $atts ? '' : ' ' . $atts;
 	$kind    = 'fotogrids_album' === $tag ? 'album' : 'gallery';
+	$content = '';
+
+	foreach ( $ids as $id ) {
+		$content .= '[' . $tag . ' id="' . $id . '"' . $atts . ']' . "\n\n";
+	}
+
 	$page_id = wp_insert_post(
 		array(
 			'post_type'    => 'post',
-			'post_title'   => 'Renders ' . $kind . ' ' . $collection_id,
+			'post_title'   => 'Renders ' . $kind . ' ' . implode( '-', $ids ),
 			'post_status'  => 'publish',
-			'post_content' => '[' . $tag . ' id="' . $collection_id . '"' . $atts . ']',
+			'post_content' => trim( $content ),
 		),
 		true
 	);
@@ -236,14 +246,20 @@ if ( 'page' === $op ) {
 	// A rendering page for a collection that already exists. The page is
 	// scoped; the collection is untouched.
 	$album_id = (int) fg_col_arg( $args, 'album' );
-	$id       = $album_id ? $album_id : (int) fg_col_arg( $args, 'gallery' );
 	$tag      = $album_id ? 'fotogrids_album' : 'fotogrids_gallery';
+
+	// `galleries=13,13` embeds a list, in order; `gallery=13` embeds one.
+	$list = fg_col_arg( $args, 'galleries' );
+	$ids  = '' !== $list
+		? array_map( 'intval', explode( ',', $list ) )
+		: array( $album_id ? $album_id : (int) fg_col_arg( $args, 'gallery' ) );
 
 	WP_CLI::log(
 		(string) wp_json_encode(
 			array(
-				'id'  => $id,
-				'url' => get_permalink( fg_col_render_page( $id, fg_col_arg( $args, 'atts' ), $tag ) ),
+				'id'  => $ids[0],
+				'ids' => $ids,
+				'url' => get_permalink( fg_col_render_page( $ids, fg_col_arg( $args, 'atts' ), $tag ) ),
 			)
 		)
 	);
