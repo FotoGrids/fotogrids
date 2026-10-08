@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Internal\Asset_Resolver;
@@ -227,6 +228,13 @@ add_filter(
 	array( \FotoGrids\Render\Features\Collection_Header\Collection_Header::class, 'cache_bucket' ),
 	10,
 	3
+);
+
+add_action(
+	Actions_Cache::HIT,
+	array( \FotoGrids\Render\Features\Loading_Icon\Loading_Icon::class, 'publish_for_cache_hit' ),
+	10,
+	1
 );
 
 add_action(
