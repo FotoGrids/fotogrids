@@ -123,6 +123,40 @@ describe('sharing', () => {
 		}
 	);
 
+	it.each([
+		['gallery', 7],
+		['album', 12],
+	])(
+		'a view-page footer share records the whole %s',
+		(objectType, objectId) => {
+			const container = document.createElement('div');
+			container.setAttribute(
+				'data-fg-share-footer',
+				JSON.stringify({
+					enabled: true,
+					networks: { linkedin: true },
+					labels: LABELS,
+					object_type: objectType,
+					object_id: objectId,
+				})
+			);
+			document.body.appendChild(container);
+			loadModule();
+
+			click(container, 'linkedin');
+
+			expect(window.open).toHaveBeenCalledTimes(1);
+			expect(shares).toEqual([
+				{
+					itemId: '',
+					network: 'linkedin',
+					objectType,
+					objectId: String(objectId),
+				},
+			]);
+		}
+	);
+
 	it('copy_link writes the link to the clipboard and records the share', async () => {
 		const writeText = jest.fn(() => Promise.resolve());
 		Object.defineProperty(navigator, 'clipboard', {

@@ -71,17 +71,26 @@
 	 * listener) can record the share. Sharing itself does not call the
 	 * REST API; stats are a separate module's concern.
 	 *
-	 * @param {string|number} itemId
-	 * @param {string} network
+	 * A share of a whole gallery or album also carries objectType and
+	 * objectId.
+	 *
+	 * @param {HTMLElement} img     Proxy element carrying the share target.
+	 * @param {string}      network shareItem network key.
 	 */
-	function dispatchShareEvent(itemId, network) {
+	function dispatchShareEvent(img, network) {
+		const data = (img && img.dataset) || {};
+		const detail = {
+			itemId: data.id != null ? String(data.id) : '',
+			network,
+		};
+		if (data.fgShareObjectType && data.fgShareObjectId) {
+			detail.objectType = data.fgShareObjectType;
+			detail.objectId = data.fgShareObjectId;
+		}
 		document.dispatchEvent(
 			new CustomEvent('fotogrids:share', {
 				bubbles: true,
-				detail: {
-					itemId: itemId != null ? String(itemId) : '',
-					network,
-				},
+				detail,
 			})
 		);
 	}
@@ -341,10 +350,7 @@
 			case 'copy':
 				return copyToClipboard(shareTarget).then(function (ok) {
 					if (ok) {
-						dispatchShareEvent(
-							img.dataset && img.dataset.id,
-							network
-						);
+						dispatchShareEvent(img, network);
 					}
 					return ok;
 				});
@@ -352,7 +358,7 @@
 
 		if (shareUrl) {
 			window.open(shareUrl, '_blank', 'width=600,height=400');
-			dispatchShareEvent(img.dataset && img.dataset.id, network);
+			dispatchShareEvent(img, network);
 			return Promise.resolve(true);
 		}
 		return Promise.resolve(false);
@@ -365,7 +371,9 @@
 	 *
 	 * @param {Object} config             Resolved sharing - { networks, button_style, button_size, labels }.
 	 *                                    `labels` is the translated map from Sharing_Decorator::client_labels().
-	 * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl }.
+	 * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl,
+	 *                                    objectType, objectId }. objectType ('gallery' |
+	 *                                    'album') and objectId mark a whole-collection share.
 	 * @param {Object} [options]          Optional layout overrides.
 	 * @param {string} [options.layout]   'grid' | 'row'. 'grid' adds a 2-column grid
 	 *                                    modifier (used inside the lightbox info panel and
@@ -415,6 +423,10 @@
 		proxy.dataset.id = context.id != null ? String(context.id) : '';
 		proxy.dataset.fgFullSrc = context.fullUrl || '';
 		proxy.alt = context.caption || '';
+		if (context.objectType && context.objectId) {
+			proxy.dataset.fgShareObjectType = String(context.objectType);
+			proxy.dataset.fgShareObjectId = String(context.objectId);
+		}
 		if (context.galleryEl) {
 			proxy.dataset.galleryId =
 				context.galleryId ||
@@ -628,6 +640,8 @@
 						caption: document.title || '',
 						galleryEl: null,
 						galleryId: '',
+						objectType: config.object_type || '',
+						objectId: config.object_id || '',
 					},
 					{ layout: 'row' }
 				);
