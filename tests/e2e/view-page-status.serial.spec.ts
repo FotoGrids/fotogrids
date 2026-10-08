@@ -10,8 +10,8 @@ import { storageStateFor, wpCli, wpEval } from './support/roles';
  *
  * Published and private collections render as normal view pages and record one
  * view per visit. Draft, pending and scheduled collections render as a draft
- * preview for their editors and record nothing. Each case runs in both layout
- * modes.
+ * preview for their editors and record nothing, as does any collection with
+ * statistics switched off. Each case runs in both layout modes.
  *
  * Serial: it switches the site-wide view page layout mode.
  */
@@ -34,8 +34,8 @@ function gallery( status: string, settings: Record< string, unknown > = {} ): Co
 	return { id, kind: 'gallery', view: viewUrl( id ), embed: url };
 }
 
-function albumOf( status: string, children: number[] ): Collection {
-	const made = album( children, {}, `View page album ${ status }`, 'admin', status );
+function albumOf( status: string, children: number[], settings: Record< string, unknown > = {} ): Collection {
+	const made = album( children, settings, `View page album ${ status }`, 'admin', status );
 	return { id: made.id, kind: 'album', view: made.view, embed: made.url };
 }
 
@@ -107,6 +107,7 @@ test.beforeAll( () => {
 
 	c = {
 		published,
+		publishedNoStats: gallery( 'publish', { enable_statistics: false } ),
 		private: priv,
 		privateNoStats: gallery( 'private', { enable_statistics: false } ),
 		privateLocked: gallery( 'private', { password_protect: true, password_remember: false } ),
@@ -114,6 +115,7 @@ test.beforeAll( () => {
 		future: gallery( 'draft' ),
 		privateAlbum: albumOf( 'private', [ published.id, priv.id ] ),
 		pendingAlbum: albumOf( 'pending', [ published.id ] ),
+		publishedNoStatsAlbum: albumOf( 'publish', [ published.id ], { enable_statistics: false } ),
 	};
 
 	wpEval(
@@ -251,6 +253,18 @@ for ( const mode of MODES ) {
 				await visitCounted( page, c.published );
 				await expect.poll( () => views( c.published ) ).toBe( 2 );
 			} );
+
+			for ( const key of [ 'publishedNoStats', 'publishedNoStatsAlbum' ] ) {
+				test( `records nothing for ${ key } with statistics switched off`, { tag: [ '@critical', '@layout' ] }, async ( {
+					page,
+				} ) => {
+					const target = c[ key ];
+					resetViews( target );
+
+					await visitUncounted( page, target );
+					expect( views( target ) ).toBe( 0 );
+				} );
+			}
 
 			test( 'gets no view page and records nothing for private collections', { tag: [ '@permissions' ] }, async ( { page } ) => {
 				for ( const key of [ 'private', 'privateAlbum' ] ) {
