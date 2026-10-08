@@ -1418,14 +1418,9 @@ class Admin_Data {
 	}
 
 	/**
-	 * Recently edited galleries and albums
+	 * Recently edited galleries and albums the current user can edit.
 	 *
-	 * Shared by the REST route above and the dashboard widget, which renders
-	 * the same rows server-side with its own limit and status set. Only
-	 * collections the current user can edit are returned; uneditable ones are
-	 * skipped in batches, so they never shorten the list. A user who cannot
-	 * edit other users' collections of any requested type is only searched
-	 * among their own.
+	 * Shared by the REST route above and the dashboard widget.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $args Optional. Keys: limit, post_type, post_status.
