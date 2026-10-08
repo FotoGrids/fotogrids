@@ -151,6 +151,37 @@ describe('useGalleryItems', () => {
 			]);
 		});
 
+		it('decodes the entities in a rendered title', async () => {
+			mount([]);
+			wp.apiFetch.mockResolvedValue({
+				id: 6,
+				title: { rendered: 'Tom &#038; &#8220;Jerry&#8221; &#8216;s' },
+				source_url: 'https://example.com/b.jpg',
+			});
+
+			await act(async () => {
+				await api.handleUploadComplete([6]);
+			});
+
+			expect(api.items[0].title).toBe('Tom & “Jerry” ‘s');
+		});
+
+		it('falls back to the slug when the title is empty', async () => {
+			mount([]);
+			wp.apiFetch.mockResolvedValue({
+				id: 7,
+				title: { rendered: '' },
+				slug: 'img-7',
+				source_url: 'https://example.com/c.jpg',
+			});
+
+			await act(async () => {
+				await api.handleUploadComplete([7]);
+			});
+
+			expect(api.items[0].title).toBe('img-7');
+		});
+
 		it('skips an attachment it cannot read', async () => {
 			mount([]);
 			wp.apiFetch.mockRejectedValue(new Error('gone'));

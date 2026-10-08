@@ -6,6 +6,7 @@
  */
 
 use FotoGrids\Metaboxes\Metabox_Registrar;
+use FotoGrids\REST\Media\Media_Items;
 
 class MetaboxGridItemTest extends WP_UnitTestCase {
 
@@ -53,5 +54,11 @@ class MetaboxGridItemTest extends WP_UnitTestCase {
 
 		$this->assertSame( 'Untitled', $item['title'] );
 		$this->assertSame( '', $item['alt'] );
+	}
+
+	public function test_an_imported_item_title_carries_characters_not_entities(): void {
+		$item = Media_Items::to_item( $this->attachment( 'Tom & "Jerry" \'s' ) );
+
+		$this->assertSame( 'Tom & “Jerry” ‘s', $item['title'] );
 	}
 }

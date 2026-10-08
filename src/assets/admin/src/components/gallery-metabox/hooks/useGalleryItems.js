@@ -145,7 +145,11 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 					newItems.push({
 						id: media.id,
 						title:
-							media.title?.rendered || media.slug || 'Untitled',
+							wp.htmlEntities.decodeEntities(
+								media.title?.rendered || ''
+							) ||
+							media.slug ||
+							'Untitled',
 						url: media.source_url,
 						thumbnail:
 							media.media_details?.sizes?.thumbnail?.source_url ||
