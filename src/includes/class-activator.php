@@ -316,7 +316,7 @@ class Activator {
 	 * already hold either all of these caps or none of them, so they are left
 	 * unchanged.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @return void
 	 */
 	private static function grant_published_caps_to_publishers(): void {

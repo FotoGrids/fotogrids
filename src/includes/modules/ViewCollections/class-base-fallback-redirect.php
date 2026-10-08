@@ -3,7 +3,7 @@
  * Fallback resolution for view page URLs built on a superseded base.
  *
  * @package FotoGrids\Modules\ViewCollections
- * @since   1.2.0
+ * @since   1.1.1
  */
 
 namespace FotoGrids\Modules\ViewCollections;
