@@ -625,7 +625,8 @@ class Register_Admin_Routes {
 			)
 		);
 
-		// Preview rendering lives at POST /preview/gallery/{id} (Preview_Endpoint).
+		// Preview rendering lives at POST /preview/gallery/{id}, registered by the
+		// PageBuilders module (includes/modules/PageBuilders/core/rest/).
 
 		// Get catalog field states: GET /admin/catalog/field-states
 		register_rest_route(
