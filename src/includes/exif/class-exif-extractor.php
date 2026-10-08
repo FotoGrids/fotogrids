@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Exif;
 
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Filters_Data;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -113,6 +114,26 @@ final class Exif_Extractor {
 		$enabled_fields = (array) apply_filters( Filters_Data::EXIF_ENABLED_FIELDS, $enabled_fields, $settings, $gallery_id );
 
 		return Exif_Fields::sanitize_keys( $enabled_fields );
+	}
+
+	/**
+	 * Build the EXIF-field whitelist for a gallery, from its stored settings.
+	 *
+	 * @since      1.0.0
+	 * @deprecated 1.2.0 Use Exif_Extractor::enabled_fields_for_settings(), or Lightbox_Info_Scope::exif_fields() for the fields a gallery's Lightbox shows.
+	 * @param int $gallery_id Gallery post ID.
+	 * @return string[] Enabled EXIF field keys; empty when the gallery does not display EXIF.
+	 */
+	public static function enabled_fields_for_gallery( int $gallery_id ): array {
+		_deprecated_function( __METHOD__, '1.2.0', 'FotoGrids\\Exif\\Exif_Extractor::enabled_fields_for_settings()' );
+
+		$settings = Gallery_Repository::get_settings( $gallery_id );
+
+		if ( empty( $settings['display_exif'] ) ) {
+			return array();
+		}
+
+		return self::enabled_fields_for_settings( $settings, $gallery_id );
 	}
 
 	/**
