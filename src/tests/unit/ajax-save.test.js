@@ -262,6 +262,73 @@ describe('ajax-save', () => {
 		).toBe('block');
 	});
 
+	describe('leave-page warning', () => {
+		function loadAndGetBeforeUnload() {
+			const spy = jest.spyOn(window, 'addEventListener');
+			loadAndInit();
+			const call = spy.mock.calls.find(
+				([type]) => type === 'beforeunload'
+			);
+			spy.mockRestore();
+			return call[1];
+		}
+
+		function typeTitle() {
+			const title = document.querySelector('input[name="post_title"]');
+			title.value = 'Brand new';
+			title.dispatchEvent(new window.Event('input', { bubbles: true }));
+		}
+
+		function fireBeforeUnload(handler) {
+			const e = new window.Event('beforeunload', { cancelable: true });
+			handler(e);
+			return e.defaultPrevented;
+		}
+
+		beforeEach(() => {
+			document.getElementById('original_post_status').value =
+				'auto-draft';
+		});
+
+		it('warns when leaving Add New with a typed title', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(true);
+		});
+
+		it('does not warn when the post form submits', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			document
+				.getElementById('post')
+				.dispatchEvent(
+					new window.Event('submit', {
+						bubbles: true,
+						cancelable: true,
+					})
+				);
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(false);
+		});
+
+		it('still warns when the submit was cancelled', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			const form = document.getElementById('post');
+			form.addEventListener('submit', (e) => e.preventDefault(), {
+				once: true,
+			});
+			form.dispatchEvent(
+				new window.Event('submit', { bubbles: true, cancelable: true })
+			);
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(true);
+		});
+	});
+
 	it('does not autosave a form change when autosave is off', () => {
 		window.fotogridsAdmin = { autosave: '' };
 		global.fetch = jest.fn();
@@ -299,6 +366,43 @@ describe('ajax-save', () => {
 		// error log is swallowed rather than printed.
 		for (let i = 0; i < 6; i++) await Promise.resolve();
 		expect(err).toHaveBeenCalledWith('Save error:', expect.any(Error));
+		err.mockRestore();
+	});
+
+	it('drops a pending autosave when the page starts unloading', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		global.fetch = jest.fn(() => new Promise(() => {}));
+		loadAndInit();
+		global.fetch.mockClear();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Renamed';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+		window.dispatchEvent(new window.Event('beforeunload'));
+
+		jest.advanceTimersByTime(5000);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it('does not report a save the browser aborts while leaving the page', async () => {
+		const err = jest.spyOn(console, 'error').mockImplementation(() => {});
+		window.fotogridsToast = { error: jest.fn(), success: jest.fn() };
+		let reject;
+		global.fetch = jest.fn(
+			() =>
+				new Promise((resolve, rej) => {
+					reject = rej;
+				})
+		);
+		loadAndInit();
+		window.FotoGridsAjaxSave.save();
+
+		window.dispatchEvent(new window.Event('beforeunload'));
+		reject(new TypeError('Failed to fetch'));
+		for (let i = 0; i < 6; i++) await Promise.resolve();
+
+		expect(err).not.toHaveBeenCalled();
+		expect(window.fotogridsToast.error).not.toHaveBeenCalled();
 		err.mockRestore();
 	});
 

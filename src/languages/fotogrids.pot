@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T09:32:12+00:00\n"
+"POT-Creation-Date: 2026-10-08T15:54:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -44,20 +44,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:251
+#: fotogrids.php:249
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:252
-#: fotogrids.php:261
+#: fotogrids.php:250
+#: fotogrids.php:259
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:260
+#: fotogrids.php:258
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:276
+#: fotogrids.php:274
 #: includes/class-admin-init.php:174
 #: includes/class-admin-init.php:175
 #: includes/tools/import-export/assets/ImportExportTool.jsx:54
@@ -65,11 +65,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:294
+#: fotogrids.php:292
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:319
+#: fotogrids.php:317
 #: assets/admin/src/components/dashboard/LearnSection.jsx:86
 msgid "Help Center"
 msgstr ""
@@ -92,7 +92,7 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:162
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1485
+#: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:446
 #: assets/admin/src/components/pages/TemplatesPage.jsx:449
@@ -250,14 +250,14 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:163
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1485
+#: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:447
 #: assets/admin/src/components/pages/TemplatesPage.jsx:448
 #: assets/admin/src/utils/gallery.js:18
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:46
 #: includes/tools/import-export/assets/ImportExportTool.jsx:132
-#: includes/tools/migration/assets/MigrationTool.jsx:105
+#: includes/tools/migration/assets/MigrationTool.jsx:103
 msgid "Gallery"
 msgstr ""
 
@@ -3989,54 +3989,47 @@ msgstr ""
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:641
+#: includes/class-admin-init.php:642
 #: includes/metaboxes/class-collection-save-pipeline.php:97
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
 #: includes/rest/admin/admin-data.php:255
 #: includes/rest/admin/admin-data.php:275
 #: includes/rest/admin/admin-data.php:783
-#: includes/rest/admin/admin-data.php:896
-#: includes/rest/admin/admin-data.php:1074
-#: includes/rest/admin/admin-data.php:1141
-#: includes/rest/admin/admin-data.php:1233
-#: includes/rest/admin/admin-data.php:1294
-#: includes/rest/admin/admin-data.php:1424
-#: includes/rest/admin/admin-data.php:1506
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:670
+#: includes/class-admin-init.php:671
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:680
+#: includes/class-admin-init.php:681
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:690
-#: includes/class-admin-init.php:748
+#: includes/class-admin-init.php:691
+#: includes/class-admin-init.php:749
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:753
+#: includes/class-admin-init.php:754
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:1015
+#: includes/class-admin-init.php:1016
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:1016
+#: includes/class-admin-init.php:1017
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1153
+#: includes/class-admin-init.php:1154
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1159
+#: includes/class-admin-init.php:1160
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4044,8 +4037,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1172
-#: includes/class-admin-init.php:1186
+#: includes/class-admin-init.php:1173
+#: includes/class-admin-init.php:1187
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4053,7 +4046,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1205
+#: includes/class-admin-init.php:1206
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4061,32 +4054,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1217
-#: includes/class-admin-init.php:1231
+#: includes/class-admin-init.php:1218
+#: includes/class-admin-init.php:1232
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1249
-#: includes/class-admin-init.php:1432
+#: includes/class-admin-init.php:1250
+#: includes/class-admin-init.php:1433
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1252
+#: includes/class-admin-init.php:1253
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1255
+#: includes/class-admin-init.php:1256
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1292
+#: includes/class-admin-init.php:1293
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1295
+#: includes/class-admin-init.php:1296
 msgid "Choose an album..."
 msgstr ""
 
@@ -6195,7 +6188,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:587
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:588
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
@@ -6226,7 +6219,7 @@ msgid "Preview"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
-#: includes/tools/migration/assets/MigrationTool.jsx:107
+#: includes/tools/migration/assets/MigrationTool.jsx:105
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:278
 msgid "Source"
 msgstr ""
@@ -6267,7 +6260,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:871
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:873
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
@@ -6305,7 +6298,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:392
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:676
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:677
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:184
 msgid "Loading preview…"
 msgstr ""
@@ -6390,7 +6383,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:386
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:481
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:482
 msgid "Select an album to display."
 msgstr ""
 
@@ -6410,8 +6403,8 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:670
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:765
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:671
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:767
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -6435,8 +6428,7 @@ msgstr ""
 msgid "Add images, videos, or other media so this gallery has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:82
-#: includes/rest/admin/class-preview-endpoint.php:38
+#: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
 #: includes/rest/gallery/gallery-data.php:323
 #: includes/rest/gallery/gallery-data.php:592
@@ -6446,22 +6438,22 @@ msgstr ""
 msgid "Gallery not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:90
-#: includes/modules/PageBuilders/core/rest/preview-data.php:264
+#: includes/modules/PageBuilders/core/rest/preview-data.php:87
+#: includes/modules/PageBuilders/core/rest/preview-data.php:260
 msgid "Render pipeline is not available."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:254
+#: includes/modules/PageBuilders/core/rest/preview-data.php:250
 #: includes/rest/album/album-data.php:36
 msgid "Album not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:429
+#: includes/modules/PageBuilders/core/rest/preview-data.php:425
 msgid "No attachments to import."
 msgstr ""
 
 #. translators: %s: date imported
-#: includes/modules/PageBuilders/core/rest/preview-data.php:438
+#: includes/modules/PageBuilders/core/rest/preview-data.php:434
 #, php-format
 msgid "Imported gallery (%s)"
 msgstr ""
@@ -6816,7 +6808,7 @@ msgid "Lowest role that can edit and delete other users' albums, including priva
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:535
-msgid "Lowest role that can manage the FotoGrids media library."
+msgid "Lowest role that can create, rename and delete the tags, people and locations that items are filed under."
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:549
@@ -6941,25 +6933,17 @@ msgstr ""
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1379
+#: includes/rest/admin/admin-data.php:1359
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1404
+#: includes/rest/admin/admin-data.php:1384
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
 msgstr[0] ""
 msgstr[1] ""
-
-#: includes/rest/admin/class-preview-request-validator.php:34
-msgid "Unsupported preview request version."
-msgstr ""
-
-#: includes/rest/admin/class-preview-request-validator.php:53
-msgid "Preview item order exceeds the maximum supported size."
-msgstr ""
 
 #: includes/rest/album/album-data.php:60
 msgid "Featured gallery must be a gallery."
@@ -7450,12 +7434,12 @@ msgstr ""
 msgid "Unknown logical permission."
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:43
-#: includes/rest/stats/stats-data.php:76
+#: includes/rest/stats/stats-data.php:44
+#: includes/rest/stats/stats-data.php:82
 msgid "Failed to update statistics"
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:124
+#: includes/rest/stats/stats-data.php:130
 msgid "The object being tracked does not exist."
 msgstr ""
 
@@ -8865,19 +8849,19 @@ msgstr ""
 msgid "Location map"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:92
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:96
 msgid "Smart Location Suggestions"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:95
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:99
 msgid "Automatically suggest locations from EXIF GPS data and map galleries geographically."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:139
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:143
 msgid "No coordinates for this location."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:150
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:155
 msgid "Add coordinates in Library →"
 msgstr ""
 
@@ -8980,7 +8964,7 @@ msgstr ""
 #. translators: %s: entry name.
 #. translators: %s: gallery title
 #: assets/admin/src/components/library/LibraryTabBase.jsx:54
-#: includes/tools/migration/assets/MigrationTool.jsx:119
+#: includes/tools/migration/assets/MigrationTool.jsx:117
 #, js-format
 msgid "Select %s"
 msgstr ""
@@ -9606,7 +9590,7 @@ msgstr ""
 
 #: assets/admin/src/components/pages/ToolsPage.jsx:273
 #: includes/tools/migration/assets/MigrationTool.jsx:41
-#: includes/tools/migration/assets/MigrationTool.jsx:398
+#: includes/tools/migration/assets/MigrationTool.jsx:396
 msgid "Coming soon"
 msgstr ""
 
@@ -11159,13 +11143,13 @@ msgstr ""
 msgid "Choose gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:422
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:440
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:423
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:441
 msgid "This album has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:706
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:724
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:708
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:726
 msgid "This gallery has nothing to preview yet."
 msgstr ""
 
@@ -11203,7 +11187,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:132
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:311
 #: includes/tools/import-export/assets/ImportExportTool.jsx:547
-#: includes/tools/migration/assets/MigrationTool.jsx:211
+#: includes/tools/migration/assets/MigrationTool.jsx:209
 msgid "Import failed."
 msgstr ""
 
@@ -11396,7 +11380,7 @@ msgid "Overwrite"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:81
-#: includes/tools/migration/assets/MigrationTool.jsx:323
+#: includes/tools/migration/assets/MigrationTool.jsx:321
 msgid "Duplicate"
 msgstr ""
 
@@ -11490,7 +11474,7 @@ msgid "Select export file"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:569
-#: includes/tools/migration/assets/MigrationTool.jsx:240
+#: includes/tools/migration/assets/MigrationTool.jsx:238
 msgid "Import complete"
 msgstr ""
 
@@ -11539,7 +11523,7 @@ msgid "We recommend taking a database backup before importing. This action canno
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:724
-#: includes/tools/migration/assets/MigrationTool.jsx:336
+#: includes/tools/migration/assets/MigrationTool.jsx:334
 msgid "Importing…"
 msgstr ""
 
@@ -11567,96 +11551,96 @@ msgstr ""
 msgid "Sliders"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:102
+#: includes/tools/migration/assets/MigrationTool.jsx:100
 msgid "Select all galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:106
+#: includes/tools/migration/assets/MigrationTool.jsx:104
 msgid "Images"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:190
+#: includes/tools/migration/assets/MigrationTool.jsx:188
 msgid "Scan failed."
 msgstr ""
 
 #. translators: 1: imported count, 2: skipped count
-#: includes/tools/migration/assets/MigrationTool.jsx:245
+#: includes/tools/migration/assets/MigrationTool.jsx:243
 #, js-format
 msgid "%1$d galleries imported, %2$d skipped."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:259
+#: includes/tools/migration/assets/MigrationTool.jsx:257
 msgid "Scan again"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:277
+#: includes/tools/migration/assets/MigrationTool.jsx:275
 msgid "Scan galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:284
+#: includes/tools/migration/assets/MigrationTool.jsx:282
 msgid "Scanning…"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:291
+#: includes/tools/migration/assets/MigrationTool.jsx:289
 msgid "No galleries found for this source."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:304
+#: includes/tools/migration/assets/MigrationTool.jsx:302
 msgid "If a gallery already exists:"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:310
+#: includes/tools/migration/assets/MigrationTool.jsx:308
 msgid "If a gallery already exists"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:319
+#: includes/tools/migration/assets/MigrationTool.jsx:317
 msgid "Skip"
 msgstr ""
 
 #. translators: %d: number of selected galleries
-#: includes/tools/migration/assets/MigrationTool.jsx:339
+#: includes/tools/migration/assets/MigrationTool.jsx:337
 #, js-format
 msgid "Import %d galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:373
+#: includes/tools/migration/assets/MigrationTool.jsx:371
 msgid "We found the plugin installed on your site."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:378
+#: includes/tools/migration/assets/MigrationTool.jsx:376
 msgid "Migration support for this plugin is coming soon."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:385
+#: includes/tools/migration/assets/MigrationTool.jsx:383
 msgid "Migration from this plugin isn’t available yet."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:390
+#: includes/tools/migration/assets/MigrationTool.jsx:388
 msgid "Support is planned for an upcoming release."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:432
+#: includes/tools/migration/assets/MigrationTool.jsx:430
 msgid "Could not load migration sources."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:460
-#: includes/tools/migration/assets/MigrationTool.jsx:468
+#: includes/tools/migration/assets/MigrationTool.jsx:458
+#: includes/tools/migration/assets/MigrationTool.jsx:466
 msgid "Choose"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:462
+#: includes/tools/migration/assets/MigrationTool.jsx:460
 msgid "Run"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:475
+#: includes/tools/migration/assets/MigrationTool.jsx:473
 msgid "Migration"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:476
+#: includes/tools/migration/assets/MigrationTool.jsx:474
 msgid "Moving from another plugin? Choose the source and FotoGrids will help bring your galleries over."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:493
+#: includes/tools/migration/assets/MigrationTool.jsx:491
 msgid "Loading sources…"
 msgstr ""
 
