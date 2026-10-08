@@ -10,6 +10,10 @@
 	const strings = window.fotogridsAjaxSave?.strings || {};
 	const State = window.FotoGridsCollectionState;
 
+	// Set once the page starts unloading. The browser aborts an in-flight
+	// save on unload, which rejects the fetch like a network failure.
+	let leavingPage = false;
+
 	document.addEventListener('DOMContentLoaded', initAjaxSave);
 
 	function initAjaxSave() {
@@ -110,6 +114,8 @@
 					// Never intercept Publish / Update / Schedule - those must
 					// reach WordPress so the post status actually changes.
 					if (submitter && submitter.id === 'publish') {
+						leavingPage = true;
+						State?.autosave.cancel();
 						return;
 					}
 
@@ -317,6 +323,8 @@
 			}
 		}
 
+		leavingPage = false;
+
 		fetch(window.ajaxurl, {
 			method: 'POST',
 			body: formData,
@@ -338,6 +346,9 @@
 				}
 			})
 			.catch((error) => {
+				if (leavingPage) {
+					return;
+				}
 				console.error('Save error:', error);
 				const errorMessage = error.message
 					? error.message
@@ -622,6 +633,7 @@
 		});
 
 		window.addEventListener('beforeunload', (e) => {
+			leavingPage = true;
 			if (submitting) {
 				return;
 			}

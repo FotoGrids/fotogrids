@@ -369,6 +369,48 @@ describe('ajax-save', () => {
 		err.mockRestore();
 	});
 
+	it('drops a pending autosave when Update submits the form', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		global.fetch = jest.fn(() => new Promise(() => {}));
+		loadAndInit();
+		global.fetch.mockClear();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Renamed';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		const form = document.getElementById('post');
+		document.getElementById('publish').focus();
+		form.dispatchEvent(
+			new window.Event('submit', { bubbles: true, cancelable: true })
+		);
+
+		jest.advanceTimersByTime(5000);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it('does not report a save the browser aborts while leaving the page', async () => {
+		const err = jest.spyOn(console, 'error').mockImplementation(() => {});
+		window.fotogridsToast = { error: jest.fn(), success: jest.fn() };
+		let reject;
+		global.fetch = jest.fn(
+			() =>
+				new Promise((resolve, rej) => {
+					reject = rej;
+				})
+		);
+		loadAndInit();
+		window.FotoGridsAjaxSave.save();
+
+		window.dispatchEvent(new window.Event('beforeunload'));
+		reject(new TypeError('Failed to fetch'));
+		for (let i = 0; i < 6; i++) await Promise.resolve();
+
+		expect(err).not.toHaveBeenCalled();
+		expect(window.fotogridsToast.error).not.toHaveBeenCalled();
+		err.mockRestore();
+	});
+
 	it('adds a quick-save admin-bar button that triggers a save', () => {
 		const fetchMock = jest.fn(() => new Promise(() => {}));
 		global.fetch = fetchMock;
