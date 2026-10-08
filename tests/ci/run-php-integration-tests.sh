@@ -26,6 +26,7 @@ tests=(
     "${plugin_root}/tests/integration/RenderCacheExpiryTest.php"
     "${plugin_root}/tests/integration/RenderCacheInlineAssetsTest.php"
     "${plugin_root}/tests/integration/RandomSortModeTest.php"
+    "${plugin_root}/tests/integration/ShareTrackingToggleTest.php"
     "${plugin_root}/tests/integration/TemplateConfigValidityTest.php"
 )
 
