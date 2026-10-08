@@ -121,9 +121,10 @@ namespace FotoGrids\Tests\Integration {
             self::test_off_records_nothing();
             self::test_on_records_share();
             self::test_default_records_share();
+            self::test_off_missing_object_is_not_found();
         }
 
-        private static function share( ?bool $track_clicks ): \WP_REST_Response|\WP_Error {
+        private static function share( ?bool $track_clicks, int $object_id = 42 ): \WP_REST_Response|\WP_Error {
             Statistics::$calls                 = [];
             $GLOBALS['fotogrids_test_actions'] = [];
             $GLOBALS['fotogrids_test_options'] = null === $track_clicks
@@ -134,7 +135,7 @@ namespace FotoGrids\Tests\Integration {
                 new \WP_REST_Request(
                     [
                         'object_type' => 'item',
-                        'object_id'   => 42,
+                        'object_id'   => $object_id,
                         'network'     => 'facebook',
                     ]
                 )
@@ -160,6 +161,13 @@ namespace FotoGrids\Tests\Integration {
             self::share( null );
 
             self::assert_same( 1, count( Statistics::$calls ), 'With nothing saved, tracking follows its default of on.' );
+        }
+
+        private static function test_off_missing_object_is_not_found(): void {
+            $response = self::share( false, 99999 );
+
+            self::assert_same( true, $response instanceof \WP_Error && 404 === $response->data['status'], 'Tracking off still answers 404 for an object that does not exist.' );
+            self::assert_same( [], Statistics::$calls, 'A missing object increments no counter.' );
         }
 
         private static function assert_same( mixed $expected, mixed $actual, string $message ): void {

@@ -66,12 +66,12 @@ class Stats_Data {
 		$object_id   = (int) $request->get_param( 'object_id' );
 		$network     = $request->get_param( 'network' );
 
-		if ( empty( Sharing_Settings_Store::get()['track_clicks'] ) ) {
-			return rest_ensure_response( array( 'success' => true ) );
-		}
-
 		if ( ! self::object_exists( $object_type, $object_id ) ) {
 			return self::not_found_error();
+		}
+
+		if ( empty( Sharing_Settings_Store::get()['track_clicks'] ) ) {
+			return rest_ensure_response( array( 'success' => true ) );
 		}
 
 		$result = \FotoGrids\Statistics::increment( $object_type, $object_id, 'shares' );
