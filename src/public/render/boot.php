@@ -222,6 +222,13 @@ add_filter(
 	3
 );
 
+add_filter(
+	Filters_Cache::BUCKET,
+	array( \FotoGrids\Render\Features\Collection_Header\Collection_Header::class, 'cache_bucket' ),
+	10,
+	3
+);
+
 add_action(
 	Actions_Render::REGISTER_HOVER_EFFECTS,
 	static function (): void {
