@@ -379,6 +379,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Upgrade Notice ==
 
+= 1.2.0 =
+FotoGrids now works in Bricks! This update also fixes multi-choice settings, statistics, cached galleries and password galleries, and keeps protected galleries out of caches.
+
 = 1.1.4 =
 Responsiveness breakpoints, deep links, statistics and plain-permalink sites now work as set, plus a Recently Edited card on the Dashboard and many more fixes throughout.
 
