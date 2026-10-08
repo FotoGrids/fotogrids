@@ -1,9 +1,10 @@
 /**
- * Tests for the Item Edit modal's Interactions and Media tabs.
+ * Tests for the Item Edit modal's Interactions, Media and Location tabs.
  */
 import React from 'react';
 import TabInteractions from '@/admin/src/components/item-edit-modal/tabs/TabInteractions';
 import TabMedia from '@/admin/src/components/item-edit-modal/tabs/TabMedia';
+import TabLocation from '@/admin/src/components/item-edit-modal/tabs/TabLocation';
 import { renderElement, act } from '@tests/helpers/render-component';
 
 const h = React.createElement;
@@ -220,6 +221,83 @@ describe('TabMedia', () => {
 			container.querySelector('.fotogrids-item-edit-media-sizes__empty')
 				.textContent
 		).toBe('Size variants are only generated for images.');
+		unmount();
+	});
+});
+
+describe('TabLocation', () => {
+	const LIBRARY_URL =
+		'https://example.com/wp-admin/admin.php?page=fotogrids-library&tab=locations';
+
+	const renderWithoutCoordinates = () =>
+		renderElement(
+			h(TabLocation, {
+				metadata: {
+					locations: [
+						{
+							id: 7,
+							name: 'Lisbon',
+							latitude: null,
+							longitude: null,
+						},
+					],
+				},
+				availableMetadata: { locations: [] },
+				metadataInput: { locations: '' },
+				setMetadataInput: () => {},
+				addMetadataItem: () => {},
+				removeMetadataItem: () => {},
+				selectExistingMetadata: () => {},
+				strings: {},
+			})
+		);
+
+	afterEach(() => {
+		delete window.fotogridsAdmin;
+	});
+
+	it('links to the Locations tab of Library when the user can manage it', () => {
+		window.fotogridsAdmin = {
+			locationLibraryUrl: LIBRARY_URL,
+			capabilities: { manage_fotogrids_library: true },
+		};
+		const { container, unmount } = renderWithoutCoordinates();
+
+		const link = container.querySelector(
+			'.fotogrids-item-edit-location-no-coords__link'
+		);
+		expect(link).not.toBeNull();
+		expect(link.getAttribute('href')).toBe(LIBRARY_URL);
+		unmount();
+	});
+
+	it('omits the link when the user cannot manage Library', () => {
+		window.fotogridsAdmin = {
+			locationLibraryUrl: LIBRARY_URL,
+			capabilities: { manage_fotogrids_library: false },
+		};
+		const { container, unmount } = renderWithoutCoordinates();
+
+		expect(
+			container.querySelector('.fotogrids-item-edit-location-no-coords')
+		).not.toBeNull();
+		expect(
+			container.querySelector(
+				'.fotogrids-item-edit-location-no-coords__link'
+			)
+		).toBeNull();
+		unmount();
+	});
+
+	it('omits the link when no capabilities are localised', () => {
+		window.fotogridsAdmin = { locationLibraryUrl: LIBRARY_URL };
+		const { container, unmount } = renderWithoutCoordinates();
+
+		expect(
+			container.querySelector(
+				'.fotogrids-item-edit-location-no-coords__link'
+			)
+		).toBeNull();
 		unmount();
 	});
 });
