@@ -217,6 +217,38 @@ test.describe( 'gallery items grid', () => {
 		expect( [ await title.innerText(), await thumb.getAttribute( 'alt' ) ] ).toEqual( live );
 	} );
 
+	test( 'ampersands, quotes and apostrophes show as characters, not HTML entities', { tag: [ '@admin' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = galleryPage();
+		const editor = new GalleryEditor( page );
+		const title = editor.item( itemId ).locator( '.fotogrids-item-title' );
+		const thumb = editor.item( itemId ).locator( 'img' ).first();
+		const entity = /&#?\w+;/;
+
+		wpEval( `
+			wp_update_post( wp_slash( array( 'ID' => ${ itemId }, 'post_title' => 'Tom & "Jerry" \\'s' ) ) );
+			delete_post_meta( ${ itemId }, '_wp_attachment_image_alt' );
+		` );
+		await editor.open( id );
+		await expect( title ).toHaveText( 'Tom & “Jerry” ‘s' );
+		await expect( thumb ).toHaveAttribute( 'alt', 'Tom & “Jerry” ‘s' );
+
+		await openItem( page, editor );
+		await expect( page.locator( '#fotogrids-item-title' ) ).toHaveValue( 'Tom & "Jerry" \'s' );
+		await saveItem( page, 'Fish & "Chips" isn\'t', '' );
+		await expect( title ).toHaveText( 'Fish & “Chips” isn’t' );
+		await expect( thumb ).toHaveAttribute( 'alt', 'Fish & “Chips” isn’t' );
+		expect( wpEval( `echo get_post_field( 'post_title', ${ itemId }, 'raw' );` ).trim() ).toBe(
+			'Fish & "Chips" isn\'t'
+		);
+
+		await editor.open( id );
+		await expect( title ).toHaveText( 'Fish & “Chips” isn’t' );
+		expect( await title.innerText() ).not.toMatch( entity );
+		expect( await thumb.getAttribute( 'alt' ) ).not.toMatch( entity );
+	} );
+
 	test.describe( () => {
 		test.use( { allowConsoleErrors: 'asserts the failed-save path, which logs the 500' } );
 
