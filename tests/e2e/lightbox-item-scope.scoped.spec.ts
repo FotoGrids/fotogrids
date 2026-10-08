@@ -1,4 +1,5 @@
-import { test, expect, APIRequestContext } from '@playwright/test';
+import type { APIRequestContext } from '@playwright/test';
+import { test, expect } from './support/test';
 import { galleryPage, Settings } from './support/collections';
 import { firstItem } from './support/fixtures';
 import { apiAnonymous } from './support/roles';
@@ -33,7 +34,7 @@ function blocksWithout( block: string ): string[] {
 	return ALL_BLOCKS.filter( ( b ) => b !== block );
 }
 
-test.describe( 'GET /lightbox/item/{id}', () => {
+test.describe( 'GET /lightbox/item/{id}', { tag: [ '@api', '@lightbox' ] }, () => {
 	let anon: APIRequestContext;
 
 	test.beforeAll( async ( { playwright } ) => {

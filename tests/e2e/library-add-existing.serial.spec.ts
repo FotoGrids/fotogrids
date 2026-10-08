@@ -1,4 +1,5 @@
-import { test, expect, APIRequestContext } from '@playwright/test';
+import type { APIRequestContext } from '@playwright/test';
+import { test, expect } from './support/test';
 import { apiAs } from './support/roles';
 
 /**
@@ -19,7 +20,7 @@ function route( path: string, query: Record< string, string > = {} ) {
 	} ).toString() }`;
 }
 
-test.describe( 'adding an existing Library entry', () => {
+test.describe( 'adding an existing Library entry', { tag: [ '@api', '@admin' ] }, () => {
 	let admin: APIRequestContext;
 	let headers: Record< string, string >;
 	const created: Array< { type: string; id: number } > = [];
