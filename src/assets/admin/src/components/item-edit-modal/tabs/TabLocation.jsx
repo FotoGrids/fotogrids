@@ -80,6 +80,10 @@ const TabLocation = ({
 	strings = {},
 }) => {
 	const isProActive = Boolean(window.fotogridsSettings?.isProActive);
+	const locationLibraryUrl =
+		window.fotogridsAdmin?.capabilities?.manage_fotogrids_library === true
+			? window.fotogridsAdmin?.locationLibraryUrl
+			: null;
 
 	// Current location (maxItems=1, so at most one entry).
 	const currentLocation = metadata?.locations?.[0] ?? null;
@@ -141,14 +145,19 @@ const TabLocation = ({
 								'fotogrids'
 							)}
 						</span>
-						<a
-							href={`${window.fotogridsAdmin?.adminUrl || '#'}admin.php?page=fotogrids-library&tab=locations`}
-							className="fotogrids-item-edit-location-no-coords__link"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{__('Add coordinates in Library →', 'fotogrids')}
-						</a>
+						{locationLibraryUrl && (
+							<a
+								href={locationLibraryUrl}
+								className="fotogrids-item-edit-location-no-coords__link"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{__(
+									'Add coordinates in Library →',
+									'fotogrids'
+								)}
+							</a>
+						)}
 					</div>
 				)}
 		</div>
