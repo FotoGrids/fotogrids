@@ -81,7 +81,7 @@ test.beforeEach( async ( { page } ) => {
 	await page.route( /\.(jpe?g|png|webp|gif|avif)(\?|$)/, () => {} );
 } );
 
-test( 'a gallery block starts its loaders on a fresh render and from the cache', { tag: [ '@layout', '@cache' ] }, async ( {
+test( 'a gallery block starts its loaders on a fresh render and from the cache', { tag: [ '@critical', '@layout', '@cache' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage( { enable_cache: true } );
