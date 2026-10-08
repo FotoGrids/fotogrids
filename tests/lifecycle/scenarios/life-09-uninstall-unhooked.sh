@@ -1,11 +1,6 @@
 # LIFE-11. Deleting the plugin honours the site's "delete my data" choice however
 # the plugin was deactivated, and whether or not the Freemius SDK's files are
 # still there.
-#
-# Cleanup runs from the FotoGrids uninstall callback, registered on activation,
-# on deactivation and on every admin load. It replaces the callback the SDK
-# registers on an admin's deactivation, and reports the uninstall to the SDK
-# itself.
 
 tables() {
 	$WP eval 'global $wpdb; echo count( $wpdb->get_col( "SHOW TABLES LIKE \"{$wpdb->prefix}fotogrids_%\"" ) );'
@@ -96,10 +91,6 @@ assert_eq "$FG_TABLE_COUNT" "$( tables )" "and kept the data, as the site's defa
 scratch_teardown
 
 # --- activated and deactivated as the admin, then deleted --------------------
-#
-# The SDK unregisters the uninstall callback on an admin's activation and
-# registers its own on an admin's deactivation. The FotoGrids callback has to be
-# the one left, and it still has to report the uninstall to the SDK.
 
 scratch_install life09d
 

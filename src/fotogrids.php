@@ -130,8 +130,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 register_activation_hook( __FILE__, array( 'FotoGrids\Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'FotoGrids\Deactivator', 'deactivate' ) );
 
-// The Freemius SDK rewrites the uninstall_plugins entry on activation and
-// deactivation, so the FotoGrids callback is re-registered after it.
+// After the Freemius SDK's own activation and deactivation callbacks.
 add_action( 'activate_' . FOTOGRIDS_PLUGIN_BASENAME, array( 'FotoGrids\Uninstaller', 'register' ), PHP_INT_MAX );
 add_action( 'deactivate_' . FOTOGRIDS_PLUGIN_BASENAME, array( 'FotoGrids\Uninstaller', 'register' ), PHP_INT_MAX );
 add_action( 'admin_init', array( 'FotoGrids\Uninstaller', 'register' ) );

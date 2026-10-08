@@ -187,10 +187,8 @@ class Freemius_Bootstrap {
 	/**
 	 * Passes the uninstall to the Freemius SDK so it can report the event.
 	 *
-	 * The FotoGrids uninstall callback replaces the one the SDK registers, so
-	 * the SDK's callback is called here. Must run inside the per-plugin
-	 * uninstall action: the SDK reads the plugin file from current_filter().
-	 * Does nothing when the SDK is not loaded.
+	 * Must run inside the per-plugin uninstall action. Does nothing when the
+	 * SDK is not loaded.
 	 *
 	 * @since  1.2.0
 	 * @return void

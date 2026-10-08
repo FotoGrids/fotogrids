@@ -34,9 +34,7 @@ class Uninstaller {
 	/**
 	 * Uninstall the plugin completely.
 	 *
-	 * WordPress calls this on the per-plugin uninstall action after loading
-	 * only the main plugin file. The uninstall is reported to Freemius before
-	 * any data is removed.
+	 * Runs with only the main plugin file loaded.
 	 */
 	public static function uninstall() {
 		\FotoGrids\Licensing\Freemius_Bootstrap::report_uninstall();
