@@ -323,6 +323,7 @@ class Admin_Init {
 				'settingsBaseUrl'    => admin_url( 'admin.php?page=fotogrids-settings' ),
 				'homeUrl'            => home_url(),
 				'permalinksUrl'      => admin_url( 'options-permalink.php' ),
+				'locationLibraryUrl' => admin_url( 'admin.php?page=fotogrids-library&tab=locations' ),
 				'permalinkStructure' => (string) get_option( 'permalink_structure' ),
 				'isFotoGridsPage'    => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
 				'capabilities'       => self::get_current_user_capabilities_snapshot(),
