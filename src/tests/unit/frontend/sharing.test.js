@@ -118,7 +118,11 @@ describe('sharing', () => {
 				encodeURIComponent(SHARE_TARGET)
 			);
 			expect(shares).toEqual([
-				{ itemId: '42', network: api.networkKeyFor(network) },
+				{
+					itemId: '42',
+					network: api.networkKeyFor(network),
+					galleryEl: bar.parentElement,
+				},
 			]);
 		}
 	);
@@ -164,12 +168,15 @@ describe('sharing', () => {
 			configurable: true,
 		});
 
-		click(renderBar(api, ['copy_link']), 'copy_link');
+		const bar = renderBar(api, ['copy_link']);
+		click(bar, 'copy_link');
 		await new Promise((resolve) => setTimeout(resolve, 0));
 
 		expect(writeText).toHaveBeenCalledWith(SHARE_TARGET);
 		expect(window.open).not.toHaveBeenCalled();
-		expect(shares).toEqual([{ itemId: '42', network: 'copy' }]);
+		expect(shares).toEqual([
+			{ itemId: '42', network: 'copy', galleryEl: bar.parentElement },
+		]);
 
 		delete navigator.clipboard;
 	});
