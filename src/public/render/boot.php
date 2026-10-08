@@ -207,6 +207,28 @@ add_filter(
 	3
 );
 
+add_filter(
+	Filters_Cache::BYPASS_PAGE_CACHE,
+	static function ( $bypass, $settings, $gallery_id ): bool {
+		if ( $bypass ) {
+			return true;
+		}
+
+		$context = \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( (int) $gallery_id, (array) $settings );
+
+		return \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
+	},
+	10,
+	3
+);
+
+add_filter(
+	Filters_Cache::BUCKET,
+	array( \FotoGrids\Render\Features\Collection_Header\Collection_Header::class, 'cache_bucket' ),
+	10,
+	3
+);
+
 add_action(
 	Actions_Render::REGISTER_HOVER_EFFECTS,
 	static function (): void {

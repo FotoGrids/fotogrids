@@ -202,7 +202,9 @@ class Gallery_Data {
 			);
 		}
 
-		if ( 'publish' !== $gallery->post_status ) {
+		$readable = 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) );
+		if ( ! $readable ) {
 			return new \WP_Error(
 				'gallery_not_published',
 				__( 'Gallery is not published', 'fotogrids' ),
