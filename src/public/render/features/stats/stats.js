@@ -141,9 +141,9 @@
 	 * Handle a fotogrids:share event by sending a share ping. The event
 	 * fires from the Sharing module when the user clicks a share button.
 	 *
-	 * An item share takes the REST URL from the first stats-enabled
-	 * collection on the page. A gallery or album share is sent only when
-	 * that collection has statistics enabled.
+	 * An item share is sent only when the gallery it belongs to has
+	 * statistics enabled. A gallery or album share is sent only when that
+	 * collection has statistics enabled.
 	 *
 	 * @param {CustomEvent} e
 	 */
@@ -164,7 +164,7 @@
 
 		const cfg =
 			objectType === 'item'
-				? firstConfig()
+				? detail.galleryEl && readConfig(detail.galleryEl)
 				: configFor(objectType, objectId);
 		if (!cfg) {
 			return;
@@ -175,18 +175,6 @@
 			object_id: objectId,
 			network: detail.network,
 		});
-	}
-
-	/**
-	 * Stats config of the first stats-enabled collection on the page.
-	 *
-	 * @returns {Object|null}
-	 */
-	function firstConfig() {
-		const el = document.querySelector(
-			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
-		);
-		return el ? readConfig(el) : null;
 	}
 
 	/**
