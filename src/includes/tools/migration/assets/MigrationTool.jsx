@@ -46,10 +46,9 @@ const SourceStatus = ({ source }) => {
 /**
  * A single source-plugin card.
  */
-const SourceCard = ({ source, active, onSelect }) => {
+const SourceCard = ({ source, onSelect }) => {
 	const cardClasses = [
 		`${baseClass}__source-card`,
-		active ? `${baseClass}__source-card--active` : '',
 		source.available ? '' : `${baseClass}__source-card--soon`,
 	]
 		.filter(Boolean)
@@ -60,7 +59,6 @@ const SourceCard = ({ source, active, onSelect }) => {
 			type="button"
 			className={cardClasses}
 			onClick={() => onSelect(source.id)}
-			aria-pressed={active}
 		>
 			<span
 				className={`${baseClass}__source-icon`}
@@ -522,7 +520,6 @@ const MigrationTool = () => {
 									<SourceCard
 										key={source.id}
 										source={source}
-										active={selectedSource === source.id}
 										onSelect={selectSource}
 									/>
 								))}

@@ -262,6 +262,73 @@ describe('ajax-save', () => {
 		).toBe('block');
 	});
 
+	describe('leave-page warning', () => {
+		function loadAndGetBeforeUnload() {
+			const spy = jest.spyOn(window, 'addEventListener');
+			loadAndInit();
+			const call = spy.mock.calls.find(
+				([type]) => type === 'beforeunload'
+			);
+			spy.mockRestore();
+			return call[1];
+		}
+
+		function typeTitle() {
+			const title = document.querySelector('input[name="post_title"]');
+			title.value = 'Brand new';
+			title.dispatchEvent(new window.Event('input', { bubbles: true }));
+		}
+
+		function fireBeforeUnload(handler) {
+			const e = new window.Event('beforeunload', { cancelable: true });
+			handler(e);
+			return e.defaultPrevented;
+		}
+
+		beforeEach(() => {
+			document.getElementById('original_post_status').value =
+				'auto-draft';
+		});
+
+		it('warns when leaving Add New with a typed title', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(true);
+		});
+
+		it('does not warn when the post form submits', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			document
+				.getElementById('post')
+				.dispatchEvent(
+					new window.Event('submit', {
+						bubbles: true,
+						cancelable: true,
+					})
+				);
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(false);
+		});
+
+		it('still warns when the submit was cancelled', () => {
+			const onBeforeUnload = loadAndGetBeforeUnload();
+			typeTitle();
+
+			const form = document.getElementById('post');
+			form.addEventListener('submit', (e) => e.preventDefault(), {
+				once: true,
+			});
+			form.dispatchEvent(
+				new window.Event('submit', { bubbles: true, cancelable: true })
+			);
+
+			expect(fireBeforeUnload(onBeforeUnload)).toBe(true);
+		});
+	});
+
 	it('does not autosave a form change when autosave is off', () => {
 		window.fotogridsAdmin = { autosave: '' };
 		global.fetch = jest.fn();

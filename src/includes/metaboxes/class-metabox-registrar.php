@@ -284,7 +284,7 @@ final class Metabox_Registrar {
 		wp_enqueue_script(
 			'fotogrids-metabox',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/metabox.js',
-			array( 'wp-element', 'wp-components', 'wp-i18n', 'wp-media-utils', 'jquery', 'jquery-ui-sortable', 'fotogrids-icons' ),
+			array( 'wp-element', 'wp-components', 'wp-html-entities', 'wp-i18n', 'wp-media-utils', 'jquery', 'jquery-ui-sortable', 'fotogrids-icons' ),
 			FOTOGRIDS_VERSION,
 			true
 		);
@@ -418,7 +418,7 @@ final class Metabox_Registrar {
 
 		$item_type  = \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
 		$is_video   = \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE === $item_type;
-		$item_title = get_the_title( $item_id );
+		$item_title = html_entity_decode( get_the_title( $item_id ), ENT_QUOTES, 'UTF-8' );
 		$item_alt   = get_post_meta( $item_id, '_wp_attachment_image_alt', true );
 
 		if ( $is_video ) {

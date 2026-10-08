@@ -214,10 +214,7 @@ final class Loading_Icon implements Feature {
 	 * @return  Module_Assets
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
-		// Publish this gallery's icon into the page-level map. Done here (during
-		// render, before Asset_Resolver force-prints loading-icon.js) so the map
-		// reaches the page ahead of the script that reads it.
-		$this->publish_icon_map( $this->resolve_icon_name( $render_context ) );
+		self::publish_icon_map( $this->resolve_icon_name( $render_context ) );
 
 		return new Module_Assets(
 			array(
@@ -245,7 +242,18 @@ final class Loading_Icon implements Feature {
 	 * @return  string
 	 */
 	private function resolve_icon_name( Render_Context $render_context ): string {
-		$icon = $render_context->settings['loading_icon'] ?? '';
+		return self::icon_name_from( $render_context->settings );
+	}
+
+	/**
+	 * Reads the icon name from a settings array, falling back to the default.
+	 *
+	 * @since   1.2.0
+	 * @param   array<string, mixed> $settings Collection settings.
+	 * @return  string
+	 */
+	private static function icon_name_from( array $settings ): string {
+		$icon = $settings['loading_icon'] ?? '';
 		return ( is_string( $icon ) && '' !== $icon ) ? $icon : self::DEFAULT_ICON;
 	}
 
@@ -277,26 +285,21 @@ final class Loading_Icon implements Feature {
 	 * The map (window.fotogridsLoadingIcons) carries the icon svg + its WAAPI
 	 * animate function, which loading-icon.js reads to start the loader
 	 * animations. It cannot ride inside the gallery markup: the animate
-	 * functions contain &&, <, > that the_content filters (wptexturize etc.)
-	 * would mangle, and the markup is destined for wp_kses(). It also cannot be
-	 * attached to loading-icon.js as a 'before' inline, because Asset_Resolver
-	 * force-prints that handle mid-content and a later inline addition is lost.
+	 * functions contain &&, <, > that the_content filters would mangle, and the
+	 * markup is destined for wp_kses().
 	 *
-	 * So each distinct icon is emitted through its own src-less script handle,
-	 * force-printed immediately when the document head has already rendered
-	 * (the normal shortcode-in-the_content case) - the same pattern
-	 * Inline_Asset_Emitter uses for per-render CSS. The assignment is additive
-	 * (Object.assign) so multiple galleries with different icons each contribute
-	 * without clobbering. A unique handle per icon keeps each independently
-	 * printable. When the head has not rendered yet the handle is enqueued and
-	 * flushed on wp_footer. REST and AJAX renders print nothing at all and go
-	 * through defer_icon_map() instead.
+	 * Each distinct icon is enqueued as its own src-less footer script, so the
+	 * map is never printed inside post content. The assignment is additive
+	 * (Object.assign) so galleries with different icons each contribute.
+	 * loading-icon.js starts the animations again on DOMContentLoaded, by which
+	 * point the footer map has run. REST and AJAX renders go through
+	 * defer_icon_map() instead.
 	 *
 	 * @since   1.0.0
 	 * @param   string $icon_name Icon name for the gallery being rendered.
 	 * @return  void
 	 */
-	private function publish_icon_map( string $icon_name ): void {
+	private static function publish_icon_map( string $icon_name ): void {
 		if ( isset( self::$published_icons[ $icon_name ] ) ) {
 			return;
 		}
@@ -322,23 +325,22 @@ final class Loading_Icon implements Feature {
 		}
 
 		$handle = 'fotogrids-loading-icons-' . (string) ++self::$map_seq;
-		wp_register_script( $handle, false, array(), FOTOGRIDS_VERSION, false );
+		wp_register_script( $handle, false, array(), FOTOGRIDS_VERSION, true );
 		wp_enqueue_script( $handle );
 		wp_add_inline_script( $handle, $js );
+	}
 
-		if ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) {
-			wp_print_scripts( $handle );
-			return;
-		}
-
-		// Head not rendered yet (very early render): flush on wp_footer.
-		add_action(
-			'wp_footer',
-			static function () use ( $handle ): void {
-				wp_print_scripts( $handle );
-			},
-			10
-		);
+	/**
+	 * Publishes a gallery's loading icon when its render is replayed from the
+	 * render cache, where assets() never runs.
+	 *
+	 * @since   1.2.0
+	 * @param   int $gallery_id Gallery ID.
+	 * @return  void
+	 */
+	public static function publish_for_cache_hit( int $gallery_id ): void {
+		$settings = \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
+		self::publish_icon_map( self::icon_name_from( $settings ) );
 	}
 
 	/**
