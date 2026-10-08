@@ -532,7 +532,7 @@ final class Core_Permissions {
 				array(
 					'key'                 => 'fg_manage_library',
 					'label'               => __( 'Manage library (tags, people, locations)', 'fotogrids' ),
-					'description'         => __( 'Lowest role that can manage the FotoGrids media library.', 'fotogrids' ),
+					'description'         => __( 'Lowest role that can create, rename and delete the tags, people and locations that items are filed under.', 'fotogrids' ),
 					'group'               => 'media',
 					'panel'               => 'simple',
 					'underlying_caps'     => array( 'manage_fotogrids_library' ),

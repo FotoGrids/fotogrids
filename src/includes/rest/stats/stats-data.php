@@ -3,6 +3,7 @@ namespace FotoGrids\REST\Stats;
 
 use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Settings\Sharing_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -53,7 +54,8 @@ class Stats_Data {
 	 *
 	 * Records a share event for a specific object, optionally tracking the
 	 * social network used for sharing. Triggers additional hooks for
-	 * extended tracking functionality.
+	 * extended tracking functionality. Records nothing and fires no hook
+	 * when the Track share clicks setting is off.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request The REST API request containing object type, ID, and network
@@ -66,6 +68,10 @@ class Stats_Data {
 
 		if ( ! self::object_exists( $object_type, $object_id ) ) {
 			return self::not_found_error();
+		}
+
+		if ( empty( Sharing_Settings_Store::get()['track_clicks'] ) ) {
+			return rest_ensure_response( array( 'success' => true ) );
 		}
 
 		$result = \FotoGrids\Statistics::increment( $object_type, $object_id, 'shares' );
