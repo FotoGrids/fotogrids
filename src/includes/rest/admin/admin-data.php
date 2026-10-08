@@ -1268,14 +1268,14 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$post = get_post( $result['object_id'] );
-			if ( $post ) {
+			if ( $post && current_user_can( 'read_post', $post->ID ) ) {
 				$activity[] = array(
 					'id'          => (int) $result['object_id'],
 					'title'       => $post->post_title,
 					'type'        => $result['object_type'],
 					'views'       => (int) $result['views'],
 					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] . ' UTC' ), time() ) . ' ago',
-					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
+					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ) ?? '',
 				);
 			}
 		}
@@ -1345,7 +1345,7 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$post = get_post( $result['object_id'] );
-			if ( $post ) {
+			if ( $post && current_user_can( 'read_post', $post->ID ) ) {
 				$views = (int) $result['views'];
 
 				$content[] = array(
@@ -1355,7 +1355,7 @@ class Admin_Data {
 					'views'       => $views,
 					'views_share' => $total_views > 0 ? round( $views / $total_views * 100, 1 ) : 0.0,
 					'shares'      => (int) ( $result['shares'] ?: 0 ),
-					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
+					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ) ?? '',
 				);
 			}
 		}
@@ -1445,7 +1445,8 @@ class Admin_Data {
 	 * Recently edited galleries and albums
 	 *
 	 * Shared by the REST route above and the dashboard widget, which renders
-	 * the same rows server-side with its own limit and status set.
+	 * the same rows server-side with its own limit and status set. Only
+	 * collections the current user can edit are returned.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $args Optional. Keys: limit, post_type, post_status.
@@ -1461,20 +1462,32 @@ class Admin_Data {
 			)
 		);
 
-		$posts = get_posts(
+		$post_ids = get_posts(
 			array(
 				'post_type'      => $args['post_type'],
 				'post_status'    => $args['post_status'],
-				'posts_per_page' => (int) $args['limit'],
+				'posts_per_page' => -1,
 				'orderby'        => 'modified',
 				'order'          => 'DESC',
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
 			)
 		);
 
 		$datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+		$limit           = (int) $args['limit'];
 
 		$items = array();
-		foreach ( $posts as $post ) {
+		foreach ( $post_ids as $post_id ) {
+			if ( count( $items ) >= $limit ) {
+				break;
+			}
+
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				continue;
+			}
+
+			$post     = get_post( $post_id );
 			$is_album = 'fotogrids_album' === $post->post_type;
 
 			$items[] = array(
