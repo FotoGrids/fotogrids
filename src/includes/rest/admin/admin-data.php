@@ -1205,7 +1205,7 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$gallery = get_post( $result['object_id'] );
-			if ( $gallery ) {
+			if ( $gallery && current_user_can( 'read_post', $gallery->ID ) ) {
 				$labels[] = $gallery->post_title;
 				$data[]   = (int) $result['total_views'];
 				$ids[]    = (int) $gallery->ID;

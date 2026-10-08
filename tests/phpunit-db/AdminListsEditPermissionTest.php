@@ -1,7 +1,8 @@
 <?php
 /**
- * The admin lists that link to a collection's editor — Recently Edited and the
- * two Stats tables — against users who cannot edit, or cannot read, every row.
+ * The admin lists that name or link to collections — Recently Edited, the
+ * Statistics tables and the popular-galleries chart — against users who cannot
+ * edit, or cannot read, every row.
  *
  * @package FotoGrids
  */
@@ -184,5 +185,43 @@ class AdminListsEditPermissionTest extends WP_UnitTestCase {
 
 		$this->assertSame( $ids, array_keys( $rows ) );
 		$this->assertNotContains( '', $rows );
+	}
+
+	private function popular_galleries(): array {
+		$request = new WP_REST_Request( 'GET' );
+		$request->set_param( 'days', 0 );
+
+		return Admin_Data::get_popular_galleries( $request )->get_data();
+	}
+
+	/**
+	 * An unreadable gallery drops out of the chart by name, and its views stay
+	 * in the total so they land in the remainder slice.
+	 */
+	public function test_popular_galleries_hide_unreadable_titles_but_keep_their_views_in_the_total(): void {
+		$own      = $this->collection( $this->author, 'publish', 10 );
+		$readable = $this->collection( $this->admin, 'publish', 20 );
+		$private  = $this->collection( $this->admin, 'private', 30 );
+		$this->stats_for( array( $own, $readable, $private ) );
+
+		wp_set_current_user( $this->author );
+
+		$chart = $this->popular_galleries();
+
+		$this->assertSame( array( $own, $readable ), $chart['ids'] );
+		$this->assertNotContains( get_post( $private )->post_title, $chart['labels'] );
+		$this->assertSame( 100 + 99 + 98, $chart['total'] );
+	}
+
+	public function test_an_administrator_sees_every_popular_gallery(): void {
+		$ids = array(
+			$this->collection( $this->author, 'publish', 10 ),
+			$this->collection( $this->admin, 'private', 20 ),
+		);
+		$this->stats_for( $ids );
+
+		wp_set_current_user( $this->admin );
+
+		$this->assertSame( $ids, $this->popular_galleries()['ids'] );
 	}
 }
