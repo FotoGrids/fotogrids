@@ -119,12 +119,14 @@ foreach ( array( '${ VIEWER }', '${ AUTHOR }', '${ STATS_ONLY }', '${ GALLERY_ON
 	}
 } );
 
-/** Sign in and land on the WordPress Dashboard, never on profile.php. */
+/** Sign in as global setup does, then open the WordPress Dashboard. */
 async function signIn( page: Page, login: string ): Promise< void > {
-	await page.goto( '/wp-login.php?redirect_to=' + encodeURIComponent( '/wp-admin/' ) );
-	await page.locator( '#user_login' ).fill( login );
-	await page.locator( '#user_pass' ).fill( PASSWORD );
-	await Promise.all( [ page.waitForURL( /\/wp-admin\/$/ ), page.locator( '#wp-submit' ).click() ] );
+	await page.request.get( '/wp-login.php' );
+	await page.request.post( '/wp-login.php', {
+		form: { log: login, pwd: PASSWORD, 'wp-submit': 'Log In', testcookie: '1' },
+		maxRedirects: 0,
+	} );
+	await page.goto( '/wp-admin/' );
 }
 
 type Row = { title: string; href: string | null };
