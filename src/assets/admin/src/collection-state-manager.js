@@ -176,11 +176,18 @@
 
 			disable() {
 				this.enabled = false;
+				this.cancel();
+				window.FotoGridsCollectionState._notifyListeners('autosave');
+			},
+
+			/**
+			 * Drop a pending autosave without turning autosave off
+			 */
+			cancel() {
 				if (this.interval) {
 					clearTimeout(this.interval);
 					this.interval = null;
 				}
-				window.FotoGridsCollectionState._notifyListeners('autosave');
 			},
 
 			/**
