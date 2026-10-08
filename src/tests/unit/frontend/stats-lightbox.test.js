@@ -66,7 +66,8 @@ describe('stats: lightbox item views', () => {
 			'http://localhost/wp-json/fotogrids/v1/stats/view'
 		);
 		expect(calls[0].init.method).toBe('POST');
-		expect(calls[0].init.headers['X-WP-Nonce']).toBe('abc123');
+		expect(calls[0].init.credentials).toBe('omit');
+		expect(calls[0].init.headers).not.toHaveProperty('X-WP-Nonce');
 		expect(calls[0].body).toEqual({ object_type: 'item', object_id: 42 });
 	});
 
