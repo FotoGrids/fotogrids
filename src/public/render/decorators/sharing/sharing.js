@@ -71,8 +71,9 @@
 	 * listener) can record the share. Sharing itself does not call the
 	 * REST API; stats are a separate module's concern.
 	 *
-	 * A share of a whole gallery or album also carries objectType and
-	 * objectId.
+	 * An item share carries the gallery element it belongs to as
+	 * galleryEl. A share of a whole gallery or album carries objectType
+	 * and objectId instead.
 	 *
 	 * @param {HTMLElement} img     Proxy element carrying the share target.
 	 * @param {string}      network shareItem network key.
@@ -86,6 +87,14 @@
 		if (data.fgShareObjectType && data.fgShareObjectId) {
 			detail.objectType = data.fgShareObjectType;
 			detail.objectId = data.fgShareObjectId;
+		} else {
+			const galleryEl =
+				img && img.closest
+					? img.closest('.fotogrids-collection.fotogrids-gallery')
+					: null;
+			if (galleryEl) {
+				detail.galleryEl = galleryEl;
+			}
 		}
 		document.dispatchEvent(
 			new CustomEvent('fotogrids:share', {

@@ -2,9 +2,9 @@
  * Tests for public/render/features/stats/stats.js (IIFE; wires its listeners
  * on import).
  *
- * Every share the Sharing module reports records one share: an item share
- * on any network, and a whole-gallery or album share from the view-page
- * footer when that collection has statistics enabled.
+ * Every share the Sharing module reports records one share when the
+ * collection it belongs to has statistics enabled: an item share on any
+ * network, and a whole-gallery or album share from the view-page footer.
  */
 
 const MODULE = '../../../public/render/features/stats/stats';
@@ -62,13 +62,41 @@ describe('stats: shares', () => {
 	});
 
 	it.each(NETWORKS)('records an item share on %s', (network) => {
-		makeCollection('gallery', 7);
+		const galleryEl = makeCollection('gallery', 7);
 
-		share({ itemId: '42', network });
+		share({ itemId: '42', network, galleryEl });
 
 		expect(shareBodies()).toEqual([
 			{ object_type: 'item', object_id: 42, network },
 		]);
+	});
+
+	it('skips an item share when its gallery has statistics off', () => {
+		makeCollection('gallery', 7);
+		const galleryEl = makeCollection('gallery', 8, false);
+
+		share({ itemId: '42', network: 'facebook', galleryEl });
+
+		expect(shareBodies()).toHaveLength(0);
+	});
+
+	it('records an item share against its own gallery, not the first on the page', () => {
+		makeCollection('gallery', 7, false);
+		const galleryEl = makeCollection('gallery', 8);
+
+		share({ itemId: '42', network: 'copy', galleryEl });
+
+		expect(shareBodies()).toEqual([
+			{ object_type: 'item', object_id: 42, network: 'copy' },
+		]);
+	});
+
+	it('skips an item share that carries no gallery', () => {
+		makeCollection('gallery', 7);
+
+		share({ itemId: '42', network: 'facebook' });
+
+		expect(shareBodies()).toHaveLength(0);
 	});
 
 	it.each([
