@@ -57,12 +57,14 @@ function writeOption( value: string | null ): void {
 
 function sharing(
 	enabled: boolean,
-	placements = [ 'view_page', 'lightbox', 'thumbnail' ]
+	placements = [ 'view_page', 'lightbox', 'thumbnail' ],
+	trackClicks = true
 ): string {
 	return JSON.stringify( {
 		enable_social_sharing: enabled,
 		networks: Object.fromEntries( NETWORKS.map( ( n ) => [ n, true ] ) ),
 		placements,
+		track_clicks: trackClicks,
 	} );
 }
 
@@ -71,6 +73,24 @@ function shares( type: 'gallery' | 'album' | 'item', id: number ): number {
 	return Number(
 		wpEval(
 			`global $wpdb; echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT shares FROM {$wpdb->prefix}fotogrids_statistics WHERE object_type = %s AND object_id = %d", '${ type }', ${ id } ) );`
+		).trim()
+	);
+}
+
+/** Share count summed across the daily rows the Statistics page charts. */
+function dailyShares( type: 'gallery' | 'album' | 'item', id: number ): number {
+	return Number(
+		wpEval(
+			`global $wpdb; echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT SUM(shares) FROM {$wpdb->prefix}fotogrids_statistics_daily WHERE object_type = %s AND object_id = %d", '${ type }', ${ id } ) );`
+		).trim()
+	);
+}
+
+/** Stored view count for one object. */
+function views( type: 'gallery' | 'album' | 'item', id: number ): number {
+	return Number(
+		wpEval(
+			`global $wpdb; echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT views FROM {$wpdb->prefix}fotogrids_statistics WHERE object_type = %s AND object_id = %d", '${ type }', ${ id } ) );`
 		).trim()
 	);
 }
@@ -279,5 +299,197 @@ test.describe( 'with sharing turned off', () => {
 			body: { object_type: 'gallery', object_id: id, network: 'copy' },
 		} );
 		expect( shares( 'gallery', id ) ).toBe( 1 );
+	} );
+} );
+
+test.describe( 'with Track share clicks off', () => {
+	test.beforeAll( () => {
+		writeOption( sharing( true, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+	} );
+
+	test.afterAll( () => {
+		writeOption( sharing( true ) );
+	} );
+
+	test( 'a thumbnail share on every network records nothing against the item', { tag: [ '@api', '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const { id, url } = galleryPage( { layout: 'grid' } );
+		const item = fixture< number[] >( 'F-small', 'items' )[ 0 ];
+		const gallery = new GalleryRender( page, id );
+		const start = shares( 'item', item );
+		const startDaily = dailyShares( 'item', item );
+
+		await page.goto( url );
+		await gallery.waitFor();
+		const bar = gallery.items().first().locator( '.fotogrids-share-bar--thumbnail' );
+		await gallery.items().first().hover();
+
+		for ( const network of NETWORKS ) {
+			const sent = await shareOn( page, bar.locator( `[data-network="${ network }"]` ) );
+
+			expect( sent.status ).toBe( 200 );
+		}
+
+		expect( shares( 'item', item ) ).toBe( start );
+		expect( dailyShares( 'item', item ) ).toBe( startDaily );
+	} );
+
+	test( 'a view-page footer share records nothing against the gallery or the album', { tag: [ '@api', '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const child = galleryPage( { layout: 'grid' } );
+		const { id, view } = album( [ child.id ] );
+
+		await page.goto( viewPage( child.id ) );
+		for ( const network of NETWORKS ) {
+			const sent = await shareOn(
+				page,
+				page.locator( `.fotogrids-share-bar--footer [data-network="${ network }"]` )
+			);
+
+			expect( sent.status ).toBe( 200 );
+		}
+
+		await page.goto( view );
+		const sent = await shareOn(
+			page,
+			page.locator( '.fotogrids-share-bar--footer [data-network="copy_link"]' )
+		);
+
+		expect( sent.status ).toBe( 200 );
+		expect( shares( 'gallery', child.id ) ).toBe( 0 );
+		expect( shares( 'album', id ) ).toBe( 0 );
+		expect( dailyShares( 'gallery', child.id ) ).toBe( 0 );
+		expect( dailyShares( 'album', id ) ).toBe( 0 );
+	} );
+
+	test( 'a share still does its job when nothing is recorded', { tag: [ '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = galleryPage( { layout: 'grid' } );
+		const view = viewPage( id );
+		const copy = page.locator( '.fotogrids-share-bar--footer [data-network="copy_link"]' );
+
+		await page.goto( view );
+		await copy.click();
+
+		await expect( copy ).toHaveAttribute( 'aria-label', 'Link copied' );
+		expect( await page.evaluate( () => navigator.clipboard.readText() ) ).toBe( view );
+
+		const [ popup ] = await Promise.all( [
+			page.waitForEvent( 'popup' ),
+			page.locator( '.fotogrids-share-bar--footer [data-network="facebook"]' ).click(),
+		] );
+
+		expect( popup.url() ).toContain( 'facebook.com/sharer/sharer.php?u=' + encodeURIComponent( view ) );
+	} );
+
+	test( 'a gallery view is still recorded', { tag: [ '@api', '@layout' ] }, async ( { page } ) => {
+		const { id } = galleryPage( { layout: 'grid' } );
+
+		await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					'POST' === response.request().method() &&
+					decodeURIComponent( response.url() ).includes( 'fotogrids/v1/stats/view' )
+			),
+			page.goto( viewPage( id ) ),
+		] );
+
+		expect( views( 'gallery', id ) ).toBe( 1 );
+	} );
+
+	test( 'a share of an object that does not exist still answers 404', { tag: [ '@api' ] }, async ( {
+		request,
+	} ) => {
+		const response = await request.post( '/wp-json/fotogrids/v1/stats/share', {
+			data: { object_type: 'item', object_id: 999999999, network: 'facebook' },
+		} );
+
+		expect( response.status() ).toBe( 404 );
+		expect( ( await response.json() ).code ).toBe( 'fotogrids_stats_object_not_found' );
+	} );
+
+	test( 'turning tracking off keeps existing counts, and turning it back on records again', { tag: [ '@api', '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = galleryPage( { layout: 'grid' } );
+		const copy = page.locator( '.fotogrids-share-bar--footer [data-network="copy_link"]' );
+
+		writeOption( sharing( true ) );
+		await page.goto( viewPage( id ) );
+		await shareOn( page, copy );
+		expect( shares( 'gallery', id ) ).toBe( 1 );
+
+		writeOption( sharing( true, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+		await page.reload();
+		await shareOn( page, copy );
+		expect( shares( 'gallery', id ) ).toBe( 1 );
+
+		writeOption( sharing( true ) );
+		await page.reload();
+		await shareOn( page, copy );
+		expect( shares( 'gallery', id ) ).toBe( 2 );
+
+		writeOption( sharing( true, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+	} );
+
+	test.describe( 'with sharing in the lightbox only', () => {
+		test.beforeAll( () => {
+			writeOption( sharing( true, [ 'lightbox' ], false ) );
+		} );
+
+		test.afterAll( () => {
+			writeOption( sharing( true, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+		} );
+
+		test( 'a lightbox share records nothing against the item on screen', { tag: [ '@api', '@lightbox' ] }, async ( {
+			page,
+		} ) => {
+			const { id, url } = galleryPage( { layout: 'grid' } );
+			const item = fixture< number[] >( 'F-small', 'items' )[ 0 ];
+			const gallery = new GalleryRender( page, id );
+			const lightbox = new Lightbox( page );
+			const start = shares( 'item', item );
+
+			await page.goto( url );
+			await gallery.waitFor();
+			await lightbox.openFrom( gallery );
+			await lightbox.dialog().locator( '.fg-lb-share' ).click();
+
+			const sent = await shareOn(
+				page,
+				page.locator( '.fotogrids-share-bar--lightbox-popover [data-network="linkedin"]' )
+			);
+
+			expect( sent.status ).toBe( 200 );
+			expect( shares( 'item', item ) ).toBe( start );
+		} );
+	} );
+
+	test.describe( 'with sharing turned off', () => {
+		test.beforeAll( () => {
+			writeOption( sharing( false, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+		} );
+
+		test.afterAll( () => {
+			writeOption( sharing( true, [ 'view_page', 'lightbox', 'thumbnail' ], false ) );
+		} );
+
+		test( 'the copy-link fallback on a view page records nothing', { tag: [ '@api', '@layout' ] }, async ( {
+			page,
+		} ) => {
+			const { id } = galleryPage( { layout: 'grid' } );
+
+			await page.goto( viewPage( id ) );
+			const sent = await shareOn(
+				page,
+				page.locator( '.fotogrids-share-bar--footer [data-network="copy_link"]' )
+			);
+
+			expect( sent.status ).toBe( 200 );
+			expect( shares( 'gallery', id ) ).toBe( 0 );
+		} );
 	} );
 } );
