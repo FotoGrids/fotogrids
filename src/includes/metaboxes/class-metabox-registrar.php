@@ -410,7 +410,7 @@ final class Metabox_Registrar {
 	 * @param int $featured_item_id The gallery's featured attachment ID, or 0.
 	 * @return array<string, mixed>|null Item payload, or null if the attachment no longer exists.
 	 */
-	private static function build_attachment_item_data( int $item_id, int $featured_item_id ): ?array {
+	public static function build_attachment_item_data( int $item_id, int $featured_item_id ): ?array {
 		$attachment = get_post( $item_id );
 		if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
 			return null;
@@ -587,8 +587,28 @@ final class Metabox_Registrar {
 	public static function render_gallery_albums( $post ): void {
 		wp_nonce_field( 'fotogrids_gallery_albums', 'fotogrids_gallery_albums_nonce' );
 
-		$assigned_albums = Gallery_Album_Relations::get_albums_for_gallery( $post->ID );
-		$all_albums      = Gallery_Album_Relations::get_all_albums();
+		$assigned_albums = array_map(
+			static function ( $album ) {
+				return array(
+					'ID'             => (int) $album->ID,
+					'post_title'     => $album->post_title,
+					'post_status'    => $album->post_status,
+					'status_display' => $album->status_display,
+					'gallery_count'  => $album->gallery_count,
+					'featured_item'  => $album->featured_item,
+					'editable'       => current_user_can( 'edit_post', $album->ID ),
+				);
+			},
+			Gallery_Album_Relations::get_albums_for_gallery( $post->ID )
+		);
+		$all_albums      = array_values(
+			array_filter(
+				Gallery_Album_Relations::get_all_albums(),
+				static function ( $album ) {
+					return current_user_can( 'edit_post', $album['id'] );
+				}
+			)
+		);
 
 		wp_localize_script(
 			'fotogrids-album-assignment',
@@ -642,8 +662,32 @@ final class Metabox_Registrar {
 			return;
 		}
 
-		$assigned_galleries  = Gallery_Album_Relations::get_galleries_for_album( $post->ID );
-		$all_galleries       = Gallery_Album_Relations::get_all_galleries();
+		$assigned_galleries  = array_map(
+			static function ( $gallery ) {
+				return array(
+					'ID'             => (int) $gallery->ID,
+					'post_title'     => $gallery->post_title,
+					'post_status'    => $gallery->post_status,
+					'status_display' => $gallery->status_display,
+					'item_count'     => $gallery->item_count,
+					'layout'         => $gallery->layout,
+					'featured_item'  => $gallery->featured_item,
+					'sample_items'   => $gallery->sample_items,
+					'permalink'      => $gallery->permalink,
+					'position'       => (int) $gallery->position,
+					'editable'       => current_user_can( 'edit_post', $gallery->ID ),
+				);
+			},
+			Gallery_Album_Relations::get_galleries_for_album( $post->ID )
+		);
+		$all_galleries       = array_values(
+			array_filter(
+				Gallery_Album_Relations::get_all_galleries(),
+				static function ( $gallery ) {
+					return current_user_can( 'edit_post', $gallery['id'] );
+				}
+			)
+		);
 		$featured_gallery_id = (int) get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
 
 		wp_localize_script(

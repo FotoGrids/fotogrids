@@ -97,6 +97,25 @@ final class CollectionDefaultsCoverageTest extends TestCase {
 	}
 
 	/**
+	 * Keys of every token_select field.
+	 *
+	 * @param mixed              $node Catalog branch.
+	 * @param array<int, string> $keys Collected keys.
+	 * @return void
+	 */
+	private function collect_token_select_keys( $node, array &$keys ): void {
+		if ( ! is_array( $node ) ) {
+			return;
+		}
+		if ( isset( $node['key'], $node['type'] ) && 'token_select' === $node['type'] ) {
+			$keys[] = $node['key'];
+		}
+		foreach ( $node as $child ) {
+			$this->collect_token_select_keys( $child, $keys );
+		}
+	}
+
+	/**
 	 * Union of the gallery and album default keys.
 	 *
 	 * @return array<string, mixed>
@@ -127,5 +146,32 @@ final class CollectionDefaultsCoverageTest extends TestCase {
 			$this->assertContains( $key, $value_keys, "$key is no longer in the catalog; drop it from KEYS_WITHOUT_READER." );
 			$this->assertArrayNotHasKey( $key, $defaults, "$key now has a default; drop it from KEYS_WITHOUT_READER." );
 		}
+	}
+
+	/** @return array<string, array{0: bool}> */
+	public function contextProvider(): array {
+		return array(
+			'collection'    => array( false ),
+			'defaults page' => array( true ),
+		);
+	}
+
+	/** @dataProvider contextProvider */
+	public function test_every_token_select_default_is_a_list( bool $is_defaults_page ): void {
+		$keys = array();
+		$this->collect_token_select_keys( Catalog::raw_files(), $keys );
+		$this->assertNotSame( array(), $keys );
+
+		$defaults = Collection_Defaults::resolve_gallery( $is_defaults_page ) + Collection_Defaults::resolve_album( $is_defaults_page );
+
+		foreach ( array_unique( $keys ) as $key ) {
+			if ( array_key_exists( $key, $defaults ) ) {
+				$this->assertIsArray( $defaults[ $key ], "$key defaults to a single value" );
+			}
+		}
+	}
+
+	public function test_list_defaults_do_not_depend_on_the_context(): void {
+		$this->assertSame( Collection_Defaults::get_base_defaults( false ), Collection_Defaults::get_base_defaults( true ) );
 	}
 }

@@ -63,6 +63,13 @@ final class Font_Resolver {
 	private array $google_fonts_seen = array();
 
 	/**
+	 * Google Font names resolved since begin_capture(), or null when not capturing.
+	 *
+	 * @var array<string, true>|null
+	 */
+	private ?array $captured = null;
+
+	/**
 	 * Whether the wp_enqueue_scripts hook has already been registered.
 	 *
 	 * @var bool
@@ -350,6 +357,46 @@ final class Font_Resolver {
 	}
 
 	/**
+	 * Starts recording the Google Font families resolved from this point on,
+	 * including families already collected by an earlier gallery on the page.
+	 *
+	 * @since  1.2.0
+	 * @return void
+	 */
+	public function begin_capture(): void {
+		$this->captured = array();
+	}
+
+	/**
+	 * Stops recording and returns the families resolved since begin_capture().
+	 *
+	 * @since  1.2.0
+	 * @return array<string> Font family names, in resolution order.
+	 */
+	public function end_capture(): array {
+		$families       = array_keys( $this->captured ?? array() );
+		$this->captured = null;
+
+		return $families;
+	}
+
+	/**
+	 * Collects Google Font families recorded by an earlier render, so a cached
+	 * gallery loads the same stylesheet as the render that produced it.
+	 *
+	 * @since  1.2.0
+	 * @param  array<mixed> $families Font family names.
+	 * @return void
+	 */
+	public function collect_families( array $families ): void {
+		foreach ( $families as $family ) {
+			if ( is_string( $family ) && '' !== $family ) {
+				$this->collect_google_font( $family );
+			}
+		}
+	}
+
+	/**
 	 * Collects a Google Font name and ensures the enqueue hook is registered.
 	 *
 	 * Gated on the `fotogrids_allow_google_fonts` option (on by default). When
@@ -367,6 +414,9 @@ final class Font_Resolver {
 			return;
 		}
 		$this->google_fonts_seen[ $family ] = true;
+		if ( null !== $this->captured ) {
+			$this->captured[ $family ] = true;
+		}
 		$this->register_enqueue_hook();
 	}
 

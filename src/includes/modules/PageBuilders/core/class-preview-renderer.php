@@ -11,10 +11,12 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders;
 
 use FotoGrids\Hooks\Actions_Render;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Render\Internal\Render_Controller;
 use FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap;
 
@@ -45,14 +47,22 @@ if ( ! defined( 'WPINC' ) ) {
 final class Preview_Renderer {
 
 	/**
+	 * Inline CSS from renders made during an AJAX request, which Inline_Asset_Emitter does not enqueue.
+	 *
+	 * @var string
+	 */
+	private static string $ajax_inline_css = '';
+
+	/**
 	 * Render a gallery preview to HTML.
 	 *
 	 * @since 1.0.0
 	 * @param int                                          $gallery_id      Gallery ID.
 	 * @param array{click_behavior: bool, pagination: bool} $preview_options Normalised toggles.
+	 * @param string                                       $placement_key   Optional. Builder element ID.
 	 * @return string Rendered HTML, or empty string if the pipeline is unavailable.
 	 */
-	public static function render_gallery_html( int $gallery_id, array $preview_options ): string {
+	public static function render_gallery_html( int $gallery_id, array $preview_options, string $placement_key = '' ): string {
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
@@ -78,7 +88,7 @@ final class Preview_Renderer {
 			Request_Source::PREVIEW_SAVED
 		);
 
-		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
+		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED, $placement_key );
 
 		$result = Render_Controller::factory()->render( $context );
 
@@ -88,6 +98,7 @@ final class Preview_Renderer {
 		do_action( Actions_Render::LATE_ASSETS, $context );
 
 		Inline_Asset_Emitter::enqueue( $result );
+		self::hold_ajax_inline_css( $result->inline_css );
 
 		return (string) $result->html;
 	}
@@ -98,9 +109,10 @@ final class Preview_Renderer {
 	 * @since 1.0.0
 	 * @param int                                          $album_id        Album ID.
 	 * @param array{click_behavior: bool, pagination: bool} $preview_options Normalised toggles.
+	 * @param string                                       $placement_key   Optional. Builder element ID.
 	 * @return string Rendered HTML, or empty string if the pipeline is unavailable.
 	 */
-	public static function render_album_html( int $album_id, array $preview_options ): string {
+	public static function render_album_html( int $album_id, array $preview_options, string $placement_key = '' ): string {
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
@@ -139,15 +151,45 @@ final class Preview_Renderer {
 			Request_Source::PREVIEW_SAVED
 		);
 
-		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
+		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED, $placement_key );
 
 		$result = Render_Controller::factory()->render( $context );
 
 		do_action( Actions_Render::LATE_ASSETS, $context );
 
 		Inline_Asset_Emitter::enqueue( $result );
+		self::hold_ajax_inline_css( $result->inline_css );
 
 		return (string) $result->html;
+	}
+
+	/**
+	 * Return and clear the inline CSS held from renders made during an AJAX request.
+	 *
+	 * Elementor renders its editor preview over admin-ajax; its widgets print this
+	 * next to the preview markup.
+	 *
+	 * @since 1.2.0
+	 * @return string Bare CSS, or empty string.
+	 */
+	public static function take_ajax_inline_css(): string {
+		$css                   = self::$ajax_inline_css;
+		self::$ajax_inline_css = '';
+
+		return $css;
+	}
+
+	/**
+	 * Hold a render's inline CSS when the request is an AJAX request.
+	 *
+	 * @since 1.2.0
+	 * @param string $inline_css Bare CSS.
+	 * @return void
+	 */
+	private static function hold_ajax_inline_css( string $inline_css ): void {
+		if ( '' !== $inline_css && wp_doing_ajax() ) {
+			self::$ajax_inline_css .= $inline_css;
+		}
 	}
 
 	/**
@@ -163,15 +205,25 @@ final class Preview_Renderer {
 	 * @since 1.0.0
 	 * @param Render_Context $context
 	 * @param value-of<Request_Source::ALL> $source
+	 * @param string         $placement_key Builder element ID; empty keeps the counter-based instance ID.
 	 * @return Render_Context
 	 */
-	private static function flip_to_preview_context( Render_Context $context, string $source ): Render_Context {
-		$preview_meta = $context->meta->with(
-			array(
-				'is_preview' => true,
-				'source'     => $source,
-			)
+	private static function flip_to_preview_context( Render_Context $context, string $source, string $placement_key = '' ): Render_Context {
+		$meta_changes = array(
+			'is_preview' => true,
+			'source'     => $source,
 		);
+
+		$collection_id = Collection_Kind::ALBUM === $context->meta->collection_kind
+			? (int) $context->meta->album_id
+			: $context->meta->gallery_id;
+		$placement_id  = Instance_Id_Factory::instance()->generate_for_placement( $collection_id, $placement_key );
+
+		if ( null !== $placement_id ) {
+			$meta_changes['instance_id'] = $placement_id;
+		}
+
+		$preview_meta = $context->meta->with( $meta_changes );
 
 		$preview_settings = array_merge(
 			$context->settings,

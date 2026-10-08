@@ -31,7 +31,7 @@
 	 * data-fg-stats JSON. Returns null if missing or invalid.
 	 *
 	 * @param {Element} galleryEl
-	 * @returns {{enabled: boolean, restUrl: string, nonce: string}|null}
+	 * @returns {{enabled: boolean, restUrl: string}|null}
 	 */
 	function readConfig(galleryEl) {
 		const raw = galleryEl.dataset.fgStats;
@@ -53,19 +53,20 @@
 	 * Fire-and-forget POST. Network errors are swallowed - stats failure
 	 * must never affect gallery functionality.
 	 *
+	 * Sent without cookies or a nonce: the stats routes are public, and a
+	 * nonce baked into cached markup belongs to whoever rendered it first.
+	 *
 	 * @param {string} url
-	 * @param {string} nonce
 	 * @param {Object} body
 	 */
-	function ping(url, nonce, body) {
+	function ping(url, body) {
 		try {
 			fetch(url, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-WP-Nonce': nonce,
 				},
-				credentials: 'same-origin',
+				credentials: 'omit',
 				body: JSON.stringify(body),
 			}).catch(() => {});
 		} catch (e) {
@@ -101,7 +102,7 @@
 
 		galleryEl.dataset.fgStatsViewSent = '1';
 
-		ping(cfg.restUrl + 'stats/view', cfg.nonce, {
+		ping(cfg.restUrl + 'stats/view', {
 			object_type: objectType,
 			object_id: objectId,
 		});
@@ -130,7 +131,7 @@
 			return;
 		}
 
-		ping(cfg.restUrl + 'stats/view', cfg.nonce, {
+		ping(cfg.restUrl + 'stats/view', {
 			object_type: 'item',
 			object_id: itemId,
 		});
@@ -140,8 +141,7 @@
 	 * Handle a fotogrids:share event by sending a share ping. The event
 	 * fires from the Sharing module when the user clicks a share button.
 	 *
-	 * The REST URL and nonce come from the first stats-enabled gallery on the
-	 * page; the nonce belongs to the request, so any gallery's works.
+	 * The REST URL comes from the first stats-enabled gallery on the page.
 	 *
 	 * @param {CustomEvent} e
 	 */
@@ -151,7 +151,7 @@
 			return;
 		}
 
-		// Any stats-enabled gallery supplies the restUrl and nonce.
+		// Any stats-enabled gallery supplies the restUrl.
 		const anyGallery = document.querySelector(
 			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
 		);
@@ -168,7 +168,7 @@
 			return;
 		}
 
-		ping(cfg.restUrl + 'stats/share', cfg.nonce, {
+		ping(cfg.restUrl + 'stats/share', {
 			object_type: 'item',
 			object_id: itemId,
 			network: detail.network,

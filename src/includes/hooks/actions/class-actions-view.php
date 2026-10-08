@@ -98,7 +98,7 @@ final class Actions_View {
 	public const INTEGRATED_AFTER_GALLERY = 'fotogrids/view/integrated/after_gallery';
 
 	/**
-	 * Fires after a view page render is tracked in the stats table.
+	 * Fires when a published or private collection's view page is visited.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_Post $post Post that was viewed.

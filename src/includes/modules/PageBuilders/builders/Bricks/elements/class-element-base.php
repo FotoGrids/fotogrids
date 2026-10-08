@@ -387,13 +387,14 @@ abstract class Element_Base extends \Bricks\Element {
 
 		$this->print_root(
 			sprintf(
-				'<div class="fg-pb-bricks-preview%1$s" data-fg-bricks-kind="%2$s" data-fg-bricks-id="%3$d" data-fg-bricks-click="%4$s" data-fg-bricks-pagination="%5$s"><div class="fg-pb-bricks-preview__status">%6$s</div></div>',
+				'<div class="fg-pb-bricks-preview%1$s" data-fg-bricks-kind="%2$s" data-fg-bricks-id="%3$d" data-fg-bricks-click="%4$s" data-fg-bricks-pagination="%5$s" data-fg-bricks-placement="%7$s"><div class="fg-pb-bricks-preview__status">%6$s</div></div>',
 				$preview_options['pagination'] ? '' : ' is-fg-pb-pagination-frozen',
 				esc_attr( $kind ),
 				$collection_id,
 				$preview_options['click_behavior'] ? '1' : '0',
 				$preview_options['pagination'] ? '1' : '0',
-				esc_html( $this->get_selected_title( $collection_id ) )
+				esc_html( $this->get_selected_title( $collection_id ) ),
+				esc_attr( (string) $this->id )
 			)
 		);
 	}
