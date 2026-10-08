@@ -14,6 +14,17 @@
 	// save on unload, which rejects the fetch like a network failure.
 	let leavingPage = false;
 
+	// The save request in flight, and how to re-enable the controls it
+	// disabled. Publish/Update waits on it so the two never overlap.
+	let saveInFlight = null;
+	let releaseForm = null;
+	let releasingSubmit = false;
+
+	// Set once Publish/Update is pressed. That submit carries the whole form,
+	// so no further save starts: one would race it on the server.
+	let publishing = false;
+	const SUBMIT_WAIT_MS = 10000;
+
 	document.addEventListener('DOMContentLoaded', initAjaxSave);
 
 	function initAjaxSave() {
@@ -111,11 +122,19 @@
 						'original_post_status'
 					)?.value;
 
-					// Never intercept Publish / Update / Schedule - those must
-					// reach WordPress so the post status actually changes.
+					// Publish / Update / Schedule always reach WordPress so the
+					// post status actually changes. Pressed during a save, they
+					// wait for it first, so the save cannot overwrite them.
 					if (submitter && submitter.id === 'publish') {
-						leavingPage = true;
 						State?.autosave.cancel();
+						if (saveInFlight && !releasingSubmit) {
+							e.preventDefault();
+							e.stopImmediatePropagation();
+							submitAfterSave(form, submitter);
+							return false;
+						}
+						publishing = true;
+						leavingPage = true;
 						return;
 					}
 
@@ -139,6 +158,25 @@
 				saveCollectionAjax();
 				return false;
 			}
+		});
+	}
+
+	function submitAfterSave(form, submitter) {
+		if (publishing) {
+			return;
+		}
+		publishing = true;
+
+		const timeLimit = new Promise((resolve) =>
+			setTimeout(resolve, SUBMIT_WAIT_MS)
+		);
+		Promise.race([saveInFlight, timeLimit]).then(() => {
+			if (releaseForm) {
+				releaseForm();
+			}
+			releasingSubmit = true;
+			form.requestSubmit(submitter);
+			releasingSubmit = false;
 		});
 	}
 
@@ -171,6 +209,9 @@
 
 	function initValidationErrorMonitoring() {
 		const checkValidationErrors = () => {
+			if (saveInFlight) {
+				return;
+			}
 			const hasErrors = hasValidationErrors();
 			updateSaveButtonState(hasErrors);
 		};
@@ -252,6 +293,10 @@
 	}
 
 	function saveCollectionAjax() {
+		if (publishing) {
+			return false;
+		}
+
 		if (hasValidationErrors()) {
 			if (window.fotogridsToast) {
 				window.fotogridsToast.error(strings.fixValidationErrors);
@@ -263,13 +308,20 @@
 
 		// Only disable native WP form controls - exclude the React-managed settings
 		// panel so focused inputs don't lose focus and React's disabled props aren't clobbered.
+		// Publish stays enabled so a press during the save is queued, not lost.
 		const settingsPanel = document.getElementById(
 			'fotogrids-collection-settings-root'
 		);
 		const formElements = Array.from(
 			form.querySelectorAll('input, textarea, select, button')
-		).filter((el) => !settingsPanel || !settingsPanel.contains(el));
+		).filter(
+			(el) =>
+				el.id !== 'publish' &&
+				(!settingsPanel || !settingsPanel.contains(el))
+		);
 		formElements.forEach((element) => (element.disabled = true));
+		const release = () =>
+			formElements.forEach((element) => (element.disabled = false));
 
 		const formData = new FormData(form);
 		formData.append('action', 'fotogrids_save_collection');
@@ -325,7 +377,7 @@
 
 		leavingPage = false;
 
-		fetch(window.ajaxurl, {
+		const request = fetch(window.ajaxurl, {
 			method: 'POST',
 			body: formData,
 		})
@@ -356,8 +408,15 @@
 				handleSaveError(errorMessage);
 			})
 			.finally(() => {
-				formElements.forEach((element) => (element.disabled = false));
+				release();
+				if (saveInFlight === request) {
+					saveInFlight = null;
+					releaseForm = null;
+				}
 			});
+
+		saveInFlight = request;
+		releaseForm = release;
 	}
 
 	function handleSaveSuccess(data) {
@@ -626,14 +685,18 @@
 			}
 		});
 
+		// A page restored from the back/forward cache is live again.
 		window.addEventListener('pageshow', (e) => {
 			if (e.persisted) {
 				submitting = false;
+				leavingPage = false;
+				publishing = false;
 			}
 		});
 
 		window.addEventListener('beforeunload', (e) => {
 			leavingPage = true;
+			State?.autosave.cancel();
 			if (submitting) {
 				return;
 			}

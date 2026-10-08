@@ -369,7 +369,7 @@ describe('ajax-save', () => {
 		err.mockRestore();
 	});
 
-	it('drops a pending autosave when Update submits the form', () => {
+	it('drops a pending autosave when the page starts unloading', () => {
 		window.fotogridsAdmin = { autosave: '1' };
 		global.fetch = jest.fn(() => new Promise(() => {}));
 		loadAndInit();
@@ -378,12 +378,7 @@ describe('ajax-save', () => {
 		const title = document.querySelector('input[name="post_title"]');
 		title.value = 'Renamed';
 		title.dispatchEvent(new window.Event('change', { bubbles: true }));
-
-		const form = document.getElementById('post');
-		document.getElementById('publish').focus();
-		form.dispatchEvent(
-			new window.Event('submit', { bubbles: true, cancelable: true })
-		);
+		window.dispatchEvent(new window.Event('beforeunload'));
 
 		jest.advanceTimersByTime(5000);
 		expect(global.fetch).not.toHaveBeenCalled();
