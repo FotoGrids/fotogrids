@@ -606,7 +606,25 @@
 	}
 
 	function initBeforeUnloadWarning() {
+		// A native post-form submit unloads the page to save it, not to leave.
+		let submitting = false;
+
+		document.addEventListener('submit', (e) => {
+			if (e.target.id === 'post' && !e.defaultPrevented) {
+				submitting = true;
+			}
+		});
+
+		window.addEventListener('pageshow', (e) => {
+			if (e.persisted) {
+				submitting = false;
+			}
+		});
+
 		window.addEventListener('beforeunload', (e) => {
+			if (submitting) {
+				return;
+			}
 			if (State && State.unsavedChanges.has() && !autosaveActive()) {
 				e.preventDefault();
 				e.returnValue = strings.unsavedChangesConfirm;
