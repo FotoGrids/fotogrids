@@ -103,6 +103,26 @@ class AdminListsEditPermissionTest extends WP_UnitTestCase {
 		$this->assertSame( $own, $this->recently_edited_ids( 10 ) );
 	}
 
+	/**
+	 * A user who may edit other users' collections, but not every one of them,
+	 * is searched past the first batch rather than limited to their own.
+	 */
+	public function test_editable_rows_beyond_the_first_batch_are_found(): void {
+		$drafts = array(
+			$this->collection( $this->admin, 'draft', 1000 ),
+			$this->collection( $this->admin, 'draft', 1010 ),
+		);
+		for ( $i = 1; $i <= 110; $i++ ) {
+			$this->collection( $this->admin, 'publish', $i );
+		}
+
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
+		get_user_by( 'id', $editor )->add_cap( 'edit_published_fotogrids_galleries', false );
+		wp_set_current_user( $editor );
+
+		$this->assertSame( $drafts, $this->recently_edited_ids( 5 ) );
+	}
+
 	public function test_every_recently_edited_row_carries_an_edit_link(): void {
 		$this->collection( $this->author, 'publish', 10 );
 		$this->collection( $this->admin, 'publish', 20 );

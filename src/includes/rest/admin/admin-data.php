@@ -1446,7 +1446,10 @@ class Admin_Data {
 	 *
 	 * Shared by the REST route above and the dashboard widget, which renders
 	 * the same rows server-side with its own limit and status set. Only
-	 * collections the current user can edit are returned.
+	 * collections the current user can edit are returned; uneditable ones are
+	 * skipped in batches, so they never shorten the list. A user who cannot
+	 * edit other users' collections of any requested type is only searched
+	 * among their own.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $args Optional. Keys: limit, post_type, post_status.
@@ -1462,47 +1465,75 @@ class Admin_Data {
 			)
 		);
 
-		$post_ids = get_posts(
-			array(
-				'post_type'      => $args['post_type'],
-				'post_status'    => $args['post_status'],
-				'posts_per_page' => -1,
-				'orderby'        => 'modified',
-				'order'          => 'DESC',
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			)
+		$query = array(
+			'post_type'              => $args['post_type'],
+			'post_status'            => $args['post_status'],
+			'orderby'                => array(
+				'modified' => 'DESC',
+				'ID'       => 'DESC',
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 		);
 
+		$edits_others = false;
+		foreach ( (array) $args['post_type'] as $post_type ) {
+			$type_object = get_post_type_object( $post_type );
+			if ( $type_object && current_user_can( $type_object->cap->edit_others_posts ) ) {
+				$edits_others = true;
+				break;
+			}
+		}
+
+		if ( ! $edits_others ) {
+			$query['author'] = get_current_user_id();
+		}
+
 		$datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-		$limit           = (int) $args['limit'];
+		$remaining       = (int) $args['limit'];
+		$batch           = $remaining;
+		$offset          = 0;
 
 		$items = array();
-		foreach ( $post_ids as $post_id ) {
-			if ( count( $items ) >= $limit ) {
+		while ( $remaining > 0 ) {
+			$query['posts_per_page'] = $batch;
+			$query['offset']         = $offset;
+
+			$posts = get_posts( $query );
+
+			foreach ( $posts as $post ) {
+				if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+					continue;
+				}
+
+				$is_album = 'fotogrids_album' === $post->post_type;
+
+				$items[] = array(
+					'id'                 => $post->ID,
+					'title'              => trim( $post->post_title ),
+					'placeholder'        => \FotoGrids\Collection_Title::placeholder( $post ),
+					'type'               => $post->post_type,
+					'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
+					'status'             => $post->post_status,
+					'modified'           => $post->post_modified,
+					'modified_gmt'       => $post->post_modified_gmt,
+					'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
+					'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
+					'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
+				);
+
+				--$remaining;
+				if ( 0 === $remaining ) {
+					break;
+				}
+			}
+
+			if ( count( $posts ) < $batch ) {
 				break;
 			}
 
-			if ( ! current_user_can( 'edit_post', $post_id ) ) {
-				continue;
-			}
-
-			$post     = get_post( $post_id );
-			$is_album = 'fotogrids_album' === $post->post_type;
-
-			$items[] = array(
-				'id'                 => $post->ID,
-				'title'              => trim( $post->post_title ),
-				'placeholder'        => \FotoGrids\Collection_Title::placeholder( $post ),
-				'type'               => $post->post_type,
-				'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
-				'status'             => $post->post_status,
-				'modified'           => $post->post_modified,
-				'modified_gmt'       => $post->post_modified_gmt,
-				'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
-				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
-				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
-			);
+			$offset += $batch;
+			$batch   = 100;
 		}
 
 		return $items;
