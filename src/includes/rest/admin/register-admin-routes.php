@@ -510,7 +510,7 @@ class Register_Admin_Routes {
 							},
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_view_stats' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_overview_read' ),
 				),
 			)
 		);
@@ -681,7 +681,7 @@ class Register_Admin_Routes {
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_recently_edited_read' ),
 				),
 			)
 		);
@@ -701,7 +701,7 @@ class Register_Admin_Routes {
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_news_read' ),
 				),
 			)
 		);

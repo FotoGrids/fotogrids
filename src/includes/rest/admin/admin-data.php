@@ -892,10 +892,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_overview_stats( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		global $wpdb;
 
 		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
@@ -1070,10 +1066,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_views_data( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 		if ( $days <= 0 ) {
 			$days = 7;
@@ -1137,10 +1129,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_popular_galleries( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1229,10 +1217,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_recent_activity( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1290,10 +1274,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_top_content( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1420,10 +1400,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_recently_edited( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$post_status = array( 'publish', 'draft' );
 		if ( $request->get_param( 'include_private' ) ) {
 			$post_status[] = 'private';
@@ -1546,10 +1522,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_news_updates( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$refresh = (bool) $request->get_param( 'refresh' );
 
 		return rest_ensure_response(

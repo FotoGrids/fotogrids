@@ -6,9 +6,10 @@ import { getOption, setOption } from './support/site';
 /**
  * Recently Edited — the WordPress Dashboard widget and the FotoGrids Dashboard
  * card — and the Statistics tables and chart, for users who cannot edit, or
- * cannot read, every collection on the site.
+ * cannot read, every collection on the site; and the requests behind those
+ * screens and the What's New panel, for users each screen admits.
  *
- * Serial: creates two users, writes both statistics tables and completes the
+ * Serial: creates four users, writes both statistics tables and completes the
  * Dashboard setup checklist, and puts all three back.
  */
 
@@ -17,6 +18,8 @@ test.describe.configure( { mode: 'serial' } );
 const PASSWORD = 'fg-recent-pass';
 const VIEWER = 'fg-recent-viewer';
 const AUTHOR = 'fg-recent-author';
+const STATS_ONLY = 'fg-recent-stats';
+const GALLERY_ONLY = 'fg-recent-galleries';
 
 const OWN = 'Recent: the author’s own gallery';
 const ADMIN_PUBLISHED = 'Recent: admin published gallery';
@@ -59,6 +62,14 @@ foreach ( array( '${ VIEWER }' => 'subscriber', '${ AUTHOR }' => 'author' ) as $
 }
 ( new WP_User( username_exists( '${ AUTHOR }' ) ) )->add_cap( 'view_fotogrids_stats' );
 
+foreach ( array( '${ STATS_ONLY }' => array( 'view_fotogrids_stats' ), '${ GALLERY_ONLY }' => array( 'edit_fotogrids_galleries', 'edit_fotogrids_gallery', 'read_fotogrids_gallery' ) ) as $login => $caps ) {
+	$id = username_exists( $login ) ?: wp_insert_user( array( 'user_login' => $login, 'user_pass' => '${ PASSWORD }', 'user_email' => "$login@example.com", 'role' => 'subscriber' ) );
+	wp_set_password( '${ PASSWORD }', $id );
+	foreach ( $caps as $cap ) {
+		( new WP_User( $id ) )->add_cap( $cap );
+	}
+}
+
 ${ addedSetupOptions ? '\\FotoGrids\\Settings\\Watermark_Settings_Store::save( \\FotoGrids\\Settings\\Watermark_Settings_Store::defaults() );' : '' }
 
 $ids = array(
@@ -96,7 +107,7 @@ foreach ( array( 'fotogrids_statistics', 'fotogrids_statistics_daily' ) as $tabl
 foreach ( $ids as $id ) {
 	wp_delete_post( $id, true );
 }
-foreach ( array( '${ VIEWER }', '${ AUTHOR }' ) as $login ) {
+foreach ( array( '${ VIEWER }', '${ AUTHOR }', '${ STATS_ONLY }', '${ GALLERY_ONLY }' ) as $login ) {
 	$id = username_exists( $login );
 	if ( $id ) {
 		wp_delete_user( $id );
@@ -189,11 +200,18 @@ async function statistics( page: Page ): Promise< { tables: StatsRow[][]; chart:
 	};
 }
 
+/** Wait for a FotoGrids REST response while `act` runs, and return its status. */
+async function restStatus( page: Page, route: string, act: () => Promise< unknown > ): Promise< number > {
+	const response = page.waitForResponse( ( r: Response ) =>
+		decodeURIComponent( r.url() ).includes( `/fotogrids/v1/${ route }` )
+	);
+	await act();
+
+	return ( await response ).status();
+}
+
 test.describe( 'a user who can edit no collection', () => {
-	test.use( {
-		storageState: { cookies: [], origins: [] },
-		allowConsoleErrors: 'the widget’s News & Updates request answers 403 to a user without edit_posts',
-	} );
+	test.use( { storageState: { cookies: [], origins: [] } } );
 
 	test( 'sees an empty Recently Edited widget, and loading it logs no PHP notice', { tag: [ '@critical', '@api', '@admin', '@permissions' ] }, async ( {
 		page,
@@ -204,6 +222,67 @@ test.describe( 'a user who can edit no collection', () => {
 		await expect( page.locator( '#fotogrids_overview .fotogrids-dw-recent-list' ) ).toContainText(
 			'No recently edited galleries or albums'
 		);
+	} );
+
+	test( 'gets the widget’s News & Updates', { tag: [ '@api', '@admin', '@permissions' ] }, async ( {
+		page,
+	} ) => {
+		const status = await restStatus( page, 'admin/news', () => signIn( page, VIEWER ) );
+
+		expect( status ).toBe( 200 );
+		await expect( page.locator( '#fotogrids_overview' ) ).not.toContainText( 'Unable to load news' );
+	} );
+
+	test( 'gets past the setup checklist on the FotoGrids Dashboard to an empty Recently Edited card', { tag: [ '@api', '@admin', '@permissions' ] }, async ( {
+		page,
+	} ) => {
+		await signIn( page, VIEWER );
+
+		const status = await restStatus( page, 'admin/stats/overview', () =>
+			page.goto( '/wp-admin/admin.php?page=fotogrids-dashboard' )
+		);
+
+		expect( status ).toBe( 200 );
+		await expect( page.locator( '.fg-abc-recently-edited-empty' ) ).toHaveText(
+			'No recently edited galleries or albums.'
+		);
+	} );
+} );
+
+test.describe( 'a user granted only the Statistics screen', () => {
+	test.use( { storageState: { cookies: [], origins: [] } } );
+
+	test( 'sees the Statistics screen filled, not refused', { tag: [ '@api', '@admin', '@permissions' ] }, async ( {
+		page,
+	} ) => {
+		await signIn( page, STATS_ONLY );
+
+		const { tables, chart } = await statistics( page );
+
+		await expect( page.locator( '.fg-stats-error' ) ).toHaveCount( 0 );
+		expect( chart ).toContain( ADMIN_PUBLISHED );
+		expect( chart ).not.toContain( ADMIN_PRIVATE );
+		for ( const rows of tables ) {
+			expect( rows ).toContainEqual( { title: ADMIN_PUBLISHED, linked: false } );
+		}
+	} );
+} );
+
+test.describe( 'a user granted only galleries', () => {
+	test.use( { storageState: { cookies: [], origins: [] } } );
+
+	test( 'opens What’s New from the FotoGrids header and gets the news', { tag: [ '@api', '@admin', '@permissions' ] }, async ( {
+		page,
+	} ) => {
+		await signIn( page, GALLERY_ONLY );
+		await page.goto( '/wp-admin/edit.php?post_type=fotogrids_gallery' );
+
+		const status = await restStatus( page, 'admin/news', () =>
+			page.locator( '.fotogrids-splash-modal-open' ).first().click()
+		);
+
+		expect( status ).toBe( 200 );
+		await expect( page.locator( '.fg-modal' ).last() ).not.toContainText( 'Unable to load the latest news' );
 	} );
 } );
 

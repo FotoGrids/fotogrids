@@ -160,6 +160,59 @@ class Admin_Permissions {
 	}
 
 	/**
+	 * Check if user can read the site-wide totals.
+	 *
+	 * The totals are read by the Statistics screen and the FotoGrids
+	 * Dashboard, so the capability of either screen grants them.
+	 *
+	 * @since  1.1.5
+	 * @param  \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_overview_read( $request ) {
+		return self::check_view_stats( $request ) || current_user_can( 'manage_fotogrids' );
+	}
+
+	/**
+	 * Check if user can read the Recently Edited list.
+	 *
+	 * The list is read by the FotoGrids Dashboard and holds only collections
+	 * the user can edit.
+	 *
+	 * @since  1.1.5
+	 * @param  \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_recently_edited_read( $request ) {
+		return self::check_edit_posts( $request ) || current_user_can( 'manage_fotogrids' );
+	}
+
+	/**
+	 * Check if user can read the News & Updates feed.
+	 *
+	 * The feed is read by the Dashboard widget and by What's New in the
+	 * header of every FotoGrids screen, so any capability that opens one of
+	 * them grants it.
+	 *
+	 * @since  1.1.5
+	 * @param  \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_news_read( $request ) {
+		if ( self::check_edit_posts( $request ) ) {
+			return true;
+		}
+
+		foreach ( array( 'manage_fotogrids', 'edit_fotogrids_galleries', 'edit_fotogrids_albums' ) as $capability ) {
+			if ( current_user_can( $capability ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Check if user can manage license
 	 *
 	 * @param \WP_REST_Request $request Request object
