@@ -22,9 +22,20 @@ class Uninstaller {
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall cleanup of custom tables and plugin rows; no core API or object cache applies.
 
 	/**
+	 * Register uninstall() as the plugin's uninstall callback.
+	 *
+	 * @since  1.2.0
+	 * @return void
+	 */
+	public static function register() {
+		register_uninstall_hook( FOTOGRIDS_PLUGIN_FILE, array( self::class, 'uninstall' ) );
+	}
+
+	/**
 	 * Uninstall the plugin completely.
 	 *
-	 * Called from uninstall.php. The uninstall is reported to Freemius before
+	 * WordPress calls this on the per-plugin uninstall action after loading
+	 * only the main plugin file. The uninstall is reported to Freemius before
 	 * any data is removed.
 	 */
 	public static function uninstall() {
