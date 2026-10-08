@@ -4,6 +4,7 @@ namespace FotoGrids;
 use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Hooks\Filters_Cache;
+use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
@@ -476,12 +477,15 @@ class Public_Render {
 				// fotogrids-runtime, which the inline JS attaches to.
 				self::replay_cached_assets( $cached['css'], $cached['js'] );
 				self::replay_cached_inline_assets( $cached );
+				Font_Resolver::instance()->collect_families( $cached['fonts'] );
 				do_action( Actions_Cache::HIT, $gallery_id, $cache_key );
 				return wp_kses( $cached['html'], \FotoGrids\Kses::rules( $cached['html'] ) );
 			}
 		}
 
-		$html = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		Font_Resolver::instance()->begin_capture();
+		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		$fonts = Font_Resolver::instance()->end_capture();
 
 		if ( null !== $cache_key ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
@@ -498,7 +502,8 @@ class Public_Render {
 				null !== $rendered ? $rendered->inline_css : '',
 				null !== $rendered ? $rendered->inline_js : '',
 				null !== $rendered ? $rendered->json_ld : '',
-				$duration
+				$duration,
+				$fonts
 			);
 			do_action( Actions_Cache::WRITTEN, $gallery_id, $cache_key );
 		}

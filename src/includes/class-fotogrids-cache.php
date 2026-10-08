@@ -34,10 +34,10 @@ class FotoGrids_Cache {
 
 	/**
 	 * Envelope schema version. Entries below this are treated as a miss, so an
-	 * entry written without its inline payloads or its expiry re-renders
-	 * instead of being replayed.
+	 * entry written without its inline payloads, its expiry or its Google
+	 * Fonts re-renders instead of being replayed.
 	 */
-	private const ENTRY_SCHEMA = 3;
+	private const ENTRY_SCHEMA = 4;
 
 	/**
 	 * Shared object-cache (L1) primitive for the render cache.
@@ -162,11 +162,12 @@ class FotoGrids_Cache {
 	 *   - 'inline_css' (string)  Per-render inline CSS (Render_Result::$inline_css).
 	 *   - 'inline_js'  (string)  Per-render inline JS (Render_Result::$inline_js).
 	 *   - 'json_ld'    (string)  Per-render JSON-LD document (Render_Result::$json_ld).
+	 *   - 'fonts'      (array)   Google Font families the render collected.
 	 *
 	 * @since  1.0.0
 	 * @param  int    $gallery_id
 	 * @param  string $cache_key  md5 key produced by make_key().
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string}|false
+	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
 	 */
 	public static function get( int $gallery_id, string $cache_key ) {
 		$l1 = self::l1()->get( $cache_key );
@@ -228,6 +229,7 @@ class FotoGrids_Cache {
 	 * @param  string                                         $inline_js  Per-render inline JS.
 	 * @param  string                                         $json_ld    Per-render JSON-LD document.
 	 * @param  int                                            $duration_hours
+	 * @param  array<string>                                  $fonts      Google Font families the render collected.
 	 * @return bool
 	 */
 	public static function put(
@@ -239,14 +241,15 @@ class FotoGrids_Cache {
 		string $inline_css,
 		string $inline_js,
 		string $json_ld,
-		int $duration_hours
+		int $duration_hours,
+		array $fonts = array()
 	): bool {
 		global $wpdb;
 
 		// Intentionally WP-local frame: expires_at is compared against current_time('mysql') (local) on read, so the write must match it.
 		$expires_ts = current_time( 'timestamp' ) + $duration_hours * HOUR_IN_SECONDS; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- local-frame TTL, see read-side comparisons.
 		$expires_at = gmdate( 'Y-m-d H:i:s', $expires_ts );
-		$payload    = self::encode_entry( $html, $css, $js, $inline_css, $inline_js, $json_ld, $expires_ts );
+		$payload    = self::encode_entry( $html, $css, $js, $inline_css, $inline_js, $json_ld, $expires_ts, $fonts );
 		$table      = $wpdb->prefix . 'fotogrids_render_cache';
 		$now        = current_time( 'mysql' );
 
@@ -530,6 +533,7 @@ class FotoGrids_Cache {
 	 * @param  string                                            $inline_js
 	 * @param  string                                            $json_ld
 	 * @param  int                                               $expires_ts Expiry as a WP-local timestamp.
+	 * @param  array<string>                                     $fonts      Google Font families.
 	 * @return string
 	 */
 	private static function encode_entry(
@@ -539,7 +543,8 @@ class FotoGrids_Cache {
 		string $inline_css,
 		string $inline_js,
 		string $json_ld,
-		int $expires_ts
+		int $expires_ts,
+		array $fonts
 	): string {
 		return wp_json_encode(
 			array(
@@ -551,6 +556,7 @@ class FotoGrids_Cache {
 				'inline_js'  => $inline_js,
 				'json_ld'    => $json_ld,
 				'expires_at' => $expires_ts,
+				'fonts'      => array_values( $fonts ),
 			),
 			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 		);
@@ -566,7 +572,7 @@ class FotoGrids_Cache {
 	 *
 	 * @since  1.0.0
 	 * @param  string $stored
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string}|false
+	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
 	 */
 	private static function decode_entry( string $stored ) {
 		$decoded = json_decode( $stored, true );
@@ -589,6 +595,7 @@ class FotoGrids_Cache {
 			'inline_css' => (string) ( $decoded['inline_css'] ?? '' ),
 			'inline_js'  => (string) ( $decoded['inline_js'] ?? '' ),
 			'json_ld'    => (string) ( $decoded['json_ld'] ?? '' ),
+			'fonts'      => is_array( $decoded['fonts'] ?? null ) ? $decoded['fonts'] : array(),
 		);
 	}
 
