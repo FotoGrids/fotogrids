@@ -269,6 +269,35 @@ test( 'views and shares count only for published or private objects of the decla
 	);
 } );
 
+test( 'a share is recorded on every network the share bar sends', {
+	tag: [ '@api' ],
+}, async ( { playwright } ) => {
+	const image = firstItem( 'F-small' );
+	const cases: Array< [ string, string, number, number ] > = [
+		...[ 'facebook', 'twitter', 'pinterest', 'linkedin', 'whatsapp', 'telegram', 'reddit', 'email', 'copy' ].map(
+			( network ): [ string, string, number, number ] => [ network, 'item', image, 200 ]
+		),
+		[ 'linkedin', 'gallery', fixture< number >( 'F-small', 'gallery' ), 200 ],
+		[ 'copy', 'album', fixture< number >( 'F-album', 'album' ), 200 ],
+		[ 'myspace', 'item', image, 400 ],
+	];
+
+	const anon = await apiAnonymous( playwright );
+	const results: string[] = [];
+	for ( const [ network, objectType, objectId ] of cases ) {
+		const response = await anon.post(
+			`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/stats/share' ) }`,
+			{ data: { object_type: objectType, object_id: objectId, network } }
+		);
+		results.push( `${ network } ${ objectType } -> ${ response.status() }` );
+	}
+	await anon.dispose();
+
+	expect( results ).toEqual(
+		cases.map( ( [ network, objectType, , status ] ) => `${ network } ${ objectType } -> ${ status }` )
+	);
+} );
+
 test( 'item metadata has no write route of its own', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
 	const { context, nonce } = await apiAs( playwright, 'administrator' );
 
