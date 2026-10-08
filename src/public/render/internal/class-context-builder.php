@@ -50,6 +50,22 @@ final class Context_Builder {
 	}
 
 	/**
+	 * Returns the visit-context album from the `fg_via` query var.
+	 *
+	 * @since  1.2.0
+	 * @return int|null Positive album ID, or null when absent or invalid.
+	 */
+	public static function via_album_from_request(): ?int {
+		if ( ! isset( $_GET['fg_via'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only breadcrumb hint on a front-end page view.
+			return null;
+		}
+
+		$candidate = (int) wp_unslash( $_GET['fg_via'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only breadcrumb hint; the (int) cast sanitizes it.
+
+		return $candidate > 0 ? $candidate : null;
+	}
+
+	/**
 	 * Creates a context for public rendering.
 	 *
 	 * @since   1.0.0
@@ -125,11 +141,8 @@ final class Context_Builder {
 		if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
 			$candidate    = (int) $meta_overrides['via_album_id'];
 			$via_album_id = $candidate > 0 ? $candidate : null;
-		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block holds the fg_via query-var fallback for the override branch.
-			if ( isset( $_GET['fg_via'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only breadcrumb hint on a front-end page view.
-				$candidate    = (int) wp_unslash( $_GET['fg_via'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only breadcrumb hint; the (int) cast sanitizes it.
-				$via_album_id = $candidate > 0 ? $candidate : null;
-			}
+		} else {
+			$via_album_id = self::via_album_from_request();
 		}
 
 		[ $thumb_size, $full_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
@@ -1104,8 +1117,9 @@ final class Context_Builder {
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
+	 * @return bool
 	 */
-	private static function is_snap_pagination_active( array $render_settings ): bool {
+	public static function is_snap_pagination_active( array $render_settings ): bool {
 		if ( ( $render_settings['layout'] ?? '' ) !== 'justified' ) {
 			return false;
 		}

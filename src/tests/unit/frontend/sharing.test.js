@@ -86,6 +86,7 @@ describe('sharing', () => {
 		document.body.innerHTML = '';
 		window.history.replaceState({}, '', '/');
 		delete window.fotogridsSharing;
+		window.fotogrids = { ...window.fotogrids, deep_linking_enabled: '1' };
 		jest.spyOn(window, 'open').mockImplementation(() => null);
 		shares = [];
 		onShare = (e) => shares.push(e.detail);
@@ -122,6 +123,40 @@ describe('sharing', () => {
 		}
 	);
 
+	it.each([
+		['gallery', 7],
+		['album', 12],
+	])(
+		'a view-page footer share records the whole %s',
+		(objectType, objectId) => {
+			const container = document.createElement('div');
+			container.setAttribute(
+				'data-fg-share-footer',
+				JSON.stringify({
+					enabled: true,
+					networks: { linkedin: true },
+					labels: LABELS,
+					object_type: objectType,
+					object_id: objectId,
+				})
+			);
+			document.body.appendChild(container);
+			loadModule();
+
+			click(container, 'linkedin');
+
+			expect(window.open).toHaveBeenCalledTimes(1);
+			expect(shares).toEqual([
+				{
+					itemId: '',
+					network: 'linkedin',
+					objectType,
+					objectId: String(objectId),
+				},
+			]);
+		}
+	);
+
 	it('copy_link writes the link to the clipboard and records the share', async () => {
 		const writeText = jest.fn(() => Promise.resolve());
 		Object.defineProperty(navigator, 'clipboard', {
@@ -137,6 +172,16 @@ describe('sharing', () => {
 		expect(shares).toEqual([{ itemId: '42', network: 'copy' }]);
 
 		delete navigator.clipboard;
+	});
+
+	it('shares the page URL when deep linking is disabled', () => {
+		window.fotogrids.deep_linking_enabled = '';
+		click(renderBar(api, ['facebook']), 'facebook');
+
+		expect(window.open.mock.calls[0][0]).toContain(
+			encodeURIComponent('http://localhost/')
+		);
+		expect(window.open.mock.calls[0][0]).not.toContain('fg-7-42');
 	});
 
 	describe('share-intent URLs', () => {

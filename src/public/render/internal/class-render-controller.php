@@ -88,6 +88,22 @@ final class Render_Controller {
 	}
 
 	/**
+	 * Reports whether any gate applies to a context.
+	 *
+	 * A gated render depends on the visitor, so its output must not be
+	 * shared between visitors.
+	 *
+	 * @since  1.1.5
+	 * @param  Render_Context $render Render context.
+	 * @return bool
+	 */
+	public static function has_active_gates( Render_Context $render ): bool {
+		$render = Hooks::apply_filter( 'render_settings', $render, $render );
+
+		return array() !== Module_Registry::active_modules( 'gates', $render );
+	}
+
+	/**
 	 * Renders a collection from the provided context.
 	 *
 	 * @since  1.0.0
@@ -244,6 +260,8 @@ final class Render_Controller {
 				}
 				$active_modules['sidecars'][] = $sidecar_module->id();
 			}
+
+			$wrapper_data_attrs = array_merge( $wrapper_data_attrs, $this->breakpoints->wrapper_attrs() );
 
 			$layout_css_classes = Hooks::apply_filter( 'wrapper_css_classes', $layout_css_classes, $render );
 			$wrapper_data_attrs = Hooks::apply_filter( 'wrapper_data_attrs', $wrapper_data_attrs, $render );

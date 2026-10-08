@@ -4,72 +4,82 @@ import useItemClickBehavior from '../useItemClickBehavior';
 
 const EXTERNAL_BEHAVIOR = 'external';
 
-const TabInteractions = ({ formData, handleInputChange, strings = {}, disabled = false }) => {
-    const clickBehavior = useItemClickBehavior();
-    const showNotice = '' !== clickBehavior && EXTERNAL_BEHAVIOR !== clickBehavior;
+const TabInteractions = ({
+	formData,
+	handleInputChange,
+	strings = {},
+	disabled = false,
+}) => {
+	const clickBehavior = useItemClickBehavior();
+	const showNotice =
+		'' !== clickBehavior && EXTERNAL_BEHAVIOR !== clickBehavior;
 
-    return (
-        <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-item-edit-interactions">
-                <h4>{strings.itemInteractions}</h4>
+	return (
+		<div className="fotogrids-tab-panel fg-is-active">
+			<div className="fotogrids-item-edit-interactions">
+				<h4>{strings.itemInteractions}</h4>
 
-                {showNotice && (
-                    <div className="fotogrids-item-edit-notice fotogrids-item-edit-notice--warning">
-                        <Icon name="alert_circle" className="fotogrids-item-edit-notice__icon" />
-                        <div className="fotogrids-item-edit-notice__body">
-                            <strong>
-                                {strings.externalUrlIgnoredTitle}
-                            </strong>
-                            <span>{strings.externalUrlIgnoredBody}</span>
-                        </div>
-                    </div>
-                )}
+				{showNotice && (
+					<div className="fotogrids-item-edit-notice fotogrids-item-edit-notice--warning">
+						<Icon
+							name="alert_circle"
+							className="fotogrids-item-edit-notice__icon"
+						/>
+						<div className="fotogrids-item-edit-notice__body">
+							<strong>{strings.externalUrlIgnoredTitle}</strong>
+							<span>{strings.externalUrlIgnoredBody}</span>
+						</div>
+					</div>
+				)}
 
-                <div className="fotogrids-item-edit-external-url">
-                    <div className="fotogrids-item-edit-field-group">
-                        <label htmlFor="fotogrids-item-external-url">
-                            {strings.externalUrl}
-                        </label>
-                        <input
-                            type="url"
-                            id="fotogrids-item-external-url"
-                            placeholder="https://example.com"
-                            value={formData?.external_url || ''}
-                            onChange={(e) => handleInputChange('external_url', e.target.value)}
-                            disabled={disabled}
-                        />
-                        <p className="description">
-                            {strings.externalUrlDesc}
-                        </p>
-                    </div>
-                    <div className="fotogrids-item-edit-field-group">
-                        <label htmlFor="fotogrids-item-link-target">
-                            {strings.linkTarget}
-                        </label>
-                        <select
-                            id="fotogrids-item-link-target"
-                            value={formData?.link_target || ''}
-                            onChange={(e) => handleInputChange('link_target', e.target.value)}
-                            disabled={disabled}
-                        >
-                            <option value="global">
-                                {strings.linkTargetGlobal}
-                            </option>
-                            <option value="_self">
-                                {strings.linkTargetSelf}
-                            </option>
-                            <option value="_blank">
-                                {strings.linkTargetBlank}
-                            </option>
-                        </select>
-                        <p className="description">
-                            {strings.linkTargetDesc}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+				<div className="fotogrids-item-edit-external-url">
+					<div className="fotogrids-item-edit-field-group">
+						<label htmlFor="fotogrids-item-external-url">
+							{strings.externalUrl}
+						</label>
+						<input
+							type="url"
+							id="fotogrids-item-external-url"
+							placeholder="https://example.com"
+							value={formData?.external_url || ''}
+							onChange={(e) =>
+								handleInputChange(
+									'external_url',
+									e.target.value
+								)
+							}
+							disabled={disabled}
+						/>
+						<p className="description">{strings.externalUrlDesc}</p>
+					</div>
+					<div className="fotogrids-item-edit-field-group">
+						<label htmlFor="fotogrids-item-link-target">
+							{strings.linkTarget}
+						</label>
+						<select
+							id="fotogrids-item-link-target"
+							value={formData?.link_target || ''}
+							onChange={(e) =>
+								handleInputChange('link_target', e.target.value)
+							}
+							disabled={disabled}
+						>
+							<option value="global">
+								{strings.linkTargetGlobal}
+							</option>
+							<option value="_self">
+								{strings.linkTargetSelf}
+							</option>
+							<option value="_blank">
+								{strings.linkTargetBlank}
+							</option>
+						</select>
+						<p className="description">{strings.linkTargetDesc}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default TabInteractions;

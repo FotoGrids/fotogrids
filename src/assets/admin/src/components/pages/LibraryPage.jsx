@@ -19,73 +19,98 @@ const { __ } = wp.i18n;
  * Uses SidebarTabs for the left-rail layout consistent with Settings and Tools.
  */
 const LibraryPage = () => {
-    const library = window.fotogridsLibrary || {};
-    const entityTypes = useMemo(() => Array.isArray(library.entityTypes) ? library.entityTypes : [], [library]);
-    const allowedTabIds = useMemo(() => entityTypes.map((t) => t.slug), [entityTypes]);
+	const library = useMemo(() => window.fotogridsLibrary || {}, []);
+	const entityTypes = useMemo(
+		() => (Array.isArray(library.entityTypes) ? library.entityTypes : []),
+		[library]
+	);
+	const allowedTabIds = useMemo(
+		() => entityTypes.map((t) => t.slug),
+		[entityTypes]
+	);
 
-    const uiState = window.FotoGridsUiState?.createNamespace({ area: 'library' });
-    const fallbackTab = library.initialTab || allowedTabIds[0] || 'tags';
+	const uiState = window.FotoGridsUiState?.createNamespace({
+		area: 'library',
+	});
+	const fallbackTab = library.initialTab || allowedTabIds[0] || 'tags';
 
-    const [activeTab, setActiveTab] = useState(() => {
-        if (!uiState) return fallbackTab;
-        return uiState.getValue({ key: 'tab', fallback: fallbackTab, urlParam: 'tab', allowed: allowedTabIds });
-    });
+	const [activeTab, setActiveTab] = useState(() => {
+		if (!uiState) {
+			return fallbackTab;
+		}
+		return uiState.getValue({
+			key: 'tab',
+			fallback: fallbackTab,
+			urlParam: 'tab',
+			allowed: allowedTabIds,
+		});
+	});
 
-    useEffect(() => {
-        const handlePopState = () => {
-            if (!uiState) return;
-            setActiveTab(uiState.getValue({ key: 'tab', fallback: fallbackTab, urlParam: 'tab', allowed: allowedTabIds }));
-        };
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [uiState, fallbackTab, allowedTabIds]);
+	useEffect(() => {
+		const handlePopState = () => {
+			if (!uiState) {
+				return;
+			}
+			setActiveTab(
+				uiState.getValue({
+					key: 'tab',
+					fallback: fallbackTab,
+					urlParam: 'tab',
+					allowed: allowedTabIds,
+				})
+			);
+		};
+		window.addEventListener('popstate', handlePopState);
+		return () => window.removeEventListener('popstate', handlePopState);
+	}, [uiState, fallbackTab, allowedTabIds]);
 
-    const handleTabChange = (tabId) => {
-        setActiveTab(tabId);
-        if (uiState) {
-            uiState.setValue({ key: 'tab', value: tabId, urlParam: 'tab' });
-        }
-    };
+	const handleTabChange = (tabId) => {
+		setActiveTab(tabId);
+		if (uiState) {
+			uiState.setValue({ key: 'tab', value: tabId, urlParam: 'tab' });
+		}
+	};
 
-    const tabs = entityTypes.map((t) => ({
-        id: t.slug,
-        label: t.label_plural || t.slug,
-        icon: t.icon || undefined,
-    }));
+	const tabs = entityTypes.map((t) => ({
+		id: t.slug,
+		label: t.label_plural || t.slug,
+		icon: t.icon || undefined,
+	}));
 
-    const activeType = entityTypes.find((t) => t.slug === activeTab) || entityTypes[0];
+	const activeType =
+		entityTypes.find((t) => t.slug === activeTab) || entityTypes[0];
 
-    const renderTabContent = () => {
-        if (!activeType) {
-            return (
-                <p className="fotogrids-library-empty-types">
-                    {__('No library entity types are registered.', 'fotogrids')}
-                </p>
-            );
-        }
+	const renderTabContent = () => {
+		if (!activeType) {
+			return (
+				<p className="fotogrids-library-empty-types">
+					{__('No library entity types are registered.', 'fotogrids')}
+				</p>
+			);
+		}
 
-        switch (activeType.slug) {
-            case 'tags':
-                return <LibraryTagsTab entityType={activeType} />;
-            case 'people':
-                return <LibraryPeopleTab entityType={activeType} />;
-            case 'locations':
-                return <LibraryLocationsTab entityType={activeType} />;
-            default:
-                return <LibraryGenericTab entityType={activeType} />;
-        }
-    };
+		switch (activeType.slug) {
+			case 'tags':
+				return <LibraryTagsTab entityType={activeType} />;
+			case 'people':
+				return <LibraryPeopleTab entityType={activeType} />;
+			case 'locations':
+				return <LibraryLocationsTab entityType={activeType} />;
+			default:
+				return <LibraryGenericTab entityType={activeType} />;
+		}
+	};
 
-    return (
-        <SidebarTabs
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            className="fotogrids-sidebar-tabs--bare-content fotogrids-library-sidebar-tabs"
-        >
-            {renderTabContent()}
-        </SidebarTabs>
-    );
+	return (
+		<SidebarTabs
+			tabs={tabs}
+			activeTab={activeTab}
+			onTabChange={handleTabChange}
+			className="fotogrids-sidebar-tabs--bare-content fotogrids-library-sidebar-tabs"
+		>
+			{renderTabContent()}
+		</SidebarTabs>
+	);
 };
 
 export default LibraryPage;

@@ -14,21 +14,25 @@
  */
 
 import {
-    readCssInteger,
-    readCssNumber,
-    readCssLength,
-    visibleItems,
-    distributeIntegers,
-    createLayoutAttach,
-    bootLayout,
+	readCssInteger,
+	readCssNumber,
+	readCssLength,
+	visibleItems,
+	distributeIntegers,
+	createLayoutAttach,
+	bootLayout,
 } from '../_helpers/layout-helpers.js';
 
-function readColumnsMode( collectionEl ) {
-    return collectionEl.getAttribute( 'data-fg-columns-mode' ) === 'auto' ? 'auto' : 'fixed';
+function readColumnsMode(collectionEl) {
+	return collectionEl.getAttribute('data-fg-columns-mode') === 'auto'
+		? 'auto'
+		: 'fixed';
 }
 
-function readOrder( collectionEl ) {
-    return collectionEl.getAttribute( 'data-fg-masonry-order' ) === 'column' ? 'column' : 'row';
+function readOrder(collectionEl) {
+	return collectionEl.getAttribute('data-fg-masonry-order') === 'column'
+		? 'column'
+		: 'row';
 }
 
 /**
@@ -39,19 +43,21 @@ function readOrder( collectionEl ) {
  * @param {number} gap
  * @return {number} Minimum 1.
  */
-function resolveColumnCount( collectionEl, containerWidth, gap ) {
-    const mode = readColumnsMode( collectionEl );
+function resolveColumnCount(collectionEl, containerWidth, gap) {
+	const mode = readColumnsMode(collectionEl);
 
-    if ( mode === 'fixed' ) {
-        const cols = readCssInteger( collectionEl, '--fg-cols', 4 );
-        return Math.max( 1, cols );
-    }
+	if (mode === 'fixed') {
+		const cols = readCssInteger(collectionEl, '--fg-cols', 4);
+		return Math.max(1, cols);
+	}
 
-    const colMin = readCssNumber( collectionEl, '--fg-col-min', 240 );
-    const slot   = colMin + gap;
-    if ( slot <= 0 ) return 1;
-    const cols = Math.floor( ( containerWidth + gap ) / slot );
-    return Math.max( 1, cols );
+	const colMin = readCssNumber(collectionEl, '--fg-col-min', 240);
+	const slot = colMin + gap;
+	if (slot <= 0) {
+		return 1;
+	}
+	const cols = Math.floor((containerWidth + gap) / slot);
+	return Math.max(1, cols);
 }
 
 /**
@@ -71,35 +77,41 @@ function resolveColumnCount( collectionEl, containerWidth, gap ) {
  * @param {number}      columnWidth The width the item is being laid out at.
  * @return {number}
  */
-function measureItemHeight( item, columnWidth ) {
-    const img = item.querySelector( 'img' );
-    let height;
+function measureItemHeight(item, columnWidth) {
+	const img = item.querySelector('img');
+	let height;
 
-    const ratioW = img ? ( img.naturalWidth || parseFloat( img.getAttribute( 'width' ) ) ) : 0;
-    const ratioH = img ? ( img.naturalHeight || parseFloat( img.getAttribute( 'height' ) ) ) : 0;
+	const ratioW = img
+		? img.naturalWidth || parseFloat(img.getAttribute('width'))
+		: 0;
+	const ratioH = img
+		? img.naturalHeight || parseFloat(img.getAttribute('height'))
+		: 0;
 
-    if ( img && ratioW > 0 && ratioH > 0 ) {
-        height = columnWidth * ( ratioH / ratioW );
-    } else {
-        // No usable intrinsic ratio (e.g. a non-image item) - fall back to the
-        // media box, which by this pass is sized to the column width.
-        const media = item.querySelector( '.fg-item-media' );
-        height = media ? media.getBoundingClientRect().height : item.getBoundingClientRect().height;
-    }
+	if (img && ratioW > 0 && ratioH > 0) {
+		height = columnWidth * (ratioH / ratioW);
+	} else {
+		// No usable intrinsic ratio (e.g. a non-image item) - fall back to the
+		// media box, which by this pass is sized to the column width.
+		const media = item.querySelector('.fg-item-media');
+		height = media
+			? media.getBoundingClientRect().height
+			: item.getBoundingClientRect().height;
+	}
 
-    // Flowing (non-overlay) captions add to the item's real height: the flex
-    // gap between media and caption (the Caption Distance from Media setting,
-    // applied as `gap` on the flex item) plus the caption box, whose measured
-    // height already includes its own padding.
-    const caption = item.querySelector( '.fg-caption' );
-    if ( caption && window.getComputedStyle( caption ).position !== 'absolute' ) {
-        const gapHost    = caption.parentElement || item;
-        const captionGap = parseFloat( window.getComputedStyle( gapHost ).rowGap );
-        height += isNaN( captionGap ) ? 0 : captionGap;
-        height += caption.getBoundingClientRect().height;
-    }
+	// Flowing (non-overlay) captions add to the item's real height: the flex
+	// gap between media and caption (the Caption Distance from Media setting,
+	// applied as `gap` on the flex item) plus the caption box, whose measured
+	// height already includes its own padding.
+	const caption = item.querySelector('.fg-caption');
+	if (caption && window.getComputedStyle(caption).position !== 'absolute') {
+		const gapHost = caption.parentElement || item;
+		const captionGap = parseFloat(window.getComputedStyle(gapHost).rowGap);
+		height += isNaN(captionGap) ? 0 : captionGap;
+		height += caption.getBoundingClientRect().height;
+	}
 
-    return height;
+	return height;
 }
 
 /**
@@ -114,31 +126,31 @@ function measureItemHeight( item, columnWidth ) {
  * @param {number} gap
  * @return {number[]} columnHeights after placement.
  */
-function placeRowMajor( items, columnLefts, columnWidths, gap ) {
-    const columnHeights = new Array( columnLefts.length ).fill( 0 );
+function placeRowMajor(items, columnLefts, columnWidths, gap) {
+	const columnHeights = new Array(columnLefts.length).fill(0);
 
-    for ( let i = 0; i < items.length; i++ ) {
-        const item = items[ i ];
+	for (let i = 0; i < items.length; i++) {
+		const item = items[i];
 
-        let shortestCol = 0;
-        let shortestHeight = columnHeights[ 0 ];
-        for ( let c = 1; c < columnHeights.length; c++ ) {
-            if ( columnHeights[ c ] < shortestHeight ) {
-                shortestHeight = columnHeights[ c ];
-                shortestCol = c;
-            }
-        }
+		let shortestCol = 0;
+		let shortestHeight = columnHeights[0];
+		for (let c = 1; c < columnHeights.length; c++) {
+			if (columnHeights[c] < shortestHeight) {
+				shortestHeight = columnHeights[c];
+				shortestCol = c;
+			}
+		}
 
-        // Items are already sized to their column width (pass 1 in `layout`),
-        // so the caption box and media measure at their final width here.
-        const itemHeight = measureItemHeight( item, columnWidths[ shortestCol ] );
-        item.style.left  = columnLefts[ shortestCol ] + 'px';
-        item.style.top   = Math.round( shortestHeight ) + 'px';
+		// Items are already sized to their column width (pass 1 in `layout`),
+		// so the caption box and media measure at their final width here.
+		const itemHeight = measureItemHeight(item, columnWidths[shortestCol]);
+		item.style.left = columnLefts[shortestCol] + 'px';
+		item.style.top = Math.round(shortestHeight) + 'px';
 
-        columnHeights[ shortestCol ] = shortestHeight + itemHeight + gap;
-    }
+		columnHeights[shortestCol] = shortestHeight + itemHeight + gap;
+	}
 
-    return columnHeights;
+	return columnHeights;
 }
 
 /**
@@ -152,97 +164,106 @@ function placeRowMajor( items, columnLefts, columnWidths, gap ) {
  * @param {number} gap
  * @return {number[]} columnHeights after placement.
  */
-function placeColumnMajor( items, columnLefts, columnWidths, gap ) {
-    const cols = columnLefts.length;
-    const itemsPerCol = Math.ceil( items.length / cols );
-    const columnHeights = new Array( cols ).fill( 0 );
+function placeColumnMajor(items, columnLefts, columnWidths, gap) {
+	const cols = columnLefts.length;
+	const itemsPerCol = Math.ceil(items.length / cols);
+	const columnHeights = new Array(cols).fill(0);
 
-    for ( let i = 0; i < items.length; i++ ) {
-        const col = Math.min( cols - 1, Math.floor( i / itemsPerCol ) );
-        const item = items[ i ];
+	for (let i = 0; i < items.length; i++) {
+		const col = Math.min(cols - 1, Math.floor(i / itemsPerCol));
+		const item = items[i];
 
-        // Items are already sized to their column width (pass 1 in `layout`),
-        // so the caption box and media measure at their final width here.
-        const itemHeight = measureItemHeight( item, columnWidths[ col ] );
-        item.style.left  = columnLefts[ col ] + 'px';
-        item.style.top   = Math.round( columnHeights[ col ] ) + 'px';
+		// Items are already sized to their column width (pass 1 in `layout`),
+		// so the caption box and media measure at their final width here.
+		const itemHeight = measureItemHeight(item, columnWidths[col]);
+		item.style.left = columnLefts[col] + 'px';
+		item.style.top = Math.round(columnHeights[col]) + 'px';
 
-        columnHeights[ col ] = columnHeights[ col ] + itemHeight + gap;
-    }
+		columnHeights[col] = columnHeights[col] + itemHeight + gap;
+	}
 
-    return columnHeights;
+	return columnHeights;
 }
 
-function getCollectionEl( trackEl ) {
-    return trackEl.closest( '[data-fg-layout="masonry"]' );
+function getCollectionEl(trackEl) {
+	return trackEl.closest('[data-fg-layout="masonry"]');
 }
 
-function layout( trackEl ) {
-    const collectionEl = getCollectionEl( trackEl );
-    if ( ! collectionEl ) return;
+function layout(trackEl) {
+	const collectionEl = getCollectionEl(trackEl);
+	if (!collectionEl) {
+		return;
+	}
 
-    const containerWidth = trackEl.clientWidth;
-    if ( containerWidth <= 0 ) return;
+	const containerWidth = trackEl.clientWidth;
+	if (containerWidth <= 0) {
+		return;
+	}
 
-    const items = visibleItems( trackEl );
-    if ( items.length === 0 ) {
-        trackEl.style.height = '';
-        return;
-    }
+	const items = visibleItems(trackEl);
+	if (items.length === 0) {
+		trackEl.style.height = '';
+		return;
+	}
 
-    const gap         = readCssLength( collectionEl, '--fg-gap', 10 );
-    const columnCount = resolveColumnCount( collectionEl, containerWidth, gap );
-    const order       = readOrder( collectionEl );
+	const gap = readCssLength(collectionEl, '--fg-gap', 10);
+	const columnCount = resolveColumnCount(collectionEl, containerWidth, gap);
+	const order = readOrder(collectionEl);
 
-    // Switch the wrapper into positioned mode so items become position:absolute
-    // and the track is a relative container for the JS-computed top/left.
-    collectionEl.setAttribute( 'data-fg-masonry-positioned', '1' );
+	// Switch the wrapper into positioned mode so items become position:absolute
+	// and the track is a relative container for the JS-computed top/left.
+	collectionEl.setAttribute('data-fg-masonry-positioned', '1');
 
-    const totalGap       = Math.max( 0, columnCount - 1 ) * gap;
-    const availableWidth = containerWidth - totalGap;
-    const columnWeights  = new Array( columnCount ).fill( 1 );
-    const columnWidths   = distributeIntegers( columnWeights, availableWidth );
+	const totalGap = Math.max(0, columnCount - 1) * gap;
+	const availableWidth = containerWidth - totalGap;
+	const columnWeights = new Array(columnCount).fill(1);
+	const columnWidths = distributeIntegers(columnWeights, availableWidth);
 
-    const columnLefts = new Array( columnCount );
-    let runningLeft = 0;
-    for ( let c = 0; c < columnCount; c++ ) {
-        columnLefts[ c ] = runningLeft;
-        runningLeft += columnWidths[ c ] + gap;
-    }
+	const columnLefts = new Array(columnCount);
+	let runningLeft = 0;
+	for (let c = 0; c < columnCount; c++) {
+		columnLefts[c] = runningLeft;
+		runningLeft += columnWidths[c] + gap;
+	}
 
-    // Pass 1: size every item to its column width. All masonry columns share
-    // the same width (give or take a sub-pixel rounding difference), so the
-    // first column's width is representative. Reading clientWidth afterwards
-    // forces a single synchronous reflow so that pass 2's caption measurement
-    // (which depends on the wrapped width and on percentage padding) reads the
-    // item at its final size rather than its pre-sized width.
-    const sizingWidth = columnWidths[ 0 ];
-    for ( let i = 0; i < items.length; i++ ) {
-        items[ i ].style.width = sizingWidth + 'px';
-    }
-    void trackEl.clientWidth;
+	// Pass 1: size every item to its column width. All masonry columns share
+	// the same width (give or take a sub-pixel rounding difference), so the
+	// first column's width is representative. Reading clientWidth afterwards
+	// forces a single synchronous reflow so that pass 2's caption measurement
+	// (which depends on the wrapped width and on percentage padding) reads the
+	// item at its final size rather than its pre-sized width.
+	const sizingWidth = columnWidths[0];
+	for (let i = 0; i < items.length; i++) {
+		items[i].style.width = sizingWidth + 'px';
+	}
+	void trackEl.clientWidth;
 
-    // Pass 2: measure each item at its applied width and position it.
-    const columnHeights = order === 'column'
-        ? placeColumnMajor( items, columnLefts, columnWidths, gap )
-        : placeRowMajor( items, columnLefts, columnWidths, gap );
+	// Pass 2: measure each item at its applied width and position it.
+	const columnHeights =
+		order === 'column'
+			? placeColumnMajor(items, columnLefts, columnWidths, gap)
+			: placeRowMajor(items, columnLefts, columnWidths, gap);
 
-    let maxHeight = 0;
-    for ( let c = 0; c < columnHeights.length; c++ ) {
-        if ( columnHeights[ c ] > maxHeight ) maxHeight = columnHeights[ c ];
-    }
-    // Each column counted a trailing gap after the last item - subtract one.
-    if ( maxHeight > 0 ) maxHeight -= gap;
-    trackEl.style.height = Math.round( maxHeight ) + 'px';
+	let maxHeight = 0;
+	for (let c = 0; c < columnHeights.length; c++) {
+		if (columnHeights[c] > maxHeight) {
+			maxHeight = columnHeights[c];
+		}
+	}
+	// Each column counted a trailing gap after the last item - subtract one.
+	if (maxHeight > 0) {
+		maxHeight -= gap;
+	}
+	trackEl.style.height = Math.round(maxHeight) + 'px';
 
-    collectionEl.dataset.fgContainerWidth = String( Math.round( containerWidth ) );
+	collectionEl.dataset.fgContainerWidth = String(Math.round(containerWidth));
 }
 
-const attach = createLayoutAttach( {
-    collectionSelector: '[data-fg-layout="masonry"]',
-    trackSelector:      '.fg-masonry-track',
-    readyKey:           'fgMasonryReady',
-    layoutFn:           layout,
-} );
+const attach = createLayoutAttach({
+	collectionSelector: '[data-fg-layout="masonry"]',
+	trackSelector: '.fg-masonry-track',
+	readyKey: 'fgMasonryReady',
+	layoutFn: layout,
+});
 
-bootLayout( attach, 10 );
+bootLayout(attach, 10);

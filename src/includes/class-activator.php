@@ -240,10 +240,11 @@ class Activator {
 		dbDelta( $sql );
 
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
+		\FotoGrids\Migrations\List_Setting_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.5' );
+		update_option( 'fotogrids_db_version', '1.6' );
 	}
 
 	/**
@@ -258,7 +259,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.5', '<' ) ) {
+		if ( version_compare( $current, '1.6', '<' ) ) {
 			self::create_tables();
 		}
 
@@ -282,8 +283,8 @@ class Activator {
 	 * caused the save pipeline to drop the payload while still returning a
 	 * success response).
 	 *
-	 * Bump CAPS_VERSION whenever atomic caps are added to Core_Permissions or
-	 * to a module's harvester so this resync runs once on next page load.
+	 * Sites below 1.2 receive the full default grant. Each later CAPS_VERSION
+	 * bump adds its own step, which runs once on the next page load.
 	 *
 	 * Public so the 'init' hook can call it; not part of the external API.
 	 *
@@ -298,16 +299,46 @@ class Activator {
 		// 'init' has already fired by the time this runs (priority 8),
 		// so the module/tool registries are already populated - pass false
 		// to skip re-firing their registration actions.
-		self::add_capabilities( false );
+		if ( version_compare( $current, '1.2', '<' ) ) {
+			self::add_capabilities( false );
+		} elseif ( version_compare( $current, '1.3', '<' ) ) {
+			self::grant_published_caps_to_publishers();
+		}
 		update_option( 'fotogrids_caps_version', self::CAPS_VERSION, false );
 	}
 
 	/**
-	 * Current capability-catalogue version. Bump whenever new atomic caps are
-	 * added to Core_Permissions or to a module's harvester so existing installs
-	 * receive them via Activator::maybe_resync_capabilities.
+	 * Grant the published-state gallery and album caps to every role that can
+	 * publish but was never given them.
+	 *
+	 * A role in that state can publish a gallery and then cannot edit or
+	 * delete it. Roles whose permissions were set from the Permissions screen
+	 * already hold either all of these caps or none of them, so they are left
+	 * unchanged.
+	 *
+	 * @since 1.1.5
+	 * @return void
 	 */
-	private const CAPS_VERSION = '1.2';
+	private static function grant_published_caps_to_publishers(): void {
+		foreach ( wp_roles()->role_objects as $role ) {
+			foreach ( array( 'galleries', 'albums' ) as $plural ) {
+				if ( ! $role->has_cap( "publish_fotogrids_{$plural}" ) ) {
+					continue;
+				}
+				$role->add_cap( "edit_published_fotogrids_{$plural}" );
+				if ( $role->has_cap( "delete_fotogrids_{$plural}" ) ) {
+					$role->add_cap( "delete_published_fotogrids_{$plural}" );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Current capability-catalogue version. Each bump adds a step to
+	 * Activator::maybe_resync_capabilities so existing installs receive the
+	 * change once.
+	 */
+	private const CAPS_VERSION = '1.3';
 
 	/**
 	 * Add plugin capabilities to WordPress roles.

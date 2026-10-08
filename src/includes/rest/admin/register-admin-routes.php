@@ -50,7 +50,7 @@ class Register_Admin_Routes {
 							},
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_album_edit' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_album_gallery_write' ),
 				),
 			)
 		);
@@ -79,7 +79,7 @@ class Register_Admin_Routes {
 							},
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_album_edit' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_album_gallery_write' ),
 				),
 			)
 		);
@@ -141,7 +141,7 @@ class Register_Admin_Routes {
 							},
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_album_write' ),
 				),
 			)
 		);
@@ -170,7 +170,7 @@ class Register_Admin_Routes {
 							},
 						),
 					),
-					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_album_write' ),
 				),
 			)
 		);

@@ -21,21 +21,23 @@ const RESIZE_DEBOUNCE_MS = 120;
  * @param {HTMLElement} itemEl
  * @return {number}
  */
-export function aspectRatioFor( itemEl ) {
-    const img = itemEl.querySelector( 'img' );
-    if ( ! img ) return 1.5;
+export function aspectRatioFor(itemEl) {
+	const img = itemEl.querySelector('img');
+	if (!img) {
+		return 1.5;
+	}
 
-    const attrW = parseInt( img.getAttribute( 'width' ), 10 );
-    const attrH = parseInt( img.getAttribute( 'height' ), 10 );
-    if ( attrW > 0 && attrH > 0 ) {
-        return attrW / attrH;
-    }
+	const attrW = parseInt(img.getAttribute('width'), 10);
+	const attrH = parseInt(img.getAttribute('height'), 10);
+	if (attrW > 0 && attrH > 0) {
+		return attrW / attrH;
+	}
 
-    if ( img.naturalWidth > 0 && img.naturalHeight > 0 ) {
-        return img.naturalWidth / img.naturalHeight;
-    }
+	if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+		return img.naturalWidth / img.naturalHeight;
+	}
 
-    return 1.5;
+	return 1.5;
 }
 
 /**
@@ -46,32 +48,40 @@ export function aspectRatioFor( itemEl ) {
  * @param {HTMLElement[]} items
  * @return {Promise<void>}
  */
-export function waitForDimensions( items ) {
-    const pending = [];
-    for ( let i = 0; i < items.length; i++ ) {
-        const img = items[ i ].querySelector( 'img' );
-        if ( ! img ) continue;
+export function waitForDimensions(items) {
+	const pending = [];
+	for (let i = 0; i < items.length; i++) {
+		const img = items[i].querySelector('img');
+		if (!img) {
+			continue;
+		}
 
-        const attrW = parseInt( img.getAttribute( 'width' ), 10 );
-        const attrH = parseInt( img.getAttribute( 'height' ), 10 );
-        if ( attrW > 0 && attrH > 0 ) continue;
-        if ( img.complete && img.naturalWidth > 0 ) continue;
+		const attrW = parseInt(img.getAttribute('width'), 10);
+		const attrH = parseInt(img.getAttribute('height'), 10);
+		if (
+			(attrW > 0 && attrH > 0) ||
+			(img.complete && img.naturalWidth > 0)
+		) {
+			continue;
+		}
 
-        pending.push( new Promise( ( resolve ) => {
-            const done = () => {
-                img.removeEventListener( 'load', done );
-                img.removeEventListener( 'error', done );
-                resolve();
-            };
-            img.addEventListener( 'load', done );
-            img.addEventListener( 'error', done );
-        } ) );
-    }
+		pending.push(
+			new Promise((resolve) => {
+				const done = () => {
+					img.removeEventListener('load', done);
+					img.removeEventListener('error', done);
+					resolve();
+				};
+				img.addEventListener('load', done);
+				img.addEventListener('error', done);
+			})
+		);
+	}
 
-    if ( pending.length === 0 ) {
-        return Promise.resolve();
-    }
-    return Promise.all( pending ).then( () => undefined );
+	if (pending.length === 0) {
+		return Promise.resolve();
+	}
+	return Promise.all(pending).then(() => undefined);
 }
 
 /**
@@ -81,11 +91,13 @@ export function waitForDimensions( items ) {
  * @param {HTMLElement} trackEl
  * @return {number}
  */
-export function readTrackGap( trackEl ) {
-    const raw = window.getComputedStyle( trackEl ).gap;
-    if ( ! raw ) return 0;
-    const parsed = parseFloat( raw );
-    return isNaN( parsed ) ? 0 : parsed;
+export function readTrackGap(trackEl) {
+	const raw = window.getComputedStyle(trackEl).gap;
+	if (!raw) {
+		return 0;
+	}
+	const parsed = parseFloat(raw);
+	return isNaN(parsed) ? 0 : parsed;
 }
 
 /**
@@ -98,11 +110,13 @@ export function readTrackGap( trackEl ) {
  * @param {number} fallback
  * @return {number}
  */
-export function readCssNumber( el, name, fallback ) {
-    const raw = window.getComputedStyle( el ).getPropertyValue( name );
-    if ( ! raw ) return fallback;
-    const parsed = parseFloat( raw );
-    return isNaN( parsed ) || parsed <= 0 ? fallback : parsed;
+export function readCssNumber(el, name, fallback) {
+	const raw = window.getComputedStyle(el).getPropertyValue(name);
+	if (!raw) {
+		return fallback;
+	}
+	const parsed = parseFloat(raw);
+	return isNaN(parsed) || parsed <= 0 ? fallback : parsed;
 }
 
 /**
@@ -114,11 +128,13 @@ export function readCssNumber( el, name, fallback ) {
  * @param {number} fallback Returned when the variable is unset or invalid.
  * @return {number}
  */
-export function readCssLength( el, name, fallback ) {
-    const raw = window.getComputedStyle( el ).getPropertyValue( name );
-    if ( ! raw ) return fallback;
-    const parsed = parseFloat( raw );
-    return isNaN( parsed ) || parsed < 0 ? fallback : parsed;
+export function readCssLength(el, name, fallback) {
+	const raw = window.getComputedStyle(el).getPropertyValue(name);
+	if (!raw) {
+		return fallback;
+	}
+	const parsed = parseFloat(raw);
+	return isNaN(parsed) || parsed < 0 ? fallback : parsed;
 }
 
 /**
@@ -130,11 +146,13 @@ export function readCssLength( el, name, fallback ) {
  * @param {number} fallback
  * @return {number}
  */
-export function readCssInteger( el, name, fallback ) {
-    const raw = window.getComputedStyle( el ).getPropertyValue( name );
-    if ( ! raw ) return fallback;
-    const parsed = parseInt( raw, 10 );
-    return isNaN( parsed ) || parsed <= 0 ? fallback : parsed;
+export function readCssInteger(el, name, fallback) {
+	const raw = window.getComputedStyle(el).getPropertyValue(name);
+	if (!raw) {
+		return fallback;
+	}
+	const parsed = parseInt(raw, 10);
+	return isNaN(parsed) || parsed <= 0 ? fallback : parsed;
 }
 
 /**
@@ -145,13 +163,13 @@ export function readCssInteger( el, name, fallback ) {
  * @param {HTMLElement} collectionEl
  * @return {boolean}
  */
-export function hasNextPage( collectionEl ) {
-    const current = parseInt( collectionEl.dataset.fgPageCurrent || '0', 10 );
-    const total   = parseInt( collectionEl.dataset.fgPageTotal   || '0', 10 );
-    if ( isNaN( current ) || isNaN( total ) || current <= 0 || total <= 0 ) {
-        return false;
-    }
-    return current < total;
+export function hasNextPage(collectionEl) {
+	const current = parseInt(collectionEl.dataset.fgPageCurrent || '0', 10);
+	const total = parseInt(collectionEl.dataset.fgPageTotal || '0', 10);
+	if (isNaN(current) || isNaN(total) || current <= 0 || total <= 0) {
+		return false;
+	}
+	return current < total;
 }
 
 /**
@@ -160,11 +178,11 @@ export function hasNextPage( collectionEl ) {
  * @param {HTMLElement} trackEl
  * @return {HTMLElement[]}
  */
-export function visibleItems( trackEl ) {
-    const all = Array.prototype.slice.call(
-        trackEl.querySelectorAll( ':scope > .fg-item' )
-    );
-    return all.filter( ( el ) => ! el.classList.contains( 'fg-is-filtered-out' ) );
+export function visibleItems(trackEl) {
+	const all = Array.prototype.slice.call(
+		trackEl.querySelectorAll(':scope > .fg-item')
+	);
+	return all.filter((el) => !el.classList.contains('fg-is-filtered-out'));
 }
 
 /**
@@ -180,24 +198,24 @@ export function visibleItems( trackEl ) {
  * @param {number} availableWidth Float pixel width to distribute.
  * @return {number[]} Integer pixel widths whose sum equals round(availableWidth).
  */
-export function distributeIntegers( weights, availableWidth ) {
-    const total = weights.reduce( ( sum, w ) => sum + ( w > 0 ? w : 0 ), 0 );
-    if ( total <= 0 || weights.length === 0 ) {
-        return weights.map( () => 0 );
-    }
+export function distributeIntegers(weights, availableWidth) {
+	const total = weights.reduce((sum, w) => sum + (w > 0 ? w : 0), 0);
+	if (total <= 0 || weights.length === 0) {
+		return weights.map(() => 0);
+	}
 
-    const result = new Array( weights.length );
-    let cumulativeFloat = 0;
-    let cumulativeInt   = 0;
+	const result = new Array(weights.length);
+	let cumulativeFloat = 0;
+	let cumulativeInt = 0;
 
-    for ( let i = 0; i < weights.length; i++ ) {
-        cumulativeFloat += ( weights[ i ] / total ) * availableWidth;
-        const cumulativeRounded = Math.round( cumulativeFloat );
-        result[ i ] = cumulativeRounded - cumulativeInt;
-        cumulativeInt = cumulativeRounded;
-    }
+	for (let i = 0; i < weights.length; i++) {
+		cumulativeFloat += (weights[i] / total) * availableWidth;
+		const cumulativeRounded = Math.round(cumulativeFloat);
+		result[i] = cumulativeRounded - cumulativeInt;
+		cumulativeInt = cumulativeRounded;
+	}
 
-    return result;
+	return result;
 }
 
 /**
@@ -206,10 +224,10 @@ export function distributeIntegers( weights, availableWidth ) {
  *
  * @param {HTMLElement[]} items
  */
-export function revealItems( items ) {
-    for ( let i = 0; i < items.length; i++ ) {
-        items[ i ].classList.remove( 'fg-item-hidden' );
-    }
+export function revealItems(items) {
+	for (let i = 0; i < items.length; i++) {
+		items[i].classList.remove('fg-item-hidden');
+	}
 }
 
 /**
@@ -234,91 +252,105 @@ export function revealItems( items ) {
  * }} opts
  * @return {(collectionEl: HTMLElement) => void}
  */
-export function createLayoutAttach( opts ) {
-    const { collectionSelector, trackSelector, readyKey, layoutFn } = opts;
+export function createLayoutAttach(opts) {
+	const { collectionSelector, trackSelector, readyKey, layoutFn } = opts;
 
-    /** @type {WeakMap<Element, { resizeTimer: number|null, observer: ResizeObserver|null, lastWidth: number }>} */
-    const trackState = new WeakMap();
+	/** @type {WeakMap<Element, { resizeTimer: number|null, observer: ResizeObserver|null, lastWidth: number }>} */
+	const trackState = new WeakMap();
 
-    function scheduleLayout( trackEl ) {
-        const state = trackState.get( trackEl );
-        if ( ! state ) return;
-        if ( state.resizeTimer !== null ) {
-            window.clearTimeout( state.resizeTimer );
-        }
-        state.resizeTimer = window.setTimeout( () => {
-            state.resizeTimer = null;
-            runLayoutAndReveal( trackEl );
-        }, RESIZE_DEBOUNCE_MS );
-    }
+	function scheduleLayout(trackEl) {
+		const state = trackState.get(trackEl);
+		if (!state) {
+			return;
+		}
+		if (state.resizeTimer !== null) {
+			window.clearTimeout(state.resizeTimer);
+		}
+		state.resizeTimer = window.setTimeout(() => {
+			state.resizeTimer = null;
+			runLayoutAndReveal(trackEl);
+		}, RESIZE_DEBOUNCE_MS);
+	}
 
-    function runLayoutAndReveal( trackEl ) {
-        layoutFn( trackEl );
-        const items = Array.prototype.slice.call(
-            trackEl.querySelectorAll( ':scope > .fg-item' )
-        );
-        revealItems( items );
-    }
+	function runLayoutAndReveal(trackEl) {
+		layoutFn(trackEl);
+		const items = Array.prototype.slice.call(
+			trackEl.querySelectorAll(':scope > .fg-item')
+		);
+		revealItems(items);
+	}
 
-    return function attach( collectionEl ) {
-        if ( ! collectionEl.matches( collectionSelector ) ) return;
-        if ( collectionEl.dataset[ readyKey ] === '1' ) return;
-        collectionEl.dataset[ readyKey ] = '1';
+	return function attach(collectionEl) {
+		if (
+			!collectionEl.matches(collectionSelector) ||
+			collectionEl.dataset[readyKey] === '1'
+		) {
+			return;
+		}
+		collectionEl.dataset[readyKey] = '1';
 
-        const trackEl = collectionEl.querySelector( trackSelector );
-        if ( ! trackEl ) return;
+		const trackEl = collectionEl.querySelector(trackSelector);
+		if (!trackEl) {
+			return;
+		}
 
-        const state = { resizeTimer: null, observer: null, lastWidth: 0 };
-        trackState.set( trackEl, state );
+		const state = { resizeTimer: null, observer: null, lastWidth: 0 };
+		trackState.set(trackEl, state);
 
-        const items = Array.prototype.slice.call(
-            trackEl.querySelectorAll( ':scope > .fg-item' )
-        );
+		const items = Array.prototype.slice.call(
+			trackEl.querySelectorAll(':scope > .fg-item')
+		);
 
-        waitForDimensions( items ).then( () => {
-            runLayoutAndReveal( trackEl );
+		waitForDimensions(items).then(() => {
+			runLayoutAndReveal(trackEl);
 
-            // Flowing (below / top) captions contribute to item height and their
-            // size isn't final until web fonts load. Re-run once fonts are ready
-            // so those layouts settle exactly. layout() is idempotent.
-            if ( document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function' ) {
-                document.fonts.ready.then( () => {
-                    scheduleLayout( trackEl );
-                } );
-            }
-        } );
+			// Flowing (below / top) captions contribute to item height and their
+			// size isn't final until web fonts load. Re-run once fonts are ready
+			// so those layouts settle exactly. layout() is idempotent.
+			if (
+				document.fonts &&
+				document.fonts.ready &&
+				typeof document.fonts.ready.then === 'function'
+			) {
+				document.fonts.ready.then(() => {
+					scheduleLayout(trackEl);
+				});
+			}
+		});
 
-        if ( typeof window.ResizeObserver === 'function' ) {
-            state.observer = new window.ResizeObserver( ( entries ) => {
-                for ( let i = 0; i < entries.length; i++ ) {
-                    const width = entries[ i ].contentRect.width;
-                    if ( Math.abs( width - state.lastWidth ) < 1 ) continue;
-                    state.lastWidth = width;
-                    scheduleLayout( trackEl );
-                }
-            } );
-            state.observer.observe( trackEl );
-        } else {
-            window.addEventListener( 'resize', () => {
-                scheduleLayout( trackEl );
-            } );
-        }
+		if (typeof window.ResizeObserver === 'function') {
+			state.observer = new window.ResizeObserver((entries) => {
+				for (let i = 0; i < entries.length; i++) {
+					const width = entries[i].contentRect.width;
+					if (Math.abs(width - state.lastWidth) < 1) {
+						continue;
+					}
+					state.lastWidth = width;
+					scheduleLayout(trackEl);
+				}
+			});
+			state.observer.observe(trackEl);
+		} else {
+			window.addEventListener('resize', () => {
+				scheduleLayout(trackEl);
+			});
+		}
 
-        collectionEl.addEventListener( 'fotogrids:items_inserted', ( event ) => {
-            const inserted = event.detail && event.detail.items;
-            if ( ! inserted || inserted.length === 0 ) {
-                scheduleLayout( trackEl );
-                return;
-            }
-            waitForDimensions( Array.prototype.slice.call( inserted ) ).then( () => {
-                runLayoutAndReveal( trackEl );
-            } );
-        } );
+		collectionEl.addEventListener('fotogrids:items_inserted', (event) => {
+			const inserted = event.detail && event.detail.items;
+			if (!inserted || inserted.length === 0) {
+				scheduleLayout(trackEl);
+				return;
+			}
+			waitForDimensions(Array.prototype.slice.call(inserted)).then(() => {
+				runLayoutAndReveal(trackEl);
+			});
+		});
 
-        collectionEl.addEventListener( 'fotogrids:filters_changed', () => {
-            scheduleLayout( trackEl );
-        } );
-    };
+		collectionEl.addEventListener('fotogrids:filters_changed', () => {
+			scheduleLayout(trackEl);
+		});
+	};
 }
 
 /**
@@ -329,19 +361,21 @@ export function createLayoutAttach( opts ) {
  * @param {(el: HTMLElement) => void} attach
  * @param {number} [priority] Default 10.
  */
-export function bootLayout( attach, priority = 10 ) {
-    function init() {
-        if ( ! window.FotoGrids ) return;
-        if ( typeof window.FotoGrids.onCollection === 'function' ) {
-            window.FotoGrids.onCollection( attach, priority );
-        } else if ( typeof window.FotoGrids.onGallery === 'function' ) {
-            window.FotoGrids.onGallery( attach, priority );
-        }
-    }
+export function bootLayout(attach, priority = 10) {
+	function init() {
+		if (!window.FotoGrids) {
+			return;
+		}
+		if (typeof window.FotoGrids.onCollection === 'function') {
+			window.FotoGrids.onCollection(attach, priority);
+		} else if (typeof window.FotoGrids.onGallery === 'function') {
+			window.FotoGrids.onGallery(attach, priority);
+		}
+	}
 
-    if ( document.readyState === 'loading' ) {
-        document.addEventListener( 'DOMContentLoaded', init );
-    } else {
-        init();
-    }
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
 }

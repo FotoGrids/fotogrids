@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,7 +87,7 @@ Track views and interactions per gallery right inside your WordPress dashboard. 
 * **Gutenberg blocks** - add a gallery or album block in the WordPress editor.
 * **Shortcodes** - drop `[fotogrids_gallery id="123"]` or `[fotogrids_album id="123"]` into any post, page, or widget.
 * **Any theme** - galleries inherit your site's width and styling.
-* **Page builders** - Elementor and Divi work in the free version; Pro adds enhanced widgets and controls.
+* **Page builders** - Elementor, Divi, and Bricks work in the free version; Pro adds enhanced widgets and controls.
 
 = 🧰 A complete toolkit, not just a plugin =
 
@@ -148,7 +148,7 @@ FotoGrids supports every image format WordPress handles natively, including JPEG
 
 = Does it work with page builders? =
 
-Yes. FotoGrids includes dedicated widgets for Elementor and Divi in the free version, and works through shortcodes in any other page builder. Pro adds enhanced widgets and controls.
+Yes. FotoGrids includes dedicated widgets for Elementor, Divi, and Bricks in the free version, and works through shortcodes in any other page builder. Pro adds enhanced widgets and controls.
 
 = Is it mobile-friendly? =
 
@@ -176,6 +176,37 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 6. Statistics dashboard showing views and shares.
 
 == Changelog ==
+
+= 1.1.4 =
+
+**Improved**
+
+* Recently Edited on the Dashboard once setup is complete.
+* Untitled galleries and albums now show as "Gallery #123" and "Album #123".
+* Tag, people and location suggestions now search as you type.
+* Unsaved changes in Edit Item are now confirmed in the FotoGrids dialog.
+* The gallery Preview tab now guides you when a gallery is empty.
+* Admin screens stay usable if a single control fails.
+* Custom image sizes now follow saved gallery settings only.
+
+**Fixed**
+
+* Fixed Responsiveness breakpoints and detection mode across every layout.
+* Fixed deep links, which now work whenever Deep linking is on.
+* Fixed starring a video as the gallery's featured item and cover.
+* Fixed statistics for album views, Lightbox slides, site timezone and tied rankings.
+* Fixed Statistics charts on narrow screens.
+* Fixed the dashboard widget counts to match the FotoGrids Dashboard.
+* Fixed REST requests and the watermark status on plain permalinks.
+* Fixed Dashboard uploads.
+* Fixed the Page Buttons arrow icon.
+* Fixed removing video embeds and setting the featured item in the items grid.
+* Fixed item details shared across galleries and for migrated galleries.
+* Fixed duplicate tags when re-adding one in different case.
+* Fixed settings screens to follow your profile language.
+* Fixed translations for the Dashboard, share bar and Lightbox.
+* Fixed the System Info error log to list only FotoGrids errors.
+* Fixed gallery reorder and settings-saved actions for developers.
 
 = 1.1.3 =
 
@@ -312,6 +343,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Responsiveness breakpoints, deep links, statistics and plain-permalink sites now work as set, plus a Recently Edited card on the Dashboard and many more fixes throughout.
 
 = 1.1.3 =
 Fixes Lightbox image sizes, saved defaults for new galleries, four share buttons and cache expiry. Adds right-to-left admin support and stricter view permissions.

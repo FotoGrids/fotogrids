@@ -46,17 +46,21 @@ class Statistics {
 			return false;
 		}
 
+		$now = current_time( 'mysql', true );
+
 		$updated = $wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i
              SET %i = %i + %d,
-                 last_viewed = NOW(),
-                 updated_at = NOW()
+                 last_viewed = %s,
+                 updated_at = %s
              WHERE object_type = %s AND object_id = %d',
 				$table,
 				$field,
 				$field,
 				$amount,
+				$now,
+				$now,
 				$object_type,
 				$object_id
 			)
@@ -72,9 +76,9 @@ class Statistics {
 				'object_id'   => $object_id,
 				'views'       => ( 'views' === $field ) ? $amount : 0,
 				'shares'      => ( 'shares' === $field ) ? $amount : 0,
-				'last_viewed' => current_time( 'mysql', true ),
-				'created_at'  => current_time( 'mysql', true ),
-				'updated_at'  => current_time( 'mysql', true ),
+				'last_viewed' => $now,
+				'created_at'  => $now,
+				'updated_at'  => $now,
 			);
 
 			$inserted = $wpdb->insert(
@@ -178,92 +182,6 @@ class Statistics {
 	}
 
 	/**
-	 * Get top performing objects by views
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $limit Number of results to return
-	 * @param int $days Number of days to look back (0 for all time)
-	 * @return array Array of objects with statistics
-	 */
-	public static function get_top_by_views( $object_type, $limit = 10, $days = 0 ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_statistics';
-		$limit = (int) $limit;
-
-		$where_date = '';
-		$params     = array( $table, $object_type );
-
-		if ( $days > 0 ) {
-			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
-			$params[]   = $days;
-		}
-
-		$params[] = $limit;
-
-		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM %i
-                WHERE object_type = %s $where_date
-                ORDER BY views DESC
-                LIMIT %d";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
-
-		$enriched = array();
-		foreach ( $results as $row ) {
-			$object_data = self::get_object_data( $object_type, $row['object_id'] );
-			if ( $object_data ) {
-				$enriched[] = array_merge( $row, $object_data );
-			}
-		}
-
-		return $enriched;
-	}
-
-	/**
-	 * Get top performing objects by shares
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $limit Number of results to return
-	 * @param int $days Number of days to look back (0 for all time)
-	 * @return array Array of objects with statistics
-	 */
-	public static function get_top_by_shares( $object_type, $limit = 10, $days = 0 ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_statistics';
-		$limit = (int) $limit;
-
-		$where_date = '';
-		$params     = array( $table, $object_type );
-
-		if ( $days > 0 ) {
-			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
-			$params[]   = $days;
-		}
-
-		$params[] = $limit;
-
-		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM %i
-                WHERE object_type = %s $where_date
-                ORDER BY shares DESC
-                LIMIT %d";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
-
-		$enriched = array();
-		foreach ( $results as $row ) {
-			$object_data = self::get_object_data( $object_type, $row['object_id'] );
-			if ( $object_data ) {
-				$enriched[] = array_merge( $row, $object_data );
-			}
-		}
-
-		return $enriched;
-	}
-
-	/**
 	 * Get total statistics
 	 *
 	 * @return array Total views and shares across all objects
@@ -295,69 +213,36 @@ class Statistics {
 	/**
 	 * Clean up old statistics data
 	 *
+	 * Deletes totals rows not viewed within the retention period and daily
+	 * rows dated before it.
+	 *
 	 * @param int $days Number of days to keep (older data will be deleted)
 	 * @return int Number of rows deleted
 	 */
 	public static function cleanup_old_data( $days = 365 ) {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'fotogrids_statistics';
+		$table       = $wpdb->prefix . 'fotogrids_statistics';
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+		$cutoff      = time() - ( (int) $days * DAY_IN_SECONDS );
 
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				'DELETE FROM %i WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)',
+				'DELETE FROM %i WHERE last_viewed < %s',
 				$table,
-				$days
+				gmdate( 'Y-m-d H:i:s', $cutoff )
 			)
 		);
 
-		return $deleted;
-	}
+		$deleted_daily = $wpdb->query(
+			$wpdb->prepare(
+				'DELETE FROM %i WHERE viewed_date < %s',
+				$daily_table,
+				wp_date( 'Y-m-d', $cutoff )
+			)
+		);
 
-	/**
-	 * Get object data based on type and ID
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $object_id ID of the object
-	 * @return array|null Object data or null if not found
-	 */
-	private static function get_object_data( $object_type, $object_id ) {
-		switch ( $object_type ) {
-			case 'gallery':
-				$post = get_post( $object_id );
-				if ( $post && 'fotogrids_gallery' === $post->post_type ) {
-					return array(
-						'title'     => $post->post_title,
-						'url'       => get_permalink( $post->ID ),
-						'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
-					);
-				}
-				break;
-
-			case 'album':
-				$post = get_post( $object_id );
-				if ( $post && 'fotogrids_album' === $post->post_type ) {
-					return array(
-						'title'     => $post->post_title,
-						'url'       => get_permalink( $post->ID ),
-						'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
-					);
-				}
-				break;
-
-			case 'item':
-				$attachment = get_post( $object_id );
-				if ( $attachment && 'attachment' === $attachment->post_type ) {
-					return array(
-						'title'     => $attachment->post_title,
-						'url'       => wp_get_attachment_url( $object_id ),
-						'thumbnail' => wp_get_attachment_image_url( $object_id, 'thumbnail' ),
-					);
-				}
-				break;
-		}
-
-		return null;
+		return (int) $deleted + (int) $deleted_daily;
 	}
 
 	/**

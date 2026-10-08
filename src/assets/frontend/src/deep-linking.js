@@ -105,8 +105,9 @@
 		}
 
 		for (const galleryEl of galleries) {
+			// Items without a click action carry only the media's data-id.
 			const itemEl = galleryEl.querySelector(
-				`[data-fg-item-id="${link.itemId}"]`
+				`[data-fg-item-id="${link.itemId}"], [data-id="${link.itemId}"]`
 			);
 			if (itemEl) {
 				const figure = itemEl.closest('.fg-item') || itemEl;
@@ -237,6 +238,11 @@
 	}
 
 	function init() {
+		// wp_localize_script delivers the flag as "1" or "".
+		if (!settings.deep_linking_enabled) {
+			return;
+		}
+
 		injectHighlightStyle();
 
 		document.addEventListener('fotogrids:lightbox:open', syncUrlToLightbox);
@@ -246,9 +252,7 @@
 		);
 		document.addEventListener('fotogrids:lightbox:close', clearDeepLink);
 
-		if (settings.deep_linking_enabled !== false) {
-			openDeepLink();
-		}
+		openDeepLink();
 	}
 
 	if (document.readyState === 'loading') {

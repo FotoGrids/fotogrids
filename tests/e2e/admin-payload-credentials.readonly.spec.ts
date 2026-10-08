@@ -1,5 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { loginAsAdmin } from './helpers';
+import { test, expect } from './support/test';
+import { storageStateFor } from './support/roles';
+
+test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
  * The fotogridsAdmin payload is inlined into the HTML of every FotoGrids admin
@@ -22,12 +24,8 @@ const CREDENTIAL_FIELDS = [
 ];
 
 test.describe('FotoGrids admin payload', () => {
-	test.beforeEach(async ({ page }) => {
-		await loginAsAdmin(page);
-	});
-
 	for (const path of ADMIN_PAGES) {
-		test(`carries no credential fields on ${path}`, async ({ page }) => {
+		test(`carries no credential fields on ${path}`, { tag: [ '@admin', '@api' ] }, async ({ page }) => {
 			await page.goto(path);
 
 			const payload = await page.evaluate(() => {

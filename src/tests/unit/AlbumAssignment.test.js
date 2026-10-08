@@ -8,7 +8,7 @@ const CONFIG = {
 	postId: 5,
 	restUrl: 'https://x/wp-json/fotogrids/v1/',
 	nonce: 'n',
-	assignedAlbums: [{ ID: 1, title: 'Trips' }],
+	assignedAlbums: [{ ID: 1, title: 'Trips', editable: true }],
 	allAlbums: [
 		{ id: 1, title: 'Trips', gallery_count: 2 },
 		{ id: 2, title: 'Food', gallery_count: 0 },
@@ -99,5 +99,17 @@ describe('AlbumAssignment', () => {
 		expect(global.wp.apiFetch).toHaveBeenCalledWith(
 			expect.objectContaining({ method: 'DELETE' })
 		);
+	});
+
+	it('offers no remove control for an assigned album the user cannot edit', async () => {
+		window.fotogridsAlbumAssignment = {
+			...CONFIG,
+			assignedAlbums: [{ ID: 9, title: 'Admin picks', editable: false }],
+		};
+		const handle = renderElement(wp.element.createElement(AlbumAssignment));
+		await flush();
+		const assigned = handle.container.querySelector('.fotogrids-assigned-album');
+		expect(assigned).not.toBeNull();
+		expect(assigned.querySelector('button')).toBeNull();
 	});
 });

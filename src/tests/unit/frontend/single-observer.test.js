@@ -149,33 +149,56 @@ describe('classic lightbox.js', () => {
 			'data-fg-lightbox-variant': 'full',
 		});
 
+	// Runtimes from earlier tests keep observing, so their lightbox copies
+	// can claim a gallery too. Every loaded copy is stubbed on click.
+	const lightboxClasses = [];
+	const loadLightbox = () => {
+		const created = loadWithRuntime(LIGHTBOX);
+		lightboxClasses.push(window.FotoGridsLightbox);
+		return created;
+	};
+
+	/**
+	 * Whether a click on the gallery's first trigger reaches a lightbox.
+	 *
+	 * @param {Element} gallery
+	 * @return {boolean}
+	 */
+	const opensOnClick = (gallery) => {
+		const spies = lightboxClasses.map((Lightbox) =>
+			jest.spyOn(Lightbox.prototype, 'open').mockImplementation(() => {})
+		);
+		gallery.querySelector('[data-fg-lightbox-trigger]').click();
+		const opened = spies.some((spy) =>
+			spy.mock.calls.some(([el]) => el === gallery)
+		);
+		spies.forEach((spy) => spy.mockRestore());
+		return opened;
+	};
+
 	test('does not construct a MutationObserver', () => {
-		expect(loadWithRuntime(LIGHTBOX)).toBe(0);
+		expect(loadLightbox()).toBe(0);
 	});
 
 	test('activates a lightbox gallery present at load', () => {
 		const gallery = lightboxGallery();
 		document.body.appendChild(gallery);
-		loadWithRuntime(LIGHTBOX);
+		loadLightbox();
 
-		expect(gallery.querySelector('.fg-item').getAttribute('tabindex')).toBe(
-			'0'
-		);
+		expect(opensOnClick(gallery)).toBe(true);
 	});
 
 	test('activates a lightbox gallery inserted after load', async () => {
-		loadWithRuntime(LIGHTBOX);
+		loadLightbox();
 		const gallery = lightboxGallery();
 		document.body.appendChild(gallery);
 		await flush();
 
-		expect(gallery.querySelector('.fg-item').getAttribute('tabindex')).toBe(
-			'0'
-		);
+		expect(opensOnClick(gallery)).toBe(true);
 	});
 
 	test('leaves galleries without the lightbox click, or with another variant, alone', async () => {
-		loadWithRuntime(LIGHTBOX);
+		loadLightbox();
 		const plain = makeCollection('gallery');
 		const mini = makeCollection('gallery', {
 			'data-fg-click': 'lightbox',
@@ -184,11 +207,7 @@ describe('classic lightbox.js', () => {
 		document.body.append(plain, mini);
 		await flush();
 
-		expect(plain.querySelector('.fg-item').hasAttribute('tabindex')).toBe(
-			false
-		);
-		expect(mini.querySelector('.fg-item').hasAttribute('tabindex')).toBe(
-			false
-		);
+		expect(opensOnClick(plain)).toBe(false);
+		expect(opensOnClick(mini)).toBe(false);
 	});
 });

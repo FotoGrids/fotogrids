@@ -66,11 +66,12 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 	}, [galleryItems]);
 
 	// Save the gallery's featured item via REST. Pass null to clear.
+	// Resolves false when the save failed.
 	const saveFeaturedItem = useCallback(
 		async (itemId) => {
 			const galleryId = window.fotogridsMetaBoxes?.postId;
 			if (!galleryId) {
-				return;
+				return true;
 			}
 			try {
 				await window.wp.apiFetch({
@@ -85,6 +86,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 							: strings.featuredItemCleared
 					);
 				}
+				return true;
 			} catch (error) {
 				if (window.fotogridsToast) {
 					window.fotogridsToast.error(
@@ -92,6 +94,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 					);
 				}
 				console.error('Error saving featured item:', error);
+				return false;
 			}
 		},
 		[strings]
@@ -167,14 +170,21 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 				return;
 			}
 			const nextItemId = clickedItem.featured ? null : itemId;
+			const previousItemId =
+				items.find((item) => item.featured)?.id ?? null;
+			const markFeatured = (featuredId) =>
+				setItems((prevItems) =>
+					prevItems.map((item) => ({
+						...item,
+						featured: featuredId !== null && item.id === featuredId,
+					}))
+				);
 
-			setItems((prevItems) =>
-				prevItems.map((item) => ({
-					...item,
-					featured: nextItemId !== null && item.id === nextItemId,
-				}))
-			);
-			await saveFeaturedItem(nextItemId);
+			markFeatured(nextItemId);
+			const saved = await saveFeaturedItem(nextItemId);
+			if (!saved) {
+				markFeatured(previousItemId);
+			}
 		},
 		[items, saveFeaturedItem]
 	);

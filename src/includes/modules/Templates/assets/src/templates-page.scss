@@ -69,6 +69,18 @@
         border-radius: 8px;
         border: 1px solid transparent;
 
+        &__trigger {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            &:focus-visible {
+                outline: 2px solid var(--fg-blue);
+                outline-offset: 4px;
+                border-radius: 4px;
+            }
+        }
+
         &--pro {
             cursor: pointer;
 

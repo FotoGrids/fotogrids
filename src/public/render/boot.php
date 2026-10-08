@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use FotoGrids\Hooks\Actions_Render;
+use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Internal\Asset_Resolver;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -146,6 +147,9 @@ add_action(
 		// Stats fires view + share pings to the REST API. Gated by the
 		// enable_statistics setting (default true) and never active in previews.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
+		// Deep Linking opens #fg-{galleryId}-{itemId} URLs. Gated by the site-level
+		// deep_linking_enabled setting, independently of social sharing.
+		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Deep_Linking\Deep_Linking::class );
 		// Inline video playback - active when video_playback_mode is "inline".
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Inline::class );
 		// Minimal video lightbox - active when video_playback_mode is "lightbox"
@@ -186,6 +190,43 @@ add_action(
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Page_Buttons\Page_Buttons::class );
 	},
 	10
+);
+
+add_filter(
+	Filters_Cache::SHOULD_CACHE,
+	static function ( $should_cache, $settings, $gallery_id ): bool {
+		if ( ! $should_cache ) {
+			return false;
+		}
+
+		$context = \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( (int) $gallery_id, (array) $settings );
+
+		return ! \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
+	},
+	10,
+	3
+);
+
+add_filter(
+	Filters_Cache::BYPASS_PAGE_CACHE,
+	static function ( $bypass, $settings, $gallery_id ): bool {
+		if ( $bypass ) {
+			return true;
+		}
+
+		$context = \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( (int) $gallery_id, (array) $settings );
+
+		return \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
+	},
+	10,
+	3
+);
+
+add_filter(
+	Filters_Cache::BUCKET,
+	array( \FotoGrids\Render\Features\Collection_Header\Collection_Header::class, 'cache_bucket' ),
+	10,
+	3
 );
 
 add_action(

@@ -87,11 +87,13 @@ class Renderer {
 	/**
 	 * Whether the collection is being previewed as a draft by an editor.
 	 *
+	 * Published and private collections render as normal view pages.
+	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	public function is_draft_preview(): bool {
-		return 'publish' !== $this->post->post_status;
+		return ! in_array( $this->post->post_status, array( 'publish', 'private' ), true );
 	}
 
 	/**
@@ -263,17 +265,27 @@ class Renderer {
 				: $this->collection_description();
 
 			// Image: explicit per-collection custom image wins; otherwise the
-			// collection cover, which itself resolves the Featured / Share Image
-			// first, then the in-gallery Featured Item / featured child gallery,
-			// then the first item; finally the plugin-wide fallback.
+			// collection cover (image or video/embed poster), which itself
+			// resolves the Featured / Share Image first, then the in-gallery
+			// Featured Item / featured child gallery, then the first item;
+			// finally the plugin-wide fallback.
 			$image_id = 0;
 			if ( 'custom' === $seo['og_image_source'] && $seo['og_image_custom_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_custom_id'];
 			}
+			$poster_url = '';
 			if ( $image_id <= 0 ) {
-				$image_id = \FotoGrids\Galleries\Cover_Resolver::for_collection( (int) $this->post->ID );
+				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
+					(int) $this->post->ID,
+					'large'
+				);
+				if ( 'attachment' === $descriptor['kind'] && wp_attachment_is_image( $descriptor['id'] ) ) {
+					$image_id = (int) $descriptor['id'];
+				} else {
+					$poster_url = $descriptor['url'];
+				}
 			}
-			if ( $image_id <= 0 && $seo['og_image_fallback_id'] > 0 ) {
+			if ( $image_id <= 0 && '' === $poster_url && $seo['og_image_fallback_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_fallback_id'];
 			}
 
@@ -288,22 +300,15 @@ class Renderer {
 				);
 			}
 
-			// Poster fallback: an embed-only or video-only collection has no
-			// image attachment cover, so use its resolved poster URL for OG.
-			if ( empty( $image['url'] ) ) {
-				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
-					(int) $this->post->ID,
-					'large'
+			// A video or embed cover has no image attachment; its poster URL is the image.
+			if ( '' !== $poster_url ) {
+				$image = array(
+					'id'     => 0,
+					'url'    => $poster_url,
+					'width'  => 0,
+					'height' => 0,
+					'alt'    => '',
 				);
-				if ( '' !== $descriptor['url'] ) {
-					$image = array(
-						'id'     => 0,
-						'url'    => $descriptor['url'],
-						'width'  => 0,
-						'height' => 0,
-						'alt'    => '',
-					);
-				}
 			}
 		}
 
@@ -445,7 +450,7 @@ class Renderer {
 		$title = (string) get_the_title( $this->post );
 
 		if ( $this->is_album() ) {
-			$count = count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) );
+			$count = count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) );
 			if ( $count <= 0 ) {
 				return '';
 			}
@@ -729,7 +734,7 @@ class Renderer {
 	 */
 	public function header_html(): string {
 		$count = $this->is_album()
-			? count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) )
+			? count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) )
 			: \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
 
 		$meta_label = $this->is_album()
@@ -832,7 +837,9 @@ class Renderer {
 			);
 		}
 
-		$config['labels'] = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+		$config['labels']      = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+		$config['object_type'] = $this->is_album() ? 'album' : 'gallery';
+		$config['object_id']   = (int) $this->post->ID;
 
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
 			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
@@ -955,9 +962,11 @@ class Renderer {
 	}
 
 	/**
-	 * Record a view against the collection's statistics.
+	 * Announce a view page visit.
 	 *
-	 * Draft previews are not counted.
+	 * The view itself is recorded by the Stats feature's view request, so
+	 * it follows the collection's Enable Statistics Tracking setting. Draft
+	 * previews are not announced.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -967,11 +976,8 @@ class Renderer {
 			return;
 		}
 
-		$object_type = $this->is_album() ? 'album' : 'gallery';
-		\FotoGrids\Statistics::increment( $object_type, (int) $this->post->ID, 'views' );
-
 		/**
-		 * Fires after a view page visit is recorded.
+		 * Fires when a published or private collection's view page is visited.
 		 *
 		 * @since 1.0.0
 		 * @param \WP_Post $post

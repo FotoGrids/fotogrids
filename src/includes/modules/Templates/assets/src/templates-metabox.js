@@ -12,15 +12,15 @@ import TemplatesMetabox from '@/admin/src/components/TemplatesMetabox.jsx';
 import './templates-metabox.scss';
 
 function initializeTemplatesMetabox() {
-    const root = document.getElementById('fotogrids-templates-metabox');
+	const root = document.getElementById('fotogrids-templates-metabox');
 
-    if (root && window.fotogridsTemplatesMetabox) {
-        createRoot(root).render(React.createElement(TemplatesMetabox));
-    }
+	if (root && window.fotogridsTemplatesMetabox) {
+		createRoot(root).render(React.createElement(TemplatesMetabox));
+	}
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeTemplatesMetabox);
+	document.addEventListener('DOMContentLoaded', initializeTemplatesMetabox);
 } else {
-    setTimeout(initializeTemplatesMetabox, 0);
+	setTimeout(initializeTemplatesMetabox, 0);
 }

@@ -226,6 +226,17 @@ describe('useGalleryItems', () => {
 			expect(window.fotogridsToast.error).toHaveBeenCalledWith('boom');
 		});
 
+		it('restores the previous featured item when the save fails', async () => {
+			mount([image(1, { featured: true }), image(2)]);
+			wp.apiFetch.mockRejectedValue(new Error('boom'));
+
+			await act(async () => {
+				await api.setFeatured(2);
+			});
+
+			expect(api.items.map((i) => i.featured)).toEqual([true, false]);
+		});
+
 		it('saves the clicked item when another update is already queued', async () => {
 			mount([image(1), image(2), image(3)]);
 

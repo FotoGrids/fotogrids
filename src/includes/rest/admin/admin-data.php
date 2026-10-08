@@ -951,30 +951,33 @@ class Admin_Data {
 		global $wpdb;
 		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
 
+		$today          = self::site_date( 0 )->format( 'Y-m-d' );
+		$current_start  = self::site_date( $days - 1 )->format( 'Y-m-d' );
+		$previous_first = self::site_date( ( 2 * $days ) - 1 );
+
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				'SELECT
-                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_current,
-                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_previous,
-                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_current,
-                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_previous
+                    SUM(CASE WHEN viewed_date >= %s THEN views  ELSE 0 END) AS views_current,
+                    SUM(CASE WHEN viewed_date <  %s THEN views  ELSE 0 END) AS views_previous,
+                    SUM(CASE WHEN viewed_date >= %s THEN shares ELSE 0 END) AS shares_current,
+                    SUM(CASE WHEN viewed_date <  %s THEN shares ELSE 0 END) AS shares_previous
                  FROM %i
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
-                   AND viewed_date <= CURDATE()',
-				$days - 1,
-				$days - 1,
-				$days - 1,
-				$days - 1,
+                 WHERE viewed_date >= %s
+                   AND viewed_date <= %s',
+				$current_start,
+				$current_start,
+				$current_start,
+				$current_start,
 				$daily_table,
-				( 2 * $days ) - 1
+				$previous_first->format( 'Y-m-d' ),
+				$today
 			),
 			ARRAY_A
 		);
 
-		// Formatted with gmdate to match the window the SQL above selected and
-		// the axis labels in get_views_data().
-		$previous_start = gmdate( 'M j', strtotime( '-' . ( ( 2 * $days ) - 1 ) . ' days' ) );
-		$previous_end   = gmdate( 'M j', strtotime( '-' . $days . ' days' ) );
+		$previous_start = $previous_first->format( 'M j' );
+		$previous_end   = self::site_date( $days )->format( 'M j' );
 
 		return array(
 			'days'            => $days,
@@ -985,6 +988,17 @@ class Admin_Data {
 			'previous_start'  => $previous_start,
 			'previous_end'    => $previous_end,
 		);
+	}
+
+	/**
+	 * Returns the site-local date a given number of days before today.
+	 *
+	 * @since 1.1.4
+	 * @param int $days_ago Days before today.
+	 * @return \DateTimeImmutable
+	 */
+	private static function site_date( int $days_ago ): \DateTimeImmutable {
+		return ( new \DateTimeImmutable( 'today', wp_timezone() ) )->modify( '-' . $days_ago . ' days' );
 	}
 
 	/**
@@ -1075,12 +1089,13 @@ class Admin_Data {
 			$wpdb->prepare(
 				'SELECT viewed_date, SUM(views) AS daily_views
              FROM %i
-             WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
-               AND viewed_date <= CURDATE()
+             WHERE viewed_date >= %s
+               AND viewed_date <= %s
              GROUP BY viewed_date
              ORDER BY viewed_date ASC',
 				$daily_table,
-				( 2 * $days ) - 1
+				self::site_date( ( 2 * $days ) - 1 )->format( 'Y-m-d' ),
+				self::site_date( 0 )->format( 'Y-m-d' )
 			),
 			ARRAY_A
 		);
@@ -1095,13 +1110,14 @@ class Admin_Data {
 		$previous = array();
 
 		for ( $i = $days - 1; $i >= 0; $i-- ) {
-			$date     = gmdate( 'Y-m-d', strtotime( "-$i days" ) );
-			$labels[] = gmdate( 'M j', strtotime( "-$i days" ) );
+			$day      = self::site_date( $i );
+			$date     = $day->format( 'Y-m-d' );
+			$labels[] = $day->format( 'M j' );
 			$data[]   = $views_by_date[ $date ] ?? 0;
 
 			// Same weekday offset one window earlier, so the two lines compare
 			// like for like.
-			$prior_date = gmdate( 'Y-m-d', strtotime( '-' . ( $i + $days ) . ' days' ) );
+			$prior_date = self::site_date( $i + $days )->format( 'Y-m-d' );
 			$previous[] = $views_by_date[ $prior_date ] ?? 0;
 		}
 
@@ -1139,12 +1155,12 @@ class Admin_Data {
 					"SELECT object_id, SUM(views) AS total_views
                  FROM %i
                  WHERE object_type = 'gallery'
-                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                   AND viewed_date >= %s
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
 					$daily_table,
-					$days - 1
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				),
 				ARRAY_A
 			);
@@ -1154,9 +1170,9 @@ class Admin_Data {
 					"SELECT SUM(views)
                  FROM %i
                  WHERE object_type = 'gallery'
-                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)",
+                   AND viewed_date >= %s",
 					$daily_table,
-					$days - 1
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				)
 			);
 		} else {
@@ -1166,7 +1182,7 @@ class Admin_Data {
                  FROM %i
                  WHERE object_type = 'gallery'
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
 					$stats_table
 				),
@@ -1227,11 +1243,11 @@ class Admin_Data {
 				$wpdb->prepare(
 					'SELECT object_type, object_id, views, last_viewed
                  FROM %i
-                 WHERE last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)
+                 WHERE last_viewed >= %s
                  ORDER BY last_viewed DESC
                  LIMIT 20',
 					$stats_table,
-					$days
+					gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) )
 				),
 				ARRAY_A
 			);
@@ -1258,8 +1274,7 @@ class Admin_Data {
 					'title'       => $post->post_title,
 					'type'        => $result['object_type'],
 					'views'       => (int) $result['views'],
-					// strtotime() on the stored MySQL datetime yields a server-local epoch; current_time('timestamp') matches that frame for human_time_diff().
-					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] ), current_time( 'timestamp' ) ) . ' ago', // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- intentional local-frame pairing.
+					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] . ' UTC' ), time() ) . ' ago',
 					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
 				);
 			}
@@ -1292,12 +1307,12 @@ class Admin_Data {
 					'SELECT object_type, object_id,
                         SUM(views) AS views, SUM(shares) AS shares
                  FROM %i
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                 WHERE viewed_date >= %s
                  GROUP BY object_type, object_id
-                 ORDER BY views DESC
+                 ORDER BY views DESC, object_type ASC, object_id ASC
                  LIMIT 20',
 					$daily_table,
-					$days - 1
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				),
 				ARRAY_A
 			);
@@ -1306,9 +1321,9 @@ class Admin_Data {
 				$wpdb->prepare(
 					'SELECT SUM(views)
                  FROM %i
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)',
+                 WHERE viewed_date >= %s',
 					$daily_table,
-					$days - 1
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				)
 			);
 		} else {
@@ -1316,7 +1331,7 @@ class Admin_Data {
 				$wpdb->prepare(
 					'SELECT object_type, object_id, views, shares
                  FROM %i
-                 ORDER BY views DESC
+                 ORDER BY views DESC, object_type ASC, object_id ASC
                  LIMIT 20',
 					$stats_table
 				),

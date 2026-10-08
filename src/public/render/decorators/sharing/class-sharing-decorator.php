@@ -157,21 +157,12 @@ final class Sharing_Decorator implements Decorator {
 				),
 			),
 			array(
-				'fotogrids-fg-tooltip'   => new Asset_Decl(
+				'fotogrids-fg-tooltip' => new Asset_Decl(
 					'../../assets/js/fg-tooltip.js',
 					array(),
 					true,
 				),
-				// deep-linking only makes sense when sharing is active -
-				// it interprets ?fg-item / #fg-<g>-<i> URLs that come
-				// from shared links. The View Page enqueues it directly
-				// because those URLs arrive there even with sharing off.
-				'fotogrids-deep-linking' => new Asset_Decl(
-					'../../assets/js/deep-linking.js',
-					array( 'fotogrids-runtime' ),
-					true,
-				),
-				'fotogrids-sharing'      => new Asset_Decl(
+				'fotogrids-sharing'    => new Asset_Decl(
 					'../../assets/js/sharing.js',
 					array( 'fotogrids-runtime', 'fotogrids-fg-tooltip' ),
 					true,

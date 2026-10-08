@@ -4,6 +4,7 @@ namespace FotoGrids;
 use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Hooks\Filters_Cache;
+use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
@@ -66,6 +67,40 @@ class Public_Render {
 		add_shortcode( 'fotogrids_album', array( __CLASS__, 'album_shortcode' ) );
 
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_scripts' ) );
+
+		if ( function_exists( 'wp_start_template_enhancement_output_buffer' ) ) {
+			add_action( 'wp_before_include_template', array( __CLASS__, 'hold_template_output' ), 1001 );
+		} else {
+			add_filter( 'template_include', array( __CLASS__, 'hold_template_output_on_include' ), PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * Buffer the template output when WordPress does not, so headers set
+	 * while a collection renders still reach the response.
+	 *
+	 * @since  1.2.0
+	 * @return void
+	 */
+	public static function hold_template_output(): void {
+		if ( did_action( 'wp_template_enhancement_output_buffer_started' ) ) {
+			return;
+		}
+
+		ob_start();
+	}
+
+	/**
+	 * template_include callback for WordPress before 6.9.
+	 *
+	 * @since  1.2.0
+	 * @param  string $template Template path, passed through unchanged.
+	 * @return string
+	 */
+	public static function hold_template_output_on_include( $template ) {
+		self::hold_template_output();
+
+		return $template;
 	}
 
 	/**
@@ -79,22 +114,15 @@ class Public_Render {
 	}
 
 	/**
-	 * Opt the current page out of host, page-builder and CDN caching when a
-	 * randomly-sorted gallery is set to randomize on the server.
-	 *
-	 * The other random_mode values keep the page cacheable and resolve in the
-	 * browser, so this does nothing for them. Server mode promises a new order
-	 * per request, which only holds if nothing downstream stores the response.
-	 * The fotogrids/cache/bypass_page_cache filter has the final say either
-	 * way; it covers only the caches FotoGrids does not own, so it cannot
-	 * re-enable the render cache that should_cache() already skipped.
+	 * Opt the current page out of host, page-builder and CDN caching when the
+	 * fotogrids/cache/bypass_page_cache filter asks for it.
 	 *
 	 * @since  1.0.0
 	 * @param  array $settings   Gallery settings.
 	 * @param  int   $gallery_id Gallery ID.
 	 * @return void
 	 */
-	private static function maybe_bypass_page_cache_for_random( array $settings, int $gallery_id ): void {
+	private static function maybe_bypass_page_cache( array $settings, int $gallery_id ): void {
 		$bypass = Random_Sorter::is_server_randomized( $settings );
 
 		if ( ! apply_filters( Filters_Cache::BYPASS_PAGE_CACHE, $bypass, $settings, $gallery_id ) ) {
@@ -206,14 +234,6 @@ class Public_Render {
 					'mobile'  => $cols,
 				);
 			}
-		}
-
-		if ( isset( $atts['captions'] ) ) {
-			$settings_overlay['captions'] = 'true' === $atts['captions'];
-		}
-
-		if ( isset( $atts['lightbox'] ) ) {
-			$settings_overlay['lightbox'] = 'true' === $atts['lightbox'];
 		}
 
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
@@ -344,8 +364,6 @@ class Public_Render {
 			'album_id' => 0,
 			'template' => '',
 			'cols'     => 0,
-			'captions' => 'true',
-			'lightbox' => 'true',
 		);
 
 		return (string) self::render_gallery_with_pipeline(
@@ -371,9 +389,6 @@ class Public_Render {
 				'id'                => 0,
 				'template'          => '',
 				'cols'              => 0,
-				'lazy'              => 'true',
-				'lightbox'          => 'true',
-				'captions'          => 'true',
 				'template_preview'  => 'false', // Template preview mode
 				'template_settings' => '', // JSON-encoded template settings
 				'template_items'    => '', // JSON-encoded template items
@@ -418,7 +433,9 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' not found.</div>';
 		}
 
-		if ( 'publish' !== $gallery->post_status ) {
+		$readable = 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) );
+		if ( ! $readable ) {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' is not published (status: ' . esc_html( $gallery->post_status ) . ').</div>';
 		}
 
@@ -429,7 +446,7 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
 		}
 
-		self::maybe_bypass_page_cache_for_random( $settings, $gallery_id );
+		self::maybe_bypass_page_cache( $settings, $gallery_id );
 
 		$source = Request_Source::SHORTCODE;
 		if ( Request_Source::BLOCK === $atts['_source'] ) {
@@ -440,6 +457,9 @@ class Public_Render {
 		}
 		if ( Request_Source::DIVI === $atts['_source'] ) {
 			$source = Request_Source::DIVI;
+		}
+		if ( Request_Source::BRICKS === $atts['_source'] ) {
+			$source = Request_Source::BRICKS;
 		}
 		if ( Request_Source::ALBUM_AJAX === $atts['_source'] ) {
 			$source = Request_Source::ALBUM_AJAX;
@@ -457,12 +477,15 @@ class Public_Render {
 				// fotogrids-runtime, which the inline JS attaches to.
 				self::replay_cached_assets( $cached['css'], $cached['js'] );
 				self::replay_cached_inline_assets( $cached );
+				Font_Resolver::instance()->collect_families( $cached['fonts'] );
 				do_action( Actions_Cache::HIT, $gallery_id, $cache_key );
 				return wp_kses( $cached['html'], \FotoGrids\Kses::rules( $cached['html'] ) );
 			}
 		}
 
-		$html = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		Font_Resolver::instance()->begin_capture();
+		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		$fonts = Font_Resolver::instance()->end_capture();
 
 		if ( null !== $cache_key ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
@@ -479,7 +502,8 @@ class Public_Render {
 				null !== $rendered ? $rendered->inline_css : '',
 				null !== $rendered ? $rendered->inline_js : '',
 				null !== $rendered ? $rendered->json_ld : '',
-				$duration
+				$duration,
+				$fonts
 			);
 			do_action( Actions_Cache::WRITTEN, $gallery_id, $cache_key );
 		}
@@ -517,11 +541,11 @@ class Public_Render {
 		}
 
 		$album = \FotoGrids\Albums\Album_Repository::get( $album_id );
-		if ( ! $album || 'publish' !== $album->post_status ) {
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
 			return '';
 		}
 
-		$child_galleries = Gallery_Album_Relations::get_galleries_for_album(
+		$child_galleries = Gallery_Album_Relations::get_visible_galleries_for_album(
 			$album_id,
 			array(
 				'orderby' => 'position',
@@ -552,6 +576,10 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+
+		if ( ! in_array( $album->post_status, array( 'publish', 'private' ), true ) ) {
+			$album_settings['enable_statistics'] = false;
+		}
 
 		// Allow the shortcode's `template` attribute to override the
 		// layout (e.g. [fotogrids_album id=42 template=masonry]).
@@ -605,9 +633,8 @@ class Public_Render {
 		// • fg-tooltip is declared as a dep by Sharing_Decorator and
 		//   Lightbox features; Asset_Resolver pulls it in when either is
 		//   active on the page.
-		// • deep-linking is declared by Sharing_Decorator (task 16). On
-		//   the View Page it's pulled in directly by Renderer::enqueue_assets
-		//   because a ?fg-item URL can arrive even when sharing is off.
+		// • deep-linking is declared by the Deep_Linking feature. On the
+		//   View Page it's pulled in directly by Renderer::enqueue_assets.
 
 		wp_enqueue_style(
 			'fotogrids-errors',
@@ -638,16 +665,6 @@ class Public_Render {
 		}
 
 		$settings = self::get_gallery_settings( $gallery_id );
-
-		$atts = shortcode_atts(
-			array(
-				'lazy'     => 'true',
-				'lightbox' => 'true',
-				'captions' => 'true',
-			),
-			$atts,
-			'fotogrids_gallery'
-		);
 
 		$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
 		if ( empty( $item_ids ) ) {
@@ -680,8 +697,6 @@ class Public_Render {
 			array(
 				'template' => '',
 				'cols'     => 0,
-				'captions' => 'true',
-				'lightbox' => 'true',
 				'album_id' => 0,
 			),
 			$atts,
@@ -709,12 +724,6 @@ class Public_Render {
 					'mobile'  => $col_count,
 				);
 			}
-		}
-		if ( isset( $atts['captions'] ) ) {
-			$settings_overlay['captions'] = 'true' === $atts['captions'];
-		}
-		if ( isset( $atts['lightbox'] ) ) {
-			$settings_overlay['lightbox'] = 'true' === $atts['lightbox'];
 		}
 		if ( isset( $atts['lazy'] ) ) {
 			$settings_overlay['lazy_load'] = 'true' === $atts['lazy'];

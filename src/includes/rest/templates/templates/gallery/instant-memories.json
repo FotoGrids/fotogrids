@@ -22,7 +22,6 @@
     },
     "instant_photo_sticker": true,
     "instant_photo_elevation": true,
-    "captions": true,
     "item_click_behavior": "lightbox"
   }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import LibraryTabBase from './LibraryTabBase';
 import LibraryPeopleHeader from './LibraryPeopleHeader';
 
@@ -9,11 +9,18 @@ import LibraryPeopleHeader from './LibraryPeopleHeader';
  * form picks up the optional `details` field automatically because
  * LibraryTabBase branches on entityType.type === 'person'.
  */
-const LibraryPeopleTab = ({ entityType }) => (
-    <>
-        <LibraryPeopleHeader entityType={entityType} />
-        <LibraryTabBase entityType={entityType} />
-    </>
-);
+const LibraryPeopleTab = ({ entityType }) => {
+	const [statsVersion, bumpStats] = useReducer((n) => n + 1, 0);
+
+	return (
+		<>
+			<LibraryPeopleHeader
+				entityType={entityType}
+				refreshKey={statsVersion}
+			/>
+			<LibraryTabBase entityType={entityType} onChange={bumpStats} />
+		</>
+	);
+};
 
 export default LibraryPeopleTab;

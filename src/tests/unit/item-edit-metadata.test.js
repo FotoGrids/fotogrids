@@ -8,6 +8,7 @@ import { renderElement, act, click } from '@tests/helpers/render-component';
 const h = React.createElement;
 
 const BEACH = { id: 7, name: 'Beach' };
+const RARE = { id: 61, name: "O'Brien Beach" };
 
 const STRINGS = {
 	tags: 'Tags',
@@ -74,7 +75,12 @@ describe('ItemEditModal metadata', () => {
 				return jsonResponse({ tags: [BEACH], people: [], locations: [] });
 			}
 			if (String(url).includes('metadata/tags')) {
-				return jsonResponse([BEACH]);
+				const search = new URL(url).searchParams.get('search') || '';
+				return jsonResponse(
+					[BEACH, RARE].filter((tag) =>
+						tag.name.toLowerCase().includes(search.toLowerCase())
+					)
+				);
 			}
 			return jsonResponse([]);
 		});
@@ -125,6 +131,59 @@ describe('ItemEditModal metadata', () => {
 		await flush();
 
 		expect(tagChips()).toHaveLength(2);
+		unmount();
+	});
+
+	it('adds no chip and shows the server message when creating is refused', async () => {
+		const { unmount } = await mount();
+		const message = '"Sunset" is not in the library, and you do not have permission to add it.';
+		window.fotogridsToast = { error: jest.fn() };
+		const answer = global.fetch.getMockImplementation();
+		global.fetch.mockImplementation((url, options = {}) =>
+			options.method === 'POST'
+				? Promise.resolve({
+						ok: false,
+						json: () =>
+							Promise.resolve({
+								code: 'fotogrids_library_forbidden',
+								message,
+								data: { status: 403 },
+							}),
+				  })
+				: answer(url, options)
+		);
+
+		const input = document.body.querySelector('.fotogrids-item-edit-metadata-input input');
+		typeInto(input, 'Sunset');
+		pressEnter(input);
+		await flush();
+
+		expect(tagChips()).toHaveLength(1);
+		expect(window.fotogridsToast.error).toHaveBeenCalledWith(message);
+		expect(input.value).toBe('Sunset');
+		delete window.fotogridsToast;
+		unmount();
+	});
+
+	it('suggests a tag found by searching as the user types', async () => {
+		const { unmount } = await mount();
+
+		const input = document.body.querySelector('.fotogrids-item-edit-metadata-input input');
+		typeInto(input, "o'bri");
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 250));
+		});
+
+		const searched = global.fetch.mock.calls
+			.map(([url]) => String(url))
+			.filter((url) => url.includes('metadata/tags'))
+			.map((url) => new URL(url).searchParams.get('search'));
+		expect(searched).toEqual(["o'bri"]);
+
+		const suggestions = Array.from(
+			document.body.querySelectorAll('.fotogrids-item-edit-autocomplete-item')
+		).map((node) => node.textContent.trim());
+		expect(suggestions).toEqual(["O'Brien Beach"]);
 		unmount();
 	});
 });

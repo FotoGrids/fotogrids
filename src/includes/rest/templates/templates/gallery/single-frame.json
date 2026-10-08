@@ -10,7 +10,6 @@
   "thumbnail": "",
   "settings": {
     "layout": "single-item",
-    "captions": true,
     "caption_placement": "overlay",
     "border_enabled": true,
     "border_width": 1,

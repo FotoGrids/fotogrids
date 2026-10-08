@@ -85,3 +85,4 @@ logs
 
 # Test harness state - a throwaway WordPress install and its server logs.
 tests/harness/.state/
+tests/phpunit-db/.wp/

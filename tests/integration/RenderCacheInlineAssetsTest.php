@@ -153,6 +153,11 @@ namespace {
             return array();
         }
     }
+    if ( ! function_exists( 'get_option' ) ) {
+        function get_option( string $option, mixed $default_value = false ): mixed {
+            return $GLOBALS['fg_options'][ $option ] ?? $default_value;
+        }
+    }
     if ( ! function_exists( 'wp_script_is' ) ) {
         function wp_script_is( string $handle, string $status = 'enqueued' ): bool {
             unset( $handle, $status );
@@ -164,6 +169,7 @@ namespace {
 namespace FotoGrids\Tests\Integration {
 
 use FotoGrids\FotoGrids_Cache;
+use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Render_Result;
 
@@ -176,6 +182,7 @@ require_once dirname( __DIR__, 2 ) . '/src/includes/cache/class-object-cache.php
 require_once dirname( __DIR__, 2 ) . '/src/includes/class-fotogrids-cache.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-render-result.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-inline-asset-emitter.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-font-resolver.php';
 
 /**
  * Regression coverage for the per-render inline assets carried through the
@@ -200,6 +207,10 @@ final class RenderCacheInlineAssetsTest {
         self::test_hit_emits_the_same_inline_css_as_the_miss();
         self::test_legacy_envelope_is_treated_as_a_miss();
         self::test_legacy_l1_entry_is_dropped_and_missed();
+        self::test_hit_returns_the_google_fonts_the_miss_stored();
+        self::test_schema_3_envelope_without_fonts_is_a_miss();
+        self::test_capture_records_fonts_an_earlier_gallery_collected();
+        self::test_replayed_fonts_respect_the_google_fonts_option();
         self::test_emitter_is_inert_during_a_rest_render();
     }
 
@@ -281,6 +292,70 @@ final class RenderCacheInlineAssetsTest {
         );
     }
 
+    private static function test_hit_returns_the_google_fonts_the_miss_stored(): void {
+        self::reset();
+
+        FotoGrids_Cache::put( 77, 'key-fonts', '<div></div>', array(), array(), '', '', '', 24, array( 'Roboto', 'Lato' ) );
+
+        $cached = FotoGrids_Cache::get( 77, 'key-fonts' );
+
+        self::assert_true( is_array( $cached ), 'A stored entry should come back as a hit.' );
+        self::assert_same( array( 'Roboto', 'Lato' ), $cached['fonts'], 'Cache hit should carry the Google Fonts the render collected.' );
+    }
+
+    private static function test_schema_3_envelope_without_fonts_is_a_miss(): void {
+        self::reset();
+
+        $GLOBALS['wpdb']->rows['key-schema-3'] = (string) json_encode(
+            array(
+                'schema'     => 3,
+                'html'       => '<div class="stale"></div>',
+                'css'        => array(),
+                'js'         => array(),
+                'inline_css' => self::INLINE_CSS,
+                'inline_js'  => '',
+                'json_ld'    => '',
+                'expires_at' => time() + 3600,
+            )
+        );
+
+        self::assert_same( false, FotoGrids_Cache::get( 77, 'key-schema-3' ), 'A schema-3 envelope carries no fonts and must read as a miss.' );
+    }
+
+    private static function test_capture_records_fonts_an_earlier_gallery_collected(): void {
+        self::reset();
+        $resolver = Font_Resolver::instance();
+
+        // An earlier gallery on the page already collected Roboto.
+        $resolver->resolve_font_family( 'Roboto' );
+
+        $resolver->begin_capture();
+        $resolver->resolve_font_family( 'Roboto' );
+        $resolver->resolve_font_family( 'Arial' );
+        $resolver->resolve_font_family( 'Lato' );
+        $captured = $resolver->end_capture();
+
+        self::assert_same( array( 'Roboto', 'Lato' ), $captured, 'Capture should record every Google Font the render used, including ones already collected.' );
+        $resolver->resolve_font_family( 'Poppins' );
+        self::assert_same( array(), $resolver->end_capture(), 'Nothing should be recorded once capture has ended.' );
+    }
+
+    private static function test_replayed_fonts_respect_the_google_fonts_option(): void {
+        self::reset();
+        $resolver = Font_Resolver::instance();
+
+        $GLOBALS['fg_options']['fotogrids_allow_google_fonts'] = false;
+        $resolver->collect_families( array( 'Merriweather' ) );
+        self::assert_true(
+            false === strpos( $resolver->get_collected_fonts_url(), 'Merriweather' ),
+            'Replayed fonts must not load while Google Fonts are turned off.'
+        );
+
+        $GLOBALS['fg_options']['fotogrids_allow_google_fonts'] = true;
+        $resolver->collect_families( array( 'Merriweather', '', 42 ) );
+        self::assert_contains( 'family=Merriweather', $resolver->get_collected_fonts_url(), 'Replayed fonts should reach the combined stylesheet URL.' );
+    }
+
     private static function test_emitter_is_inert_during_a_rest_render(): void {
         self::reset();
 
@@ -303,6 +378,7 @@ final class RenderCacheInlineAssetsTest {
         $GLOBALS['fg_object_cache']      = array();
         $GLOBALS['fg_inline_styles']     = array();
         $GLOBALS['fg_registered_styles'] = array();
+        $GLOBALS['fg_options']           = array();
     }
 
     private static function last_inline_style(): string {

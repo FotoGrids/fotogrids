@@ -8,6 +8,11 @@
 	flex-direction: column;
 	align-items: center;
 
+	&:focus-visible {
+		outline: 2px solid var(--fg-blue);
+		outline-offset: 2px;
+	}
+
 	&:hover:not(.fotogrids-upload-area--uploading) {
 		border-color: var(--fg-blue);
 		background: var(--fg-background-secondary, #f6f7f7);
@@ -125,6 +130,11 @@
 	margin: 0;
 
 	&__link {
+		padding: 0;
+		border: 0;
+		background: none;
+		font: inherit;
+		cursor: pointer;
 		color: var(--fg-blue);
 		text-decoration: none;
 		position: relative;

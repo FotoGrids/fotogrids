@@ -80,6 +80,77 @@ already exists, links the plugin in and serves it with PHP's built-in server.
 | `FG_WP_VERSION` | `latest` |
 | `FG_PHP_WORKERS` | `8` |
 
+## Fixtures
+
+`seed.sh` builds the test data sets into whichever site `boot.sh` last booted.
+
+```
+./tests/harness/seed.sh                 build anything missing or out of date
+./tests/harness/seed.sh reset           truncate the plugin's tables first
+./tests/harness/seed.sh only=F-exif     one set
+./tests/harness/seed.sh force           rebuild even if current
+```
+
+It is idempotent: a set already built by the current definition is left alone,
+so a second run is a no-op. `FG_SEED_VERSION` in `seed.php` is what makes a
+changed definition rebuild rather than persist.
+
+Playwright's global setup runs it, so `npm run test:e2e` needs no separate seed
+step. `FG_SEED_SETS` narrows what it builds to a comma-separated list, which is
+how CI avoids paying for sets no spec reads.
+
+The ids land in `.state/fixtures.json`, keyed by set, and are also printed after
+an `FGFIXTURES` marker for a caller reading stdout.
+
+| Set | What it is |
+|---|---|
+| `F-empty` `F-single` `F-small` `F-large` | 0, 1, 5 and 60 items |
+| `F-mixed` | images, an uploaded video, a YouTube embed, a Vimeo embed |
+| `F-tagged` | tags, people and locations, with two items left untagged |
+| `F-exif` | camera metadata and an XMP credit, above the `-scaled` threshold |
+| `F-noalt` | no alt, title or caption |
+| `F-album` `F-album-multi` | an album with four children, one coverless; a gallery in two albums |
+| `F-pw` `F-reg` | password protected (`open-sesame`); registered users only |
+| `F-draft` | draft, private and trashed galleries |
+| `F-orphan` | an embed and an item, neither belonging to any gallery |
+| `F-cjk` | Japanese and Hebrew titles, captions and filenames |
+| `F-huge` | 8000x6000 JPEG and a 40MB PNG — `FG_SEED_HUGE_MB` changes the second |
+| `F-alpha` | transparent PNG, animated GIF, WebP |
+
+All media is generated at seed time, so nothing binary is committed. The MP4 in
+`F-mixed` is a container with no stream: enough for the render path, which reads
+the mime type and the URL, and not enough to play.
+
+## Throwaway collections
+
+`collection.php` builds a collection a single spec owns, for the `scoped`
+project:
+
+    wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
+    wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
+    wp eval-file collection.php op=purge
+
+`op=render` prints `{"id":41,"url":"..."}` - the gallery and a post that embeds
+it through the shortcode. Settings are validated against the catalog and written
+through the same codec the save pipeline uses, then the gallery's render cache is
+dropped; without that flush the next render replays the HTML built before the
+change.
+
+Everything it creates carries `_fg_scoped`, and global setup purges those before
+seeding, so a failed run leaves its collections behind to look at and the next
+run starts clean. `tests/e2e/support/collections.ts` is the interface specs use.
+
+## Role sessions
+
+Global setup also creates `fg-editor`, `fg-author`, `fg-contributor` and
+`fg-subscriber`, signs in as each of them and as the administrator, and leaves
+the cookies in `.state/auth/<role>.json` with an index in `.state/auth/roles.json`.
+
+Signing in through the login form costs about six seconds, so a spec that did it
+itself would pay that per test. Loading a storage state instead is what makes
+checking a route against five roles affordable. `tests/e2e/support/roles.ts` is
+the way in; nothing should read those files directly.
+
 ## Portability
 
 `boot.sh` runs on macOS as often as on Linux, so it stays inside POSIX tool

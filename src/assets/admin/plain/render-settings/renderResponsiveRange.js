@@ -419,16 +419,18 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 														: setting.responsive[
 																activeDevice
 															].default;
-													isLinked
-														? updateAllSides(
-																activeDevice,
-																val
-															)
-														: updateSide(
-																activeDevice,
-																side,
-																val
-															);
+													if (isLinked) {
+														updateAllSides(
+															activeDevice,
+															val
+														);
+													} else {
+														updateSide(
+															activeDevice,
+															side,
+															val
+														);
+													}
 												},
 												disabled: isDisabled,
 												className:
@@ -868,12 +870,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 														newMin <=
 														currentMaxValue
 													) {
-														!isDisabled &&
+														if (!isDisabled) {
 															updateResponsiveValue(
 																activeDevice,
 																newMin,
 																'min'
 															);
+														}
 													}
 												},
 												disabled: isDisabled,
@@ -894,12 +897,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 														newMax >=
 														currentMinValue
 													) {
-														!isDisabled &&
+														if (!isDisabled) {
 															updateResponsiveValue(
 																activeDevice,
 																newMax,
 																'max'
 															);
+														}
 													}
 												},
 												disabled: isDisabled,
@@ -963,12 +967,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 															newMin <=
 															currentMaxValue
 														) {
-															!isDisabled &&
+															if (!isDisabled) {
 																updateResponsiveValue(
 																	activeDevice,
 																	newMin,
 																	'min'
 																);
+															}
 														}
 													},
 													disabled: isDisabled,
@@ -1022,12 +1027,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 															newMax >=
 															currentMinValue
 														) {
-															!isDisabled &&
+															if (!isDisabled) {
 																updateResponsiveValue(
 																	activeDevice,
 																	newMax,
 																	'max'
 																);
+															}
 														}
 													},
 													disabled: isDisabled,
@@ -1265,7 +1271,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								value: currentDeviceValue,
 								onChange: (e) => {
 									const v = parseValue(e.target.value);
-									!isDisabled &&
+									if (!isDisabled) {
 										updateResponsiveValue(
 											activeDevice,
 											Number.isFinite(v)
@@ -1274,6 +1280,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 														activeDevice
 													].default
 										);
+									}
 								},
 								disabled: isDisabled,
 								className: 'fotogrids-range-number-input',
@@ -1706,7 +1713,9 @@ function renderLinkButton(
 				onClick: (e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					!isDisabled && onToggle();
+					if (!isDisabled) {
+						onToggle();
+					}
 				},
 				disabled: isDisabled,
 				'aria-label': label,

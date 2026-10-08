@@ -68,7 +68,7 @@ final class Album_Repository {
 			if ( is_string( $saved_value ) ) {
 				$decoded = json_decode( $saved_value, true );
 				if ( is_array( $decoded ) ) {
-					$settings[ $key ] = is_array( $default_value )
+					$settings[ $key ] = is_array( $default_value ) && ! wp_is_numeric_array( $default_value )
 						? array_merge( $default_value, $decoded )
 						: $decoded;
 				} else {

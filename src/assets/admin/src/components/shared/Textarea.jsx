@@ -2,7 +2,7 @@
  * Textarea - shared React multi-line text input.
  *
  * A branded <textarea> with an optional label and helper/error text. The
- * label/value/onChange shape mirrors the @wordpress/components
+ * label/value/onChange shape mirrors the `@wordpress/components`
  * TextareaControl it replaces, so existing call sites migrate with minimal
  * change. `onChange` is called with the raw string value (not the event).
  *
@@ -56,7 +56,9 @@ const Textarea = ({
 		.join(' ');
 
 	const handleChange = (event) => {
-		if (!onChange) return;
+		if (!onChange) {
+			return;
+		}
 		onChange(event.target.value, event);
 	};
 
