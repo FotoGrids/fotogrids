@@ -15,9 +15,6 @@
 (function () {
 	'use strict';
 
-	/** Per-gallery state. Keyed by gallery wrapper element (WeakMap). */
-	const galleryState = new WeakMap();
-
 	/** Per-gallery change listeners. Keyed by gallery wrapper element. */
 	const listeners = new WeakMap();
 
@@ -326,12 +323,17 @@
 			10
 		);
 
+		const headers = {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': nonce,
+		};
+		if (galleryEl.dataset.fgUnlockToken) {
+			headers['X-FotoGrids-Unlock'] = galleryEl.dataset.fgUnlockToken;
+		}
+
 		return fetch(url, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': nonce,
-			},
+			headers,
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
@@ -795,8 +797,8 @@
 	/**
 	 * Subscribe to page-change notifications for a specific gallery.
 	 *
-	 * @param {Element}  galleryEl
-	 * @param {Function} cb
+	 * @param {Element}                  galleryEl
+	 * @param {(detail: Object) => void} cb
 	 */
 	function onChange(galleryEl, cb) {
 		if (!listeners.has(galleryEl)) {

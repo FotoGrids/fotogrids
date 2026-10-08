@@ -86,7 +86,7 @@
 	 * (window.fotogridsLoadingIcon) that lightbox surfaces also use.
 	 *
 	 * @param {Element} container A .fotogrids-collection element.
-	 * @returns {Function|null}
+	 * @returns {((svg: SVGElement) => Animation[])|null}
 	 */
 	function resolveAnimateFn(container) {
 		const icons = window.fotogridsLoadingIcons;
@@ -117,8 +117,8 @@
 	 * so markLoaded can cancel them. No-op when the item already has handles
 	 * (idempotent across the multiple wiring passes) or has no loader svg.
 	 *
-	 * @param {Element}  item
-	 * @param {Function} animateFn
+	 * @param {Element}                          item
+	 * @param {(svg: SVGElement) => Animation[]} animateFn
 	 */
 	function startItemAnimation(item, animateFn) {
 		if (!animateFn || getHandleMap().has(item)) {

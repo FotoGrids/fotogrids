@@ -46,7 +46,7 @@ import PreviewOptionsToolbar from '@modules/PageBuilders/core/assets/src/compone
 
 const readPbConfig = () => window?.fotogridsPageBuilders || {};
 
-const Edit = ({ attributes, setAttributes, isSelected }) => {
+const Edit = ({ attributes, setAttributes, isSelected, clientId }) => {
 	const {
 		galleryId,
 		align,
@@ -195,6 +195,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 				}
 			})
 			.catch(() => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the selected gallery; item is read only to skip reloading it.
 	}, [galleryId, restUrl, restNonce]);
 
 	const onSelectFromPicker = (picked) => {
@@ -292,6 +293,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					)}
 					<LivePreview
 						kind="gallery"
+						placementKey={clientId}
 						id={galleryId}
 						restUrl={restUrl}
 						restNonce={restNonce}

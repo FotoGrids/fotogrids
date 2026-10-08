@@ -87,11 +87,13 @@ class Renderer {
 	/**
 	 * Whether the collection is being previewed as a draft by an editor.
 	 *
+	 * Published and private collections render as normal view pages.
+	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	public function is_draft_preview(): bool {
-		return 'publish' !== $this->post->post_status;
+		return ! in_array( $this->post->post_status, array( 'publish', 'private' ), true );
 	}
 
 	/**
@@ -448,7 +450,7 @@ class Renderer {
 		$title = (string) get_the_title( $this->post );
 
 		if ( $this->is_album() ) {
-			$count = count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) );
+			$count = count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) );
 			if ( $count <= 0 ) {
 				return '';
 			}
@@ -732,7 +734,7 @@ class Renderer {
 	 */
 	public function header_html(): string {
 		$count = $this->is_album()
-			? count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) )
+			? count( \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( (int) $this->post->ID ) )
 			: \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
 
 		$meta_label = $this->is_album()
@@ -835,7 +837,9 @@ class Renderer {
 			);
 		}
 
-		$config['labels'] = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+		$config['labels']      = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+		$config['object_type'] = $this->is_album() ? 'album' : 'gallery';
+		$config['object_id']   = (int) $this->post->ID;
 
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
 			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
@@ -958,9 +962,11 @@ class Renderer {
 	}
 
 	/**
-	 * Record a view against the collection's statistics.
+	 * Announce a view page visit.
 	 *
-	 * Draft previews are not counted.
+	 * The view itself is recorded by the Stats feature's view request, so
+	 * it follows the collection's Enable Statistics Tracking setting. Draft
+	 * previews are not announced.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -970,11 +976,8 @@ class Renderer {
 			return;
 		}
 
-		$object_type = $this->is_album() ? 'album' : 'gallery';
-		\FotoGrids\Statistics::increment( $object_type, (int) $this->post->ID, 'views' );
-
 		/**
-		 * Fires after a view page visit is recorded.
+		 * Fires when a published or private collection's view page is visited.
 		 *
 		 * @since 1.0.0
 		 * @param \WP_Post $post

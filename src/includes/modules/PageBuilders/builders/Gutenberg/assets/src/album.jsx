@@ -78,7 +78,7 @@ const LayoutModePanel = ({ layoutMode, editUrl }) => {
 	);
 };
 
-const Edit = ({ attributes, setAttributes, isSelected }) => {
+const Edit = ({ attributes, setAttributes, isSelected, clientId }) => {
 	const {
 		albumId,
 		align,
@@ -139,6 +139,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 				}
 			})
 			.catch(() => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the selected album; item is read only to skip reloading it.
 	}, [albumId, restUrl, restNonce]);
 
 	const onSelectFromPicker = (picked) => {
@@ -249,6 +250,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					)}
 					<LivePreview
 						kind="album"
+						placementKey={clientId}
 						id={albumId}
 						restUrl={restUrl}
 						restNonce={restNonce}

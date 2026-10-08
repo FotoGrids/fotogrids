@@ -96,7 +96,7 @@ final class Exif_Extractor {
 	 * Reads `exif_fields` only; whether the gallery displays EXIF at all is
 	 * the caller's decision.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param array<string, mixed> $settings   Resolved gallery settings.
 	 * @param int                  $gallery_id Gallery post ID.
 	 * @return string[] Enabled EXIF field keys (may be empty).

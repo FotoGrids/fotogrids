@@ -174,6 +174,8 @@ final class Debug_Log_Reader {
 			return '';
 		}
 
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
 		if ( 'direct' !== get_filesystem_method() ) {
 			return '';
 		}

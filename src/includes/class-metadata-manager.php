@@ -133,16 +133,22 @@ class Metadata_Manager {
 	}
 
 	/**
-	 * Find an entry by name, case-insensitively or by slug.
+	 * Find an existing metadata entry by name, without creating or changing it.
 	 *
-	 * @since  1.1.5
-	 * @param  string $type Metadata type.
-	 * @param  string $name Entry name.
-	 * @return object|null Row, or null when no entry matches.
+	 * Matches case-insensitively on the name, or on the slug derived from it.
+	 *
+	 * @since 1.2.0
+	 * @param string $type Metadata type.
+	 * @param string $name Metadata name.
+	 * @return object|null Metadata row, or null when there is no match.
 	 */
 	public static function find_metadata( $type, $name ) {
+		if ( ! self::validate_type( $type ) ) {
+			return null;
+		}
+
 		$name = trim( (string) $name );
-		if ( '' === $name || ! self::validate_type( $type ) ) {
+		if ( '' === $name ) {
 			return null;
 		}
 
@@ -150,7 +156,7 @@ class Metadata_Manager {
 
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s) LIMIT 1',
+				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)',
 				$wpdb->prefix . 'fotogrids_tags',
 				$type,
 				$name,
@@ -182,9 +188,8 @@ class Metadata_Manager {
 			return false;
 		}
 
-		$slug  = sanitize_title( $name );
-		$table = $wpdb->prefix . 'fotogrids_tags';
-
+		$slug     = sanitize_title( $name );
+		$table    = $wpdb->prefix . 'fotogrids_tags';
 		$existing = self::find_metadata( $type, $name );
 
 		if ( $existing ) {
@@ -282,7 +287,7 @@ class Metadata_Manager {
 	 * Both values empty means no coordinates. Values are rounded to six
 	 * decimal places.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  mixed $latitude  Latitude in decimal degrees, or empty.
 	 * @param  mixed $longitude Longitude in decimal degrees, or empty.
 	 * @return array{latitude: float, longitude: float}|null|\WP_Error
@@ -316,7 +321,7 @@ class Metadata_Manager {
 	/**
 	 * Read the coordinates stored in a location's meta.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string|array|null $meta Stored meta, as JSON or decoded.
 	 * @return array{latitude: float|null, longitude: float|null} Both null unless both are stored.
 	 */
@@ -342,7 +347,7 @@ class Metadata_Manager {
 	 * Decodes `meta` and lifts each type's fields to the top level:
 	 * `latitude`/`longitude` for locations, `details` for people.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  object $row Row from the tags table.
 	 * @return array<string, mixed>
 	 */
@@ -374,7 +379,7 @@ class Metadata_Manager {
 	 * A location keeps its coordinates only when they pass
 	 * normalize_coordinates(); otherwise both are dropped.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string            $type Metadata type.
 	 * @param  string|array|null $meta Meta as JSON or decoded.
 	 * @return string|null JSON for the `meta` column, or null when empty.
@@ -396,7 +401,7 @@ class Metadata_Manager {
 	/**
 	 * Decode a stored meta value.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string|null $meta JSON from the `meta` column.
 	 * @return array<string, mixed> Empty when absent or not a JSON object.
 	 */
@@ -411,7 +416,7 @@ class Metadata_Manager {
 	/**
 	 * Build the error returned for invalid coordinates.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string $message Translated message.
 	 * @return \WP_Error
 	 */
@@ -874,7 +879,7 @@ class Metadata_Manager {
 	/**
 	 * Count locations that store coordinates.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return int
 	 */
 	public static function count_locations_with_coordinates() {

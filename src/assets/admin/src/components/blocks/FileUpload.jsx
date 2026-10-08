@@ -7,12 +7,12 @@
  * Calls onFileReady({ name, size, text }) when the file has been read
  * successfully. Calls onFileError(message) on read failure.
  *
- * @param {Function} props.onFileReady          Called with { name, size, text }.
- * @param {string}   [props.accept]             File input accept attr, e.g. ".json,.xml".
- * @param {string}   [props.title]              Upload zone title text.
- * @param {string}   [props.subtitle]           Upload zone subtitle text.
- * @param {string}   [props.hint]               Upload zone hint text (muted, small).
- * @param {string}   [props.inputId]            HTML id for the hidden file input.
+ * @param {(file: Object) => void} props.onFileReady          Called with { name, size, text }.
+ * @param {string}                 [props.accept]             File input accept attr, e.g. ".json,.xml".
+ * @param {string}                 [props.title]              Upload zone title text.
+ * @param {string}                 [props.subtitle]           Upload zone subtitle text.
+ * @param {string}                 [props.hint]               Upload zone hint text (muted, small).
+ * @param {string}                 [props.inputId]            HTML id for the hidden file input.
  */
 import React, { useState, useRef } from 'react';
 import UploadArea from './UploadArea';

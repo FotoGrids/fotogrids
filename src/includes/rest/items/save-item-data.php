@@ -2,6 +2,8 @@
 namespace FotoGrids\REST\Items;
 
 use FotoGrids\Hooks\Filters_Save;
+use FotoGrids\Metaboxes\Metabox_Registrar;
+use FotoGrids\REST\Metadata\Metadata_Data;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -150,8 +152,16 @@ class Save_Item_Data {
 				if ( empty( $tag_name ) ) {
 					continue;
 				}
-				$result = \FotoGrids\Metadata_Manager::add_tag_to_item( $item_id, $tag_name );
-				if ( $result ) {
+				$tag = Metadata_Data::resolve_entry(
+					'tag',
+					$tag_name,
+					function () use ( $tag_name ) {
+						return \FotoGrids\Metadata_Manager::add_or_get_tag( $tag_name );
+					}
+				);
+				if ( is_wp_error( $tag ) ) {
+					$meta_results['errors'][] = $tag->get_error_message();
+				} elseif ( $tag && \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, (int) $tag->id ) ) {
 					$meta_results['tags'][] = array( 'name' => $tag_name );
 				} else {
 					$meta_results['errors'][] = sprintf(
@@ -186,8 +196,16 @@ class Save_Item_Data {
 					);
 				}
 			} elseif ( ! empty( $name ) ) {
-				$result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
-				if ( $result ) {
+				$entry = Metadata_Data::resolve_entry(
+					'person',
+					$name,
+					function () use ( $name, $details ) {
+						return \FotoGrids\Metadata_Manager::add_or_get_person( $name, $details );
+					}
+				);
+				if ( is_wp_error( $entry ) ) {
+					$meta_results['errors'][] = $entry->get_error_message();
+				} elseif ( $entry && \FotoGrids\Metadata_Manager::link_person_to_item( $item_id, (int) $entry->id ) ) {
 					$meta_results['people'][] = array( 'name' => $name );
 				} else {
 					/* translators: %s: person name. */
@@ -219,8 +237,16 @@ class Save_Item_Data {
 					);
 				}
 			} elseif ( ! empty( $name ) ) {
-				$result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
-				if ( $result ) {
+				$entry = Metadata_Data::resolve_entry(
+					'location',
+					$name,
+					function () use ( $name, $latitude, $longitude ) {
+						return \FotoGrids\Metadata_Manager::add_or_get_location( $name, $latitude, $longitude );
+					}
+				);
+				if ( is_wp_error( $entry ) ) {
+					$meta_results['errors'][] = $entry->get_error_message();
+				} elseif ( $entry && \FotoGrids\Metadata_Manager::link_location_to_item( $item_id, (int) $entry->id ) ) {
 					$meta_results['locations'][] = array( 'name' => $name );
 				} else {
 					/* translators: %s: location name. */
@@ -242,11 +268,17 @@ class Save_Item_Data {
 		 */
 		$meta_results = apply_filters( Filters_Save::ITEM_METADATA, $meta_results, $item_id, $request );
 
+		$grid_item = Metabox_Registrar::build_attachment_item_data( $item_id, 0 );
+
 		return rest_ensure_response(
 			array(
 				'success'  => true,
 				'message'  => __( 'Item saved successfully.', 'fotogrids' ),
 				'metadata' => $meta_results,
+				'item'     => $grid_item ? array(
+					'title' => $grid_item['title'],
+					'alt'   => $grid_item['alt'],
+				) : null,
 			)
 		);
 	}

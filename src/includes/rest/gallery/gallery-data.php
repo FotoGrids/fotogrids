@@ -115,16 +115,9 @@ class Gallery_Data {
 			);
 		}
 
-		// Non-published galleries (draft, private, trashed, etc.) are only
-		// readable by users who can edit them; the public lightbox only ever
-		// requests published galleries. The `preview` flag does NOT relax this
-		// - it must never expose unpublished content to anonymous callers.
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
-			return new \WP_Error(
-				'gallery_not_published',
-				__( 'Gallery is not published', 'fotogrids' ),
-				array( 'status' => 403 )
-			);
+		$access = Gallery_Permissions::authorize_gallery_view( $gallery_id );
+		if ( true !== $access ) {
+			return $access;
 		}
 
 		$meta = array(
@@ -209,7 +202,9 @@ class Gallery_Data {
 			);
 		}
 
-		if ( 'publish' !== $gallery->post_status ) {
+		$readable = 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) );
+		if ( ! $readable ) {
 			return new \WP_Error(
 				'gallery_not_published',
 				__( 'Gallery is not published', 'fotogrids' ),
@@ -272,15 +267,16 @@ class Gallery_Data {
 
 		return rest_ensure_response(
 			array(
-				'success'   => true,
-				'html'      => $html,
-				'css'       => $css_urls,
-				'js'        => $js_data,
-				'fonts'     => $fonts_url,
-				'remember'  => $remember,
-				'inlineCss' => null !== $inline ? $inline->inline_css : '',
-				'inlineJs'  => null !== $inline ? $inline->inline_js : '',
-				'jsonLd'    => null !== $inline ? $inline->json_ld : '',
+				'success'     => true,
+				'html'        => $html,
+				'css'         => $css_urls,
+				'js'          => $js_data,
+				'fonts'       => $fonts_url,
+				'remember'    => $remember,
+				'unlockToken' => $remember ? '' : self::make_unlock_token( $gallery_id, $stored ),
+				'inlineCss'   => null !== $inline ? $inline->inline_css : '',
+				'inlineJs'    => null !== $inline ? $inline->inline_js : '',
+				'jsonLd'      => null !== $inline ? $inline->json_ld : '',
 			)
 		);
 	}
@@ -476,6 +472,59 @@ class Gallery_Data {
 	}
 
 	/**
+	 * Issues a signed, expiring unlock token for a gallery.
+	 *
+	 * Returned by the unlock endpoint when the gallery does not remember
+	 * visitors, so the page can authorise its own follow-up requests
+	 * without a cookie. Format: `<expiry>.<hmac>`.
+	 *
+	 * @since  1.2.0
+	 * @param  int    $gallery_id Gallery ID.
+	 * @param  string $stored     Encrypted password from post meta.
+	 * @return string
+	 */
+	public static function make_unlock_token( int $gallery_id, string $stored ): string {
+		$expires = time() + DAY_IN_SECONDS;
+		return $expires . '.' . self::sign_unlock_token( $gallery_id, $stored, $expires );
+	}
+
+	/**
+	 * Checks an unlock token against the gallery's current password.
+	 *
+	 * @since  1.2.0
+	 * @param  int    $gallery_id Gallery ID.
+	 * @param  string $stored     Encrypted password from post meta.
+	 * @param  string $token      Token issued by make_unlock_token().
+	 * @return bool
+	 */
+	public static function verify_unlock_token( int $gallery_id, string $stored, string $token ): bool {
+		$parts = explode( '.', $token, 2 );
+		if ( 2 !== count( $parts ) || ! ctype_digit( $parts[0] ) ) {
+			return false;
+		}
+
+		$expires = (int) $parts[0];
+		if ( $expires < time() ) {
+			return false;
+		}
+
+		return hash_equals( self::sign_unlock_token( $gallery_id, $stored, $expires ), $parts[1] );
+	}
+
+	/**
+	 * HMAC over the gallery, its stored password and the token's expiry.
+	 *
+	 * @since  1.2.0
+	 * @param  int    $gallery_id Gallery ID.
+	 * @param  string $stored     Encrypted password from post meta.
+	 * @param  int    $expires    Unix timestamp the token expires at.
+	 * @return string
+	 */
+	private static function sign_unlock_token( int $gallery_id, string $stored, int $expires ): string {
+		return hash_hmac( 'sha256', 'token|' . $gallery_id . '|' . $stored . '|' . $expires, wp_salt( 'auth' ) );
+	}
+
+	/**
 	 * Get galleries list for Gutenberg block
 	 *
 	 * Retrieves a paginated list of published galleries with basic metadata.
@@ -543,12 +592,9 @@ class Gallery_Data {
 			return new \WP_Error( 'gallery_not_found', __( 'Gallery not found.', 'fotogrids' ), array( 'status' => 404 ) );
 		}
 
-		// This endpoint is public so the front-end lightbox can read items
-		// without a nonce, but only for published galleries. Items from
-		// unpublished galleries (draft, private, trashed) are restricted to
-		// users who can edit the gallery.
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
-			return new \WP_Error( 'gallery_not_available', __( 'Gallery is not available.', 'fotogrids' ), array( 'status' => 403 ) );
+		$access = Gallery_Permissions::authorize_gallery_view( $gallery_id );
+		if ( true !== $access ) {
+			return $access;
 		}
 
 		$rows = \FotoGrids\Galleries\Gallery_Repository::get_items( $gallery_id );

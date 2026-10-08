@@ -197,7 +197,7 @@
 
 			/**
 			 * Trigger autosave (debounced)
-			 * @param {Function} saveCallback - Callback function to execute save
+			 * @param {() => void} saveCallback - Callback function to execute save
 			 */
 			trigger(saveCallback) {
 				if (!this.enabled || typeof saveCallback !== 'function') {
@@ -230,7 +230,7 @@
 		/**
 		 * Add event listener
 		 * @param {string} event - Event name ('items', 'unsavedChanges', 'autosave')
-		 * @param {Function} callback - Callback function
+		 * @param {() => void} callback - Callback function
 		 */
 		on(event, callback) {
 			if (this._listeners[event] && typeof callback === 'function') {
@@ -241,7 +241,7 @@
 		/**
 		 * Remove event listener
 		 * @param {string} event - Event name
-		 * @param {Function} callback - Callback function to remove
+		 * @param {() => void} callback - Callback function to remove
 		 */
 		off(event, callback) {
 			if (this._listeners[event]) {

@@ -29,11 +29,14 @@ const FontStyleComponent = ({
 			? defaultOptionValue
 			: currentValue;
 
-	const defaultOption = {
-		label: __('Theme Default', 'fotogrids'),
-		value: 'default',
-		fontStyle: '',
-	};
+	const defaultOption = useMemo(
+		() => ({
+			label: __('Theme Default', 'fotogrids'),
+			value: 'default',
+			fontStyle: '',
+		}),
+		[__]
+	);
 
 	const selectedOption = useMemo(() => {
 		const match = FOTOGRIDS_FONT_STYLE_OPTIONS.find(
@@ -52,7 +55,7 @@ const FontStyleComponent = ({
 			value: resolvedValue,
 			fontStyle: resolvedValue,
 		};
-	}, [resolvedValue]);
+	}, [resolvedValue, defaultOption]);
 
 	return window.FotoGridsRenderSettings.renderSelect({
 		setting,

@@ -55,6 +55,7 @@ const ItemEditModal = ({
 	items,
 	onClose,
 	onNavigate,
+	onSaved,
 	strings,
 }) => {
 	const [activeTab, setActiveTab] = useState('details');
@@ -142,6 +143,7 @@ const ItemEditModal = ({
 		if (itemId) {
 			loadItemMetadata();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- loads metadata once per item.
 	}, [itemId]);
 
 	useEffect(() => {
@@ -243,6 +245,13 @@ const ItemEditModal = ({
 			);
 
 			const newItem = await response.json();
+
+			if (!response.ok) {
+				window.fotogridsToast?.error(
+					newItem?.message || strings.errorSaving
+				);
+				return;
+			}
 
 			// For replace-type keys (maxItems === 1, e.g. locations), replace
 			// the existing entry rather than appending.
@@ -355,6 +364,9 @@ const ItemEditModal = ({
 
 				setHasChanges(false);
 				setSaving(false);
+				if (data.item) {
+					onSaved?.(itemId, data.item);
+				}
 
 				if (window.fotogridsToast) {
 					window.fotogridsToast.success(

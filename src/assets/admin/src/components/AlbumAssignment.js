@@ -15,7 +15,7 @@ const AlbumAssignment = () => {
 			setAssignedAlbums(config.assignedAlbums || []);
 			setAllAlbums(config.allAlbums || []);
 		}
-	}, []);
+	}, [config]);
 
 	// Derive available albums during render - avoids useEffect sync and two-phase updates
 	// that were causing removeChild errors when item moved from available to assigned
@@ -94,6 +94,7 @@ const AlbumAssignment = () => {
 							status_display: albumToAdd.status_display,
 							gallery_count: updatedGalleryCount,
 							featured_item: albumToAdd.featured_item,
+							editable: true,
 						},
 					]);
 
@@ -212,24 +213,26 @@ const AlbumAssignment = () => {
 									`${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`
 								)
 							),
-							React.createElement(
-								'button',
-								{
-									key: 'action',
-									type: 'button',
-									className:
-										'fg-action-button fg-action-button--remove',
-									onClick: () => handleAlbumToggle(album.ID),
-									disabled: saving,
-									title: 'Remove from album',
-								},
-								React.createElement('span', {
-									className: 'fotogrids-icon',
-									dangerouslySetInnerHTML: {
-										__html: FotoGridsIcons.x || '',
+							album.editable &&
+								React.createElement(
+									'button',
+									{
+										key: 'action',
+										type: 'button',
+										className:
+											'fg-action-button fg-action-button--remove',
+										onClick: () =>
+											handleAlbumToggle(album.ID),
+										disabled: saving,
+										title: 'Remove from album',
 									},
-								})
-							)
+									React.createElement('span', {
+										className: 'fotogrids-icon',
+										dangerouslySetInnerHTML: {
+											__html: FotoGridsIcons.x || '',
+										},
+									})
+								)
 						)
 					)
 				)

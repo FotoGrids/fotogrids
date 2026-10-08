@@ -7,7 +7,7 @@
  * functions they touch are stubbed.
  *
  * @package FotoGrids\Tests
- * @since   1.1.5
+ * @since   1.2.0
  */
 
 declare(strict_types=1);

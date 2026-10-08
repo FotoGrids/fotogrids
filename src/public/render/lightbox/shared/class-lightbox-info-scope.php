@@ -3,7 +3,7 @@
  * Which info-panel blocks and EXIF fields a gallery's Lightbox shows.
  *
  * @package FotoGrids\Render\Lightbox\Shared
- * @since   1.1.5
+ * @since   1.2.0
  */
 
 declare(strict_types=1);
@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The rendered Lightbox markup and every REST route that returns Lightbox data
  * read the same answer from here.
  *
- * @since 1.1.5
+ * @since 1.2.0
  */
 final class Lightbox_Info_Scope {
 
@@ -33,7 +33,7 @@ final class Lightbox_Info_Scope {
 	/**
 	 * Info blocks shown when a gallery has no `lightbox_info_blocks` setting.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @var array<int, string>
 	 */
 	public const DEFAULT_BLOCKS = array( 'title', 'caption', 'description', 'file_info', 'exif', 'share', 'credit', 'tags', 'people', 'location' );
@@ -53,7 +53,7 @@ final class Lightbox_Info_Scope {
 	private $gallery_id;
 
 	/**
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param array<string, mixed> $settings   Resolved gallery settings.
 	 * @param int                  $gallery_id Gallery ID.
 	 */
@@ -65,7 +65,7 @@ final class Lightbox_Info_Scope {
 	/**
 	 * Whether the info panel is enabled.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return bool
 	 */
 	public function panel_enabled(): bool {
@@ -75,7 +75,7 @@ final class Lightbox_Info_Scope {
 	/**
 	 * Info blocks the panel shows, in order. Empty when the panel is off.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return array<int, string>
 	 */
 	public function blocks(): array {
@@ -92,7 +92,7 @@ final class Lightbox_Info_Scope {
 	/**
 	 * Whether the panel shows a block.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string $block Block ID, e.g. 'exif' or 'location'.
 	 * @return bool
 	 */
@@ -105,7 +105,7 @@ final class Lightbox_Info_Scope {
 	 *
 	 * Empty unless the panel shows the EXIF block and `display_exif` is on.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @return array<int, string>
 	 */
 	public function exif_fields(): array {

@@ -78,13 +78,36 @@ class Register_Stats_Routes {
 						'network'     => array(
 							'sanitize_callback' => 'sanitize_text_field',
 							'validate_callback' => function ( $param ) {
-								return in_array( $param, array( 'facebook', 'twitter', 'pinterest', 'email', 'copy' ), true );
+								return in_array( $param, self::share_networks(), true );
 							},
 						),
 					),
 					'permission_callback' => array( '\FotoGrids\REST\Stats\Stats_Permissions', 'check_stats' ),
 				),
 			)
+		);
+	}
+
+	/**
+	 * Network keys accepted by the share endpoint.
+	 *
+	 * Matches the keys the frontend share bar reports: every stored sharing
+	 * network, with `x` reported as `twitter` and `copy_link` as `copy`.
+	 *
+	 * @since  1.2.0
+	 * @return string[]
+	 */
+	private static function share_networks(): array {
+		$aliases = array(
+			'x'         => 'twitter',
+			'copy_link' => 'copy',
+		);
+
+		return array_map(
+			static function ( $network ) use ( $aliases ) {
+				return $aliases[ $network ] ?? $network;
+			},
+			\FotoGrids\Settings\Sharing_Settings_Store::NETWORKS
 		);
 	}
 }

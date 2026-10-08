@@ -163,6 +163,7 @@ const PickerModal = ({
 		if (page > 1) {
 			fetchPage(page, false);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- fetches only when the page number advances.
 	}, [page]);
 
 	const handleRefresh = useCallback(() => {

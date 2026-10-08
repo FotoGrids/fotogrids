@@ -12,9 +12,8 @@ const VARIANT_ICONS = {
 	success: 'check_circle',
 };
 
-const t = (s) =>
-	(typeof window !== 'undefined' && window.wp?.i18n?.__?.(s, 'fotogrids')) ||
-	s;
+const __ =
+	(typeof window !== 'undefined' && window.wp?.i18n?.__) || ((text) => text);
 
 const Prompt = ({
 	isOpen,
@@ -130,7 +129,7 @@ const Prompt = ({
 					onClick={handleCancel}
 					disabled={busy}
 				>
-					{cancelLabel || t('Cancel')}
+					{cancelLabel || __('Cancel', 'fotogrids')}
 				</Button>
 				<Button
 					variant="primary"
@@ -138,7 +137,7 @@ const Prompt = ({
 					busy={busy}
 					disabled={!isValid}
 				>
-					{submitLabel || t('OK')}
+					{submitLabel || __('OK', 'fotogrids')}
 				</Button>
 			</Modal.Footer>
 		</Modal>

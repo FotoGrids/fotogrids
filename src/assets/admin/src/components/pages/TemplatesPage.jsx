@@ -166,6 +166,7 @@ const TemplatesPage = () => {
 		if (match) {
 			handlePreview(match);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- opens the linked preview once, when templates finish loading.
 	}, [loading]);
 
 	const setPreviewParam = (templateId) => {

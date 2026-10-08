@@ -401,8 +401,8 @@ const MaintenanceTab = () => {
 
 						let constantLine = channel.constant_name;
 						if (isForced && channel.forced_value === true) {
-							/* translators: %s: PHP constant name. */
 							constantLine = sprintf(
+								/* translators: %s: PHP constant name. */
 								__(
 									'Locked on by %s in wp-config.php',
 									'fotogrids'
@@ -410,8 +410,8 @@ const MaintenanceTab = () => {
 								channel.constant_name
 							);
 						} else if (isForced) {
-							/* translators: %s: PHP constant name. */
 							constantLine = sprintf(
+								/* translators: %s: PHP constant name. */
 								__(
 									'Locked off by %s in wp-config.php',
 									'fotogrids'

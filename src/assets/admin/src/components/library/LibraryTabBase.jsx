@@ -50,6 +50,7 @@ const LibraryTableRow = memo(
 							checked={isSelected}
 							onChange={() => onToggleSelected(item.id)}
 							ariaLabel={sprintf(
+								/* translators: %s: entry name. */
 								__('Select %s', 'fotogrids'),
 								item.name
 							)}
@@ -173,6 +174,7 @@ const LibraryTableRow = memo(
 								disabled={!canManage}
 								onClick={() => onRequestDelete(item)}
 								ariaLabel={sprintf(
+									/* translators: %s: entry name. */
 									__('Delete %s', 'fotogrids'),
 									item.name
 								)}
@@ -190,6 +192,7 @@ const LibraryTableRow = memo(
 									<p>
 										{item.usage_count > 0
 											? sprintf(
+													/* translators: 1: entry name, 2: number of items using it. */
 													_n(
 														'Delete "%1$s"? This will remove it from %2$d item.',
 														'Delete "%1$s"? This will remove it from %2$d items.',
@@ -200,6 +203,7 @@ const LibraryTableRow = memo(
 													item.usage_count
 												)
 											: sprintf(
+													/* translators: %s: entry name. */
 													__(
 														'Delete "%s"? It is not used by any items.',
 														'fotogrids'
@@ -276,6 +280,7 @@ const LibraryTableToolbar = memo(
 						placeholder={
 							entityType.label_plural
 								? sprintf(
+										/* translators: %s: plural entry type, e.g. "tags". */
 										__('Search %s…', 'fotogrids'),
 										entityType.label_plural.toLowerCase()
 									)
@@ -304,6 +309,7 @@ const LibraryTableToolbar = memo(
 							onClick={onOpenCreate}
 						>
 							{sprintf(
+								/* translators: %s: singular entry type, e.g. "tag". */
 								__('Add %s', 'fotogrids'),
 								entityType.label_singular ||
 									__('entry', 'fotogrids')
@@ -336,6 +342,7 @@ const LibraryTableBulkBar = memo(
 			<div className="fotogrids-library-bulkbar">
 				<span>
 					{sprintf(
+						/* translators: %d: number of selected entries. */
 						_n(
 							'%d selected',
 							'%d selected',
@@ -480,8 +487,13 @@ LibraryTableHead.displayName = 'LibraryTableHead';
  * differences (extra columns, create-form fields, inline-edit fields) come in
  * via the `config` prop. Keeping it shared means a bug-fix in one place
  * applies to every tab.
+ *
+ * @param {Object}     props
+ * @param {Object}     props.entityType Entity type descriptor from the registry.
+ * @param {() => void} [props.onChange] Called after an entry is created, saved,
+ *                                      deleted, merged or recounted.
  */
-const LibraryTabBase = ({ entityType, config }) => {
+const LibraryTabBase = ({ entityType, onChange }) => {
 	const library = window.fotogridsLibrary || {};
 	const restBase = library.restBase || 'fotogrids/v1/library';
 	const canManage = Boolean(library.canManage);
@@ -672,6 +684,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 					prev.map((it) => (it.id === editingId ? updated : it))
 				);
 				cancelEdit();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -704,9 +717,11 @@ const LibraryTabBase = ({ entityType, config }) => {
 		editingDraft,
 		entityType.type,
 		entityType.slug,
+		entityType.label_singular,
 		restBase,
 		cancelEdit,
 		flashNotice,
+		onChange,
 	]);
 
 	const requestDelete = useCallback((item) => {
@@ -734,6 +749,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				setItems((prev) => prev.filter((it) => it.id !== id));
 				setTotal((t) => Math.max(0, t - 1));
 				cancelDelete();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -767,6 +783,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 		restBase,
 		cancelDelete,
 		flashNotice,
+		onChange,
 	]);
 
 	const confirmBulkDelete = () => {
@@ -782,6 +799,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 		})
 			.then((response) => {
 				loadList();
+				onChange?.();
 				setBulkConfirmOpen(false);
 				const deleted = response.deleted || 0;
 				flashNotice(
@@ -863,6 +881,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 			.then((created) => {
 				setCreateOpen(false);
 				loadList();
+				onChange?.();
 				flashNotice(
 					'success',
 					sprintf(
@@ -897,6 +916,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 			data: { target_id: targetId, source_ids: sourceIds },
 		}).then((response) => {
 			loadList();
+			onChange?.();
 			setMergeOpen(false);
 			const merged = response.merged || 0;
 			const typeLabel = (
@@ -944,6 +964,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 		})
 			.then((response) => {
 				loadList();
+				onChange?.();
 				const touched = response.touched || 0;
 				flashNotice(
 					'success',
@@ -1101,6 +1122,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				<div className="fotogrids-library-pagination tablenav-pages">
 					<span className="displaying-num">
 						{sprintf(
+							/* translators: %d: number of entries. */
 							_n('%d entry', '%d entries', total, 'fotogrids'),
 							total
 						)}
@@ -1115,6 +1137,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 						</Button>
 						<span className="paging-input">
 							{sprintf(
+								/* translators: 1: current page, 2: total pages. */
 								__('%1$d of %2$d', 'fotogrids'),
 								page,
 								totalPages
@@ -1140,6 +1163,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				variant="danger"
 				title={__('Delete selected entries?', 'fotogrids')}
 				message={sprintf(
+					/* translators: 1: number of entries, 2: plural entry type, e.g. "tags". */
 					_n(
 						'You are about to delete %1$d entry. Linked items will lose this %2$s.',
 						'You are about to delete %1$d entries. Linked items will lose these %2$s.',
@@ -1160,6 +1184,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				<Modal.Header>
 					<Modal.HeaderTitle>
 						{sprintf(
+							/* translators: %s: singular entry type, e.g. "tag". */
 							__('Add %s', 'fotogrids'),
 							entityType.label_singular ||
 								__('entry', 'fotogrids')

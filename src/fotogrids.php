@@ -84,6 +84,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-seeder.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-list-setting-repair.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-request-validator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
@@ -130,9 +131,6 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 
 register_activation_hook( __FILE__, array( 'FotoGrids\Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'FotoGrids\Deactivator', 'deactivate' ) );
-// Uninstall cleanup runs on the Freemius `after_uninstall` action (registered
-// in Freemius_Bootstrap), not register_uninstall_hook()/uninstall.php, so the
-// uninstall event is reported to Freemius before the plugin data is removed.
 
 /**
  * Initialize the plugin

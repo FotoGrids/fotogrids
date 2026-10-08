@@ -1,0 +1,52 @@
+/**
+ * Bricks builder panel: gallery and album picker.
+ */
+
+@use "sass:meta";
+
+[data-controlkey="fgPicker"] [data-control="info"],
+[data-controlkey="fgCreateNew"] [data-control="info"] {
+    padding: 0;
+    background: none;
+    color: inherit;
+}
+
+// Bricks styles every panel button; scoping the shared button rules
+// under the picker restores them.
+.bricks-panel .fg-pb-bricks-picker {
+    @include meta.load-css("../../../../../../../assets/admin/src/styles/fg-button/fg-button");
+
+    .fg-button {
+        height: auto;
+        text-transform: none;
+    }
+}
+
+.fg-pb-bricks-picker__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .fg-pb-inspector-summary {
+        margin-bottom: 0;
+    }
+}
+
+.fg-pb-bricks-picker__empty {
+    margin: 0;
+}
+
+.fg-pb-bricks-picker__actions {
+    display: flex;
+    gap: 4px;
+
+    > .fg-button {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+// The raw ID field stays usable until the picker has mounted.
+body.fg-pb-bricks-picker-ready [data-controlkey="fgCollectionId"] {
+    display: none;
+}

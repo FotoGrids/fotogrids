@@ -21,7 +21,6 @@
       "mobile": 5
     },
     "display_exif": true,
-    "captions": true,
     "item_click_behavior": "lightbox",
     "hover_effect": "frame",
     "caption_placement": "bottom",

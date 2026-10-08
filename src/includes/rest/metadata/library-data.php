@@ -106,7 +106,7 @@ class Library_Data {
 	/**
 	 * Counts across every entry of a type, for the Library header cards.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  string $type Metadata type.
 	 * @return array<string, int>
 	 */

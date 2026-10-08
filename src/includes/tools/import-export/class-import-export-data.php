@@ -554,6 +554,8 @@ class Import_Export_Data {
 
 			$wpdb->query( 'COMMIT' );
 
+			\FotoGrids\Migrations\List_Setting_Repair::run();
+
 		} catch ( \Exception $e ) {
 			$wpdb->query( 'ROLLBACK' );
 			return new \WP_REST_Response(

@@ -24,7 +24,7 @@ const STATUS_ICONS = {
  * result trimmed - this tool has to stay legible on exactly the broken sites it
  * exists to describe.
  *
- * @param  {*} err Rejection value from apiFetch.
+ * @param  {unknown} err Rejection value from apiFetch.
  * @return {string} Message to display.
  */
 const readableError = (err) => {

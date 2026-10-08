@@ -16,9 +16,9 @@
  *          for every slide the lightbox shows.
  *   Share: listens for the document-level `fotogrids:share` event
  *          (dispatched by the Sharing module when a user shares an
- *          item) and fires the share ping. Sharing itself never calls
- *          fetch - the Stats module is the only place that talks to
- *          the REST API.
+ *          item, gallery or album) and fires the share ping. Sharing
+ *          itself never calls fetch - the Stats module is the only
+ *          place that talks to the REST API.
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
@@ -31,7 +31,7 @@
 	 * data-fg-stats JSON. Returns null if missing or invalid.
 	 *
 	 * @param {Element} galleryEl
-	 * @returns {{enabled: boolean, restUrl: string, nonce: string}|null}
+	 * @returns {{enabled: boolean, restUrl: string}|null}
 	 */
 	function readConfig(galleryEl) {
 		const raw = galleryEl.dataset.fgStats;
@@ -53,19 +53,20 @@
 	 * Fire-and-forget POST. Network errors are swallowed - stats failure
 	 * must never affect gallery functionality.
 	 *
+	 * Sent without cookies or a nonce: the stats routes are public, and a
+	 * nonce baked into cached markup belongs to whoever rendered it first.
+	 *
 	 * @param {string} url
-	 * @param {string} nonce
 	 * @param {Object} body
 	 */
-	function ping(url, nonce, body) {
+	function ping(url, body) {
 		try {
 			fetch(url, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-WP-Nonce': nonce,
 				},
-				credentials: 'same-origin',
+				credentials: 'omit',
 				body: JSON.stringify(body),
 			}).catch(() => {});
 		} catch (e) {
@@ -101,7 +102,7 @@
 
 		galleryEl.dataset.fgStatsViewSent = '1';
 
-		ping(cfg.restUrl + 'stats/view', cfg.nonce, {
+		ping(cfg.restUrl + 'stats/view', {
 			object_type: objectType,
 			object_id: objectId,
 		});
@@ -130,7 +131,7 @@
 			return;
 		}
 
-		ping(cfg.restUrl + 'stats/view', cfg.nonce, {
+		ping(cfg.restUrl + 'stats/view', {
 			object_type: 'item',
 			object_id: itemId,
 		});
@@ -140,39 +141,76 @@
 	 * Handle a fotogrids:share event by sending a share ping. The event
 	 * fires from the Sharing module when the user clicks a share button.
 	 *
-	 * The REST URL and nonce come from the first stats-enabled gallery on the
-	 * page; the nonce belongs to the request, so any gallery's works.
+	 * An item share takes the REST URL from the first stats-enabled
+	 * collection on the page. A gallery or album share is sent only when
+	 * that collection has statistics enabled.
 	 *
 	 * @param {CustomEvent} e
 	 */
 	function trackShare(e) {
 		const detail = e && e.detail;
-		if (!detail || !detail.itemId || !detail.network) {
+		if (!detail || !detail.network) {
 			return;
 		}
 
-		// Any stats-enabled gallery supplies the restUrl and nonce.
-		const anyGallery = document.querySelector(
-			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
+		const objectType = detail.objectType || 'item';
+		const objectId = parseInt(
+			objectType === 'item' ? detail.itemId : detail.objectId,
+			10
 		);
-		if (!anyGallery) {
+		if (!objectId) {
 			return;
 		}
-		const cfg = readConfig(anyGallery);
+
+		const cfg =
+			objectType === 'item'
+				? firstConfig()
+				: configFor(objectType, objectId);
 		if (!cfg) {
 			return;
 		}
 
-		const itemId = parseInt(detail.itemId, 10);
-		if (!itemId) {
-			return;
-		}
-
-		ping(cfg.restUrl + 'stats/share', cfg.nonce, {
-			object_type: 'item',
-			object_id: itemId,
+		ping(cfg.restUrl + 'stats/share', {
+			object_type: objectType,
+			object_id: objectId,
 			network: detail.network,
 		});
+	}
+
+	/**
+	 * Stats config of the first stats-enabled collection on the page.
+	 *
+	 * @returns {Object|null}
+	 */
+	function firstConfig() {
+		const el = document.querySelector(
+			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
+		);
+		return el ? readConfig(el) : null;
+	}
+
+	/**
+	 * Stats config of the collection wrapper for one gallery or album.
+	 *
+	 * @param {string} objectType 'gallery' or 'album'.
+	 * @param {number} objectId
+	 * @returns {Object|null}
+	 */
+	function configFor(objectType, objectId) {
+		const els = document.querySelectorAll(
+			'.fotogrids-collection[data-fg-stats]'
+		);
+		for (let i = 0; i < els.length; i++) {
+			const cfg = readConfig(els[i]);
+			if (
+				cfg &&
+				cfg.objectType === objectType &&
+				parseInt(cfg.objectId, 10) === objectId
+			) {
+				return cfg;
+			}
+		}
+		return null;
 	}
 
 	function init() {

@@ -153,20 +153,22 @@ const AlbumGalleries = () => {
 								<Icon name="preview" />
 							</a>
 						</Tooltip>
-						<Tooltip
-							content={config.strings.editGallery}
-							position="top"
-						>
-							<a
-								href={`${window.location.origin}/wp-admin/post.php?post=${g.id}&action=edit`}
-								className="fg-action-button fg-action-button--edit"
-								title={config.strings.editGallery}
-								target="_blank"
-								rel="noopener noreferrer"
+						{(!isAssigned || gallery.editable) && (
+							<Tooltip
+								content={config.strings.editGallery}
+								position="top"
 							>
-								<Icon name="edit" />
-							</a>
-						</Tooltip>
+								<a
+									href={`${window.location.origin}/wp-admin/post.php?post=${g.id}&action=edit`}
+									className="fg-action-button fg-action-button--edit"
+									title={config.strings.editGallery}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Icon name="edit" />
+								</a>
+							</Tooltip>
+						)}
 						{actionButtonTooltip ? (
 							<Tooltip
 								content={actionButtonTooltip}
@@ -189,7 +191,7 @@ const AlbumGalleries = () => {
 			setAllGalleries(config.allGalleries || []);
 			setFeaturedGalleryId(config.featuredGalleryId ?? null);
 		}
-	}, []);
+	}, [config]);
 
 	useEffect(() => {
 		if (allGalleries.length > 0) {
@@ -231,6 +233,7 @@ const AlbumGalleries = () => {
 					sample_items: galleryToAdd.sample_items,
 					status_display: galleryToAdd.status_display,
 					position: assignedGalleries.length,
+					editable: true,
 				};
 				setAssignedGalleries((prev) => [...prev, newAssignedGallery]);
 				setAvailableGalleries((prev) =>
@@ -465,17 +468,19 @@ const AlbumGalleries = () => {
 							renderGalleryItem(
 								gallery,
 								'assigned',
-								<button
-									type="button"
-									className="fg-action-button fg-action-button--remove"
-									onClick={() =>
-										handleRemoveGallery(gallery.ID)
-									}
-									disabled={saving}
-									title={config.strings.removeFromAlbum}
-								>
-									<Icon name="x" />
-								</button>,
+								gallery.editable && (
+									<button
+										type="button"
+										className="fg-action-button fg-action-button--remove"
+										onClick={() =>
+											handleRemoveGallery(gallery.ID)
+										}
+										disabled={saving}
+										title={config.strings.removeFromAlbum}
+									>
+										<Icon name="x" />
+									</button>
+								),
 								index
 							)
 						)}

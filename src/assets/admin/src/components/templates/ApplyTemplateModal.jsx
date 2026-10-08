@@ -18,6 +18,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 	useEffect(() => {
 		setTargetId('');
 		loadTargets();
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- reloads targets only when the target type changes.
 	}, [targetType]);
 
 	const loadTargets = async () => {

@@ -20,7 +20,6 @@
       "tablet": 3,
       "mobile": 2
     },
-    "hover_effect": "grayscale",
-    "captions": false
+    "hover_effect": "grayscale"
   }
 }
