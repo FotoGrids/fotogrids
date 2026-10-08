@@ -643,7 +643,7 @@ class Import_Export_Data {
 					'type'        => $type,
 					'name'        => $name,
 					'slug'        => $slug,
-					'meta'        => $tag['meta'] ?? null,
+					'meta'        => \FotoGrids\Metadata_Manager::prepare_imported_meta( $type, $tag['meta'] ?? null ),
 					'usage_count' => 0,
 				)
 			);

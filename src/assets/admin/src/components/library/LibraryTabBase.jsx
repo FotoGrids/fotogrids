@@ -116,6 +116,9 @@ const LibraryTableRow = memo(
 											})
 										}
 										type="number"
+										min={-90}
+										max={90}
+										step="any"
 										__nextHasNoMarginBottom
 									/>
 									<TextControl
@@ -128,6 +131,9 @@ const LibraryTableRow = memo(
 											})
 										}
 										type="number"
+										min={-180}
+										max={180}
+										step="any"
 										__nextHasNoMarginBottom
 									/>
 								</div>
@@ -1216,6 +1222,9 @@ const LibraryTabBase = ({ entityType, onChange }) => {
 								<input
 									id="fg-library-create-lat"
 									type="number"
+									min={-90}
+									max={90}
+									step="any"
 									value={createDraft.latitude ?? ''}
 									onChange={(e) =>
 										setCreateDraft({
@@ -1233,6 +1242,9 @@ const LibraryTabBase = ({ entityType, onChange }) => {
 								<input
 									id="fg-library-create-lng"
 									type="number"
+									min={-180}
+									max={180}
+									step="any"
 									value={createDraft.longitude ?? ''}
 									onChange={(e) =>
 										setCreateDraft({

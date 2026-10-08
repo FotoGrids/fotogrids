@@ -314,8 +314,8 @@ const ItemEditModal = ({
 				locations: metadata.locations.map((loc) => ({
 					id: loc.id,
 					name: loc.name || '',
-					latitude: loc.latitude || null,
-					longitude: loc.longitude || null,
+					latitude: loc.latitude ?? null,
+					longitude: loc.longitude ?? null,
 				})),
 			};
 
