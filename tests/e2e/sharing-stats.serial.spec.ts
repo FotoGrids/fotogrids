@@ -1,7 +1,7 @@
 import { execFileSync } from 'child_process';
 import type { Page, Response } from '@playwright/test';
 import { test, expect } from './support/test';
-import { album, galleryPage } from './support/collections';
+import { album, galleryPage, multiGalleryPage } from './support/collections';
 import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
@@ -125,6 +125,13 @@ function recordShares( page: Page ): string[] {
 		}
 	} );
 	return sent;
+}
+
+/** Open the Lightbox Grid from a gallery's first item, then its share menu. */
+async function openGridShareMenu( page: Page, gallery: GalleryRender ) {
+	await gallery.items().first().click();
+	await page.locator( '.fg-lb-grid-share' ).click();
+	return page.locator( '.fg-lb-grid-share-popover' );
 }
 
 let before: string | null;
@@ -281,9 +288,7 @@ test.describe( 'with sharing in the lightbox only', () => {
 
 		await page.goto( url );
 		await gallery.waitFor();
-		await gallery.items().first().click();
-		await page.locator( '.fg-lb-grid-share' ).click();
-		const menu = page.locator( '.fg-lb-grid-share-popover' );
+		const menu = await openGridShareMenu( page, gallery );
 
 		for ( const network of NETWORKS ) {
 			const sent = await shareOn( page, menu.locator( `[data-network="${ network }"]` ) );
@@ -299,6 +304,81 @@ test.describe( 'with sharing in the lightbox only', () => {
 		}
 
 		expect( shares( 'gallery', id ) ).toBe( NETWORKS.length );
+	} );
+
+	test( 'a Lightbox Grid share opened from Show all on Featured Item is recorded against the gallery', { tag: [ '@api', '@lightbox' ] }, async ( {
+		page,
+	} ) => {
+		const { id, url } = galleryPage( { layout: 'featured-item', featured_thumbs_count: 2 } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( url );
+		await gallery.waitFor();
+		await gallery.root.locator( '[data-fg-show-all]' ).click();
+		await page.locator( '.fg-lb-grid-share' ).click();
+
+		const sent = await shareOn( page, page.locator( '.fg-lb-grid-share-popover [data-network="copy_link"]' ) );
+
+		expect( sent ).toEqual( {
+			status: 200,
+			body: { object_type: 'gallery', object_id: id, network: 'copy' },
+		} );
+		expect( shares( 'gallery', id ) ).toBe( 1 );
+	} );
+
+	test( 'a Lightbox Grid share on a gallery view page is recorded against the gallery', { tag: [ '@api', '@lightbox' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = galleryPage( { layout: 'grid', lightbox_variant: 'grid' } );
+		const view = viewPage( id );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( view );
+		await gallery.waitFor();
+		const menu = await openGridShareMenu( page, gallery );
+		const sent = await shareOn( page, menu.locator( '[data-network="copy_link"]' ) );
+
+		expect( sent ).toEqual( {
+			status: 200,
+			body: { object_type: 'gallery', object_id: id, network: 'copy' },
+		} );
+		expect( await page.evaluate( () => navigator.clipboard.readText() ) ).toBe( view );
+		expect( shares( 'gallery', id ) ).toBe( 1 );
+	} );
+
+	test( 'a Lightbox Grid share is recorded against its own gallery when two share a page', { tag: [ '@api', '@lightbox' ] }, async ( {
+		page,
+	} ) => {
+		const first = galleryPage( { layout: 'grid', lightbox_variant: 'grid' } );
+		const second = galleryPage( { layout: 'grid', lightbox_variant: 'grid' } );
+
+		await page.goto( multiGalleryPage( [ first.id, second.id ] ).url );
+		const gallery = new GalleryRender( page, second.id );
+		await gallery.waitFor();
+		const menu = await openGridShareMenu( page, gallery );
+		const sent = await shareOn( page, menu.locator( '[data-network="linkedin"]' ) );
+
+		expect( sent.body ).toEqual( { object_type: 'gallery', object_id: second.id, network: 'linkedin' } );
+		expect( shares( 'gallery', second.id ) ).toBe( 1 );
+		expect( shares( 'gallery', first.id ) ).toBe( 0 );
+	} );
+
+	test( 'a Lightbox Grid share on a gallery with statistics off records nothing', { tag: [ '@api', '@lightbox' ] }, async ( {
+		page,
+	} ) => {
+		const { id, url } = galleryPage( { layout: 'grid', lightbox_variant: 'grid', enable_statistics: false } );
+		const gallery = new GalleryRender( page, id );
+		const sent = recordShares( page );
+
+		await page.goto( url );
+		await gallery.waitFor();
+		const menu = await openGridShareMenu( page, gallery );
+		const copy = menu.locator( '[data-network="copy_link"]' );
+		await copy.click();
+
+		await expect( copy ).toHaveAttribute( 'aria-label', 'Link copied' );
+		expect( sent ).toEqual( [] );
+		expect( shares( 'gallery', id ) ).toBe( 0 );
 	} );
 } );
 
@@ -493,6 +573,21 @@ test.describe( 'with Track share clicks off', () => {
 
 			expect( sent.status ).toBe( 200 );
 			expect( shares( 'item', item ) ).toBe( start );
+		} );
+
+		test( 'a Lightbox Grid share records nothing against the gallery', { tag: [ '@api', '@lightbox' ] }, async ( {
+			page,
+		} ) => {
+			const { id, url } = galleryPage( { layout: 'grid', lightbox_variant: 'grid' } );
+			const gallery = new GalleryRender( page, id );
+
+			await page.goto( url );
+			await gallery.waitFor();
+			const menu = await openGridShareMenu( page, gallery );
+			const sent = await shareOn( page, menu.locator( '[data-network="linkedin"]' ) );
+
+			expect( sent.status ).toBe( 200 );
+			expect( shares( 'gallery', id ) ).toBe( 0 );
 		} );
 	} );
 
