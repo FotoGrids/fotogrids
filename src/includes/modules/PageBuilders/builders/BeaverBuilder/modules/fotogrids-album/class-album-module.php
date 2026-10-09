@@ -66,8 +66,9 @@ final class Album_Module extends Module_Base {
 						'title'  => '',
 						'fields' => array(
 							self::SETTING_ID => array(
-								'type'    => 'text',
-								'label'   => __( 'Album ID', 'fotogrids' ),
+								'type'    => Beaver_Builder_Module::FIELD_TYPE,
+								'label'   => __( 'Album', 'fotogrids' ),
+								'kind'    => 'album',
 								'preview' => array( 'type' => 'refresh' ),
 							),
 						),
