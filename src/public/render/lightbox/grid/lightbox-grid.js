@@ -461,16 +461,19 @@ function buildShareButton(config) {
 		if (!sharingMod || typeof sharingMod.renderShareBar !== 'function') {
 			return null;
 		}
+		const galleryId = config.galleryEl
+			? config.galleryEl.getAttribute('data-fg-gallery-id')
+			: '';
 		const bar = sharingMod.renderShareBar(
 			config.sharing,
 			{
 				id: '',
 				fullUrl: window.location.href,
 				caption: '',
-				galleryId: config.galleryEl
-					? config.galleryEl.getAttribute('data-fg-gallery-id')
-					: '',
+				galleryId,
 				galleryEl: config.galleryEl || null,
+				objectType: 'gallery',
+				objectId: galleryId,
 			},
 			{ layout: 'grid' }
 		);
