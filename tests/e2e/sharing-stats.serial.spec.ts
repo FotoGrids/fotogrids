@@ -272,6 +272,34 @@ test.describe( 'with sharing in the lightbox only', () => {
 			body: { object_type: 'item', object_id: item, network: 'linkedin' },
 		} );
 	} );
+
+	test( 'a Lightbox Grid share is recorded against the gallery on every network', { tag: [ '@api', '@lightbox' ] }, async ( {
+		page,
+	} ) => {
+		const { id, url } = galleryPage( { layout: 'grid', lightbox_variant: 'grid' } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( url );
+		await gallery.waitFor();
+		await gallery.items().first().click();
+		await page.locator( '.fg-lb-grid-share' ).click();
+		const menu = page.locator( '.fg-lb-grid-share-popover' );
+
+		for ( const network of NETWORKS ) {
+			const sent = await shareOn( page, menu.locator( `[data-network="${ network }"]` ) );
+
+			expect( sent ).toEqual( {
+				status: 200,
+				body: {
+					object_type: 'gallery',
+					object_id: id,
+					network: REPORTED[ network ] ?? network,
+				},
+			} );
+		}
+
+		expect( shares( 'gallery', id ) ).toBe( NETWORKS.length );
+	} );
 } );
 
 test.describe( 'with sharing turned off', () => {
