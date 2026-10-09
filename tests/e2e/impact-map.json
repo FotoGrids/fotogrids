@@ -37,7 +37,6 @@
 		"src/includes/cache/**": "@cache",
 		"src/includes/class-fotogrids-cache.php": "@cache",
 		"src/includes/class-uninstaller.php": "@lifecycle",
-		"src/uninstall.php": "@lifecycle",
 		"src/includes/admin/**": "@admin",
 		"src/includes/metaboxes/**": "@admin",
 		"src/includes/modules/Metaboxes/**": "@admin",

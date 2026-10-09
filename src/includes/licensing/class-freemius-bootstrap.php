@@ -187,9 +187,8 @@ class Freemius_Bootstrap {
 	/**
 	 * Passes the uninstall to the Freemius SDK so it can report the event.
 	 *
-	 * WordPress runs uninstall.php instead of the uninstall callback the SDK
-	 * registers, so that callback is fired here on the per-plugin action
-	 * WordPress would have used. Does nothing when the SDK is not loaded.
+	 * Must run inside the per-plugin uninstall action. Does nothing when the
+	 * SDK is not loaded.
 	 *
 	 * @since  1.2.0
 	 * @return void
@@ -199,9 +198,6 @@ class Freemius_Bootstrap {
 			return;
 		}
 
-		$action = 'uninstall_' . FOTOGRIDS_PLUGIN_BASENAME;
-
-		add_action( $action, array( 'Freemius', '_uninstall_plugin_hook' ) );
-		do_action( $action ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Core's per-plugin uninstall action.
+		\Freemius::_uninstall_plugin_hook();
 	}
 }
