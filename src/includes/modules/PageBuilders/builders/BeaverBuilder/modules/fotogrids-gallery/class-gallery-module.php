@@ -30,6 +30,13 @@ final class Gallery_Module extends Module_Base {
 	public const SETTING_ID = 'gallery_id';
 
 	/**
+	 * Module panel icon: the FotoGrids gallery mark, drawn in the panel's text colour.
+	 *
+	 * @var string
+	 */
+	private const ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="4" height="4" rx="0.2"/><rect x="10" y="3" width="4" height="4" rx="0.2"/><rect x="17" y="3" width="4" height="4" rx="0.2"/><rect x="3" y="10" width="4" height="4" rx="0.2"/><rect x="10" y="10" width="4" height="4" rx="0.2"/><rect x="17" y="10" width="4" height="4" rx="0.2"/><rect x="3" y="17" width="4" height="4" rx="0.2"/><rect x="10" y="17" width="4" height="4" rx="0.2"/><rect x="17" y="17" width="4" height="4" rx="0.2"/></svg>';
+
+	/**
 	 * Build the module.
 	 *
 	 * @since 1.3.0
@@ -37,10 +44,10 @@ final class Gallery_Module extends Module_Base {
 	public function __construct() {
 		parent::__construct(
 			array(
-				'name'        => __( 'FotoGrids Gallery', 'fotogrids' ),
+				'name'        => __( 'Gallery', 'fotogrids' ),
 				'description' => __( 'Display a FotoGrids gallery.', 'fotogrids' ),
 				'slug'        => Beaver_Builder_Module::GALLERY_MODULE,
-				'icon'        => 'format-gallery.svg',
+				'icon'        => self::ICON,
 			)
 		);
 	}

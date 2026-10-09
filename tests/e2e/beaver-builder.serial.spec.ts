@@ -336,8 +336,8 @@ test.describe( 'in the builder', () => {
 				.sort();
 		} );
 		expect( listed ).toEqual( [
-			'fotogrids-album|FotoGrids Album|FotoGrids',
-			'fotogrids-gallery|FotoGrids Gallery|FotoGrids',
+			'fotogrids-album|Album|FotoGrids',
+			'fotogrids-gallery|Gallery|FotoGrids',
 		] );
 
 		await dropModule( page, frame, 'fotogrids-gallery' );

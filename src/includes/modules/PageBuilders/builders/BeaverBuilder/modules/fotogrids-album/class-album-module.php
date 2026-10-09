@@ -29,6 +29,13 @@ final class Album_Module extends Module_Base {
 	public const SETTING_ID = 'album_id';
 
 	/**
+	 * Module panel icon: the FotoGrids album mark, drawn in the panel's text colour.
+	 *
+	 * @var string
+	 */
+	private const ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg>';
+
+	/**
 	 * Build the module.
 	 *
 	 * @since 1.3.0
@@ -36,10 +43,10 @@ final class Album_Module extends Module_Base {
 	public function __construct() {
 		parent::__construct(
 			array(
-				'name'        => __( 'FotoGrids Album', 'fotogrids' ),
+				'name'        => __( 'Album', 'fotogrids' ),
 				'description' => __( 'Display a FotoGrids album.', 'fotogrids' ),
 				'slug'        => Beaver_Builder_Module::ALBUM_MODULE,
-				'icon'        => 'grid.svg',
+				'icon'        => self::ICON,
 			)
 		);
 	}
