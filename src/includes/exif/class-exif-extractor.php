@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  *  - `extract()` reads an attachment's raw EXIF tags and returns the requested
  *    fields, formatted for display.
- *  - `enabled_fields_for_gallery()` translates a gallery's `display_exif` and
+ *  - `enabled_fields_for_settings()` translates a gallery's `display_exif` and
  *    `exif_fields` settings into the field whitelist `extract()` expects.
  *
  * The field vocabulary itself lives in `Exif_Fields`. Add-ons extend the
@@ -94,17 +94,15 @@ final class Exif_Extractor {
 	/**
 	 * Build the EXIF-field whitelist for a gallery, from its settings.
 	 *
-	 * @since 1.0.0
-	 * @param int $gallery_id Gallery post ID.
+	 * Reads `exif_fields` only; whether the gallery displays EXIF at all is
+	 * the caller's decision.
+	 *
+	 * @since 1.2.0
+	 * @param array<string, mixed> $settings   Resolved gallery settings.
+	 * @param int                  $gallery_id Gallery post ID.
 	 * @return string[] Enabled EXIF field keys (may be empty).
 	 */
-	public static function enabled_fields_for_gallery( int $gallery_id ): array {
-		$settings = Gallery_Repository::get_settings( $gallery_id );
-
-		if ( empty( $settings['display_exif'] ) ) {
-			return array();
-		}
-
+	public static function enabled_fields_for_settings( array $settings, int $gallery_id ): array {
 		$enabled_fields = Exif_Fields::sanitize_keys( self::parse_field_setting( $settings['exif_fields'] ?? array() ) );
 
 		/**
@@ -113,7 +111,29 @@ final class Exif_Extractor {
 		 *
 		 * @see Filters_Data::EXIF_ENABLED_FIELDS
 		 */
-		return (array) apply_filters( Filters_Data::EXIF_ENABLED_FIELDS, $enabled_fields, $settings, $gallery_id );
+		$enabled_fields = (array) apply_filters( Filters_Data::EXIF_ENABLED_FIELDS, $enabled_fields, $settings, $gallery_id );
+
+		return Exif_Fields::sanitize_keys( $enabled_fields );
+	}
+
+	/**
+	 * Build the EXIF-field whitelist for a gallery, from its stored settings.
+	 *
+	 * @since      1.0.0
+	 * @deprecated 1.2.0 Use Exif_Extractor::enabled_fields_for_settings(), or Lightbox_Info_Scope::exif_fields() for the fields a gallery's Lightbox shows.
+	 * @param int $gallery_id Gallery post ID.
+	 * @return string[] Enabled EXIF field keys; empty when the gallery does not display EXIF.
+	 */
+	public static function enabled_fields_for_gallery( int $gallery_id ): array {
+		_deprecated_function( __METHOD__, '1.2.0', 'FotoGrids\\Exif\\Exif_Extractor::enabled_fields_for_settings()' );
+
+		$settings = Gallery_Repository::get_settings( $gallery_id );
+
+		if ( empty( $settings['display_exif'] ) ) {
+			return array();
+		}
+
+		return self::enabled_fields_for_settings( $settings, $gallery_id );
 	}
 
 	/**

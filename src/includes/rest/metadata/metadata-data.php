@@ -30,7 +30,7 @@ class Metadata_Data {
 
 		$tags = \FotoGrids\Metadata_Manager::get_tags( $search, $limit );
 
-		return rest_ensure_response( $tags );
+		return rest_ensure_response( self::format_rows( $tags ) );
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Metadata_Data {
 
 		$people = \FotoGrids\Metadata_Manager::get_people( $search, $limit );
 
-		return rest_ensure_response( $people );
+		return rest_ensure_response( self::format_rows( $people ) );
 	}
 
 	/**
@@ -68,7 +68,7 @@ class Metadata_Data {
 
 		$locations = \FotoGrids\Metadata_Manager::get_locations( $search, $limit );
 
-		return rest_ensure_response( $locations );
+		return rest_ensure_response( self::format_rows( $locations ) );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class Metadata_Data {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create tag', 'fotogrids' ), array( 'status' => 500 ) );
 		}
 
-		return rest_ensure_response( $tag );
+		return rest_ensure_response( \FotoGrids\Metadata_Manager::format_for_response( $tag ) );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Metadata_Data {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create person', 'fotogrids' ), array( 'status' => 500 ) );
 		}
 
-		return rest_ensure_response( $person );
+		return rest_ensure_response( \FotoGrids\Metadata_Manager::format_for_response( $person ) );
 	}
 
 	/**
@@ -162,6 +162,11 @@ class Metadata_Data {
 			return new \WP_Error( 'missing_name', __( 'Location name is required', 'fotogrids' ), array( 'status' => 400 ) );
 		}
 
+		$coordinates = \FotoGrids\Metadata_Manager::normalize_coordinates( $latitude, $longitude );
+		if ( is_wp_error( $coordinates ) ) {
+			return $coordinates;
+		}
+
 		$location = self::resolve_entry(
 			'location',
 			$name,
@@ -178,7 +183,7 @@ class Metadata_Data {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create location', 'fotogrids' ), array( 'status' => 500 ) );
 		}
 
-		return rest_ensure_response( $location );
+		return rest_ensure_response( \FotoGrids\Metadata_Manager::format_for_response( $location ) );
 	}
 
 	/**
@@ -196,7 +201,25 @@ class Metadata_Data {
 
 		$metadata = \FotoGrids\Metadata_Manager::get_item_metadata( $item_id );
 
+		foreach ( array( 'tags', 'people', 'locations' ) as $key ) {
+			$metadata[ $key ] = self::format_rows( $metadata[ $key ] ?? array() );
+		}
+
 		return rest_ensure_response( $metadata );
+	}
+
+	/**
+	 * Shape a list of metadata rows for a REST response.
+	 *
+	 * @since  1.2.0
+	 * @param  array|false $rows Rows from the tags table.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function format_rows( $rows ) {
+		return array_map(
+			array( '\FotoGrids\Metadata_Manager', 'format_for_response' ),
+			is_array( $rows ) ? $rows : array()
+		);
 	}
 
 	/**

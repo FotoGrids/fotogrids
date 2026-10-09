@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-07T08:32:58+00:00\n"
+"POT-Creation-Date: 2026-10-08T15:54:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -18,8 +18,8 @@ msgstr ""
 #. Author of the plugin
 #: fotogrids.php
 #: includes/catalog/catalog-strings.php:357
-#: includes/class-admin-init.php:97
-#: includes/class-admin-init.php:98
+#: includes/class-admin-init.php:108
+#: includes/class-admin-init.php:109
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
@@ -44,32 +44,32 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:250
+#: fotogrids.php:249
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:251
-#: fotogrids.php:260
+#: fotogrids.php:250
+#: fotogrids.php:259
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:259
+#: fotogrids.php:258
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:275
-#: includes/class-admin-init.php:163
-#: includes/class-admin-init.php:164
+#: fotogrids.php:274
+#: includes/class-admin-init.php:174
+#: includes/class-admin-init.php:175
 #: includes/tools/import-export/assets/ImportExportTool.jsx:54
 #: includes/tools/import-export/assets/ImportExportTool.jsx:137
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:293
+#: fotogrids.php:292
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:318
+#: fotogrids.php:317
 #: assets/admin/src/components/dashboard/LearnSection.jsx:86
 msgid "Help Center"
 msgstr ""
@@ -92,9 +92,9 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:162
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1485
+#: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
-#: public/render/features/collection-header/class-collection-header.php:421
+#: public/render/features/collection-header/class-collection-header.php:446
 #: assets/admin/src/components/pages/TemplatesPage.jsx:449
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:45
 #: includes/tools/import-export/assets/ImportExportTool.jsx:133
@@ -113,7 +113,7 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:93
 #: includes/admin/class-dashboard-widget.php:142
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:27
-#: assets/admin/src/components/library/LibraryTabBase.jsx:451
+#: assets/admin/src/components/library/LibraryTabBase.jsx:457
 #: assets/admin/src/components/pages/StatsPage.jsx:241
 #: includes/tools/import-export/assets/ImportExportTool.jsx:33
 #: includes/tools/import-export/assets/ImportExportTool.jsx:134
@@ -152,8 +152,8 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:214
 #: includes/admin/class-dashboard-widget.php:126
-#: includes/class-admin-init.php:118
-#: includes/class-admin-init.php:119
+#: includes/class-admin-init.php:129
+#: includes/class-admin-init.php:130
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:15
@@ -221,8 +221,8 @@ msgid "New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:134
-#: includes/class-admin-init.php:127
-#: includes/class-admin-init.php:128
+#: includes/class-admin-init.php:138
+#: includes/class-admin-init.php:139
 #: includes/diagnostics/class-system-report.php:161
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:21
 #: assets/admin/src/components/pages/StatsPage.jsx:235
@@ -237,8 +237,8 @@ msgid "Engagement"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:167
-#: includes/class-admin-init.php:109
-#: includes/class-admin-init.php:110
+#: includes/class-admin-init.php:120
+#: includes/class-admin-init.php:121
 msgid "Dashboard"
 msgstr ""
 
@@ -250,14 +250,14 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:163
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1485
+#: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
-#: public/render/features/collection-header/class-collection-header.php:422
+#: public/render/features/collection-header/class-collection-header.php:447
 #: assets/admin/src/components/pages/TemplatesPage.jsx:448
 #: assets/admin/src/utils/gallery.js:18
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:46
 #: includes/tools/import-export/assets/ImportExportTool.jsx:132
-#: includes/tools/migration/assets/MigrationTool.jsx:105
+#: includes/tools/migration/assets/MigrationTool.jsx:103
 msgid "Gallery"
 msgstr ""
 
@@ -276,8 +276,8 @@ msgid "News & Updates"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:239
-#: includes/metaboxes/class-metabox-registrar.php:610
-#: includes/metaboxes/class-metabox-registrar.php:675
+#: includes/metaboxes/class-metabox-registrar.php:630
+#: includes/metaboxes/class-metabox-registrar.php:719
 #: includes/metaboxes/class-metabox-strings.php:64
 msgid "Loading..."
 msgstr ""
@@ -311,9 +311,9 @@ msgstr ""
 #: includes/metaboxes/class-metabox-strings.php:90
 #: includes/modules/Templates/Module.php:333
 #: assets/admin/plain/render-settings/renderBulkModal.js:242
-#: assets/admin/src/components/library/LibraryTabBase.jsx:161
-#: assets/admin/src/components/library/LibraryTabBase.jsx:221
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1259
+#: assets/admin/src/components/library/LibraryTabBase.jsx:167
+#: assets/admin/src/components/library/LibraryTabBase.jsx:227
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1284
 #: assets/admin/src/components/library/MergeDialog.jsx:214
 #: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:167
 #: assets/admin/src/components/shared/Modal/wrappers/Prompt.jsx:132
@@ -409,8 +409,8 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderSelect.js:61
 #: assets/admin/plain/render-settings/renderTextInput.js:18
 #: assets/admin/plain/render-settings/renderToggle.js:20
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:242
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:227
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:246
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:232
 #: assets/admin/src/components/pages/TemplatesPage.jsx:388
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:391
 msgid "Pro"
@@ -483,7 +483,7 @@ msgid "Action on Hover"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:36
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:126
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:131
 msgid "Active"
 msgstr ""
 
@@ -2380,7 +2380,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:499
 #: includes/metaboxes/class-metabox-strings.php:98
 #: includes/rest/metadata/library-data.php:69
-#: public/render/lightbox/classic/class-lightbox.php:225
+#: public/render/lightbox/classic/class-lightbox.php:223
 msgid "Location"
 msgstr ""
 
@@ -2729,7 +2729,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:577
 #: includes/metaboxes/class-metabox-strings.php:97
 #: includes/rest/metadata/library-data.php:59
-#: public/render/lightbox/classic/class-lightbox.php:224
+#: public/render/lightbox/classic/class-lightbox.php:222
 msgid "People"
 msgstr ""
 
@@ -2885,7 +2885,7 @@ msgid "Reddit"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:614
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:127
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:132
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:327
 msgid "Regular"
 msgstr ""
@@ -3415,7 +3415,7 @@ msgstr ""
 #: includes/metaboxes/class-metabox-strings.php:96
 #: includes/rest/metadata/library-data.php:50
 #: public/render/filters/sources/tags/class-tags-filter-source.php:46
-#: public/render/lightbox/classic/class-lightbox.php:223
+#: public/render/lightbox/classic/class-lightbox.php:221
 #: includes/tools/import-export/assets/ImportExportTool.jsx:46
 #: includes/tools/import-export/assets/ImportExportTool.jsx:135
 msgid "Tags"
@@ -3675,7 +3675,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:803
 #: includes/metaboxes/class-metabox-strings.php:184
-#: public/render/lightbox/classic/class-lightbox.php:218
+#: public/render/lightbox/classic/class-lightbox.php:216
 #: public/render/video/class-video-lightbox-mini.php:51
 msgid "Video"
 msgstr ""
@@ -3948,12 +3948,12 @@ msgstr ""
 msgid "{postType} Password"
 msgstr ""
 
-#: includes/class-admin-init.php:88
+#: includes/class-admin-init.php:99
 msgid "Sorry, you are not allowed to access this page."
 msgstr ""
 
-#: includes/class-admin-init.php:136
-#: includes/class-admin-init.php:137
+#: includes/class-admin-init.php:147
+#: includes/class-admin-init.php:148
 #: includes/class-upgrade-modal.php:97
 #: includes/modules/Templates/Module.php:43
 #: includes/modules/Templates/Module.php:118
@@ -3962,81 +3962,74 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: includes/class-admin-init.php:145
-#: includes/class-admin-init.php:146
+#: includes/class-admin-init.php:156
+#: includes/class-admin-init.php:157
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
 msgid "Library"
 msgstr ""
 
-#: includes/class-admin-init.php:154
-#: includes/class-admin-init.php:155
+#: includes/class-admin-init.php:165
+#: includes/class-admin-init.php:166
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
 #: includes/tools/import-export/assets/ImportExportTool.jsx:62
 msgid "Statistics"
 msgstr ""
 
-#: includes/class-admin-init.php:172
-#: includes/class-admin-init.php:173
+#: includes/class-admin-init.php:183
+#: includes/class-admin-init.php:184
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:35
 msgid "Tools"
 msgstr ""
 
-#: includes/class-admin-init.php:182
-#: includes/class-admin-init.php:183
+#: includes/class-admin-init.php:193
+#: includes/class-admin-init.php:194
 #: includes/metaboxes/class-metabox-strings.php:290
 #: includes/modules/Templates/Module.php:322
 #: assets/admin/plain/collection-settings.js:2546
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:630
+#: includes/class-admin-init.php:642
 #: includes/metaboxes/class-collection-save-pipeline.php:97
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
 #: includes/rest/admin/admin-data.php:255
 #: includes/rest/admin/admin-data.php:275
 #: includes/rest/admin/admin-data.php:783
-#: includes/rest/admin/admin-data.php:896
-#: includes/rest/admin/admin-data.php:1074
-#: includes/rest/admin/admin-data.php:1141
-#: includes/rest/admin/admin-data.php:1233
-#: includes/rest/admin/admin-data.php:1294
-#: includes/rest/admin/admin-data.php:1424
-#: includes/rest/admin/admin-data.php:1506
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:659
+#: includes/class-admin-init.php:671
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:669
+#: includes/class-admin-init.php:681
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:679
-#: includes/class-admin-init.php:737
+#: includes/class-admin-init.php:691
+#: includes/class-admin-init.php:749
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:742
+#: includes/class-admin-init.php:754
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:985
+#: includes/class-admin-init.php:1016
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:986
-msgid "Remove from All Albums"
+#: includes/class-admin-init.php:1017
+msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1117
+#: includes/class-admin-init.php:1154
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1123
+#: includes/class-admin-init.php:1160
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4044,49 +4037,49 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1136
-#: includes/class-admin-init.php:1150
+#: includes/class-admin-init.php:1173
+#: includes/class-admin-init.php:1187
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: %d: number of galleries removed from all albums.
-#: includes/class-admin-init.php:1169
+#. translators: %d: number of galleries removed from albums.
+#: includes/class-admin-init.php:1206
 #, php-format
-msgid "%d gallery removed from all albums."
-msgid_plural "%d galleries removed from all albums."
+msgid "%d gallery removed from its albums."
+msgid_plural "%d galleries removed from their albums."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1181
-#: includes/class-admin-init.php:1195
+#: includes/class-admin-init.php:1218
+#: includes/class-admin-init.php:1232
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1213
-#: includes/class-admin-init.php:1404
+#: includes/class-admin-init.php:1250
+#: includes/class-admin-init.php:1433
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1216
+#: includes/class-admin-init.php:1253
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1219
+#: includes/class-admin-init.php:1256
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1264
+#: includes/class-admin-init.php:1293
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1267
+#: includes/class-admin-init.php:1296
 msgid "Choose an album..."
 msgstr ""
 
@@ -4152,30 +4145,42 @@ msgstr ""
 msgid "Gallery and album rendering, including error context."
 msgstr ""
 
-#: includes/class-metadata-manager.php:818
-#: includes/class-metadata-manager.php:882
-#: includes/rest/metadata/library-data.php:245
-#: includes/rest/metadata/library-data.php:311
+#: includes/class-metadata-manager.php:304
+msgid "Enter both latitude and longitude, or leave both empty."
+msgstr ""
+
+#: includes/class-metadata-manager.php:308
+msgid "Latitude must be a number from -90 to 90."
+msgstr ""
+
+#: includes/class-metadata-manager.php:312
+msgid "Longitude must be a number from -180 to 180."
+msgstr ""
+
+#: includes/class-metadata-manager.php:981
+#: includes/class-metadata-manager.php:1045
+#: includes/rest/metadata/library-data.php:237
+#: includes/rest/metadata/library-data.php:300
 msgid "Entry not found."
 msgstr ""
 
-#: includes/class-metadata-manager.php:823
+#: includes/class-metadata-manager.php:986
 msgid "Name cannot be empty."
 msgstr ""
 
-#: includes/class-metadata-manager.php:841
+#: includes/class-metadata-manager.php:1004
 msgid "Another entry with this name already exists. Use Merge if you want to combine them."
 msgstr ""
 
-#: includes/class-metadata-manager.php:907
+#: includes/class-metadata-manager.php:1070
 msgid "Failed to delete entry."
 msgstr ""
 
-#: includes/class-metadata-manager.php:970
+#: includes/class-metadata-manager.php:1133
 msgid "Invalid metadata type."
 msgstr ""
 
-#: includes/class-metadata-manager.php:975
+#: includes/class-metadata-manager.php:1138
 msgid "Target entry not found."
 msgstr ""
 
@@ -4217,12 +4222,12 @@ msgstr ""
 
 #: includes/class-post-types.php:123
 #: includes/metaboxes/class-metabox-registrar.php:323
-#: includes/metaboxes/class-metabox-registrar.php:674
+#: includes/metaboxes/class-metabox-registrar.php:718
 msgid "Edit Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:124
-#: includes/metaboxes/class-metabox-registrar.php:673
+#: includes/metaboxes/class-metabox-registrar.php:717
 msgid "View Gallery"
 msgstr ""
 
@@ -4859,8 +4864,8 @@ msgid "FotoGrids custom sizes"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:367
-#: assets/admin/src/components/library/LibraryTabBase.jsx:425
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1177
+#: assets/admin/src/components/library/LibraryTabBase.jsx:431
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1196
 #: assets/admin/src/components/pages/StatsPage.jsx:148
 #: assets/admin/src/components/pages/StatsPage.jsx:176
 msgid "Name"
@@ -4962,12 +4967,12 @@ msgid "Copyright"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:194
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1199
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1218
 msgid "Latitude"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:201
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1216
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1238
 msgid "Longitude"
 msgstr ""
 
@@ -5252,115 +5257,115 @@ msgstr ""
 msgid "You're viewing these settings in read-only mode. Ask a site administrator if changes are needed."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:603
+#: includes/metaboxes/class-metabox-registrar.php:623
 msgid "Search albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:604
+#: includes/metaboxes/class-metabox-registrar.php:624
 msgid "No available albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:605
+#: includes/metaboxes/class-metabox-registrar.php:625
 msgid "No more albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:606
+#: includes/metaboxes/class-metabox-registrar.php:626
 msgid "Create New Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:607
+#: includes/metaboxes/class-metabox-registrar.php:627
 msgid "Assigned to"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:608
+#: includes/metaboxes/class-metabox-registrar.php:628
 msgid "Not assigned to any"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:609
+#: includes/metaboxes/class-metabox-registrar.php:629
 msgid "albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:611
+#: includes/metaboxes/class-metabox-registrar.php:631
 msgid "Error loading albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:612
+#: includes/metaboxes/class-metabox-registrar.php:632
 msgid "Album assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:619
+#: includes/metaboxes/class-metabox-registrar.php:639
 msgid "Loading albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:660
+#: includes/metaboxes/class-metabox-registrar.php:704
 msgid "Assigned Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:661
+#: includes/metaboxes/class-metabox-registrar.php:705
 msgid "Available Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:662
+#: includes/metaboxes/class-metabox-registrar.php:706
 msgid "Search Galleries..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:663
+#: includes/metaboxes/class-metabox-registrar.php:707
 msgid "No Galleries assigned to this Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:664
+#: includes/metaboxes/class-metabox-registrar.php:708
 msgid "No available Galleries found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:665
+#: includes/metaboxes/class-metabox-registrar.php:709
 msgid "Drag to reorder Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:666
+#: includes/metaboxes/class-metabox-registrar.php:710
 msgid "Remove from Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:667
+#: includes/metaboxes/class-metabox-registrar.php:711
 msgid "Add to Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:668
+#: includes/metaboxes/class-metabox-registrar.php:712
 msgid "Set as featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:669
+#: includes/metaboxes/class-metabox-registrar.php:713
 msgid "Clear featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:670
+#: includes/metaboxes/class-metabox-registrar.php:714
 msgid "Featured Gallery set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:671
+#: includes/metaboxes/class-metabox-registrar.php:715
 msgid "Featured Gallery cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:672
+#: includes/metaboxes/class-metabox-registrar.php:716
 msgid "Error saving featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:676
+#: includes/metaboxes/class-metabox-registrar.php:720
 msgid "Gallery assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:677
+#: includes/metaboxes/class-metabox-registrar.php:721
 msgid "Error updating Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:678
+#: includes/metaboxes/class-metabox-registrar.php:722
 msgid "items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:679
+#: includes/metaboxes/class-metabox-registrar.php:723
 msgid "No items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:680
+#: includes/metaboxes/class-metabox-registrar.php:724
 msgid "Drop item here"
 msgstr ""
 
@@ -5436,12 +5441,12 @@ msgid "Save Changes"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:92
-#: public/render/lightbox/classic/class-lightbox.php:211
+#: public/render/lightbox/classic/class-lightbox.php:209
 msgid "Previous item"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:93
-#: public/render/lightbox/classic/class-lightbox.php:212
+#: public/render/lightbox/classic/class-lightbox.php:210
 msgid "Next item"
 msgstr ""
 
@@ -5834,7 +5839,7 @@ msgid "Add some items to this gallery and its preview will appear here."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:259
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:218
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:270
 msgid "Add items"
 msgstr ""
 
@@ -5885,7 +5890,7 @@ msgid "File Size"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:286
-#: public/render/lightbox/classic/class-lightbox.php:221
+#: public/render/lightbox/classic/class-lightbox.php:219
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:152
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:346
 msgid "Dimensions"
@@ -6072,7 +6077,7 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:355
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:108
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:231
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:236
 msgid "AI Facial Recognition"
 msgstr ""
 
@@ -6183,7 +6188,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:587
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:588
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
@@ -6214,7 +6219,7 @@ msgid "Preview"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
-#: includes/tools/migration/assets/MigrationTool.jsx:107
+#: includes/tools/migration/assets/MigrationTool.jsx:105
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:278
 msgid "Source"
 msgstr ""
@@ -6255,7 +6260,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:871
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:873
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
@@ -6293,8 +6298,8 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:392
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:676
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:180
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:677
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:184
 msgid "Loading preview…"
 msgstr ""
 
@@ -6378,7 +6383,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:386
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:481
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:482
 msgid "Select an album to display."
 msgstr ""
 
@@ -6398,58 +6403,57 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:670
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:765
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:671
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:767
 msgid "Select a gallery to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:212
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:264
 msgid "This album has no galleries yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:265
 msgid "Add one or more galleries so this album has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:214
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:266
 msgid "Add galleries"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:216
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:268
 msgid "This gallery has no items yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:217
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:269
 msgid "Add images, videos, or other media so this gallery has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:80
-#: includes/rest/admin/class-preview-endpoint.php:38
+#: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:320
-#: includes/rest/gallery/gallery-data.php:536
+#: includes/rest/gallery/gallery-data.php:323
+#: includes/rest/gallery/gallery-data.php:592
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
 msgid "Gallery not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:88
-#: includes/modules/PageBuilders/core/rest/preview-data.php:250
+#: includes/modules/PageBuilders/core/rest/preview-data.php:87
+#: includes/modules/PageBuilders/core/rest/preview-data.php:260
 msgid "Render pipeline is not available."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:240
+#: includes/modules/PageBuilders/core/rest/preview-data.php:250
 #: includes/rest/album/album-data.php:36
 msgid "Album not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:414
+#: includes/modules/PageBuilders/core/rest/preview-data.php:425
 msgid "No attachments to import."
 msgstr ""
 
 #. translators: %s: date imported
-#: includes/modules/PageBuilders/core/rest/preview-data.php:423
+#: includes/modules/PageBuilders/core/rest/preview-data.php:434
 #, php-format
 msgid "Imported gallery (%s)"
 msgstr ""
@@ -6537,7 +6541,7 @@ msgid "Description (optional)"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:331
-#: assets/admin/src/components/library/LibraryTabBase.jsx:154
+#: assets/admin/src/components/library/LibraryTabBase.jsx:160
 msgid "Save"
 msgstr ""
 
@@ -6587,7 +6591,7 @@ msgid "Draft preview - this collection is not published yet."
 msgstr ""
 
 #. translators: 1: gallery count, 2: album title
-#: includes/modules/ViewCollections/class-renderer.php:457
+#: includes/modules/ViewCollections/class-renderer.php:459
 #, php-format
 msgid "%1$d gallery in %2$s."
 msgid_plural "%1$d galleries in %2$s."
@@ -6595,7 +6599,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: item count, 2: gallery title
-#: includes/modules/ViewCollections/class-renderer.php:469
+#: includes/modules/ViewCollections/class-renderer.php:471
 #, php-format
 msgid "%1$d photo in %2$s."
 msgid_plural "%1$d photos in %2$s."
@@ -6605,7 +6609,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries in the album.
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
-#: includes/modules/ViewCollections/class-renderer.php:740
+#: includes/modules/ViewCollections/class-renderer.php:742
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:63
@@ -6619,7 +6623,7 @@ msgstr[1] ""
 #. translators: %d: number of items in the gallery.
 #. translators: %d: number of items.
 #. translators: %d: item count
-#: includes/modules/ViewCollections/class-renderer.php:742
+#: includes/modules/ViewCollections/class-renderer.php:744
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:154
@@ -6804,7 +6808,7 @@ msgid "Lowest role that can edit and delete other users' albums, including priva
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:535
-msgid "Lowest role that can manage the FotoGrids media library."
+msgid "Lowest role that can create, rename and delete the tags, people and locations that items are filed under."
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:549
@@ -6929,25 +6933,17 @@ msgstr ""
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1379
+#: includes/rest/admin/admin-data.php:1359
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1404
+#: includes/rest/admin/admin-data.php:1384
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
 msgstr[0] ""
 msgstr[1] ""
-
-#: includes/rest/admin/class-preview-request-validator.php:34
-msgid "Unsupported preview request version."
-msgstr ""
-
-#: includes/rest/admin/class-preview-request-validator.php:53
-msgid "Preview item order exceeds the maximum supported size."
-msgstr ""
 
 #: includes/rest/album/album-data.php:60
 msgid "Featured gallery must be a gallery."
@@ -6991,20 +6987,20 @@ msgstr ""
 msgid "Gallery not found"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:208
+#: includes/rest/gallery/gallery-data.php:210
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:219
+#: includes/rest/gallery/gallery-data.php:221
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:311
+#: includes/rest/gallery/gallery-data.php:314
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:328
+#: includes/rest/gallery/gallery-data.php:331
 #: includes/rest/gallery/gallery-permissions.php:76
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
@@ -7133,48 +7129,48 @@ msgstr ""
 msgid "The embed item_meta row ID to delete."
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:52
-#: includes/rest/lightbox/lightbox-data.php:54
+#: includes/rest/items/save-item-data.php:53
+#: includes/rest/lightbox/lightbox-data.php:57
 msgid "Item not found."
 msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:143
+#: includes/rest/items/save-item-data.php:144
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: tag name, 2: item ID.
-#: includes/rest/items/save-item-data.php:168
+#: includes/rest/items/save-item-data.php:169
 #, php-format
 msgid "Failed to add tag: %1$s to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:192
+#: includes/rest/items/save-item-data.php:193
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
-#: includes/rest/items/save-item-data.php:211
+#: includes/rest/items/save-item-data.php:212
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:233
+#: includes/rest/items/save-item-data.php:234
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
-#: includes/rest/items/save-item-data.php:252
+#: includes/rest/items/save-item-data.php:253
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:273
+#: includes/rest/items/save-item-data.php:276
 msgid "Item saved successfully."
 msgstr ""
 
@@ -7356,33 +7352,39 @@ msgstr ""
 msgid "Locations"
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:160
-#: includes/rest/metadata/library-data.php:197
-#: includes/rest/metadata/library-data.php:240
-#: includes/rest/metadata/library-data.php:306
-#: includes/rest/metadata/library-data.php:333
-#: includes/rest/metadata/library-data.php:352
-#: includes/rest/metadata/library-data.php:380
+#: includes/rest/metadata/library-data.php:140
+#: includes/rest/metadata/library-data.php:178
+#: includes/rest/metadata/library-data.php:232
+#: includes/rest/metadata/library-data.php:295
+#: includes/rest/metadata/library-data.php:322
+#: includes/rest/metadata/library-data.php:341
+#: includes/rest/metadata/library-data.php:369
 msgid "Unknown library type."
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:202
+#: includes/rest/metadata/library-data.php:183
 msgid "Name is required."
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:225
+#. translators: %s: name of the existing tag, person or location.
+#: includes/rest/metadata/library-data.php:191
+#, php-format
+msgid "\"%s\" already exists."
+msgstr ""
+
+#: includes/rest/metadata/library-data.php:217
 msgid "Failed to create entry."
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:338
+#: includes/rest/metadata/library-data.php:327
 msgid "No IDs supplied."
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:359
+#: includes/rest/metadata/library-data.php:348
 msgid "Target ID is required."
 msgstr ""
 
-#: includes/rest/metadata/library-data.php:362
+#: includes/rest/metadata/library-data.php:351
 msgid "At least one source ID is required."
 msgstr ""
 
@@ -7406,12 +7408,12 @@ msgstr ""
 msgid "Location name is required"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:178
+#: includes/rest/metadata/metadata-data.php:183
 msgid "Failed to create location"
 msgstr ""
 
 #. translators: %s: tag, person or location name.
-#: includes/rest/metadata/metadata-data.php:229
+#: includes/rest/metadata/metadata-data.php:252
 #, php-format
 msgid "\"%s\" is not in the library, and you do not have permission to add it."
 msgstr ""
@@ -7432,12 +7434,12 @@ msgstr ""
 msgid "Unknown logical permission."
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:43
-#: includes/rest/stats/stats-data.php:76
+#: includes/rest/stats/stats-data.php:44
+#: includes/rest/stats/stats-data.php:82
 msgid "Failed to update statistics"
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:124
+#: includes/rest/stats/stats-data.php:130
 msgid "The object being tracked does not exist."
 msgstr ""
 
@@ -7973,19 +7975,19 @@ msgid "Link copied"
 msgstr ""
 
 #. translators: %s: album title
-#: public/render/features/collection-header/class-collection-header.php:383
+#: public/render/features/collection-header/class-collection-header.php:408
 #, php-format
 msgid "Back to %s"
 msgstr ""
 
-#: public/render/features/collection-header/class-collection-header.php:385
+#: public/render/features/collection-header/class-collection-header.php:410
 #: public/render/lightbox/grid/class-lightbox-grid.php:61
 #: assets/admin/src/components/pages/SetupWizardPage.jsx:216
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:217
 msgid "Back"
 msgstr ""
 
-#: public/render/features/collection-header/class-collection-header.php:424
+#: public/render/features/collection-header/class-collection-header.php:449
 msgid "Breadcrumb"
 msgstr ""
 
@@ -8039,27 +8041,27 @@ msgid "Log In"
 msgstr ""
 
 #. translators: heading shown on the gallery password lock screen
-#: public/render/gates/password/class-password-gate.php:174
+#: public/render/gates/password/class-password-gate.php:182
 msgid "Gallery Protected"
 msgstr ""
 
 #. translators: instruction text shown below the lock screen heading
-#: public/render/gates/password/class-password-gate.php:176
+#: public/render/gates/password/class-password-gate.php:184
 msgid "Enter the password to view this gallery."
 msgstr ""
 
 #. translators: placeholder text inside the password input on the lock screen
-#: public/render/gates/password/class-password-gate.php:178
+#: public/render/gates/password/class-password-gate.php:186
 msgid "Password"
 msgstr ""
 
 #. translators: label/text for the submit button on the gallery lock screen
-#: public/render/gates/password/class-password-gate.php:180
+#: public/render/gates/password/class-password-gate.php:188
 msgid "Unlock"
 msgstr ""
 
 #. translators: error shown when the visitor enters an incorrect gallery password
-#: public/render/gates/password/class-password-gate.php:182
+#: public/render/gates/password/class-password-gate.php:190
 msgid "Incorrect password. Please try again."
 msgstr ""
 
@@ -8067,82 +8069,82 @@ msgstr ""
 msgid "Show all images"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:199
+#: public/render/lightbox/classic/class-lightbox.php:197
 msgid "Lightbox controls"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:200
+#: public/render/lightbox/classic/class-lightbox.php:198
 msgid "Close lightbox"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:201
+#: public/render/lightbox/classic/class-lightbox.php:199
 msgid "Show info panel"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:202
+#: public/render/lightbox/classic/class-lightbox.php:200
 msgid "Hide info panel"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:203
+#: public/render/lightbox/classic/class-lightbox.php:201
 #: public/render/lightbox/grid/class-lightbox-grid.php:62
 msgid "Share"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:204
+#: public/render/lightbox/classic/class-lightbox.php:202
 msgid "Enter fullscreen"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:205
+#: public/render/lightbox/classic/class-lightbox.php:203
 msgid "Exit fullscreen"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:206
+#: public/render/lightbox/classic/class-lightbox.php:204
 msgid "Zoom in"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:207
+#: public/render/lightbox/classic/class-lightbox.php:205
 msgid "Zoom out"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:208
+#: public/render/lightbox/classic/class-lightbox.php:206
 msgid "Pause auto-advance"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:209
+#: public/render/lightbox/classic/class-lightbox.php:207
 msgid "Resume auto-advance"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:210
+#: public/render/lightbox/classic/class-lightbox.php:208
 msgid "Gallery lightbox"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:213
+#: public/render/lightbox/classic/class-lightbox.php:211
 msgid "Item navigation"
 msgstr ""
 
 #. translators: 1: item position, 2: total number of items.
-#: public/render/lightbox/classic/class-lightbox.php:215
+#: public/render/lightbox/classic/class-lightbox.php:213
 #, php-format
 msgid "Item %1$d of %2$d"
 msgstr ""
 
 #. translators: %d: item position.
-#: public/render/lightbox/classic/class-lightbox.php:217
+#: public/render/lightbox/classic/class-lightbox.php:215
 #, php-format
 msgid "Go to item %d"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:219
+#: public/render/lightbox/classic/class-lightbox.php:217
 msgctxt "file name label in the lightbox info panel"
 msgid "File"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:220
+#: public/render/lightbox/classic/class-lightbox.php:218
 msgctxt "file size label in the lightbox info panel"
 msgid "Size"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:222
+#: public/render/lightbox/classic/class-lightbox.php:220
 msgctxt "file type label in the lightbox info panel"
 msgid "Type"
 msgstr ""
@@ -8164,7 +8166,7 @@ msgstr ""
 #. translators: 1: item position, 2: total number of items.
 #. translators: 1: current page, 2: total pages.
 #: public/render/lightbox/grid/class-lightbox-grid.php:69
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1122
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1141
 #, php-format,js-format
 msgid "%1$d of %2$d"
 msgstr ""
@@ -8291,8 +8293,8 @@ msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2570
 #: assets/admin/plain/render-settings/renderPromo.js:81
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:268
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:256
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:272
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:261
 msgid "Learn more"
 msgstr ""
 
@@ -8573,7 +8575,7 @@ msgid "Link values"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderSelect.js:287
-#: assets/admin/src/components/library/LibraryTabBase.jsx:281
+#: assets/admin/src/components/library/LibraryTabBase.jsx:287
 msgid "Search…"
 msgstr ""
 
@@ -8678,7 +8680,7 @@ msgid "Complete Your Setup"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/CreateOptions.jsx:17
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1266
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1291
 msgid "Create"
 msgstr ""
 
@@ -8847,19 +8849,19 @@ msgstr ""
 msgid "Location map"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:92
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:96
 msgid "Smart Location Suggestions"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:95
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:99
 msgid "Automatically suggest locations from EXIF GPS data and map galleries geographically."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:139
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:143
 msgid "No coordinates for this location."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:150
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:155
 msgid "Add coordinates in Library →"
 msgstr ""
 
@@ -8879,90 +8881,90 @@ msgstr ""
 msgid "AI detected faces"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:133
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:137
 msgid "Total Locations"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:138
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:142
 msgid "With Coordinates"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:140
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:144
 msgid "geo-mapped"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:145
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:129
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:193
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:117
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:149
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:134
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:198
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:122
 msgid "Unused"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:147
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:151
 msgid "no tagged items"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:153
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:157
 msgid "Top Locations by Usage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:166
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:170
 msgid "Geo Coverage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:176
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:180
 msgid "World map showing location dots"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:230
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:234
 msgid "No coordinates stored yet"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:246
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:250
 msgid "Interactive Map View"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:248
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:252
 msgid "With smart EXIF locations"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:128
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:133
 msgid "Occasional"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:182
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:187
 msgid "Total People"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:187
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:192
 msgid "In Galleries"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:189
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:194
 msgid "have tagged items"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:195
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:186
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:200
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:191
 msgid "in visible list"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:206
 msgid "Most-tagged People"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:214
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:219
 msgid "Tag Frequency"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:233
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:238
 msgid "Auto-detect people in images"
 msgstr ""
 
 #. translators: %s: entry name.
 #. translators: %s: gallery title
 #: assets/admin/src/components/library/LibraryTabBase.jsx:54
-#: includes/tools/migration/assets/MigrationTool.jsx:119
+#: includes/tools/migration/assets/MigrationTool.jsx:117
 #, js-format
 msgid "Select %s"
 msgstr ""
@@ -8975,25 +8977,25 @@ msgstr ""
 msgid "Lat"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:122
+#: assets/admin/src/components/library/LibraryTabBase.jsx:125
 msgid "Lng"
 msgstr ""
 
 #. translators: %s: entry name.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:172
+#: assets/admin/src/components/library/LibraryTabBase.jsx:178
 #, js-format
 msgid "Delete %s"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:176
-#: assets/admin/src/components/library/LibraryTabBase.jsx:214
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1157
+#: assets/admin/src/components/library/LibraryTabBase.jsx:182
+#: assets/admin/src/components/library/LibraryTabBase.jsx:220
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1176
 #: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:29
 msgid "Delete"
 msgstr ""
 
 #. translators: 1: entry name, 2: number of items using it.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:190
+#: assets/admin/src/components/library/LibraryTabBase.jsx:196
 #, js-format
 msgid "Delete \"%1$s\"? This will remove it from %2$d item."
 msgid_plural "Delete \"%1$s\"? This will remove it from %2$d items."
@@ -9001,141 +9003,141 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: entry name.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:201
+#: assets/admin/src/components/library/LibraryTabBase.jsx:207
 #, js-format
 msgid "Delete \"%s\"? It is not used by any items."
 msgstr ""
 
 #. translators: %s: plural entry type, e.g. "tags".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:278
+#: assets/admin/src/components/library/LibraryTabBase.jsx:284
 #, js-format
 msgid "Search %s…"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:291
+#: assets/admin/src/components/library/LibraryTabBase.jsx:297
 msgid "Unused only"
 msgstr ""
 
 #. translators: %s: singular entry type, e.g. "tag".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:307
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1169
+#: assets/admin/src/components/library/LibraryTabBase.jsx:313
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1188
 #, js-format
 msgid "Add %s"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:309
-#: assets/admin/src/components/library/LibraryTabBase.jsx:683
-#: assets/admin/src/components/library/LibraryTabBase.jsx:698
-#: assets/admin/src/components/library/LibraryTabBase.jsx:729
-#: assets/admin/src/components/library/LibraryTabBase.jsx:802
-#: assets/admin/src/components/library/LibraryTabBase.jsx:858
-#: assets/admin/src/components/library/LibraryTabBase.jsx:906
-#: assets/admin/src/components/library/LibraryTabBase.jsx:963
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1171
+#: assets/admin/src/components/library/LibraryTabBase.jsx:315
+#: assets/admin/src/components/library/LibraryTabBase.jsx:695
+#: assets/admin/src/components/library/LibraryTabBase.jsx:710
+#: assets/admin/src/components/library/LibraryTabBase.jsx:742
+#: assets/admin/src/components/library/LibraryTabBase.jsx:818
+#: assets/admin/src/components/library/LibraryTabBase.jsx:874
+#: assets/admin/src/components/library/LibraryTabBase.jsx:924
+#: assets/admin/src/components/library/LibraryTabBase.jsx:982
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1190
 msgid "entry"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:321
+#: assets/admin/src/components/library/LibraryTabBase.jsx:327
 msgid "Recalculate counts"
 msgstr ""
 
 #. translators: %d: number of selected entries.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:340
+#: assets/admin/src/components/library/LibraryTabBase.jsx:346
 #, js-format
 msgid "%d selected"
 msgid_plural "%d selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:355
+#: assets/admin/src/components/library/LibraryTabBase.jsx:361
 msgid "Delete selected"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:363
+#: assets/admin/src/components/library/LibraryTabBase.jsx:369
 msgid "Merge…"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:410
+#: assets/admin/src/components/library/LibraryTabBase.jsx:416
 msgid "Select all on this page"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:438
+#: assets/admin/src/components/library/LibraryTabBase.jsx:444
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:345
 msgid "Slug"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:460
+#: assets/admin/src/components/library/LibraryTabBase.jsx:466
 msgid "Latitude / Longitude"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:467
+#: assets/admin/src/components/library/LibraryTabBase.jsx:473
 msgid "Actions"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:543
+#: assets/admin/src/components/library/LibraryTabBase.jsx:554
 msgid "Failed to load entries."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:680
+#: assets/admin/src/components/library/LibraryTabBase.jsx:692
 #, js-format
 msgid "Saved the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: %s: entity type singular (e.g. "tag")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:695
+#: assets/admin/src/components/library/LibraryTabBase.jsx:707
 #, js-format
 msgid "Could not save %s."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:743
+#: assets/admin/src/components/library/LibraryTabBase.jsx:757
 #, js-format
 msgid "Deleted the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:755
+#: assets/admin/src/components/library/LibraryTabBase.jsx:769
 #, js-format
 msgid "Could not delete the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:793
+#: assets/admin/src/components/library/LibraryTabBase.jsx:809
 #, js-format
 msgid "Deleted %1$d %2$s."
 msgid_plural "Deleted %1$d %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:804
-#: assets/admin/src/components/library/LibraryTabBase.jsx:821
-#: assets/admin/src/components/library/LibraryTabBase.jsx:907
-#: assets/admin/src/components/library/LibraryTabBase.jsx:965
-#: assets/admin/src/components/library/LibraryTabBase.jsx:982
+#: assets/admin/src/components/library/LibraryTabBase.jsx:820
+#: assets/admin/src/components/library/LibraryTabBase.jsx:837
+#: assets/admin/src/components/library/LibraryTabBase.jsx:925
+#: assets/admin/src/components/library/LibraryTabBase.jsx:984
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1001
 msgid "entries"
 msgstr ""
 
 #. translators: %s: entity type plural (e.g. "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:815
+#: assets/admin/src/components/library/LibraryTabBase.jsx:831
 #, js-format
 msgid "Could not delete the selected %s."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:872
+#: assets/admin/src/components/library/LibraryTabBase.jsx:889
 #, js-format
 msgid "Created the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: %s: entity type singular (e.g. "tag")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:884
+#: assets/admin/src/components/library/LibraryTabBase.jsx:901
 #, js-format
 msgid "Could not create %s."
 msgstr ""
 
 #. translators: 1: number of merged entries, 2: entity type (singular or plural), 3: target entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:914
+#: assets/admin/src/components/library/LibraryTabBase.jsx:932
 #, js-format
 msgid "Merged %1$d %2$s into \"%3$s\"."
 msgid_plural "Merged %1$d %2$s into \"%3$s\"."
@@ -9143,7 +9145,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of merged entries, 2: entity type (singular or plural)
-#: assets/admin/src/components/library/LibraryTabBase.jsx:926
+#: assets/admin/src/components/library/LibraryTabBase.jsx:944
 #, js-format
 msgid "Merged %1$d %2$s."
 msgid_plural "Merged %1$d %2$s."
@@ -9151,7 +9153,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:954
+#: assets/admin/src/components/library/LibraryTabBase.jsx:973
 #, js-format
 msgid "Recalculated counts for %1$d %2$s."
 msgid_plural "Recalculated counts for %1$d %2$s."
@@ -9159,84 +9161,84 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: entity type plural (e.g. "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:976
+#: assets/admin/src/components/library/LibraryTabBase.jsx:995
 #, js-format
 msgid "Could not recalculate counts for %s."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1056
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1075
 msgid "No unused entries."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1058
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1077
 msgid "No entries match your search."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1062
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1081
 msgid "No entries yet."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1069
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1088
 msgid "Entries are usually created from the Item Edit modal inside a gallery. You can also add one directly using the button above."
 msgstr ""
 
 #. translators: %d: number of entries.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1107
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1126
 #, js-format
 msgid "%d entry"
 msgid_plural "%d entries"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1145
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1164
 msgid "Delete selected entries?"
 msgstr ""
 
 #. translators: 1: number of entries, 2: plural entry type, e.g. "tags".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1148
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1167
 #, js-format
 msgid "You are about to delete %1$d entry. Linked items will lose this %2$s."
 msgid_plural "You are about to delete %1$d entries. Linked items will lose these %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1236
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1261
 msgid "Details (optional)"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:114
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:119
 msgid "High"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:115
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:120
 msgid "Mid"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:116
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:121
 msgid "Low"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:164
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:169
 msgid "Total Tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:169
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:174
 msgid "Tag Uses"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:180
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:185
 msgid "across top tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:184
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:189
 msgid "Unused Tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:192
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:197
 msgid "Top Tags by Usage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:205
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:210
 msgid "Usage Distribution"
 msgstr ""
 
@@ -9588,7 +9590,7 @@ msgstr ""
 
 #: assets/admin/src/components/pages/ToolsPage.jsx:273
 #: includes/tools/migration/assets/MigrationTool.jsx:41
-#: includes/tools/migration/assets/MigrationTool.jsx:398
+#: includes/tools/migration/assets/MigrationTool.jsx:396
 msgid "Coming soon"
 msgstr ""
 
@@ -11141,13 +11143,13 @@ msgstr ""
 msgid "Choose gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:422
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:440
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:423
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:441
 msgid "This album has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:706
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:724
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:708
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:726
 msgid "This gallery has nothing to preview yet."
 msgstr ""
 
@@ -11177,23 +11179,23 @@ msgstr ""
 msgid "Change in the album editor"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:279
+#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:280
 msgid "Select a FotoGrids album"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:114
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:132
-#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:310
+#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:311
 #: includes/tools/import-export/assets/ImportExportTool.jsx:547
-#: includes/tools/migration/assets/MigrationTool.jsx:211
+#: includes/tools/migration/assets/MigrationTool.jsx:209
 msgid "Import failed."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:306
+#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:307
 msgid "Importing the gallery into FotoGrids…"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:330
+#: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:331
 msgid "Select a FotoGrids gallery"
 msgstr ""
 
@@ -11249,15 +11251,15 @@ msgstr ""
 msgid "Show gallery settings used"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:109
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:112
 msgid "Failed to fetch preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:137
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:140
 msgid "Failed to load preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:185
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:189
 msgid "Couldn’t load preview."
 msgstr ""
 
@@ -11378,7 +11380,7 @@ msgid "Overwrite"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:81
-#: includes/tools/migration/assets/MigrationTool.jsx:323
+#: includes/tools/migration/assets/MigrationTool.jsx:321
 msgid "Duplicate"
 msgstr ""
 
@@ -11472,7 +11474,7 @@ msgid "Select export file"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:569
-#: includes/tools/migration/assets/MigrationTool.jsx:240
+#: includes/tools/migration/assets/MigrationTool.jsx:238
 msgid "Import complete"
 msgstr ""
 
@@ -11521,7 +11523,7 @@ msgid "We recommend taking a database backup before importing. This action canno
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:724
-#: includes/tools/migration/assets/MigrationTool.jsx:336
+#: includes/tools/migration/assets/MigrationTool.jsx:334
 msgid "Importing…"
 msgstr ""
 
@@ -11549,96 +11551,96 @@ msgstr ""
 msgid "Sliders"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:102
+#: includes/tools/migration/assets/MigrationTool.jsx:100
 msgid "Select all galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:106
+#: includes/tools/migration/assets/MigrationTool.jsx:104
 msgid "Images"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:190
+#: includes/tools/migration/assets/MigrationTool.jsx:188
 msgid "Scan failed."
 msgstr ""
 
 #. translators: 1: imported count, 2: skipped count
-#: includes/tools/migration/assets/MigrationTool.jsx:245
+#: includes/tools/migration/assets/MigrationTool.jsx:243
 #, js-format
 msgid "%1$d galleries imported, %2$d skipped."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:259
+#: includes/tools/migration/assets/MigrationTool.jsx:257
 msgid "Scan again"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:277
+#: includes/tools/migration/assets/MigrationTool.jsx:275
 msgid "Scan galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:284
+#: includes/tools/migration/assets/MigrationTool.jsx:282
 msgid "Scanning…"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:291
+#: includes/tools/migration/assets/MigrationTool.jsx:289
 msgid "No galleries found for this source."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:304
+#: includes/tools/migration/assets/MigrationTool.jsx:302
 msgid "If a gallery already exists:"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:310
+#: includes/tools/migration/assets/MigrationTool.jsx:308
 msgid "If a gallery already exists"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:319
+#: includes/tools/migration/assets/MigrationTool.jsx:317
 msgid "Skip"
 msgstr ""
 
 #. translators: %d: number of selected galleries
-#: includes/tools/migration/assets/MigrationTool.jsx:339
+#: includes/tools/migration/assets/MigrationTool.jsx:337
 #, js-format
 msgid "Import %d galleries"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:373
+#: includes/tools/migration/assets/MigrationTool.jsx:371
 msgid "We found the plugin installed on your site."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:378
+#: includes/tools/migration/assets/MigrationTool.jsx:376
 msgid "Migration support for this plugin is coming soon."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:385
+#: includes/tools/migration/assets/MigrationTool.jsx:383
 msgid "Migration from this plugin isn’t available yet."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:390
+#: includes/tools/migration/assets/MigrationTool.jsx:388
 msgid "Support is planned for an upcoming release."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:432
+#: includes/tools/migration/assets/MigrationTool.jsx:430
 msgid "Could not load migration sources."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:460
-#: includes/tools/migration/assets/MigrationTool.jsx:468
+#: includes/tools/migration/assets/MigrationTool.jsx:458
+#: includes/tools/migration/assets/MigrationTool.jsx:466
 msgid "Choose"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:462
+#: includes/tools/migration/assets/MigrationTool.jsx:460
 msgid "Run"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:475
+#: includes/tools/migration/assets/MigrationTool.jsx:473
 msgid "Migration"
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:476
+#: includes/tools/migration/assets/MigrationTool.jsx:474
 msgid "Moving from another plugin? Choose the source and FotoGrids will help bring your galleries over."
 msgstr ""
 
-#: includes/tools/migration/assets/MigrationTool.jsx:493
+#: includes/tools/migration/assets/MigrationTool.jsx:491
 msgid "Loading sources…"
 msgstr ""
 

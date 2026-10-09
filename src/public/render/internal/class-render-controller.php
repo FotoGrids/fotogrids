@@ -93,7 +93,7 @@ final class Render_Controller {
 	 * A gated render depends on the visitor, so its output must not be
 	 * shared between visitors.
 	 *
-	 * @since  1.1.5
+	 * @since  1.2.0
 	 * @param  Render_Context $render Render context.
 	 * @return bool
 	 */

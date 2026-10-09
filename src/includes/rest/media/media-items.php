@@ -35,7 +35,7 @@ class Media_Items {
 		}
 
 		$thumbnail = wp_get_attachment_image_url( $attachment_id, 'thumbnail' );
-		$title     = get_the_title( $attachment_id );
+		$title     = html_entity_decode( get_the_title( $attachment_id ), ENT_QUOTES, 'UTF-8' );
 		$alt       = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
 
 		return array(

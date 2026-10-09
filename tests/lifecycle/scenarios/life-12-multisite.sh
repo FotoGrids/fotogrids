@@ -60,7 +60,7 @@ done
 
 # --- a network delete --------------------------------------------------------
 #
-# uninstall.php runs once, against whichever site WordPress happens to be on.
+# The uninstall callback runs once, against whichever site WordPress happens to be on.
 # Site 2 asked for its data to be deleted too and keeps all of it.
 
 $WP_SITE2 eval 'global $wpdb; $wpdb->insert( $wpdb->prefix . "fotogrids_tags", array( "name" => "life12", "type" => "tag" ) );'

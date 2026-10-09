@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -177,6 +177,41 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
+= 1.2.0 =
+
+**New**
+
+* FotoGrids now works in Bricks! Drop in a gallery or album and see it live as you design.
+
+**Improved**
+
+* Library checks for duplicate names and valid coordinates, and Edit Item shows a location's coordinates.
+
+**Fixed**
+
+* Fixed multi-choice settings such as Lightbox info blocks and share networks, and repaired galleries saved with one value.
+* Fixed share statistics for every network, the view-page footer and the Track share clicks setting.
+* Fixed view counting to one view per visit, and daily statistics now follow the retention period.
+* Fixed private galleries and albums to show as normal view pages for users who can read them.
+* Fixed Google Fonts, the loading icon and the back-to-album link on cached galleries.
+* Fixed paging and the Lightbox in unlocked password galleries that don't remember the visitor.
+* Fixed Lightbox navigation, and the info panel on images with no credit tag.
+* Fixed access for authors and editors to the Galleries and Albums lists and to galleries they published.
+* Fixed Library access to follow the Permissions Manager, with a clearer description of what it covers.
+* Fixed Publish and Update while an autosave is running, and the leave-page prompt on new galleries.
+* Fixed the items grid and Library stats to refresh after edits, and item titles with & or quotes.
+* Fixed album order when galleries are added one after another.
+* Fixed page builder previews with the same gallery placed twice.
+* Fixed the System Info Error Log tab with debug logging on.
+* Fixed uninstall cleanup when FotoGrids is deleted with WP-CLI or a script.
+
+**Security and hardening**
+
+* Password-protected and members-only galleries stay out of the render cache, page caches and public REST responses.
+* Albums, Recently Edited and Statistics show each person only the galleries they may see.
+* Assigning a gallery to an album needs edit rights on both, and only Library managers can change tags, people and locations.
+* Statistics count views and shares only for galleries, albums and items that exist.
+
 = 1.1.4 =
 
 **Improved**
@@ -343,6 +378,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+FotoGrids now works in Bricks! This update also fixes multi-choice settings, statistics, cached galleries and password galleries, and keeps protected galleries out of caches.
 
 = 1.1.4 =
 Responsiveness breakpoints, deep links, statistics and plain-permalink sites now work as set, plus a Recently Edited card on the Dashboard and many more fixes throughout.

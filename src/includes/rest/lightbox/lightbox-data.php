@@ -2,6 +2,7 @@
 namespace FotoGrids\REST\Lightbox;
 
 use FotoGrids\Metadata_Manager;
+use FotoGrids\Render\Lightbox\Shared\Lightbox_Info_Scope;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -26,11 +27,13 @@ if ( ! defined( 'WPINC' ) ) {
  *     height:     int,
  *     mime_type:  string,
  *   },
- *   exif:        object|null,      // key-value pairs present in stored exif_data
+ *   exif:        object|null,      // only the fields the gallery's EXIF block displays
  *   tags:        string[],         // tag names
  *   people:      string[],         // person names
- *   location:    { name: string, meta: object|null }|null,
+ *   location:    { name: string, latitude?: float|null, longitude?: float|null }|null,
  * }
+ *
+ * Coordinates are included only when the gallery shows the location block.
  *
  * @since 1.0.0
  */
@@ -61,27 +64,27 @@ class Lightbox_Data {
 		// ── Description ──────────────────────────────────────────────────────
 		$description = (string) $attachment->post_content;
 
+		$info_scope  = new Lightbox_Info_Scope(
+			\FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id ),
+			$gallery_id
+		);
+		$exif_fields = $info_scope->exif_fields();
+
 		// ── EXIF ─────────────────────────────────────────────────────────────
-		$exif = null;
+		$stored_exif = null;
 		if ( $custom_meta && ! empty( $custom_meta['exif_data'] ) ) {
 			$decoded = json_decode( $custom_meta['exif_data'], true );
 			if ( is_array( $decoded ) ) {
-				$exif = $decoded;
+				$stored_exif = $decoded;
 			}
 		}
 
-		// If no stored EXIF, fall back to reading live from the file - but
-		// only when the gallery has EXIF display enabled and has enabled fields.
-		// This handles items that were added before EXIF extraction ran, or
-		// whose exif_data column was never populated.
-		if ( null === $exif && $gallery_id > 0 ) {
-			$enabled_fields = \FotoGrids\Exif\Exif_Extractor::enabled_fields_for_gallery( $gallery_id );
-			if ( ! empty( $enabled_fields ) ) {
-				$live_exif = \FotoGrids\Exif\Exif_Extractor::extract( $item_id, $enabled_fields );
-				if ( ! empty( $live_exif ) ) {
-					$exif = $live_exif;
-				}
-			}
+		$exif = null;
+		if ( ! empty( $exif_fields ) ) {
+			$exif = null !== $stored_exif
+				? array_intersect_key( $stored_exif, array_flip( $exif_fields ) )
+				: \FotoGrids\Exif\Exif_Extractor::extract( $item_id, $exif_fields );
+			$exif = empty( $exif ) ? null : $exif;
 		}
 
 		// ── Credit ───────────────────────────────────────────────────────────
@@ -90,8 +93,8 @@ class Lightbox_Data {
 			// EXIF Copyright field. It is read whether or not the gallery
 			// displays it in the EXIF block, because choosing EXIF as the
 			// credit source is itself the request for it.
-			if ( is_array( $exif ) && isset( $exif['copyright'] ) ) {
-				$credit = (string) $exif['copyright'];
+			if ( is_array( $stored_exif ) && isset( $stored_exif['copyright'] ) ) {
+				$credit = (string) $stored_exif['copyright'];
 			} else {
 				$copyright = \FotoGrids\Exif\Exif_Extractor::extract( $item_id, array( 'copyright' ) );
 				$credit    = $copyright['copyright'] ?? '';
@@ -137,17 +140,10 @@ class Lightbox_Data {
 		$location = null;
 		if ( ! empty( $raw_metadata['locations'] ) ) {
 			$loc_row  = $raw_metadata['locations'][0];
-			$loc_meta = null;
-			if ( ! empty( $loc_row->meta ) ) {
-				$decoded = json_decode( $loc_row->meta, true );
-				if ( is_array( $decoded ) ) {
-					$loc_meta = $decoded;
-				}
+			$location = array( 'name' => $loc_row->name );
+			if ( $info_scope->shows( 'location' ) ) {
+				$location += Metadata_Manager::coordinates_from_meta( $loc_row->meta ?? null );
 			}
-			$location = array(
-				'name' => $loc_row->name,
-				'meta' => $loc_meta,
-			);
 		}
 
 		return rest_ensure_response(

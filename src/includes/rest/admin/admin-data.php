@@ -892,10 +892,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_overview_stats( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		global $wpdb;
 
 		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
@@ -1070,10 +1066,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_views_data( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 		if ( $days <= 0 ) {
 			$days = 7;
@@ -1137,10 +1129,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_popular_galleries( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1205,7 +1193,7 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$gallery = get_post( $result['object_id'] );
-			if ( $gallery ) {
+			if ( $gallery && current_user_can( 'read_post', $gallery->ID ) ) {
 				$labels[] = $gallery->post_title;
 				$data[]   = (int) $result['total_views'];
 				$ids[]    = (int) $gallery->ID;
@@ -1229,10 +1217,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_recent_activity( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1268,14 +1252,14 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$post = get_post( $result['object_id'] );
-			if ( $post ) {
+			if ( $post && current_user_can( 'read_post', $post->ID ) ) {
 				$activity[] = array(
 					'id'          => (int) $result['object_id'],
 					'title'       => $post->post_title,
 					'type'        => $result['object_type'],
 					'views'       => (int) $result['views'],
 					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] . ' UTC' ), time() ) . ' ago',
-					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
+					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ) ?? '',
 				);
 			}
 		}
@@ -1290,10 +1274,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_top_content( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$days = (int) $request->get_param( 'days' );
 
 		global $wpdb;
@@ -1345,7 +1325,7 @@ class Admin_Data {
 
 		foreach ( $results as $result ) {
 			$post = get_post( $result['object_id'] );
-			if ( $post ) {
+			if ( $post && current_user_can( 'read_post', $post->ID ) ) {
 				$views = (int) $result['views'];
 
 				$content[] = array(
@@ -1355,7 +1335,7 @@ class Admin_Data {
 					'views'       => $views,
 					'views_share' => $total_views > 0 ? round( $views / $total_views * 100, 1 ) : 0.0,
 					'shares'      => (int) ( $result['shares'] ?: 0 ),
-					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
+					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ) ?? '',
 				);
 			}
 		}
@@ -1420,10 +1400,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_recently_edited( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$post_status = array( 'publish', 'draft' );
 		if ( $request->get_param( 'include_private' ) ) {
 			$post_status[] = 'private';
@@ -1442,10 +1418,9 @@ class Admin_Data {
 	}
 
 	/**
-	 * Recently edited galleries and albums
+	 * Recently edited galleries and albums the current user can edit.
 	 *
-	 * Shared by the REST route above and the dashboard widget, which renders
-	 * the same rows server-side with its own limit and status set.
+	 * Shared by the REST route above and the dashboard widget.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $args Optional. Keys: limit, post_type, post_status.
@@ -1461,35 +1436,75 @@ class Admin_Data {
 			)
 		);
 
-		$posts = get_posts(
-			array(
-				'post_type'      => $args['post_type'],
-				'post_status'    => $args['post_status'],
-				'posts_per_page' => (int) $args['limit'],
-				'orderby'        => 'modified',
-				'order'          => 'DESC',
-			)
+		$query = array(
+			'post_type'              => $args['post_type'],
+			'post_status'            => $args['post_status'],
+			'orderby'                => array(
+				'modified' => 'DESC',
+				'ID'       => 'DESC',
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 		);
 
+		$edits_others = false;
+		foreach ( (array) $args['post_type'] as $post_type ) {
+			$type_object = get_post_type_object( $post_type );
+			if ( $type_object && current_user_can( $type_object->cap->edit_others_posts ) ) {
+				$edits_others = true;
+				break;
+			}
+		}
+
+		if ( ! $edits_others ) {
+			$query['author'] = get_current_user_id();
+		}
+
 		$datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+		$remaining       = (int) $args['limit'];
+		$batch           = $remaining;
+		$offset          = 0;
 
 		$items = array();
-		foreach ( $posts as $post ) {
-			$is_album = 'fotogrids_album' === $post->post_type;
+		while ( $remaining > 0 ) {
+			$query['posts_per_page'] = $batch;
+			$query['offset']         = $offset;
 
-			$items[] = array(
-				'id'                 => $post->ID,
-				'title'              => trim( $post->post_title ),
-				'placeholder'        => \FotoGrids\Collection_Title::placeholder( $post ),
-				'type'               => $post->post_type,
-				'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
-				'status'             => $post->post_status,
-				'modified'           => $post->post_modified,
-				'modified_gmt'       => $post->post_modified_gmt,
-				'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
-				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
-				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
-			);
+			$posts = get_posts( $query );
+
+			foreach ( $posts as $post ) {
+				if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+					continue;
+				}
+
+				$is_album = 'fotogrids_album' === $post->post_type;
+
+				$items[] = array(
+					'id'                 => $post->ID,
+					'title'              => trim( $post->post_title ),
+					'placeholder'        => \FotoGrids\Collection_Title::placeholder( $post ),
+					'type'               => $post->post_type,
+					'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
+					'status'             => $post->post_status,
+					'modified'           => $post->post_modified,
+					'modified_gmt'       => $post->post_modified_gmt,
+					'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
+					'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
+					'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
+				);
+
+				--$remaining;
+				if ( 0 === $remaining ) {
+					break;
+				}
+			}
+
+			if ( count( $posts ) < $batch ) {
+				break;
+			}
+
+			$offset += $batch;
+			$batch   = 100;
 		}
 
 		return $items;
@@ -1502,10 +1517,6 @@ class Admin_Data {
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
 	public static function get_news_updates( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$refresh = (bool) $request->get_param( 'refresh' );
 
 		return rest_ensure_response(

@@ -15,6 +15,7 @@ global.wp = {
     components: require('@wordpress/components'),
     data: require('@wordpress/data'),
     apiFetch: jest.fn(),
+    htmlEntities: require('@wordpress/html-entities'),
     i18n: {
         __: jest.fn((text) => text),
         _n: jest.fn((single, plural, number) => number === 1 ? single : plural),

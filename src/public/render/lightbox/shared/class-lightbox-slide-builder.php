@@ -35,10 +35,11 @@ final class Lightbox_Slide_Builder {
 	 *
 	 * @since 1.0.0
 	 * @param array<int, int>      $attachment_ids
-	 * @param array<string, mixed> $settings  Resolved gallery settings.
+	 * @param array<string, mixed> $settings       Resolved gallery settings.
+	 * @param int                  $gallery_id     Gallery the slides belong to.
 	 * @return array<int, array<string, mixed>> Slide dicts in input order.
 	 */
-	public static function build_many( array $attachment_ids, array $settings ): array {
+	public static function build_many( array $attachment_ids, array $settings, int $gallery_id ): array {
 		$ids = array_values( array_unique( array_map( 'intval', $attachment_ids ) ) );
 		$ids = array_filter( $ids, static fn( $id ) => $id > 0 );
 		if ( empty( $ids ) ) {
@@ -55,7 +56,7 @@ final class Lightbox_Slide_Builder {
 		$people_map   = self::batch_load_tag_slugs( $ids, 'person' );
 		$location_map = self::batch_load_tag_slugs( $ids, 'location' );
 
-		$include_exif = self::should_include_exif( $settings );
+		$exif_fields = ( new Lightbox_Info_Scope( $settings, $gallery_id ) )->exif_fields();
 
 		$slides = array();
 		foreach ( $ids as $aid ) {
@@ -128,8 +129,8 @@ final class Lightbox_Slide_Builder {
 				$slide['full_mobile_url'] = null !== $mobile ? $mobile['url'] : '';
 			}
 
-			if ( $include_exif ) {
-				$slide['exif'] = self::load_exif( $aid, $settings );
+			if ( ! empty( $exif_fields ) ) {
+				$slide['exif'] = \FotoGrids\Exif\Exif_Extractor::extract( $aid, $exif_fields );
 			}
 
 			$slides[] = $slide;
@@ -273,38 +274,5 @@ final class Lightbox_Slide_Builder {
 			}
 		}
 		return $out;
-	}
-
-	private static function should_include_exif( array $settings ): bool {
-		// EXIF is shown when both the info block is enabled AND the
-		// EXIF block specifically appears in lightbox_info_blocks.
-		$blocks = $settings['lightbox_info_blocks'] ?? array();
-		if ( ! is_array( $blocks ) ) {
-			return false;
-		}
-		return in_array( 'exif', $blocks, true );
-	}
-
-	/**
-	 * Load EXIF for an attachment, scoped to the fields the gallery displays.
-	 *
-	 * @param  int   $aid      Attachment ID.
-	 * @param  array $settings Gallery settings.
-	 * @return array<string, mixed>
-	 */
-	private static function load_exif( int $aid, array $settings ): array {
-		if ( empty( $settings['display_exif'] ) ) {
-			return array();
-		}
-
-		$enabled = \FotoGrids\Exif\Exif_Fields::sanitize_keys(
-			\FotoGrids\Exif\Exif_Extractor::parse_field_setting( $settings['exif_fields'] ?? array() )
-		);
-
-		if ( empty( $enabled ) ) {
-			return array();
-		}
-
-		return \FotoGrids\Exif\Exif_Extractor::extract( $aid, $enabled );
 	}
 }

@@ -121,11 +121,11 @@ class Register_Metadata_Routes {
 						),
 						'latitude'  => array(
 							'default'           => null,
-							'sanitize_callback' => 'floatval',
+							'sanitize_callback' => null,
 						),
 						'longitude' => array(
 							'default'           => null,
-							'sanitize_callback' => 'floatval',
+							'sanitize_callback' => null,
 						),
 					),
 					'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),
