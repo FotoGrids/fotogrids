@@ -461,6 +461,9 @@ class Public_Render {
 		if ( Request_Source::BRICKS === $atts['_source'] ) {
 			$source = Request_Source::BRICKS;
 		}
+		if ( Request_Source::BEAVER_BUILDER === $atts['_source'] ) {
+			$source = Request_Source::BEAVER_BUILDER;
+		}
 		if ( Request_Source::ALBUM_AJAX === $atts['_source'] ) {
 			$source = Request_Source::ALBUM_AJAX;
 		}

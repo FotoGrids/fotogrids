@@ -19,6 +19,7 @@ final class Request_Source {
 	const ELEMENTOR        = 'elementor';
 	const DIVI             = 'divi';
 	const BRICKS           = 'bricks';
+	const BEAVER_BUILDER   = 'beaver_builder';
 	const PREVIEW_SAVED    = 'preview_saved';
 	const PREVIEW_UNSAVED  = 'preview_unsaved';
 	const ALBUM_AJAX       = 'album_ajax';
@@ -36,6 +37,7 @@ final class Request_Source {
 		self::ELEMENTOR,
 		self::DIVI,
 		self::BRICKS,
+		self::BEAVER_BUILDER,
 		self::PREVIEW_SAVED,
 		self::PREVIEW_UNSAVED,
 		self::ALBUM_AJAX,
