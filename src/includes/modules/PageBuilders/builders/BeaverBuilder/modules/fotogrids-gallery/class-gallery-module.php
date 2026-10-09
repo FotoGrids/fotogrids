@@ -67,8 +67,9 @@ final class Gallery_Module extends Module_Base {
 						'title'  => '',
 						'fields' => array(
 							self::SETTING_ID => array(
-								'type'    => 'text',
-								'label'   => __( 'Gallery ID', 'fotogrids' ),
+								'type'    => Beaver_Builder_Module::FIELD_TYPE,
+								'label'   => __( 'Gallery', 'fotogrids' ),
+								'kind'    => 'gallery',
 								'preview' => array( 'type' => 'refresh' ),
 							),
 						),
