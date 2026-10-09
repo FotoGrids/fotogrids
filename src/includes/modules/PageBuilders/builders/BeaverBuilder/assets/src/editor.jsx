@@ -6,6 +6,9 @@
  * which this bundle fills with a React card. The chosen ID is written into
  * the field's input followed by a native `change` event, which Beaver
  * Builder's live preview and settings save both read.
+ *
+ * The bundle also handles clicks in the builder layout, which renders in an
+ * iframe of this document when the iframe UI is on.
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
@@ -23,6 +26,9 @@ const PLACEHOLDER_SELECTOR = '.fg-pb-bb-picker[data-fg-picker-kind]';
 const FIELD_SELECTOR = '.fg-pb-bb-collection';
 const INPUT_SELECTOR = '.fg-pb-bb-collection__input';
 const READY_CLASS = 'is-fg-pb-ready';
+const LAYOUT_FRAME_SELECTOR = 'iframe.fl-builder-ui-iframe';
+const PAGINATION_SELECTOR = '.fg-pagination, .fg-pagination__btn';
+const EMPTY_STATE_CTA_SELECTOR = '.fg-pb-bb-preview .fg-pb-empty-state__cta';
 
 const roots = new Map();
 const cache = { gallery: null, album: null };
@@ -272,6 +278,70 @@ const CollectionPicker = ({ kind, input }) => {
 };
 
 /**
+ * Handle clicks in a document holding builder previews: pagination stays
+ * inert while its preview setting is off, and an empty-state button opens
+ * the collection's edit screen in a new tab.
+ *
+ * @param {Document} targetDocument Document holding the builder layout.
+ */
+const bindLayoutClicks = (targetDocument) => {
+	if (!targetDocument || targetDocument.fgPbBbClicksBound) {
+		return;
+	}
+	targetDocument.fgPbBbClicksBound = true;
+
+	targetDocument.addEventListener(
+		'click',
+		(event) => {
+			const target = event.target;
+			if (!target || !target.closest) {
+				return;
+			}
+			const cta = target.closest(EMPTY_STATE_CTA_SELECTOR);
+			if (cta) {
+				event.preventDefault();
+				event.stopPropagation();
+				if (cta.dataset.fgEditUrl) {
+					openTab(cta.dataset.fgEditUrl);
+				}
+				return;
+			}
+			if (
+				target.closest('.is-fg-pb-pagination-frozen') &&
+				target.closest(PAGINATION_SELECTOR)
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+			}
+		},
+		true
+	);
+};
+
+/**
+ * Bind the layout click handling to this document and to every builder
+ * layout iframe, again whenever an iframe loads a new document.
+ */
+const bindLayouts = () => {
+	bindLayoutClicks(document);
+	document.querySelectorAll(LAYOUT_FRAME_SELECTOR).forEach((frame) => {
+		const bind = () => {
+			try {
+				bindLayoutClicks(frame.contentDocument);
+			} catch (error) {
+				// A cross-origin frame cannot hold a builder layout.
+			}
+		};
+		if (!frame.dataset.fgPbBbBound) {
+			frame.dataset.fgPbBbBound = '1';
+			frame.addEventListener('load', bind);
+		}
+		bind();
+	});
+};
+
+/**
  * Mount a card into every new placeholder and unmount cards whose
  * placeholder Beaver Builder has removed with its settings form.
  */
@@ -304,9 +374,14 @@ const reconcile = () => {
 	});
 };
 
-new MutationObserver(reconcile).observe(document.body, {
+const update = () => {
+	reconcile();
+	bindLayouts();
+};
+
+new MutationObserver(update).observe(document.body, {
 	childList: true,
 	subtree: true,
 });
 
-reconcile();
+update();

@@ -20,7 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * REST/AJAX renders are self-gated out here: those responses return the inline
  * assets as discrete fields for the client to inject, since a server-side
- * enqueue would never reach the already-loaded page.
+ * enqueue would never reach the already-loaded page. The inline CSS of AJAX
+ * renders is held for hosts that ship it with their own response.
  *
  * @package FotoGrids\Render\Internal
  * @since   1.0.0
@@ -55,17 +56,28 @@ final class Inline_Asset_Emitter {
 	private static bool $json_ld_hooked = false;
 
 	/**
+	 * @var string Inline CSS of renders made during an AJAX request.
+	 */
+	private static string $ajax_inline_css = '';
+
+	/**
 	 * Enqueue a render result's inline assets for direct page output.
 	 *
-	 * No-op in REST/AJAX requests (the response returns the assets instead) and
-	 * when the result carries no inline assets.
+	 * No-op in REST requests (the response returns the assets instead) and when
+	 * the result carries no inline assets. In AJAX requests the inline CSS is
+	 * held for take_ajax_inline_css().
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Result $result Render result.
 	 * @return void
 	 */
 	public static function enqueue( Render_Result $result ): void {
-		if ( wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		if ( wp_doing_ajax() ) {
+			self::$ajax_inline_css .= $result->inline_css;
+			return;
+		}
+
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			return;
 		}
 
@@ -80,6 +92,19 @@ final class Inline_Asset_Emitter {
 		if ( '' !== $result->json_ld ) {
 			self::queue_json_ld( $result->json_ld );
 		}
+	}
+
+	/**
+	 * Return and clear the inline CSS held from renders made during an AJAX request.
+	 *
+	 * @since  1.3.0
+	 * @return string Bare CSS (no <style> tags).
+	 */
+	public static function take_ajax_inline_css(): string {
+		$css                   = self::$ajax_inline_css;
+		self::$ajax_inline_css = '';
+
+		return $css;
 	}
 
 	/**

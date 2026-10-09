@@ -12,6 +12,7 @@ namespace FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder;
 
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Album_Module;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Gallery_Module;
+use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -84,6 +85,7 @@ final class Module {
 		add_filter( 'fl_builder_custom_fields', array( self::class, 'register_field' ) );
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_builder_assets' ) );
 		add_action( 'fl_builder_ui_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
+		add_filter( 'fl_builder_ajax_layout_response', array( self::class, 'add_ajax_inline_css' ) );
 	}
 
 	/**
@@ -175,6 +177,30 @@ final class Module {
 				'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
 			)
 		);
+	}
+
+	/**
+	 * Filter callback: ship the per-render inline CSS of a builder AJAX render
+	 * with the response.
+	 *
+	 * Beaver Builder re-renders layout parts over AJAX and adds the response's
+	 * `scriptsStyles` markup to the page, so the CSS held by the emitter goes
+	 * there. Covers the FotoGrids modules and FotoGrids shortcodes in any module.
+	 *
+	 * @since 1.3.0
+	 * @param array<string,mixed> $response Beaver Builder layout response.
+	 * @return array<string,mixed>
+	 */
+	public static function add_ajax_inline_css( $response ) {
+		$css = Inline_Asset_Emitter::take_ajax_inline_css();
+		if ( '' === $css || ! is_array( $response ) ) {
+			return $response;
+		}
+
+		$scripts_styles            = isset( $response['scriptsStyles'] ) && is_string( $response['scriptsStyles'] ) ? $response['scriptsStyles'] : '';
+		$response['scriptsStyles'] = $scripts_styles . '<style class="fotogrids-inline-css">' . str_replace( '</', '<\\/', $css ) . '</style>';
+
+		return $response;
 	}
 
 	/**
