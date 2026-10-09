@@ -17,6 +17,12 @@
     }
 }
 
+// Beaver Builder's settings lightbox sits at z-index 100010, above the
+// FotoGrids modal base; the offset keeps stacked modals in their order.
+body.fl-builder-edit .fg-modal {
+    z-index: calc(var(--fg-modal-z, 100000) + 1000000);
+}
+
 // The raw ID field stays usable until the picker has mounted.
 .fg-pb-bb-collection.is-fg-pb-ready .fg-pb-bb-collection__input {
     display: none;
