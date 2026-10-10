@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import NumberField from '../NumberField';
-
-const { __ } = wp.i18n;
 
 /**
  * DimensionsField - a Width × Height pair built from two NumberFields.

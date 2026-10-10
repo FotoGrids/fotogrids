@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import { Modal } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import { FormField } from '../shared/FormField';
 import LoadingIcon from '../shared/LoadingIcon';
 import { collectionTitle } from '../../utils/collection-title';
 
-const { __ } = wp.i18n;
 const { createInterpolateElement } = wp.element;
 
 const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {

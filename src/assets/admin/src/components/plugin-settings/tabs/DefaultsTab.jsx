@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import { Panel, SaveBar } from '../../shared/settings';
 import ErrorBoundary from '../../shared/ErrorBoundary';
-
-const { __ } = wp.i18n;
 
 /**
  * Unified component for rendering Gallery or Album defaults

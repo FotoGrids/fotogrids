@@ -44,6 +44,7 @@
  */
 
 import React, { useCallback, useEffect, useId, useRef } from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
 
 const SIZES = new Set(['default', 'compact']);
@@ -71,7 +72,6 @@ const SearchBar = ({
 	const inputId = id || `fg-search-${generatedId}`;
 	const helpId = help ? `${inputId}-help` : undefined;
 	const inputRef = useRef(null);
-	const { __ } = (window.wp && window.wp.i18n) || { __: (s) => s };
 
 	const resolvedSize = SIZES.has(size) ? size : 'default';
 	const resolvedPlaceholder =

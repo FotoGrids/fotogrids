@@ -2,13 +2,12 @@
  * Statistics Page Component
  */
 import React, { useState, useEffect, useRef } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 import StatCard from '../shared/StatCard';
 import StatsTable from '../shared/StatsTable';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import { collectionPlaceholder } from '../../utils/collection-title';
-
-const { __, sprintf } = wp.i18n;
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
 

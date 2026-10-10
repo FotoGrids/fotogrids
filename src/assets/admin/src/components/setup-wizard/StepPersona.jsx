@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
-
-const { __ } = wp.i18n;
 
 /**
  * Step 2 - "What best describes you?"

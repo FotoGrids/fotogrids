@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { __ } from '@wordpress/i18n';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import LibraryTagsTab from '../library/LibraryTagsTab';
 import LibraryPeopleTab from '../library/LibraryPeopleTab';
 import LibraryLocationsTab from '../library/LibraryLocationsTab';
 import LibraryGenericTab from '../library/LibraryGenericTab';
-
-const { __ } = wp.i18n;
 
 /**
  * FotoGrids → Library admin page.

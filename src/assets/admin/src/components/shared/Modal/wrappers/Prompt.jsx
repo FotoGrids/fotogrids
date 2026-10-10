@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import Modal from '../Modal';
 import Button from '../../Button/Button';
 import FormField from '../../FormField/FormField';
@@ -11,9 +12,6 @@ const VARIANT_ICONS = {
 	danger: 'trash',
 	success: 'check_circle',
 };
-
-const __ =
-	(typeof window !== 'undefined' && window.wp?.i18n?.__) || ((text) => text);
 
 const Prompt = ({
 	isOpen,

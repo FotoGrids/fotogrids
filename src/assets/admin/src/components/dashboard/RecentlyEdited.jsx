@@ -2,12 +2,11 @@
  * Recently Edited Component - Dashboard
  */
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import LoadingIcon from '../shared/LoadingIcon';
 import { fetchRecentlyEdited } from '../../utils/api';
-
-const { __ } = wp.i18n;
 
 const ROW_LIMIT = 5;
 

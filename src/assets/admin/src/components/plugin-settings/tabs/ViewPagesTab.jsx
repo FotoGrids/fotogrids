@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -10,8 +11,6 @@ import {
 import Toggle from '../../shared/Toggle';
 import InfoBlock from '../../shared/InfoBlock';
 import { Button } from '../../shared/Button';
-
-const { __ } = wp.i18n;
 
 // View_Settings_Store::defaults() reaches the browser through
 // wp_localize_script, so PHP owns the values. Nested arrays keep their types

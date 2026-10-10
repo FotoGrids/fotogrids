@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import Icon from '../../shared/Icon';
 import InfoBlock from '../../shared/InfoBlock';
 import Segmented from '../../shared/Segmented';
@@ -8,8 +9,6 @@ import { Button } from '../../shared/Button';
 import { SaveBar } from '../../shared/settings';
 import Panel from '../../shared/SidebarTabs/elements/Panel';
 import PanelRow from '../../shared/SidebarTabs/elements/PanelRow';
-
-const { __ } = wp.i18n;
 
 const ROLE_LADDER = [
 	'administrator',

@@ -6,6 +6,30 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Gettext names stay unmangled and translators comments stay in, so the string
+// extractor wordpress.org runs on a release can read every call.
+const terserOptions = (compress = {}) => ({
+    compress: {
+        drop_console: isProduction,
+        drop_debugger: true,
+        pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
+        ...compress,
+    },
+    mangle: {
+        toplevel: false,
+        reserved: ['jQuery', '$', 'wp', 'ajaxurl', '__', '_x', '_n', '_nx'],
+        properties: false,
+    },
+    format: {
+        comments: /translators:/i,
+    },
+});
+
+// Standalone admin scripts receive `__` as a variable. With `conditionals` on,
+// Terser folds `c ? __('a') : __('b')` into `__(c ? 'a' : 'b')`, which no
+// extractor can read.
+const PLAIN_ADMIN_SCRIPTS = /assets[\\/]admin[\\/]plain[\\/]/;
+
 const ENTRY_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.scss'];
 
 /**
@@ -679,22 +703,13 @@ const mainConfig = {
                 // invalidates the map and has produced broken output before
                 // (Chart.js: `let` narrowed to `const` -> "Assignment to
                 // constant variable" at runtime).
-                exclude: /assets[\\/]admin[\\/]vendor[\\/]/,
-                terserOptions: {
-                    compress: {
-                        drop_console: isProduction,
-                        drop_debugger: true,
-                        pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
-                    },
-                    mangle: {
-                        toplevel: false,
-                        reserved: ['jQuery', '$', 'wp', 'ajaxurl'],
-                        properties: false,
-                    },
-                    format: {
-                        comments: false,
-                    },
-                },
+                exclude: [/assets[\\/]admin[\\/]vendor[\\/]/, PLAIN_ADMIN_SCRIPTS],
+                terserOptions: terserOptions(),
+                extractComments: false,
+            }),
+            new TerserPlugin({
+                include: PLAIN_ADMIN_SCRIPTS,
+                terserOptions: terserOptions({ conditionals: false }),
                 extractComments: false,
             }),
         ],

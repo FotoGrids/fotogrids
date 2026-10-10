@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { __ } from '@wordpress/i18n';
 
 import Modal from '../shared/Modal/Modal';
 import Button from '../shared/Button';
@@ -8,8 +9,6 @@ import StepPersona from '../setup-wizard/StepPersona';
 import StepComplexity from '../setup-wizard/StepComplexity';
 import StepCreateGallery from '../setup-wizard/StepCreateGallery';
 import { persistSetting } from '../setup-wizard/persist-setting';
-
-const { __ } = wp.i18n;
 
 /**
  * SetupWizardPage - first-run wizard rendered as a page-less full-screen
