@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Albums\Album_Repository;
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Filters_Settings;
 
@@ -242,6 +244,62 @@ class Statistics {
 	}
 
 	/**
+	 * Deletes the statistics of galleries and albums that have gone longer
+	 * without a view than their Retain Statistics setting allows.
+	 *
+	 * Collections set to Forever keep their statistics. Item statistics are
+	 * not covered.
+	 *
+	 * @since 1.3.0
+	 * @return int Number of rows deleted.
+	 */
+	private static function cleanup_expired_collections() {
+		global $wpdb;
+
+		$table       = $wpdb->prefix . 'fotogrids_statistics';
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT object_type, object_id, last_viewed FROM %i WHERE object_type IN ('gallery', 'album')",
+				$table
+			),
+			ARRAY_A
+		);
+
+		if ( empty( $rows ) ) {
+			return 0;
+		}
+
+		update_meta_cache( 'post', array_map( 'intval', wp_list_pluck( $rows, 'object_id' ) ) );
+
+		$now     = time();
+		$deleted = 0;
+
+		foreach ( $rows as $row ) {
+			$object_id = (int) $row['object_id'];
+			$settings  = 'album' === $row['object_type']
+				? Album_Repository::get_settings( $object_id )
+				: Gallery_Repository::get_settings( $object_id );
+			$window    = $settings['retain_statistics'] ?? 'forever';
+			$days      = is_numeric( $window ) ? (int) $window : 0;
+
+			if ( $days <= 0 || strtotime( $row['last_viewed'] . ' UTC' ) >= $now - ( $days * DAY_IN_SECONDS ) ) {
+				continue;
+			}
+
+			$where    = array(
+				'object_type' => $row['object_type'],
+				'object_id'   => $object_id,
+			);
+			$deleted += (int) $wpdb->delete( $table, $where, array( '%s', '%d' ) );
+			$deleted += (int) $wpdb->delete( $daily_table, $where, array( '%s', '%d' ) );
+		}
+
+		return $deleted;
+	}
+
+	/**
 	 * Initialize scheduled cleanup
 	 */
 	public static function init_cleanup_schedule() {
@@ -256,6 +314,7 @@ class Statistics {
 	public static function run_scheduled_cleanup() {
 		$days_to_keep = apply_filters( Filters_Settings::STATS_RETENTION_DAYS, 365 );
 		self::cleanup_old_data( $days_to_keep );
+		self::cleanup_expired_collections();
 	}
 
 	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
