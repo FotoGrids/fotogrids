@@ -95,3 +95,25 @@ if ( ! function_exists( 'esc_attr' ) ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
 	}
 }
+
+if ( ! function_exists( 'absint' ) ) {
+	/**
+	 * @param mixed $maybeint Value to convert.
+	 * @return int
+	 */
+	function absint( $maybeint ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		return abs( (int) $maybeint );
+	}
+}
+
+// Array arguments only; real wp_parse_args also accepts objects and query strings.
+if ( ! function_exists( 'wp_parse_args' ) ) {
+	/**
+	 * @param array<string, mixed> $args     Arguments.
+	 * @param array<string, mixed> $defaults Defaults.
+	 * @return array<string, mixed>
+	 */
+	function wp_parse_args( $args, $defaults = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		return array_merge( (array) $defaults, (array) $args );
+	}
+}
