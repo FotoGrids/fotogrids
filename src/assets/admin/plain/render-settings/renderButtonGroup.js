@@ -92,7 +92,9 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 					const buttonClassName = [
 						`${baseClass}__button`,
 						isPro ? `${baseClass}__button__pro` : '',
-						currentValue === option.value ? 'fg-is-active' : '',
+						String(currentValue) === String(option.value)
+							? 'fg-is-active'
+							: '',
 					]
 						.filter(Boolean)
 						.join(' ');
