@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -10,8 +11,6 @@ import {
 } from '../../shared/settings';
 import { Button } from '../../shared/Button';
 import Select from '../../shared/Select';
-
-const { __ } = wp.i18n;
 
 /**
  * Plugin Settings → Media tab.

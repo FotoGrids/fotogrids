@@ -18,9 +18,8 @@
  *                 header reflects it before the user sorts anything
  */
 import React, { useMemo, useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 import Icon from './Icon';
-
-const { __, sprintf } = wp.i18n;
 
 const SKELETON_ROWS = 5;
 

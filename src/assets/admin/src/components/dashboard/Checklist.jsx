@@ -2,9 +2,8 @@
  * Setup Checklist Component
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
-
-const { __ } = wp.i18n;
 
 const ChecklistItem = ({ completed, href, label }) => {
 	const marker = completed ? <Icon name="check" /> : <span />;

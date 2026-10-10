@@ -149,6 +149,27 @@ export default [
         },
     },
     {
+        // Bundled scripts import gettext functions from '@wordpress/i18n'. A local
+        // copy is renamed by the minifier and its strings disappear from the
+        // extractor. Scripts copied verbatim are exempt.
+        files: ['src/**/*.{js,jsx,ts,tsx}'],
+        ignores: ['src/assets/admin/plain/**', 'src/public/assets/**'],
+        rules: {
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: 'VariableDeclarator[id.name=/^(__|_x|_n|_nx)$/]',
+                    message: "Import gettext functions from '@wordpress/i18n'.",
+                },
+                {
+                    selector:
+                        'VariableDeclarator > ObjectPattern > Property[key.name=/^(__|_x|_n|_nx)$/]',
+                    message: "Import gettext functions from '@wordpress/i18n'.",
+                },
+            ],
+        },
+    },
+    {
         files: ['**/*.ts', '**/*.tsx'],
         rules: {
             // TypeScript-aware counterpart of no-unused-vars, with the same

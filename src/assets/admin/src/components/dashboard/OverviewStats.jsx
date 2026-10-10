@@ -2,9 +2,8 @@
  * Overview Statistics Component - Dashboard
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import StatCard from '../shared/StatCard';
-
-const { __ } = wp.i18n;
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
 const STATS_PAGE_URL = 'admin.php?page=fotogrids-stats';

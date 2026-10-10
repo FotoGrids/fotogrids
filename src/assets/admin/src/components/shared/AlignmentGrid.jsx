@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
-
-const { __ } = wp.i18n;
 
 /**
  * The nine placement values in visual grid order (row by row), each paired

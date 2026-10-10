@@ -2,10 +2,9 @@
  * Learn & Get Inspired Section Component
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { fgGoUrl } from '../../utils/go-url';
-
-const { __ } = wp.i18n;
 
 const LearnSection = () => {
 	return (

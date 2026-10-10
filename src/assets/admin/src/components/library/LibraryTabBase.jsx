@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, memo, useRef, useState } from 'react';
 import { Notice, Spinner, TextControl, Popover } from '@wordpress/components';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { Modal, Confirm } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import Checkbox from '../shared/Checkbox';
@@ -9,7 +10,6 @@ import Panel from '../shared/SidebarTabs/elements/Panel';
 import Toggle from '../shared/Toggle';
 import Icon from '../shared/Icon';
 
-const { __, sprintf, _n } = wp.i18n;
 const apiFetch = wp.apiFetch;
 
 const DEFAULT_PER_PAGE = 50;
@@ -36,8 +36,6 @@ const LibraryTableRow = memo(
 		onCancelDelete,
 		onConfirmDelete,
 	}) => {
-		const { __, sprintf, _n } = wp.i18n;
-
 		return (
 			<React.Fragment key={item.id}>
 				<tr
@@ -251,7 +249,6 @@ const LibraryTableToolbar = memo(
 		onOpenCreate,
 		onRecalc,
 	}) => {
-		const { __, sprintf } = wp.i18n;
 		const [search, setSearch] = useState('');
 		const [unusedOnly, setUnusedOnly] = useState(false);
 
@@ -337,7 +334,6 @@ LibraryTableToolbar.displayName = 'LibraryTableToolbar';
 
 const LibraryTableBulkBar = memo(
 	({ selectedCount, canManage, onDeleteSelected, onMerge }) => {
-		const { __, sprintf, _n } = wp.i18n;
 		return (
 			<div className="fotogrids-library-bulkbar">
 				<span>
@@ -386,8 +382,6 @@ const LibraryTableHead = memo(
 		onSort,
 		onToggleSelectAll,
 	}) => {
-		const { __ } = wp.i18n;
-
 		const sortIndicator = (column) => {
 			if (orderby !== column) {
 				return null;

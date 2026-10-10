@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import Modal from '../Modal';
 import Button from '../../Button/Button';
 import Icon from '../../Icon';
 import { emit } from '../api/events';
-
-const __ =
-	(typeof window !== 'undefined' && window.wp?.i18n?.__) || ((text) => text);
 
 const VARIANT_DEFAULTS = {
 	info: {

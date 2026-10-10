@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import { Modal } from '../shared/Modal';
-
-const { __ } = wp.i18n;
 
 const TemplateInfoModal = ({ isOpen, onClose }) => {
 	return (

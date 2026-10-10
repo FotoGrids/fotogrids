@@ -26,10 +26,9 @@
  * @param {string}                      [props.inputId]          HTML id for the hidden input.
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { activateOnKey } from '../../utils/activate-on-key';
-
-const { __ } = wp.i18n;
 
 const UploadArea = ({
 	isDragging = false,

@@ -1,6 +1,7 @@
 /**
  * Gallery Helper Utilities
  */
+import { __ } from '@wordpress/i18n';
 import { addItemsToGallery } from './api';
 import { navigateTo } from './navigate';
 
@@ -13,7 +14,6 @@ export const createGalleryFromImages = async (imageIds) => {
 	}
 
 	try {
-		const { __ } = wp.i18n;
 		const galleryTitle =
 			__('Gallery', 'fotogrids') + ' ' + new Date().toLocaleDateString();
 
@@ -37,7 +37,6 @@ export const createGalleryFromImages = async (imageIds) => {
 		throw new Error('Failed to create gallery');
 	} catch (error) {
 		console.error('Error creating gallery:', error);
-		const { __ } = wp.i18n;
 		throw new Error(
 			__(
 				'Images uploaded but failed to create gallery. You can manually create a gallery.',

@@ -2,11 +2,10 @@
  * Pro Features Component
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import { fgGoUrl } from '../../utils/go-url';
-
-const { __ } = wp.i18n;
 
 const ProFeatures = () => {
 	return (
