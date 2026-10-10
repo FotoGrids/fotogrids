@@ -65,9 +65,12 @@ async function fetchItems(kind) {
 	return cache[kind];
 }
 
+const GUARDED_KEY_EVENTS = ['keydown', 'keypress', 'keyup'];
+
 /**
  * Keep keystrokes inside the modal away from Beaver Builder's keyboard
- * shortcuts.
+ * shortcuts, which listen on the document. Tab still reaches the document,
+ * where the modal's focus trap handles it.
  *
  * @param {() => void} onEscape Called when Escape is pressed.
  * @return {() => void} Removes the guard.
@@ -81,17 +84,21 @@ const guardKeys = (onEscape) => {
 		if (!inModal) {
 			return;
 		}
+		if (event.type === 'keydown' && event.key === 'Tab') {
+			return;
+		}
 		event.stopPropagation();
 		if (event.type === 'keydown' && event.key === 'Escape') {
 			onEscape();
 		}
 	};
-	document.body.addEventListener('keydown', handler);
-	document.body.addEventListener('keyup', handler);
-	return () => {
-		document.body.removeEventListener('keydown', handler);
-		document.body.removeEventListener('keyup', handler);
-	};
+	GUARDED_KEY_EVENTS.forEach((type) =>
+		document.body.addEventListener(type, handler)
+	);
+	return () =>
+		GUARDED_KEY_EVENTS.forEach((type) =>
+			document.body.removeEventListener(type, handler)
+		);
 };
 
 /**

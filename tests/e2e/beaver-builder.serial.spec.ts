@@ -350,6 +350,18 @@ test.describe( 'in the builder', () => {
 		await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
 		const modal = page.locator( '.fg-modal' );
 		await expect( modal ).toBeVisible();
+
+		// Beaver Builder binds single keys: P previews the layout, closing the
+		// settings form, and R switches to responsive editing.
+		await page.keyboard.press( 'p' );
+		await page.keyboard.press( 'r' );
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
+		await expect( page.locator( 'body' ) ).not.toHaveClass( /fl-builder-ui-iframe-responsive-editing/ );
+		for ( let press = 0; press < 20; press++ ) {
+			await page.keyboard.press( 'Tab' );
+		}
+		await expect( modal.locator( ':focus' ) ).toHaveCount( 1 );
+
 		await page.keyboard.press( 'Escape' );
 		await expect( modal ).toHaveCount( 0 );
 		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
