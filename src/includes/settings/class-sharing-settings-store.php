@@ -174,12 +174,17 @@ final class Sharing_Settings_Store {
 	/**
 	 * Sanitise and persist sharing settings.
 	 *
+	 * A change flushes the render cache, which holds the resolved sharing
+	 * configuration in cached markup.
+	 *
 	 * @since 1.0.0
 	 * @param mixed $value Raw input.
 	 * @return array<string, mixed> The stored, merged settings.
 	 */
 	public static function save( $value ): array {
-		update_option( self::OPTION, self::sanitize( $value ) );
+		if ( update_option( self::OPTION, self::sanitize( $value ) ) ) {
+			\FotoGrids\FotoGrids_Cache::flush_all();
+		}
 		return self::get();
 	}
 
