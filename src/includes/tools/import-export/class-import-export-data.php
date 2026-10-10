@@ -491,10 +491,14 @@ class Import_Export_Data {
 		$wpdb->query( 'START TRANSACTION' );
 
 		try {
-			if ( in_array( 'tags', $include, true ) && ! empty( $data['tags'] ) ) {
-				[ $imp, $skip ]   = self::import_tags( $data['tags'] );
-				$imported['tags'] = $imp;
-				$skipped['tags']  = $skip;
+			$tag_id_map = array();
+			if ( ! empty( $data['tags'] ) ) {
+				$create_tags                 = in_array( 'tags', $include, true );
+				[ $imp, $skip, $tag_id_map ] = self::import_tags( $data['tags'], $create_tags );
+				if ( $create_tags ) {
+					$imported['tags'] = $imp;
+					$skipped['tags']  = $skip;
+				}
 			}
 
 			$gallery_id_map = array(); // old_id => new_id
@@ -534,7 +538,7 @@ class Import_Export_Data {
 
 			// Item metadata is imported after both items and tags exist.
 			if ( in_array( 'items', $include, true ) && ! empty( $data['item_metadata'] ) ) {
-				self::import_item_metadata( $data['item_metadata'] );
+				self::import_item_metadata( $data['item_metadata'], $tag_id_map );
 			}
 
 			if ( in_array( 'settings', $include, true ) && ! empty( $data['settings'] ) ) {
@@ -554,6 +558,7 @@ class Import_Export_Data {
 
 			$wpdb->query( 'COMMIT' );
 
+			\FotoGrids\Cache\Metadata_Cache::forget_all();
 			\FotoGrids\Migrations\List_Setting_Repair::run();
 
 		} catch ( \Exception $e ) {
@@ -604,26 +609,33 @@ class Import_Export_Data {
 	}
 
 	/**
-	 * Import tags. Returns [imported_count, skipped_count].
-	 * Skips tags that already exist (same name + type). Usage counts not imported.
+	 * Import tags, matching existing ones by name and type.
+	 *
+	 * A tag already on the site is skipped. With `$create` false, tags are only
+	 * matched and nothing is written.
+	 *
+	 * Returns [imported_count, skipped_count, id_map], where id_map is
+	 * type => [ exported_id => site_id ].
 	 */
-	private static function import_tags( array $tags ): array {
+	private static function import_tags( array $tags, bool $create ): array {
 		global $wpdb;
 		$table    = $wpdb->prefix . 'fotogrids_tags';
 		$imported = 0;
 		$skipped  = 0;
+		$id_map   = array();
 
 		foreach ( $tags as $tag ) {
-			$name = sanitize_text_field( $tag['name'] ?? '' );
-			$type = sanitize_text_field( $tag['type'] ?? 'tag' );
-			$slug = sanitize_title( $tag['slug'] ?? $name );
+			$old_id = (int) ( $tag['id'] ?? 0 );
+			$name   = sanitize_text_field( $tag['name'] ?? '' );
+			$type   = sanitize_text_field( $tag['type'] ?? 'tag' );
+			$slug   = sanitize_title( $tag['slug'] ?? $name );
 
 			if ( empty( $name ) ) {
 				++$skipped;
 				continue;
 			}
 
-			$exists = $wpdb->get_var(
+			$exists = (int) $wpdb->get_var(
 				$wpdb->prepare(
 					'SELECT id FROM %i WHERE name = %s AND type = %s LIMIT 1',
 					$table,
@@ -633,11 +645,16 @@ class Import_Export_Data {
 			);
 
 			if ( $exists ) {
+				$id_map[ $type ][ $old_id ] = $exists;
 				++$skipped;
 				continue;
 			}
 
-			$wpdb->insert(
+			if ( ! $create ) {
+				continue;
+			}
+
+			$inserted = $wpdb->insert(
 				$table,
 				array(
 					'type'        => $type,
@@ -647,10 +664,17 @@ class Import_Export_Data {
 					'usage_count' => 0,
 				)
 			);
+
+			if ( ! $inserted ) {
+				++$skipped;
+				continue;
+			}
+
+			$id_map[ $type ][ $old_id ] = (int) $wpdb->insert_id;
 			++$imported;
 		}
 
-		return array( $imported, $skipped );
+		return array( $imported, $skipped, $id_map );
 	}
 
 	/**
@@ -819,19 +843,28 @@ class Import_Export_Data {
 		return array( $imported, $skipped );
 	}
 
-	/** Import item_metadata (tag/person/location join rows). */
-	private static function import_item_metadata( array $rows ): void {
+	/**
+	 * Import item_metadata (tag/person/location join rows).
+	 *
+	 * Each row's metadata_id is translated through `$tag_id_map` from
+	 * import_tags(). Rows whose tag or attachment is not on this site are
+	 * skipped, and every linked tag's usage count is recomputed.
+	 */
+	private static function import_item_metadata( array $rows, array $tag_id_map ): void {
 		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_metadata';
+		$table  = $wpdb->prefix . 'fotogrids_item_metadata';
+		$linked = array();
 
 		foreach ( $rows as $row ) {
 			$attachment_id = (int) ( $row['attachment_id'] ?? 0 );
 			$metadata_type = sanitize_text_field( $row['metadata_type'] ?? '' );
-			$metadata_id   = (int) ( $row['metadata_id'] ?? 0 );
+			$metadata_id   = (int) ( $tag_id_map[ $metadata_type ][ (int) ( $row['metadata_id'] ?? 0 ) ] ?? 0 );
 
-			if ( ! $attachment_id || ! $metadata_type || ! $metadata_id ) {
+			if ( ! $attachment_id || ! $metadata_type || ! $metadata_id || 'attachment' !== get_post_type( $attachment_id ) ) {
 				continue;
 			}
+
+			$linked[ $metadata_type ][ $metadata_id ] = true;
 
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
@@ -852,6 +885,12 @@ class Import_Export_Data {
 						'metadata_id'   => $metadata_id,
 					)
 				);
+			}
+		}
+
+		foreach ( $linked as $type => $ids ) {
+			foreach ( array_keys( $ids ) as $id ) {
+				\FotoGrids\Metadata_Manager::recompute_usage_count( $type, $id );
 			}
 		}
 	}
