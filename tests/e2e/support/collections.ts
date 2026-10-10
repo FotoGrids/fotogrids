@@ -93,6 +93,33 @@ export function pageFor(galleryId: number): { id: number; url: string } {
 }
 
 /**
+ * A password-protected gallery, and a post that renders it.
+ *
+ * The stored password is ciphertext, so the plaintext is handed to the harness
+ * to encrypt rather than written into settings here.
+ *
+ * @param password Plaintext password a visitor will type.
+ * @param settings Catalog key to value, merged over the protection keys.
+ * @param items    Attachment ids. Defaults to F-small's five.
+ */
+export function passwordGalleryPage(
+	password: string,
+	settings: Settings = {},
+	items?: number[]
+): { id: number; url: string } {
+	const ids = items ?? fixture<number[]>('F-small', 'items');
+
+	return JSON.parse(
+		collection([
+			'op=render',
+			`items=${ids.join(',')}`,
+			`settings=${JSON.stringify(settings)}`,
+			`password=${password}`,
+		])
+	);
+}
+
+/**
  * A page embedding a collection through its shortcode with extra attributes.
  *
  * @param id   Gallery or album id.
