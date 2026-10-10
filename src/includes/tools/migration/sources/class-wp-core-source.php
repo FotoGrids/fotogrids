@@ -159,9 +159,17 @@ class WP_Core_Source extends Abstract_Source {
 					continue;
 				}
 
+				$origin = $this->get_id() . ':post:' . $post_id . ':' . $index;
+
+				if ( 'skip' === $conflict && Gallery_Writer::find_by_origin( $origin ) ) {
+					++$skipped;
+					continue;
+				}
+
 				$result = Gallery_Writer::create_from_attachments(
 					$this->gallery_title( $post, $index ),
-					$attachment_ids
+					$attachment_ids,
+					$origin
 				);
 
 				if ( is_wp_error( $result ) ) {
