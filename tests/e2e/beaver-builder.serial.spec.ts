@@ -315,11 +315,12 @@ test.describe( 'in the builder', () => {
 		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
 	} );
 
-	test( 'the modules are listed under FotoGrids, and a dropped gallery module publishes', { tag: [ '@admin', '@layout' ] }, async ( {
+	test( 'the modules are listed under FotoGrids, and a gallery picked for a dropped module publishes', { tag: [ '@admin', '@layout' ] }, async ( {
 		page,
 		browser,
 	} ) => {
-		const { id } = galleryPage();
+		const title = `Beaver Builder pick ${ Date.now() }`;
+		const { id } = galleryPage( {}, undefined, title );
 		const target = emptyPage();
 		const logFrom = debugLogSize();
 		const pageErrors: string[] = [];
@@ -342,11 +343,25 @@ test.describe( 'in the builder', () => {
 
 		await dropModule( page, frame, 'fotogrids-gallery' );
 
-		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
-		await expect( field ).toBeVisible( { timeout: 15000 } );
-		await field.click();
-		await page.keyboard.type( String( id ), { delay: 50 } );
+		const card = page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' );
+		await expect( card ).toContainText( 'No gallery selected yet.', { timeout: 15000 } );
+		await expect( page.locator( 'form.fl-builder-settings input[name="gallery_id"]' ) ).toBeHidden();
+
+		await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
+		const modal = page.locator( '.fg-modal' );
+		await expect( modal ).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toHaveCount( 0 );
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
+
+		await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
+		await modal.locator( '.fg-pb-picker-card', { hasText: title } ).first().click();
+		await expect( modal ).toHaveCount( 0 );
+		await expect( page.locator( '.fg-pb-bb-picker__modal-host' ) ).toHaveCount( 0 );
 		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+		await expect( card ).toContainText( title );
+		await expect( card ).toContainText( '5 items' );
+		await expect( card.getByRole( 'button', { name: 'Change gallery' } ) ).toBeVisible();
 
 		await page.locator( '.fl-builder-settings-save' ).click();
 		await expect( page.locator( 'form.fl-builder-settings' ) ).toHaveCount( 0 );

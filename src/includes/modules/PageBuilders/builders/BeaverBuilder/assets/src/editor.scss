@@ -1,0 +1,53 @@
+/**
+ * Beaver Builder settings form: gallery and album picker.
+ */
+
+@use "sass:meta";
+
+// Beaver Builder sets the colour, size and line height of every element in
+// its settings lightbox; scoping the shared button rules under the picker
+// restores them.
+.fl-lightbox .fl-builder-settings .fg-pb-bb-picker {
+    @include meta.load-css("../../../../../../../assets/admin/src/styles/fg-button/fg-button");
+
+    .fg-button * {
+        color: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+}
+
+// Beaver Builder's settings lightbox sits at z-index 100010, above the
+// FotoGrids modal base; the offset keeps stacked modals in their order.
+body.fl-builder-edit .fg-modal {
+    z-index: calc(var(--fg-modal-z, 100000) + 1000000);
+}
+
+// The raw ID field stays usable until the picker has mounted.
+.fg-pb-bb-collection.is-fg-pb-ready .fg-pb-bb-collection__input {
+    display: none;
+}
+
+.fg-pb-bb-picker__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .fg-pb-inspector-summary {
+        margin-bottom: 0;
+    }
+}
+
+.fg-pb-bb-picker__empty {
+    margin: 0;
+}
+
+.fg-pb-bb-picker__actions {
+    display: flex;
+    gap: 4px;
+
+    > .fg-button {
+        flex: 1;
+        justify-content: center;
+    }
+}
