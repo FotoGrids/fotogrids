@@ -51,7 +51,7 @@ const FontWeightComponent = ({
 		}
 
 		const match = FOTOGRIDS_FONT_WEIGHT_OPTIONS.find(
-			(opt) => opt.value === resolvedValue
+			(opt) => opt.value === String(resolvedValue)
 		);
 		if (match) {
 			return match;

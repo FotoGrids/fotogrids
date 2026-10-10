@@ -38,6 +38,16 @@ describe('renderFontWeight', () => {
 		).toBe('Bold (700)');
 	});
 
+	it('shows the named weight when the saved value arrives as a number', () => {
+		const { container } = renderElement(
+			build({ key: 'weight' }, 700, false)
+		);
+		expect(
+			container.querySelector('.fotogrids-render-select__selected')
+				.textContent
+		).toBe('Bold (700)');
+	});
+
 	it('falls back to the raw value for an unknown weight', () => {
 		const { container } = renderElement(
 			build({ key: 'weight' }, '650', false)
