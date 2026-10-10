@@ -22,9 +22,11 @@ if ( ! defined( 'WPINC' ) ) {
  * Owns one shared `core/` (REST endpoints, Pro-guard, picker UI, live-preview
  * UI, inspector primitives) and one sub-module per builder under `builders/`:
  *
- *   - builders/Gutenberg/  - the Gutenberg blocks (gallery + album)
- *   - builders/Elementor/  - Elementor widgets (gallery + album)
- *   - builders/Divi/       - Divi modules (gallery + album)
+ *   - builders/Gutenberg/     - the Gutenberg blocks (gallery + album)
+ *   - builders/Elementor/     - Elementor widgets (gallery + album)
+ *   - builders/Divi/          - Divi modules (gallery + album)
+ *   - builders/Bricks/        - Bricks elements (gallery + album)
+ *   - builders/BeaverBuilder/ - Beaver Builder modules (gallery + album)
  *
  * Each sub-module decides its own activation (e.g. the Elementor and Divi
  * sub-modules only boot when their builder is present). Gutenberg always
@@ -149,6 +151,9 @@ class Module extends Abstract_Module {
 
 		require_once __DIR__ . '/builders/Bricks/Module.php';
 		Builders\Bricks\Module::init();
+
+		require_once __DIR__ . '/builders/BeaverBuilder/Module.php';
+		Builders\BeaverBuilder\Module::init();
 	}
 
 	/**
