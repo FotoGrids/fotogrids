@@ -162,16 +162,17 @@ class Gallery_Album_Relations {
 
 		$table_name = self::get_table_name();
 
+		$order        = 'desc' === strtolower( $args['order'] ) ? 'DESC' : 'ASC';
 		$order_clause = '';
 		if ( 'position' === $args['orderby'] ) {
-			$order_clause = 'ORDER BY ga.position ' . $args['order'];
+			$order_clause = 'ORDER BY ga.position ' . $order;
 		} elseif ( 'title' === $args['orderby'] ) {
-			$order_clause = 'ORDER BY p.post_title ' . $args['order'];
+			$order_clause = 'ORDER BY p.post_title ' . $order;
 		} elseif ( 'date' === $args['orderby'] ) {
-			$order_clause = 'ORDER BY p.post_date ' . $args['order'];
+			$order_clause = 'ORDER BY p.post_date ' . $order;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names and ASC/DESC.
 		$sql = $wpdb->prepare(
 			"SELECT p.*, ga.position, ga.created_at as relationship_created
              FROM {$wpdb->posts} p
@@ -185,7 +186,7 @@ class Gallery_Album_Relations {
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$galleries = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names.
+		$galleries = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names and ASC/DESC.
 
 		if ( $args['include_meta'] && ! empty( $galleries ) ) {
 			foreach ( $galleries as $gallery ) {
@@ -246,14 +247,15 @@ class Gallery_Album_Relations {
 
 		$table_name = self::get_table_name();
 
+		$order        = 'desc' === strtolower( $args['order'] ) ? 'DESC' : 'ASC';
 		$order_clause = '';
 		if ( 'title' === $args['orderby'] ) {
-			$order_clause = 'ORDER BY p.post_title ' . $args['order'];
+			$order_clause = 'ORDER BY p.post_title ' . $order;
 		} elseif ( 'date' === $args['orderby'] ) {
-			$order_clause = 'ORDER BY p.post_date ' . $args['order'];
+			$order_clause = 'ORDER BY p.post_date ' . $order;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names and ASC/DESC.
 		$sql = $wpdb->prepare(
 			"SELECT p.*, ga.position, ga.created_at as relationship_created
              FROM {$wpdb->posts} p
@@ -267,7 +269,7 @@ class Gallery_Album_Relations {
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$albums = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names.
+		$albums = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names and ASC/DESC.
 
 		if ( $args['include_meta'] && ! empty( $albums ) ) {
 			foreach ( $albums as $album ) {
