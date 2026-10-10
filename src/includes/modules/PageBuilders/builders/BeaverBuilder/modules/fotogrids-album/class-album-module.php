@@ -130,7 +130,7 @@ final class Album_Module extends Module_Base {
 	 * @return string
 	 */
 	protected static function get_click_preview_description(): string {
-		return __( 'When disabled, item clicks open the module settings in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' );
+		return __( 'When disabled, item clicks open the module settings in the builder instead of opening the album action. Published pages are not affected.', 'fotogrids' );
 	}
 
 	/**
