@@ -17,6 +17,25 @@
     }
 }
 
+// Beaver Builder's dark skin gives every element in its settings lightbox an
+// important text colour. Important declarations in a cascade layer take
+// precedence over unlayered ones, so these keep the buttons readable.
+@layer fg-pb-bb-picker {
+    .fl-builder-ui-skin--dark .fg-pb-bb-picker {
+        .fg-button--variant-primary {
+            color: #fff !important;
+        }
+
+        .fg-button--variant-secondary {
+            color: var(--fg-text-secondary) !important;
+        }
+
+        .fg-button * {
+            color: inherit !important;
+        }
+    }
+}
+
 // Beaver Builder's settings lightbox sits at z-index 100010, above the
 // FotoGrids modal base; the offset keeps stacked modals in their order.
 body.fl-builder-edit .fg-modal {
