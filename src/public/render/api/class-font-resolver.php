@@ -358,7 +358,8 @@ final class Font_Resolver {
 
 	/**
 	 * Starts recording the Google Font families resolved from this point on,
-	 * including families already collected by an earlier gallery on the page.
+	 * including families already collected by an earlier gallery on the page
+	 * and families not loaded because Google Fonts are turned off.
 	 *
 	 * @since  1.2.0
 	 * @return void
@@ -399,8 +400,9 @@ final class Font_Resolver {
 	/**
 	 * Collects a Google Font name and ensures the enqueue hook is registered.
 	 *
-	 * Gated on the `fotogrids_allow_google_fonts` option (on by default). When
-	 * an administrator turns it off, no font is collected, so no
+	 * An active capture records the family first. Collection is gated on the
+	 * `fotogrids_allow_google_fonts` option (on by default). When an
+	 * administrator turns it off, no font is collected, so no
 	 * fonts.googleapis.com stylesheet is ever enqueued or printed for visitors;
 	 * the CSS font-family is still emitted, so the browser falls back to the
 	 * system font stack.
@@ -410,13 +412,13 @@ final class Font_Resolver {
 	 * @return void
 	 */
 	private function collect_google_font( string $family ): void {
+		if ( null !== $this->captured ) {
+			$this->captured[ $family ] = true;
+		}
 		if ( ! get_option( 'fotogrids_allow_google_fonts', true ) ) {
 			return;
 		}
 		$this->google_fonts_seen[ $family ] = true;
-		if ( null !== $this->captured ) {
-			$this->captured[ $family ] = true;
-		}
 		$this->register_enqueue_hook();
 	}
 
