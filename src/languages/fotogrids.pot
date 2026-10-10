@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.4\n"
+"Project-Id-Version: FotoGrids 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T15:54:04+00:00\n"
+"POT-Creation-Date: 2026-10-09T14:50:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -23,6 +23,7 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
+#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:405
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:129
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:166
 #: assets/admin/src/components/setup-wizard/StepWelcome.jsx:120
@@ -44,20 +45,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:249
+#: fotogrids.php:254
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:250
-#: fotogrids.php:259
+#: fotogrids.php:255
+#: fotogrids.php:264
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:258
+#: fotogrids.php:263
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:274
+#: fotogrids.php:279
 #: includes/class-admin-init.php:174
 #: includes/class-admin-init.php:175
 #: includes/tools/import-export/assets/ImportExportTool.jsx:54
@@ -65,11 +66,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:292
+#: fotogrids.php:297
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:317
+#: fotogrids.php:322
 #: assets/admin/src/components/dashboard/LearnSection.jsx:86
 msgid "Help Center"
 msgstr ""
@@ -90,6 +91,9 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:91
 #: includes/admin/class-dashboard-widget.php:187
 #: includes/metaboxes/class-collection-save-pipeline.php:162
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:47
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:64
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:71
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
 #: includes/rest/admin/admin-data.php:1487
@@ -248,6 +252,9 @@ msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:184
 #: includes/metaboxes/class-collection-save-pipeline.php:163
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:69
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:86
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:107
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
 #: includes/rest/admin/admin-data.php:1487
@@ -6185,10 +6192,121 @@ msgstr ""
 msgid "Gallery and album editing metaboxes in the post editor."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:122
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:143
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:156
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:195
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:208
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:353
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:370
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
+msgid "Off"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:123
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:142
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:155
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:194
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:207
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:352
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:369
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
+msgid "On"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:127
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:174
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:129
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:181
+#: includes/rest/templates/templates-data.php:607
+#: assets/admin/src/components/pages/TemplatesPage.jsx:89
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:169
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:33
+msgid "Preview"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:134
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:246
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:139
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:191
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:35
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:68
+msgid "Make items clickable"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:142
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:255
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:152
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:204
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:44
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:77
+msgid "Enable pagination controls"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:143
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:256
+msgid "When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:48
+msgid "Display a FotoGrids album."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:123
+msgid "Choose an album in the module settings."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:133
+msgid "When disabled, item clicks open the module settings in the builder instead of opening the album action. Published pages are not affected."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:70
+msgid "Display a FotoGrids gallery."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:93
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
+#: includes/tools/migration/assets/MigrationTool.jsx:105
+#: includes/tools/system-info/assets/SystemInfoTool.jsx:278
+msgid "Source"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:96
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:99
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:118
+msgid "Gallery Picker"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:97
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:198
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:119
+msgid "Dynamic"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:113
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:109
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:143
+msgid "Dynamic Gallery ID"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:114
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:119
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:147
+msgid "Bind a dynamic source that outputs a gallery ID."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:175
+msgid "Choose a gallery in the module settings."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:185
+msgid "When disabled, item clicks open the module settings in the builder instead of opening the gallery action. Published pages are not affected."
+msgstr ""
+
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:588
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
@@ -6208,47 +6326,6 @@ msgstr ""
 msgid "FotoGrids album #%d"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:174
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:129
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:181
-#: includes/rest/templates/templates-data.php:607
-#: assets/admin/src/components/pages/TemplatesPage.jsx:89
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:169
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:33
-msgid "Preview"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
-#: includes/tools/migration/assets/MigrationTool.jsx:105
-#: includes/tools/system-info/assets/SystemInfoTool.jsx:278
-msgid "Source"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:198
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:119
-msgid "Dynamic"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:246
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:139
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:191
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:35
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:68
-msgid "Make items clickable"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:255
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:152
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:204
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:44
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:77
-msgid "Enable pagination controls"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:256
-msgid "When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected."
-msgstr ""
-
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:269
 msgid "When disabled, item clicks select the element in the builder instead of opening the album action. Published pages are not affected."
 msgstr ""
@@ -6260,7 +6337,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:873
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
@@ -6268,21 +6345,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:79
 msgid "Gallery ID"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:99
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:118
-msgid "Gallery Picker"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:109
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:143
-msgid "Dynamic Gallery ID"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:119
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:147
-msgid "Bind a dynamic source that outputs a gallery ID."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:129
@@ -6297,8 +6359,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:392
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:677
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:184
 msgid "Loading preview…"
 msgstr ""
@@ -6330,6 +6391,7 @@ msgid "Browse all"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:102
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:270
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:261
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:200
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:110
@@ -6337,6 +6399,7 @@ msgid "Edit album"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:103
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:271
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:262
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:244
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:111
@@ -6344,6 +6407,7 @@ msgid "Edit gallery"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:117
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:175
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:173
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:99
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:372
@@ -6354,26 +6418,6 @@ msgstr ""
 msgid "When disabled, item clicks select the widget in the editor instead of opening the album action. Published pages are not affected."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:142
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:155
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:194
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:207
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:352
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:369
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
-msgid "On"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:143
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:156
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:195
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:208
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:353
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:370
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
-msgid "Off"
-msgstr ""
-
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:153
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:205
 #: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:45
@@ -6382,8 +6426,7 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:386
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:482
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
@@ -6392,6 +6435,7 @@ msgid "Gallery source"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:164
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:176
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:174
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:100
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:373
@@ -6403,8 +6447,7 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:671
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:767
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -6458,12 +6501,12 @@ msgstr ""
 msgid "Imported gallery (%s)"
 msgstr ""
 
-#: includes/modules/PageBuilders/Module.php:86
+#: includes/modules/PageBuilders/Module.php:88
 msgid "Page Builders"
 msgstr ""
 
-#: includes/modules/PageBuilders/Module.php:90
-msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi and Bricks."
+#: includes/modules/PageBuilders/Module.php:92
+msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi, Bricks and Beaver Builder."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:47
@@ -6610,6 +6653,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
 #: includes/modules/ViewCollections/class-renderer.php:742
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:151
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:63
@@ -6626,6 +6670,7 @@ msgstr[1] ""
 #: includes/modules/ViewCollections/class-renderer.php:744
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:156
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:154
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:150
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:148
@@ -11113,44 +11158,48 @@ msgstr ""
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:249
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:240
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:53
 msgid "No album selected yet."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:250
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:241
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:54
 msgid "No gallery selected yet."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:257
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:248
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:194
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:117
 msgid "Change album"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:258
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:249
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:238
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:118
 msgid "Change gallery"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:260
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:251
 msgid "Choose album"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:261
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:252
 msgid "Choose gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:423
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:441
-msgid "This album has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+msgid "This gallery has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:708
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:726
-msgid "This gallery has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+msgid "This album has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:336
