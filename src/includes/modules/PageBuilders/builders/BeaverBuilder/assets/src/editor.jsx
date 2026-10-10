@@ -5,7 +5,8 @@
  * `fotogrids-collection` field carries a `.fg-pb-bb-picker` placeholder,
  * which this bundle fills with a React card. The chosen ID is written into
  * the field's input followed by a native `change` event, which Beaver
- * Builder's live preview and settings save both read.
+ * Builder's live preview and settings save both read. Users who cannot list
+ * galleries keep the plain ID input.
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
@@ -311,9 +312,11 @@ const reconcile = () => {
 	});
 };
 
-new MutationObserver(reconcile).observe(document.body, {
-	childList: true,
-	subtree: true,
-});
+if (config.canPick) {
+	new MutationObserver(reconcile).observe(document.body, {
+		childList: true,
+		subtree: true,
+	});
 
-reconcile();
+	reconcile();
+}

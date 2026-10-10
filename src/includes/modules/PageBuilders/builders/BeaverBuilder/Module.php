@@ -147,6 +147,8 @@ final class Module {
 	/**
 	 * Enqueue the settings-form bundle in the document that renders settings forms.
 	 *
+	 * Users who cannot list galleries through the picker keep the plain ID input.
+	 *
 	 * @since 1.3.0
 	 * @return void
 	 */
@@ -167,6 +169,7 @@ final class Module {
 			self::EDITOR_HANDLE,
 			'fotogridsPbBeaverBuilder',
 			array(
+				'canPick'          => current_user_can( 'manage_fotogrids' ),
 				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
 				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),

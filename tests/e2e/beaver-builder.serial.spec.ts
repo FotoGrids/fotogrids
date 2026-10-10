@@ -4,7 +4,7 @@ import path from 'path';
 import type { Browser, Frame, Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { album, galleryPage } from './support/collections';
-import { storageStateFor, wpCli, wpEval } from './support/roles';
+import { roles, storageStateFor, wpCli, wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 
@@ -190,7 +190,9 @@ test.beforeAll( () => {
 	}
 
 	// Skips the first-launch tour prompt, which covers the module panel.
-	wp( [ 'user', 'meta', 'update', process.env.WP_ADMIN_USER ?? 'admin', '_fl_builder_launched', '1' ] );
+	for ( const user of [ process.env.WP_ADMIN_USER ?? 'admin', roles().roles.editor.user ] ) {
+		wp( [ 'user', 'meta', 'update', user, '_fl_builder_launched', '1' ] );
+	}
 } );
 
 test.afterAll( () => {
@@ -386,6 +388,37 @@ test.describe( 'in the builder', () => {
 		await gallery.waitFor();
 		await expect( gallery.items() ).toHaveCount( 5 );
 		await visitor.close();
+
+		expect( pageErrors ).toEqual( [] );
+		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
+	} );
+} );
+
+test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
+	test.use( {
+		storageState: storageStateFor( 'editor' ),
+		allowConsoleErrors: 'Beaver Builder\'s own UI logs errors, such as its welcome video failing to load',
+		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
+	} );
+
+	test( 'a dropped module keeps the plain ID field, and an entered ID previews', { tag: [ '@admin', '@layout' ] }, async ( { page } ) => {
+		const { id } = galleryPage();
+		const target = emptyPage();
+		const logFrom = debugLogSize();
+		const pageErrors: string[] = [];
+		page.on( 'pageerror', ( error ) => pageErrors.push( error.message ) );
+
+		const frame = await openBuilder( page, target.url );
+		await dropModule( page, frame, 'fotogrids-gallery' );
+
+		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
+		await expect( field ).toBeVisible( { timeout: 15000 } );
+		await expect( page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' ) ).toHaveCount( 0 );
+
+		await field.click();
+		await page.keyboard.type( String( id ), { delay: 50 } );
+		await page.keyboard.press( 'Tab' );
+		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
 
 		expect( pageErrors ).toEqual( [] );
 		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
