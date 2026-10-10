@@ -10,7 +10,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
  * The scheduled statistics cleanup applies the retention period to the
- * per-day history as well as to the totals.
+ * per-day history and keeps every totals row.
  *
  * Daily rows carry the site-local date, so the boundary day is checked in
  * timezones on both sides of UTC. The cleanup is fired through wp-cron.php,
@@ -173,6 +173,25 @@ test.describe( 'statistics retention', () => {
 		await runCleanup( request );
 
 		expect( dailyRows() ).toHaveLength( 5 );
+		for ( const days of [ 7, 30, 90 ] ) {
+			expect( await statsScreen( page, days ), `${ days }-day view` ).toBe( before[ days ] );
+		}
+	} );
+
+	test( 'a gallery unviewed for longer than the retention period keeps its totals', { tag: [ '@admin' ] }, async ( {
+		page,
+		request,
+	} ) => {
+		seed( galleryId, [ 400, 0 ], 400 );
+
+		const before: Record< number, string > = {};
+		for ( const days of [ 7, 30, 90 ] ) {
+			before[ days ] = await statsScreen( page, days );
+		}
+
+		await runCleanup( request );
+
+		expect( totalsRows() ).toBe( 1 );
 		for ( const days of [ 7, 30, 90 ] ) {
 			expect( await statsScreen( page, days ), `${ days }-day view` ).toBe( before[ days ] );
 		}

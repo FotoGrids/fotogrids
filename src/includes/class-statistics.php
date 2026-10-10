@@ -213,36 +213,32 @@ class Statistics {
 	/**
 	 * Clean up old statistics data
 	 *
-	 * Deletes totals rows not viewed within the retention period and daily
-	 * rows dated before it.
+	 * Deletes daily rows dated before the retention period. Totals rows are
+	 * kept, so lifetime figures do not drop. A period of zero or less deletes
+	 * nothing.
 	 *
-	 * @param int $days Number of days to keep (older data will be deleted)
+	 * @param int $days Number of days of daily history to keep.
 	 * @return int Number of rows deleted
 	 */
 	public static function cleanup_old_data( $days = 365 ) {
 		global $wpdb;
 
-		$table       = $wpdb->prefix . 'fotogrids_statistics';
+		$days = (int) $days;
+
+		if ( $days <= 0 ) {
+			return 0;
+		}
+
 		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
-		$cutoff      = time() - ( (int) $days * DAY_IN_SECONDS );
+		$cutoff      = time() - ( $days * DAY_IN_SECONDS );
 
-		$deleted = $wpdb->query(
-			$wpdb->prepare(
-				'DELETE FROM %i WHERE last_viewed < %s',
-				$table,
-				gmdate( 'Y-m-d H:i:s', $cutoff )
-			)
-		);
-
-		$deleted_daily = $wpdb->query(
+		return (int) $wpdb->query(
 			$wpdb->prepare(
 				'DELETE FROM %i WHERE viewed_date < %s',
 				$daily_table,
 				wp_date( 'Y-m-d', $cutoff )
 			)
 		);
-
-		return (int) $deleted + (int) $deleted_daily;
 	}
 
 	/**

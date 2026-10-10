@@ -66,7 +66,10 @@ final class Filters_Settings {
 	public const SANITIZE = 'fotogrids/settings/sanitize';
 
 	/**
-	 * Number of days to retain statistics rows.
+	 * Number of days of daily statistics history to keep.
+	 *
+	 * Lifetime totals are not affected. Zero or less turns the daily cleanup
+	 * off.
 	 *
 	 * @since 1.0.0
 	 * @param int $days_to_keep Retention window in days. Default 365.
