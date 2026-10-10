@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-10T15:43:29+00:00\n"
+"POT-Creation-Date: 2026-10-10T16:00:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -1277,7 +1277,7 @@ msgid "Data Management"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:227
-#: includes/tools/import-export/assets/ImportExportTool.jsx:776
+#: includes/tools/import-export/assets/ImportExportTool.jsx:855
 msgid "Date"
 msgstr ""
 
@@ -5460,7 +5460,7 @@ msgid "Drop here"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:95
-#: includes/tools/import-export/assets/ImportExportTool.jsx:778
+#: includes/tools/import-export/assets/ImportExportTool.jsx:857
 msgid "Details"
 msgstr ""
 
@@ -7600,12 +7600,12 @@ msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
 #: includes/tools/import-export/class-import-export-tool.php:30
-#: includes/tools/import-export/assets/ImportExportTool.jsx:833
+#: includes/tools/import-export/assets/ImportExportTool.jsx:912
 msgid "Import / Export"
 msgstr ""
 
 #: includes/tools/import-export/class-import-export-tool.php:34
-#: includes/tools/import-export/assets/ImportExportTool.jsx:834
+#: includes/tools/import-export/assets/ImportExportTool.jsx:913
 msgid "Move gallery data between sites, or keep a safe copy of your galleries, albums, items, statistics, and settings."
 msgstr ""
 
@@ -8645,7 +8645,7 @@ msgid "Regenerate this gallery"
 msgstr ""
 
 #: assets/admin/src/components/blocks/FileUpload.jsx:25
-#: includes/tools/import-export/assets/ImportExportTool.jsx:611
+#: includes/tools/import-export/assets/ImportExportTool.jsx:690
 msgid "Select file to import"
 msgstr ""
 
@@ -9389,7 +9389,7 @@ msgstr ""
 #: assets/admin/src/components/pages/StatsPage.jsx:154
 #: assets/admin/src/components/pages/StatsPage.jsx:182
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:236
-#: includes/tools/import-export/assets/ImportExportTool.jsx:777
+#: includes/tools/import-export/assets/ImportExportTool.jsx:856
 msgid "Type"
 msgstr ""
 
@@ -11196,7 +11196,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:114
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:132
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:311
-#: includes/tools/import-export/assets/ImportExportTool.jsx:547
+#: includes/tools/import-export/assets/ImportExportTool.jsx:640
 #: includes/tools/migration/assets/MigrationTool.jsx:209
 msgid "Import failed."
 msgstr ""
@@ -11402,7 +11402,7 @@ msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:86
 #: includes/tools/import-export/assets/ImportExportTool.jsx:113
-#: includes/tools/import-export/assets/ImportExportTool.jsx:725
+#: includes/tools/import-export/assets/ImportExportTool.jsx:804
 msgid "Import"
 msgstr ""
 
@@ -11470,90 +11470,110 @@ msgstr ""
 msgid "Select at least one item to export."
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:501
-msgid "Could not analyse the file."
+#: includes/tools/import-export/assets/ImportExportTool.jsx:514
+msgid "Your data has been imported. Some records were skipped."
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:518
+msgid "Your data has been imported successfully."
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:520
+msgid "Every record you selected was skipped."
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:531
-msgid "Importing - please do not close this window…"
+msgid "Nothing was imported"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:562
-#: includes/tools/import-export/assets/ImportExportTool.jsx:590
-msgid "Select export file"
-msgstr ""
-
-#: includes/tools/import-export/assets/ImportExportTool.jsx:569
+#: includes/tools/import-export/assets/ImportExportTool.jsx:532
 #: includes/tools/migration/assets/MigrationTool.jsx:238
 msgid "Import complete"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:571
-msgid "Your data has been imported successfully."
+#: includes/tools/import-export/assets/ImportExportTool.jsx:537
+msgid "Imported"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:578
+#: includes/tools/import-export/assets/ImportExportTool.jsx:544
+msgid "Skipped"
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:551
 msgid "Import another file"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:591
+msgid "Could not analyse the file."
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:622
+msgid "Importing - please do not close this window…"
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:655
+#: includes/tools/import-export/assets/ImportExportTool.jsx:669
+msgid "Select export file"
+msgstr ""
+
+#: includes/tools/import-export/assets/ImportExportTool.jsx:670
 msgid "Selected export file"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:602
+#: includes/tools/import-export/assets/ImportExportTool.jsx:681
 msgid "Choose a different file"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:612
+#: includes/tools/import-export/assets/ImportExportTool.jsx:691
 msgid "Drop your .json or .xml export file here"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:616
+#: includes/tools/import-export/assets/ImportExportTool.jsx:695
 msgid "Supported formats: JSON, XML"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:628
+#: includes/tools/import-export/assets/ImportExportTool.jsx:707
 msgid "Analysing file…"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:643
+#: includes/tools/import-export/assets/ImportExportTool.jsx:722
 msgid "What to import"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:685
+#: includes/tools/import-export/assets/ImportExportTool.jsx:764
 msgid "conflict handling"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:711
+#: includes/tools/import-export/assets/ImportExportTool.jsx:790
 msgid "Ready to import"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:712
+#: includes/tools/import-export/assets/ImportExportTool.jsx:791
 msgid "We recommend taking a database backup before importing. This action cannot be undone."
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:724
+#: includes/tools/import-export/assets/ImportExportTool.jsx:803
 #: includes/tools/migration/assets/MigrationTool.jsx:334
 msgid "Importing…"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:745
+#: includes/tools/import-export/assets/ImportExportTool.jsx:824
 msgid "Could not load operation log."
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:752
+#: includes/tools/import-export/assets/ImportExportTool.jsx:831
 msgid "Import / Export Log"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:754
+#: includes/tools/import-export/assets/ImportExportTool.jsx:833
 msgid "Loading log…"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:765
+#: includes/tools/import-export/assets/ImportExportTool.jsx:844
 msgid "No operations recorded yet. Export or import data to see a log here."
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:779
+#: includes/tools/import-export/assets/ImportExportTool.jsx:858
 msgid "Status"
 msgstr ""
 

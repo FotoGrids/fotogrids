@@ -465,6 +465,95 @@ const FileSummary = ({ file, summary }) => {
 	);
 };
 
+/**
+ * Turn one side of an import response into chip descriptors.
+ *
+ * @param {Object} counts Data type to count, or `true` for a type imported whole.
+ * @return {Array} Chip descriptors in EXPORT_TYPES order: { key, count, label }.
+ */
+function importResultChips(counts) {
+	return EXPORT_TYPES.filter(
+		({ key }) => true === counts?.[key] || counts?.[key] > 0
+	).map(({ key, label }) => {
+		const count = counts[key];
+		const labels = LOG_DETAIL_LABELS[key];
+
+		if (true === count || !labels) {
+			return { key, label };
+		}
+
+		return { key, count, label: labels[1 === count ? 0 : 1] };
+	});
+}
+
+const ImportResultRow = ({ title, chips, variant }) => (
+	<div className="fg-ie-done__result">
+		<span className="fg-ie-done__result-title">{title}</span>
+		<span className="fg-ie-chips">
+			{chips.map(({ key, count, label }) => (
+				<span key={key} className={`fg-ie-chip fg-ie-chip--${variant}`}>
+					{undefined !== count && (
+						<span className="fg-ie-chip__count">{count}</span>
+					)}
+					<span className="fg-ie-chip__label">{label}</span>
+				</span>
+			))}
+		</span>
+	</div>
+);
+
+const ImportResult = ({ result, onReset }) => {
+	const imported = importResultChips(result?.imported);
+	const skipped = importResultChips(result?.skipped);
+	const nothingImported = 0 === imported.length;
+
+	let message = null;
+	if (!nothingImported) {
+		message =
+			skipped.length > 0
+				? __(
+						'Your data has been imported. Some records were skipped.',
+						'fotogrids'
+					)
+				: __('Your data has been imported successfully.', 'fotogrids');
+	} else if (skipped.length > 0) {
+		message = __('Every record you selected was skipped.', 'fotogrids');
+	}
+
+	return (
+		<div
+			className={`fg-ie-done${nothingImported ? ' fg-ie-done--nothing-imported' : ''}`}
+		>
+			<Icon name={nothingImported ? 'alert_circle' : 'check_badge_gi'} />
+			<div className="fg-ie-done__content">
+				<h3>
+					{nothingImported
+						? __('Nothing was imported', 'fotogrids')
+						: __('Import complete', 'fotogrids')}
+				</h3>
+				{message && <p>{message}</p>}
+				{imported.length > 0 && (
+					<ImportResultRow
+						title={__('Imported', 'fotogrids')}
+						chips={imported}
+						variant="count"
+					/>
+				)}
+				{skipped.length > 0 && (
+					<ImportResultRow
+						title={__('Skipped', 'fotogrids')}
+						chips={skipped}
+						variant="skipped"
+					/>
+				)}
+			</div>
+			<Button variant="primary" onClick={onReset}>
+				{__('Import another file', 'fotogrids')}
+			</Button>
+		</div>
+	);
+};
+
 const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const [phase, setPhase] = useState('idle');
 	const [file, setFile] = useState(null);
@@ -473,6 +562,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const [importError, setImportError] = useState(null);
 	const [include, setInclude] = useState(new Set());
 	const [conflictMode, setConflictMode] = useState({}); // { [key]: 'skip'|'overwrite'|'duplicate' }
+	const [result, setResult] = useState(null);
 
 	const getConflictMode = (key) => conflictMode[key] ?? 'skip';
 	const setTypeConflictMode = (key, value) =>
@@ -507,6 +597,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const resetFile = () => {
 		setFile(null);
 		setSummary(null);
+		setResult(null);
 		setPhase('idle');
 		setAnalyseError(null);
 		setImportError(null);
@@ -532,16 +623,18 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 		);
 
 		try {
-			await apiFetch({
+			const response = await apiFetch({
 				path: '/fotogrids/v1/admin/tools/import-export/import',
 				method: 'POST',
 				data: {
 					phase: 'execute',
 					file: file.text,
 					include: [...include],
-					conflict_mode: conflictMode,
+					galleries: getConflictMode('galleries'),
+					albums: getConflictMode('albums'),
 				},
 			});
+			setResult(response);
 			setPhase('done');
 		} catch (err) {
 			setImportError(err.message || __('Import failed.', 'fotogrids'));
@@ -563,21 +656,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 				titleTag="h3"
 				equalBodyPadding
 			>
-				<div className="fg-ie-done">
-					<Icon name="check_badge_gi" />
-					<div className="fg-ie-done__content">
-						<h3>{__('Import complete', 'fotogrids')}</h3>
-						<p>
-							{__(
-								'Your data has been imported successfully.',
-								'fotogrids'
-							)}
-						</p>
-					</div>
-					<Button variant="primary" onClick={resetFile}>
-						{__('Import another file', 'fotogrids')}
-					</Button>
-				</div>
+				<ImportResult result={result} onReset={resetFile} />
 			</Panel>
 		);
 	}
