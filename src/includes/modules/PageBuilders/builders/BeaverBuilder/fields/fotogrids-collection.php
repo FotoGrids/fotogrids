@@ -1,6 +1,6 @@
 <?php
 /**
- * Beaver Builder field template of the FotoGrids gallery and album picker.
+ * Beaver Builder picker field template.
  *
  * @package FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder
  * @since   1.3.0

@@ -102,7 +102,7 @@ final class Module {
 	}
 
 	/**
-	 * Filter callback: register the gallery and album picker field type.
+	 * Register the picker field type.
 	 *
 	 * @since 1.3.0
 	 * @param array<string,string> $fields Field templates keyed by field type.
@@ -116,13 +116,7 @@ final class Module {
 	}
 
 	/**
-	 * Enqueue the builder stylesheet in every builder document, and the
-	 * settings-form bundle when the builder runs without its iframe UI.
-	 *
-	 * Beaver Builder's iframe UI renders settings forms in the top-level
-	 * document and empties that document's script queue after
-	 * `wp_enqueue_scripts`, so the bundle reaches it through
-	 * `fl_builder_ui_enqueue_scripts` instead.
+	 * Enqueue the builder stylesheet, and the settings-form bundle without the iframe UI.
 	 *
 	 * @since 1.3.0
 	 * @return void
@@ -145,9 +139,7 @@ final class Module {
 	}
 
 	/**
-	 * Enqueue the settings-form bundle in the document that renders settings forms.
-	 *
-	 * Users who cannot list galleries through the picker keep the plain ID input.
+	 * Enqueue the settings-form bundle in the iframe UI's top-level document.
 	 *
 	 * @since 1.3.0
 	 * @return void
@@ -181,8 +173,7 @@ final class Module {
 	}
 
 	/**
-	 * Whether the current request belongs to Beaver Builder's iframe UI, either
-	 * its top-level document or the layout iframe.
+	 * Whether the request belongs to Beaver Builder's iframe UI.
 	 *
 	 * @since 1.3.0
 	 * @return bool

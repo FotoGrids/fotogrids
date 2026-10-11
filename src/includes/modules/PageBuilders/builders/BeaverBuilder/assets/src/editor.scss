@@ -4,9 +4,7 @@
 
 @use "sass:meta";
 
-// Beaver Builder sets the colour, size and line height of every element in
-// its settings lightbox; scoping the shared button rules under the picker
-// restores them.
+// Restore button styles overridden by the settings lightbox.
 .fl-lightbox .fl-builder-settings .fg-pb-bb-picker {
     @include meta.load-css("../../../../../../../assets/admin/src/styles/fg-button/fg-button");
 
@@ -17,9 +15,7 @@
     }
 }
 
-// Beaver Builder's dark skin gives every element in its settings lightbox an
-// important text colour. Important declarations in a cascade layer take
-// precedence over unlayered ones, so these keep the buttons readable.
+// Button colours in Beaver Builder's dark skin.
 @layer fg-pb-bb-picker {
     .fl-builder-ui-skin--dark .fg-pb-bb-picker {
         .fg-button--variant-primary {
@@ -36,13 +32,12 @@
     }
 }
 
-// Beaver Builder's settings lightbox sits at z-index 100010, above the
-// FotoGrids modal base; the offset keeps stacked modals in their order.
+// Above Beaver Builder's settings lightbox.
 body.fl-builder-edit .fg-modal {
     z-index: calc(var(--fg-modal-z, 100000) + 1000000);
 }
 
-// The raw ID field stays usable until the picker has mounted.
+// Hide the raw ID field once the picker has mounted.
 .fg-pb-bb-collection.is-fg-pb-ready .fg-pb-bb-collection__input {
     display: none;
 }

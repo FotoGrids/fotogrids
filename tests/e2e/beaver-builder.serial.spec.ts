@@ -9,11 +9,7 @@ import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 
 /**
- * The FotoGrids Gallery and FotoGrids Album modules in Beaver Builder.
- *
- * Installs Beaver Builder Lite, builds layouts through its own model API, and
- * checks the modules in the builder and on the published page, where they must
- * render exactly what the shortcode renders.
+ * The Gallery and Album modules in Beaver Builder.
  *
  * Serial: activates a page builder for the whole site.
  */
@@ -25,7 +21,7 @@ const BUILDER_VERSION = '2.11.0.6';
 
 let builderWasActive = false;
 
-/** Pages this spec created; deleted afterwards, since the theme lists every page in its navigation. */
+/** Pages this spec created, deleted afterwards. */
 const createdPages: number[] = [];
 
 type Module = [ string, Record< string, string > ];
@@ -87,8 +83,7 @@ function builderUrl( url: string ): string {
 }
 
 /**
- * A collection wrapper's markup as the server sent it, with the per-request
- * instance counter and the page-specific login redirect taken out.
+ * A collection wrapper's server markup, without per-request values.
  */
 async function serverMarkup( browser: Browser, url: string, selector: string ): Promise< string > {
 	const context = await browser.newContext( { javaScriptEnabled: false } );
@@ -189,7 +184,7 @@ test.beforeAll( () => {
 		wp( [ 'plugin', 'activate', BUILDER ] );
 	}
 
-	// Skips the first-launch tour prompt, which covers the module panel.
+	// Skip the first-launch tour.
 	for ( const user of [ process.env.WP_ADMIN_USER ?? 'admin', roles().roles.editor.user ] ) {
 		wp( [ 'user', 'meta', 'update', user, '_fl_builder_launched', '1' ] );
 	}
@@ -353,8 +348,7 @@ test.describe( 'in the builder', () => {
 		const modal = page.locator( '.fg-modal' );
 		await expect( modal ).toBeVisible();
 
-		// Beaver Builder binds single keys: P previews the layout, closing the
-		// settings form, and R switches to responsive editing.
+		// Beaver Builder shortcuts: P previews, R enters responsive editing.
 		await page.keyboard.press( 'p' );
 		await page.keyboard.press( 'r' );
 		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
