@@ -13,6 +13,7 @@ namespace FotoGrids\Metaboxes;
 use FotoGrids\Collection_Defaults;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Post_Types;
+use FotoGrids\Hooks\Actions_Album;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Permissions\Permission_Check;
 use FotoGrids\Permissions\Permission_Gate;
@@ -156,6 +157,8 @@ final class Collection_Save_Pipeline {
 
 		if ( 'fotogrids_gallery' === $post->post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, $post_id );
+		} else {
+			do_action( Actions_Album::SETTINGS_SAVED, $post_id );
 		}
 
 		$collection_type = 'fotogrids_album' === $post->post_type

@@ -30,6 +30,14 @@
 		"src/public/render/gates/**": "@gate",
 		"src/public/render/filters/**": "*",
 		"src/includes/rest/**": "@api",
+		"src/includes/rest/maintenance/**": [
+			"@settings",
+			"@lifecycle"
+		],
+		"src/includes/options/**": [
+			"@settings",
+			"@lifecycle"
+		],
 		"src/includes/class-rest.php": "@api",
 		"src/includes/permissions/**": "@permissions",
 		"src/includes/settings/**": "@settings",

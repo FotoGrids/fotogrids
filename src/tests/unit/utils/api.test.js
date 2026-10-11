@@ -292,6 +292,17 @@ describe('utils/api', () => {
 			global.wp.apiFetch.mockRejectedValue(new Error('boom'));
 			jest.spyOn(console, 'error').mockImplementation(() => {});
 			await expect(fetchDashboardStats()).resolves.toEqual(zero);
+			expect(console.error).toHaveBeenCalled();
+			console.error.mockRestore();
+		});
+
+		it('does not log a request cancelled by leaving the page', async () => {
+			global.wp.apiFetch.mockRejectedValue({ code: 'fetch_error' });
+			jest.spyOn(console, 'error').mockImplementation(() => {});
+			window.dispatchEvent(new Event('pagehide'));
+			await expect(fetchDashboardStats()).resolves.toEqual(zero);
+			expect(console.error).not.toHaveBeenCalled();
+			window.dispatchEvent(new Event('pageshow'));
 			console.error.mockRestore();
 		});
 	});
@@ -317,6 +328,17 @@ describe('utils/api', () => {
 			global.wp.apiFetch.mockRejectedValue(new Error('boom'));
 			jest.spyOn(console, 'error').mockImplementation(() => {});
 			await expect(fetchRecentlyEdited()).resolves.toEqual([]);
+			expect(console.error).toHaveBeenCalled();
+			console.error.mockRestore();
+		});
+
+		it('does not log a request cancelled by leaving the page', async () => {
+			global.wp.apiFetch.mockRejectedValue({ code: 'invalid_json' });
+			jest.spyOn(console, 'error').mockImplementation(() => {});
+			window.dispatchEvent(new Event('beforeunload'));
+			await expect(fetchRecentlyEdited()).resolves.toEqual([]);
+			expect(console.error).not.toHaveBeenCalled();
+			window.dispatchEvent(new Event('pageshow'));
 			console.error.mockRestore();
 		});
 	});

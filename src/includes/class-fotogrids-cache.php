@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Album;
 use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Hooks\Actions_Item;
+use FotoGrids\Hooks\Actions_Maintenance;
 use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Render\Sorters\Random\Random_Sorter;
@@ -79,6 +81,12 @@ class FotoGrids_Cache {
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::IMPORTED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( 'save_post_fotogrids_gallery', array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Album::GALLERY_ADDED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Album::GALLERY_REMOVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Album::SETTINGS_SAVED, array( __CLASS__, 'on_album_mutation' ), 10, 1 );
+		add_action( 'save_post_fotogrids_album', array( __CLASS__, 'on_album_mutation' ), 10, 1 );
+		add_action( Actions_Maintenance::OPTIONS_RESET, array( __CLASS__, 'flush_all' ), 10, 0 );
 
 		add_action( 'init', array( __CLASS__, 'init_purge_schedule' ) );
 		add_action( Actions_Cron::CACHE_PURGE, array( __CLASS__, 'purge_expired' ) );
@@ -119,6 +127,17 @@ class FotoGrids_Cache {
 	 */
 	public static function on_gallery_mutation( $gallery_id ): void {
 		self::flush_for_gallery( (int) $gallery_id );
+	}
+
+	/**
+	 * Flush every gallery in an album whose post or settings just changed.
+	 *
+	 * @since  1.3.0
+	 * @param  int|mixed $album_id
+	 * @return void
+	 */
+	public static function on_album_mutation( $album_id ): void {
+		self::flush_for_album( (int) $album_id );
 	}
 
 	/**
@@ -287,6 +306,23 @@ class FotoGrids_Cache {
 	 */
 	public static function flush_for_item( int $item_id ): void {
 		foreach ( Gallery_Repository::find_galleries_for_item( $item_id ) as $gallery_id ) {
+			self::flush_for_gallery( $gallery_id );
+		}
+	}
+
+	/**
+	 * Flush every cached render of a gallery in an album.
+	 *
+	 * A gallery's header carries its parent album's title, link and
+	 * navigation settings, so a change to the album invalidates every gallery
+	 * in it.
+	 *
+	 * @since  1.3.0
+	 * @param  int $album_id Album post ID.
+	 * @return void
+	 */
+	public static function flush_for_album( int $album_id ): void {
+		foreach ( Gallery_Album_Relations::get_gallery_ids_for_album( $album_id ) as $gallery_id ) {
 			self::flush_for_gallery( $gallery_id );
 		}
 	}
