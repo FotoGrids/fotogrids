@@ -203,13 +203,13 @@ test( 'trashing the album removes the back link and restoring it brings it back'
 	const parent = album( [ gallery.id ], NAVIGATION );
 
 	await cached( browser, gallery.url, gallery.id );
-	wp( [ 'post', 'delete', String( parent.id ) ] );
+	wpEval( `wp_trash_post( ${ parent.id } );` );
 	const [ trashed, trashedUncached ] = await servedAndUncached( browser, gallery );
 	expect( trashed ).toEqual( trashedUncached );
 	expect( trashed.album ).toBeNull();
 
 	await cached( browser, gallery.url, gallery.id );
-	wp( [ 'eval', `wp_untrash_post( ${ parent.id } );` ] );
+	wpEval( `wp_untrash_post( ${ parent.id } );` );
 	const [ restored, restoredUncached ] = await servedAndUncached( browser, gallery );
 	expect( restored ).toEqual( restoredUncached );
 	expect( restored.album ).toBe( parent.id );
