@@ -386,6 +386,35 @@ test.describe( 'in the builder', () => {
 		expect( pageErrors ).toEqual( [] );
 		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
 	} );
+
+	test( 'with both preview settings on, items and pagination respond, and the Lightbox keeps its keys', { tag: [ '@admin', '@lightbox' ] }, async ( { page } ) => {
+		const { id } = galleryPage( {
+			layout: 'grid',
+			pagination_type: 'paginated',
+			pagination_method: 'load_more',
+			items_per_page: { desktop: 2, tablet: 2, mobile: 2 },
+		} );
+		const target = builderPage( [ [ 'fotogrids-gallery', { gallery_id: String( id ), preview_click_behavior: '1', preview_pagination: '1' } ] ] );
+
+		const frame = await openBuilder( page, target.url );
+		const module = frame.locator( '.fl-module-fotogrids-gallery' );
+		await expect( module.locator( '.fg-item' ) ).toHaveCount( 2 );
+
+		await module.getByRole( 'button', { name: 'Load More' } ).click();
+		await expect( module.locator( '.fg-item' ) ).toHaveCount( 4 );
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toHaveCount( 0 );
+
+		await module.locator( '.fg-item' ).first().click();
+		const lightbox = frame.locator( 'dialog.fg-lightbox' );
+		await expect( lightbox ).toBeVisible();
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toHaveCount( 0 );
+
+		// R is Beaver Builder's responsive editing shortcut.
+		await page.keyboard.press( 'r' );
+		await page.keyboard.press( 'Escape' );
+		await expect( lightbox ).toBeHidden();
+		await expect( page.locator( 'body' ) ).not.toHaveClass( /fl-builder-ui-iframe-responsive-editing/ );
+	} );
 } );
 
 test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
@@ -408,6 +437,8 @@ test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
 		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
 		await expect( field ).toBeVisible( { timeout: 15000 } );
 		await expect( page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' ) ).toHaveCount( 0 );
+		// Beaver Builder focuses the first field once the form is ready.
+		await expect( page.locator( 'form.fl-builder-settings select[name="gallery_source"]' ) ).toBeFocused();
 
 		await field.click();
 		await page.keyboard.type( String( id ), { delay: 50 } );

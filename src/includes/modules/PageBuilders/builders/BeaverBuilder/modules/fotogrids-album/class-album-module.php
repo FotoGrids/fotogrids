@@ -9,6 +9,7 @@
 namespace FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules;
 
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Module as Beaver_Builder_Module;
+use FotoGrids\Modules\PageBuilders\Preview_Renderer;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -59,7 +60,7 @@ final class Album_Module extends Module_Base {
 	 */
 	public static function get_form(): array {
 		return array(
-			'general' => array(
+			'general'           => array(
 				'title'    => __( 'Album', 'fotogrids' ),
 				'sections' => array(
 					'collection' => array(
@@ -75,6 +76,7 @@ final class Album_Module extends Module_Base {
 					),
 				),
 			),
+			'fotogrids_preview' => self::get_preview_tab(),
 		);
 	}
 
@@ -99,6 +101,39 @@ final class Album_Module extends Module_Base {
 	}
 
 	/**
+	 * Number of galleries in the album.
+	 *
+	 * @since 1.3.0
+	 * @param int $collection_id Album post ID.
+	 * @return int
+	 */
+	protected function get_item_count( int $collection_id ): int {
+		return class_exists( '\FotoGrids\Gallery_Album_Relations' )
+			? count( (array) \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album( $collection_id ) )
+			: 0;
+	}
+
+	/**
+	 * Builder placeholder shown before an album is chosen.
+	 *
+	 * @since 1.3.0
+	 * @return string
+	 */
+	protected function get_empty_prompt(): string {
+		return __( 'Choose an album in the module settings.', 'fotogrids' );
+	}
+
+	/**
+	 * Description of the "Make items clickable" preview setting.
+	 *
+	 * @since 1.3.0
+	 * @return string
+	 */
+	protected static function get_click_preview_description(): string {
+		return __( 'When disabled, item clicks open the module settings in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' );
+	}
+
+	/**
 	 * Render the album through the shortcode pipeline.
 	 *
 	 * @since 1.3.0
@@ -107,5 +142,17 @@ final class Album_Module extends Module_Base {
 	 */
 	protected function render_collection( int $collection_id ): string {
 		return (string) \FotoGrids\Public_Render::album_shortcode( array( 'id' => $collection_id ) );
+	}
+
+	/**
+	 * Render the album for the builder.
+	 *
+	 * @since 1.3.0
+	 * @param int                                          $collection_id   Album post ID.
+	 * @param array{click_behavior: bool, pagination: bool} $preview_options Normalised preview settings.
+	 * @return string
+	 */
+	protected function render_preview( int $collection_id, array $preview_options ): string {
+		return Preview_Renderer::render_album_html( $collection_id, $preview_options, (string) $this->node );
 	}
 }

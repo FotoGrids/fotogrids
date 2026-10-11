@@ -17,6 +17,15 @@ const PLACEHOLDER_SELECTOR = '.fg-pb-bb-picker[data-fg-picker-kind]';
 const FIELD_SELECTOR = '.fg-pb-bb-collection';
 const INPUT_SELECTOR = '.fg-pb-bb-collection__input';
 const READY_CLASS = 'is-fg-pb-ready';
+const LAYOUT_FRAME_SELECTOR = 'iframe.fl-builder-ui-iframe';
+const PAGINATION_SELECTOR = '.fg-pagination, .fg-pagination__btn';
+const EMPTY_STATE_CTA_SELECTOR = '.fg-pb-bb-preview .fg-pb-empty-state__cta';
+const PREVIEW_SELECTOR = '.fg-pb-bb-preview';
+const CLICKABLE_CLASS = 'is-fg-pb-clickable';
+const FROZEN_CLASS = 'is-fg-pb-pagination-frozen';
+const ITEM_CONTROL_SELECTOR = '.fg-item, a, button';
+const OPEN_LIGHTBOX_SELECTOR =
+	'dialog.fg-lightbox[open], .fg-lb-mini, .fg-lb-grid, .fg-lb-mv';
 
 const roots = new Map();
 const cache = { gallery: null, album: null };
@@ -271,6 +280,114 @@ const CollectionPicker = ({ kind, input }) => {
 };
 
 /**
+ * Mute Beaver Builder's keyboard shortcuts while a FotoGrids Lightbox is open.
+ *
+ * @param {Document} targetDocument Document holding the builder layout.
+ */
+const muteShortcutsInLightbox = (targetDocument) => {
+	const Mousetrap = targetDocument.defaultView?.Mousetrap;
+	if (
+		!Mousetrap?.prototype?.stopCallback ||
+		Mousetrap.prototype.fgPbBbMuted
+	) {
+		return;
+	}
+	const stopCallback = Mousetrap.prototype.stopCallback;
+	Mousetrap.prototype.stopCallback = function (...args) {
+		if (targetDocument.querySelector(OPEN_LIGHTBOX_SELECTOR)) {
+			return true;
+		}
+		return stopCallback.apply(this, args);
+	};
+	Mousetrap.prototype.fgPbBbMuted = true;
+};
+
+/**
+ * Handle preview clicks: frozen pagination, empty-state links, and live
+ * clicks that must not open the module settings.
+ *
+ * @param {Document} targetDocument Document holding the builder layout.
+ */
+const bindLayoutClicks = (targetDocument) => {
+	if (!targetDocument || targetDocument.fgPbBbClicksBound) {
+		return;
+	}
+	targetDocument.fgPbBbClicksBound = true;
+
+	// Shortcuts may load after binding.
+	targetDocument.addEventListener(
+		'keydown',
+		() => muteShortcutsInLightbox(targetDocument),
+		true
+	);
+
+	targetDocument.addEventListener(
+		'click',
+		(event) => {
+			const target = event.target;
+			if (!target || !target.closest) {
+				return;
+			}
+			const cta = target.closest(EMPTY_STATE_CTA_SELECTOR);
+			if (cta) {
+				event.preventDefault();
+				event.stopPropagation();
+				if (cta.dataset.fgEditUrl) {
+					openTab(cta.dataset.fgEditUrl);
+				}
+				return;
+			}
+			const preview = target.closest(PREVIEW_SELECTOR);
+			if (!preview) {
+				return;
+			}
+			const frozen = preview.classList.contains(FROZEN_CLASS);
+			if (frozen && target.closest(PAGINATION_SELECTOR)) {
+				event.preventDefault();
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				return;
+			}
+			const live =
+				(!frozen && target.closest(PAGINATION_SELECTOR)) ||
+				(preview.classList.contains(CLICKABLE_CLASS) &&
+					target.closest(ITEM_CONTROL_SELECTOR));
+			const module = live && preview.closest('.fl-module');
+			if (module) {
+				// Stop at the module, after FotoGrids' handlers.
+				module.addEventListener(
+					'click',
+					(moduleEvent) => moduleEvent.stopPropagation(),
+					{ once: true }
+				);
+			}
+		},
+		true
+	);
+};
+
+/**
+ * Bind layout clicks in this document and every layout iframe.
+ */
+const bindLayouts = () => {
+	bindLayoutClicks(document);
+	document.querySelectorAll(LAYOUT_FRAME_SELECTOR).forEach((frame) => {
+		const bind = () => {
+			try {
+				bindLayoutClicks(frame.contentDocument);
+			} catch (error) {
+				// Cross-origin frame.
+			}
+		};
+		if (!frame.dataset.fgPbBbBound) {
+			frame.dataset.fgPbBbBound = '1';
+			frame.addEventListener('load', bind);
+		}
+		bind();
+	});
+};
+
+/**
  * Mount cards into new placeholders and unmount removed ones.
  */
 const reconcile = () => {
@@ -302,11 +419,16 @@ const reconcile = () => {
 	});
 };
 
-if (config.canPick) {
-	new MutationObserver(reconcile).observe(document.body, {
-		childList: true,
-		subtree: true,
-	});
+const update = () => {
+	if (config.canPick) {
+		reconcile();
+	}
+	bindLayouts();
+};
 
-	reconcile();
-}
+new MutationObserver(update).observe(document.body, {
+	childList: true,
+	subtree: true,
+});
+
+update();
