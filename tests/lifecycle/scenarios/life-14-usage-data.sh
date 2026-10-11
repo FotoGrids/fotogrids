@@ -1,12 +1,12 @@
 # LIFE-19. Share usage data, switched off and on again once the site has a
 # Freemius account.
 #
-# The Freemius API is answered by fixtures/freemius-api.php, which records every
+# The Freemius API is answered by tests/harness/freemius-api.php, which records every
 # request in the fs_test_log option.
 
 scratch_install life14
 mkdir -p "$SCRATCH_DIR/wp-content/mu-plugins"
-cp "$HERE/fixtures/freemius-api.php" "$SCRATCH_DIR/wp-content/mu-plugins/"
+cp "$HERE/../harness/freemius-api.php" "$SCRATCH_DIR/wp-content/mu-plugins/"
 scratch_activate
 
 consent() {
@@ -65,5 +65,14 @@ case "$on" in
 esac
 assert_eq yes "$( sync_scheduled )" "the daily sync is scheduled again"
 assert_eq 1 "$( freemius '(int) $fs->is_registered()' )" "and the account is connected again"
+
+# Freemius refusing the opt-out must still leave nothing to send.
+$WP option update fs_test_fail 1 --quiet
+consent false
+$WP option delete fs_test_fail --quiet
+
+assert_eq 0 "$( $WP option get fotogrids_share_statistics )" "with the Freemius API failing, the choice is still stored as off"
+assert_eq 0 "$( freemius '(int) $fs->is_tracking_allowed()' )" "tracking is switched off on the site"
+assert_eq 1 "$( freemius '(int) $fs->is_anonymous()' )" "and the account is disconnected locally"
 
 scratch_teardown

@@ -37,6 +37,14 @@ final class FreemiusConsentContractTest extends TestCase {
 		$this->assertStringContainsString( 'toggle_user_permission(', $body );
 	}
 
+	public function test_the_local_opt_out_methods_are_public(): void {
+		$freemius = (string) file_get_contents( FOTOGRIDS_PLUGIN_DIR . 'freemius/includes/class-freemius.php' );
+		$manager  = (string) file_get_contents( FOTOGRIDS_PLUGIN_DIR . 'freemius/includes/managers/class-fs-permission-manager.php' );
+
+		$this->assertMatchesRegularExpression( '/\n\s*(public\s+)?function\s+skip_connection\(/', $freemius );
+		$this->assertMatchesRegularExpression( '/\n\s*(public\s+)?function\s+update_site_tracking\(\s*\$is_enabled/', $manager );
+	}
+
 	public function test_the_permission_ids_still_exist(): void {
 		$source = (string) file_get_contents( FOTOGRIDS_PLUGIN_DIR . 'freemius/includes/managers/class-fs-permission-manager.php' );
 

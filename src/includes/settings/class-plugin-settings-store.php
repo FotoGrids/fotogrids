@@ -265,8 +265,9 @@ final class Plugin_Settings_Store {
 	 * is registered by `opt_in()` when the choice is on. A site that has one
 	 * goes through the SDK's own opt-out and opt-in, which update the
 	 * permissions on the Freemius server, schedule or clear its daily sync,
-	 * and disconnect or reconnect the account. Turning the choice off also
-	 * revokes marketing consent first, while the account can still be
+	 * and disconnect or reconnect the account; if Freemius refuses the
+	 * opt-out, the site is opted out locally instead. Turning the choice off
+	 * also revokes marketing consent first, while the account can still be
 	 * reached. Both the Settings tab REST path and the wizard's path call
 	 * this so the option and Freemius state can't drift out of sync.
 	 *
@@ -293,6 +294,10 @@ final class Plugin_Settings_Store {
 					if ( $fs->is_registered( true ) ) {
 						if ( ! self::toggle_freemius_tracking( $fs, $opted_in ) ) {
 							\FotoGrids\Debug_Log::write( 'license', 'apply_share_statistics_consent: the Freemius permission update did not complete' );
+
+							if ( ! $opted_in ) {
+								self::opt_out_locally( $fs );
+							}
 						}
 						$fs_after = self::probe_freemius_state();
 					} elseif ( $opted_in ) {
@@ -340,6 +345,25 @@ final class Plugin_Settings_Store {
 		);
 
 		return $opted_in;
+	}
+
+	/**
+	 * Stop Freemius sending anything from this site without reaching its API.
+	 *
+	 * Used when the API refuses or cannot be reached while the choice is being
+	 * turned off: tracking is switched off locally and the account is put in
+	 * anonymous mode, so no sync sends data until the choice is turned on.
+	 *
+	 * @since  1.3.0
+	 * @param  \Freemius $fs The FotoGrids Freemius instance.
+	 * @return void
+	 */
+	private static function opt_out_locally( \Freemius $fs ): void {
+		if ( class_exists( 'FS_Permission_Manager' ) ) {
+			\FS_Permission_Manager::instance( $fs )->update_site_tracking( false );
+		}
+
+		$fs->skip_connection();
 	}
 
 	/**
