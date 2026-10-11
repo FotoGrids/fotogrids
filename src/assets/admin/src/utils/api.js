@@ -1,6 +1,7 @@
 /**
  * API Helper Utilities
  */
+import { isLeavingPage } from './leaving-page';
 
 /**
  * Check if WordPress API is available
@@ -175,7 +176,9 @@ export const fetchRecentlyEdited = (limit = 5) => {
 		})
 		.then((data) => data.items || [])
 		.catch((error) => {
-			console.error('Error fetching recently edited:', error);
+			if (!isLeavingPage()) {
+				console.error('Error fetching recently edited:', error);
+			}
 			return [];
 		});
 };
@@ -206,7 +209,9 @@ export const fetchDashboardStats = () => {
 			method: 'GET',
 		})
 		.catch((error) => {
-			console.error('Error fetching dashboard stats:', error);
+			if (!isLeavingPage()) {
+				console.error('Error fetching dashboard stats:', error);
+			}
 			return { ...emptyStats };
 		});
 };
