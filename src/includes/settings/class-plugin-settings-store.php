@@ -32,6 +32,15 @@ final class Plugin_Settings_Store {
 
 	const OPTION_GENERAL = 'fotogrids_general_settings';
 
+	/**
+	 * Freemius permissions the usage-data choice covers: name and email,
+	 * site details, usage events, and the installed plugins and themes.
+	 *
+	 * @since 1.3.0
+	 * @var array<int, string>
+	 */
+	private const FREEMIUS_PERMISSIONS = array( 'user', 'site', 'events', 'extensions' );
+
 	// ---------------------------------------------------------------------
 	// General (responsiveness) settings
 	// ---------------------------------------------------------------------
@@ -252,13 +261,14 @@ final class Plugin_Settings_Store {
 	 * Apply the user's usage-data sharing choice.
 	 *
 	 * Writes the local `fotogrids_share_statistics` option as `'1'` / `'0'`
-	 * and mirrors the change into Freemius. On first opt-in, when the site
-	 * is still anonymous and has no install, `opt_in()` registers it and
-	 * starts sending data; afterwards the choice toggles the per-site
-	 * tracking permission via `FS_Permission_Manager::update_site_tracking()`,
-	 * which is what `Freemius::is_tracking_allowed()` reads. Both the
-	 * Settings tab REST path and the wizard's path call this so the option
-	 * and Freemius state can't drift out of sync.
+	 * and mirrors the change into Freemius. A site with no Freemius account
+	 * is registered by `opt_in()` when the choice is on. A site that has one
+	 * goes through the SDK's own opt-out and opt-in, which update the
+	 * permissions on the Freemius server, schedule or clear its daily sync,
+	 * and disconnect or reconnect the account. Turning the choice off also
+	 * revokes marketing consent first, while the account can still be
+	 * reached. Both the Settings tab REST path and the wizard's path call
+	 * this so the option and Freemius state can't drift out of sync.
 	 *
 	 * @since 1.0.0
 	 * @param bool $opted_in
@@ -272,14 +282,20 @@ final class Plugin_Settings_Store {
 		$fs_before = self::probe_freemius_state();
 		$fs_after  = $fs_before; // updated below if we successfully mirror
 
+		if ( ! $opted_in ) {
+			self::apply_marketing_consent( false );
+		}
+
 		if ( function_exists( 'freemius' ) ) {
 			$fs = freemius( 'fotogrids' );
 			if ( $fs instanceof \Freemius ) {
 				try {
-					if ( $opted_in && method_exists( $fs, 'is_registered' ) && ! $fs->is_registered() ) {
-						// Under anonymous_mode no Freemius install exists yet, so
-						// flipping a tracking permission has nothing to act on.
-						// opt_in() registers the site and starts sending data.
+					if ( $fs->is_registered( true ) ) {
+						if ( ! self::toggle_freemius_tracking( $fs, $opted_in ) ) {
+							\FotoGrids\Debug_Log::write( 'license', 'apply_share_statistics_consent: the Freemius permission update did not complete' );
+						}
+						$fs_after = self::probe_freemius_state();
+					} elseif ( $opted_in ) {
 						// is_marketing_allowed is false: this consent covers
 						// diagnostics only, never promotional email. redirect is
 						// false because this runs in a REST/AJAX request.
@@ -297,16 +313,6 @@ final class Plugin_Settings_Store {
 							false
 						);
 						$fs_after = self::probe_freemius_state();
-					} elseif ( class_exists( 'FS_Permission_Manager' ) ) {
-						$pm = \FS_Permission_Manager::instance( $fs );
-						if ( $pm && method_exists( $pm, 'update_site_tracking' ) ) {
-							$pm->update_site_tracking( $opted_in );
-							$fs_after = self::probe_freemius_state();
-						} else {
-							\FotoGrids\Debug_Log::write( 'license', 'apply_share_statistics_consent: FS_Permission_Manager has no update_site_tracking()' );
-						}
-					} else {
-						\FotoGrids\Debug_Log::write( 'license', 'apply_share_statistics_consent: FS_Permission_Manager not loaded' );
 					}
 				} catch ( \Throwable $e ) {
 					\FotoGrids\Debug_Log::write( 'license', 'apply_share_statistics_consent: Freemius mirror threw: ' . $e->getMessage() );
@@ -333,13 +339,31 @@ final class Plugin_Settings_Store {
 			)
 		);
 
-		// Marketing consent depends on usage-data sharing; revoke it when
-		// sharing is turned off so the two states can't contradict.
-		if ( ! $opted_in ) {
-			self::apply_marketing_consent( false );
+		return $opted_in;
+	}
+
+	/**
+	 * Switch the Freemius permissions behind the usage-data choice.
+	 *
+	 * Calls `Freemius::toggle_permission_tracking()`, the method behind the
+	 * SDK's own Opt Out dialog. It is private, so it is reached through
+	 * reflection; `FreemiusConsentContractTest` fails if a vendored SDK update
+	 * changes it.
+	 *
+	 * @since  1.3.0
+	 * @param  \Freemius $fs      The FotoGrids Freemius instance.
+	 * @param  bool      $enabled Whether to grant the permissions.
+	 * @return bool True when the SDK reported success.
+	 */
+	private static function toggle_freemius_tracking( \Freemius $fs, bool $enabled ): bool {
+		if ( ! method_exists( $fs, 'toggle_permission_tracking' ) ) {
+			return false;
 		}
 
-		return $opted_in;
+		$method = new \ReflectionMethod( $fs, 'toggle_permission_tracking' );
+		$method->setAccessible( true );
+
+		return true === $method->invoke( $fs, self::FREEMIUS_PERMISSIONS, $enabled );
 	}
 
 	/**
