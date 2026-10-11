@@ -106,7 +106,8 @@ class Admin_Init {
 	public static function add_admin_menu() {
 		$dashboard_hook = add_menu_page(
 			__( 'FotoGrids', 'fotogrids' ),
-			__( 'FotoGrids', 'fotogrids' ),
+			// Untranslated: WordPress builds every FotoGrids screen ID from the menu title.
+			'FotoGrids',
 			self::menu_parent_capability(),
 			'fotogrids',
 			array( __CLASS__, 'dashboard_page' ),
