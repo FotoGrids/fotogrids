@@ -7,6 +7,7 @@
  *   wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
  *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
  *   wp eval-file collection.php op=render items=4 author=fg-author
+ *   wp eval-file collection.php op=render items=4,5 password=open-sesame
  *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
  *   wp eval-file collection.php op=album author=fg-author status=draft
  *   wp eval-file collection.php op=page gallery=13
@@ -172,7 +173,19 @@ if ( 'render' === $op ) {
 	}
 
 	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
-	if ( is_array( $settings ) && $settings ) {
+	if ( ! is_array( $settings ) ) {
+		$settings = array();
+	}
+
+	// A plaintext password, encrypted here: the stored value is ciphertext, so a
+	// spec cannot write one itself.
+	$password = fg_col_arg( $args, 'password' );
+	if ( '' !== $password ) {
+		$settings['password_protect'] = true;
+		$settings['password']         = \FotoGrids\Password_Crypto::encrypt( $password );
+	}
+
+	if ( $settings ) {
 		fg_col_settings( $gallery_id, $settings );
 	}
 
