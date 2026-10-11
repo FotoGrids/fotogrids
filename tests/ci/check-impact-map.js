@@ -13,7 +13,7 @@
 
 const { execFileSync } = require( 'child_process' );
 const path = require( 'path' );
-const { EVERYTHING, loadMap } = require( './impact' );
+const { EVERYTHING, listedTests, loadMap } = require( './impact' );
 
 const ROOT = path.join( __dirname, '..', '..' );
 const PROJECTS = [ 'readonly', 'scoped', 'serial' ];
@@ -42,33 +42,13 @@ function selected( grep ) {
 	let total = 0;
 
 	for ( const project of PROJECTS ) {
-		const args = [
-			'playwright',
-			'test',
-			'--list',
-			`--project=${ project }`,
-			'--no-deps',
-		];
+		const args = [ `--project=${ project }`, '--no-deps' ];
 
 		if ( grep ) {
 			args.push( '--grep', grep );
 		}
 
-		let out;
-		try {
-			out = execFileSync( 'npx', args, {
-				cwd: ROOT,
-				encoding: 'utf8',
-				stdio: [ 'ignore', 'pipe', 'ignore' ],
-			} );
-		} catch ( error ) {
-			// Playwright exits non-zero on an empty selection; here that is
-			// an answer, not a failure.
-			out = error.stdout ?? '';
-		}
-
-		const reported = out.match( /Total: (\d+) test/ );
-		total += reported ? Number( reported[ 1 ] ) : 0;
+		total += listedTests( args );
 	}
 
 	return total;

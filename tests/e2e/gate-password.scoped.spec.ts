@@ -16,7 +16,7 @@ import { wpEval } from './support/roles';
  */
 
 const PASSWORD = 'open-sesame';
-const FIVE = fixture<number[]>('F-small', 'items');
+const five = (): number[] => fixture<number[]>('F-small', 'items');
 
 /** The lock screen's own elements. */
 const GATE = '.fotogrids-gate';
@@ -107,7 +107,7 @@ test.describe('a locked gallery', () => {
 			await page.locator(`${FORM} [type="submit"]`).click();
 
 			await gallery.waitFor();
-			await expect(gallery.items()).toHaveCount(FIVE.length);
+			await expect(gallery.items()).toHaveCount(five().length);
 			await expect(page.locator(GATE)).toHaveCount(0);
 		}
 	);
@@ -189,7 +189,7 @@ test.describe('remembering an unlock', () => {
 
 				const gallery = new GalleryRender(page, id);
 				await gallery.waitFor();
-				await expect(gallery.items()).toHaveCount(FIVE.length);
+				await expect(gallery.items()).toHaveCount(five().length);
 				await expect(page.locator(GATE)).toHaveCount(0);
 			} finally {
 				await context.close();

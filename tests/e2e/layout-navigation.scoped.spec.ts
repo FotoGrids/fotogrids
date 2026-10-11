@@ -11,8 +11,8 @@ import type { Locator } from '@playwright/test';
  * scoped: each test renders its own gallery and reads it.
  */
 
-const FIVE = fixture<number[]>('F-small', 'items');
-const SIXTY = fixture<number[]>('F-large', 'items');
+const five = (): number[] => fixture<number[]>('F-small', 'items');
+const sixty = (): number[] => fixture<number[]>('F-large', 'items');
 
 const DESKTOP = { width: 1280, height: 900 };
 
@@ -61,7 +61,7 @@ test.describe('Slider', () => {
 					layout_show_counter: true,
 					layout_thumbnails_show: true,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -74,13 +74,13 @@ test.describe('Slider', () => {
 			).toHaveCount(2);
 			await expect(
 				gallery.root.locator('.fg-carousel-bullet')
-			).toHaveCount(FIVE.length);
+			).toHaveCount(five().length);
 			await expect(
 				gallery.root.locator('.fg-carousel-counter')
 			).toHaveCount(1);
 			await expect(
 				gallery.root.locator('.fg-carousel-thumb')
-			).toHaveCount(FIVE.length);
+			).toHaveCount(five().length);
 		}
 	);
 
@@ -96,7 +96,7 @@ test.describe('Slider', () => {
 					layout_show_counter: false,
 					layout_thumbnails_show: false,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -118,7 +118,7 @@ test.describe('Slider', () => {
 			).toHaveCount(0);
 
 			// The items are still all there; only the navigation went.
-			await expect(gallery.items()).toHaveCount(FIVE.length);
+			await expect(gallery.items()).toHaveCount(five().length);
 		}
 	);
 
@@ -138,7 +138,7 @@ test.describe('Slider', () => {
 					layout_transition_duration: 'custom',
 					layout_transition_duration_custom: 900,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -170,7 +170,7 @@ test.describe('Slider', () => {
 					layout_show_counter: true,
 					layout_loop: false,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -183,16 +183,16 @@ test.describe('Slider', () => {
 			await expect(
 				gallery.root.locator('[data-fg-carousel-counter]')
 			).toBeVisible();
-			expect(await slide(gallery)).toBe(`1 / ${FIVE.length}`);
+			expect(await slide(gallery)).toBe(`1 / ${five().length}`);
 
 			await gallery.root.focus();
 
-			const last = `${FIVE.length} / ${FIVE.length}`;
+			const last = `${five().length} / ${five().length}`;
 			const moves = [
-				{ key: 'ArrowRight', at: `2 / ${FIVE.length}` },
-				{ key: 'ArrowLeft', at: `1 / ${FIVE.length}` },
+				{ key: 'ArrowRight', at: `2 / ${five().length}` },
+				{ key: 'ArrowLeft', at: `1 / ${five().length}` },
 				{ key: 'End', at: last },
-				{ key: 'Home', at: `1 / ${FIVE.length}` },
+				{ key: 'Home', at: `1 / ${five().length}` },
 			] as const;
 
 			for (const move of moves) {
@@ -214,7 +214,7 @@ test.describe('Slider', () => {
 					layout_show_counter: true,
 					layout_loop: false,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -228,7 +228,7 @@ test.describe('Slider', () => {
 			await page.keyboard.press('End');
 			await settled(scroller);
 
-			expect(await slide(gallery)).toBe(`1 / ${FIVE.length}`);
+			expect(await slide(gallery)).toBe(`1 / ${five().length}`);
 		}
 	);
 
@@ -252,7 +252,7 @@ test.describe('Slider', () => {
 					layout_transition_duration: 'custom',
 					layout_transition_duration_custom: 3000,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 			const scroller = gallery.root.locator('.fg-carousel-track-wrapper');
@@ -315,7 +315,7 @@ test.describe('Image Viewer', () => {
 					layout_show_arrows: false,
 					layout_show_bullets: true,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -355,7 +355,7 @@ test.describe('Image Viewer', () => {
 				caption_hide_description: false,
 			};
 
-			const grid = galleryPage({ layout: 'grid', ...settings }, FIVE);
+			const grid = galleryPage({ layout: 'grid', ...settings }, five());
 			const gridRender = new GalleryRender(page, grid.id);
 
 			await page.goto(grid.url);
@@ -375,7 +375,7 @@ test.describe('Image Viewer', () => {
 
 			const viewer = galleryPage(
 				{ layout: 'image-viewer', ...settings },
-				FIVE
+				five()
 			);
 			const viewerRender = new GalleryRender(page, viewer.id);
 
@@ -418,7 +418,7 @@ test.describe('a gallery of sixty', () => {
 			`LAY-27: ${layout} renders ${items} of sixty`,
 			{ tag: '@layout' },
 			async ({ page }) => {
-				const { id, url } = galleryPage({ layout }, SIXTY);
+				const { id, url } = galleryPage({ layout }, sixty());
 				const gallery = new GalleryRender(page, id);
 
 				await page.setViewportSize(DESKTOP);
@@ -439,7 +439,7 @@ test.describe('a gallery of sixty', () => {
 					layout: 'grid',
 					items_per_page: { desktop: 20, tablet: 20, mobile: 20 },
 				},
-				SIXTY
+				sixty()
 			);
 			const gallery = new GalleryRender(page, id);
 
