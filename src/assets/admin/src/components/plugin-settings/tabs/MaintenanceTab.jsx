@@ -124,7 +124,7 @@ const MaintenanceTab = () => {
 		reset: {
 			title: __('Reset all settings?', 'fotogrids'),
 			body: __(
-				'This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics and Pro licence are not affected.',
+				'This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics, permissions, Pro licence and privacy choices are not affected.',
 				'fotogrids'
 			),
 			actionLabel: __('Reset settings', 'fotogrids'),
@@ -273,7 +273,7 @@ const MaintenanceTab = () => {
 				<DangerZone
 					title={__('Reset all settings', 'fotogrids')}
 					description={__(
-						'Restores every Plugin Settings tab to defaults. Galleries, albums, statistics and your Pro licence are preserved.',
+						'Restores Plugin Settings to defaults. Galleries, albums, statistics, permissions, your Pro licence and your privacy choices are preserved.',
 						'fotogrids'
 					)}
 					icon="settings"

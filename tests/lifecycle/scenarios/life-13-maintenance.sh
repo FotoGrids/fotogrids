@@ -57,64 +57,80 @@ assert_eq "$schema_version" "$( $WP option get fotogrids_db_version )" \
 
 # --- LIFE-18. Resetting the settings -----------------------------------------
 #
-# Every option the plugin owns falls into one of three groups, and the reset
-# treats them differently. The third group is not a decision the route makes -
-# those keys are in neither of its lists, and survive because nothing names
-# them.
+# Every option the plugin owns is declared under includes/options/declarations/
+# as cleared or kept by the reset. The two lists below pin that decision, and
+# the registry is checked against them, so moving an option between them takes
+# an edit here as well.
 
-RESET="fotogrids_general_settings fotogrids_permission_settings
-	fotogrids_integration_settings fotogrids_gallery_defaults
-	fotogrids_album_defaults fotogrids_sharing_settings fotogrids_view_settings
-	fotogrids_autosave fotogrids_share_statistics fotogrids_allow_google_fonts
-	fotogrids_allow_news_updates fotogrids_preserve_data_on_uninstall
-	fotogrids_notice_bar_dismissed fotogrids_review_stats
-	fotogrids_debug_channels"
+RESET="fotogrids_album_defaults fotogrids_autosave fotogrids_debug_channels
+	fotogrids_gallery_defaults fotogrids_general_settings
+	fotogrids_integration_settings fotogrids_media_settings
+	fotogrids_permission_settings fotogrids_preserve_data_on_uninstall
+	fotogrids_seo_settings fotogrids_sharing_settings
+	fotogrids_view_rewrite_version fotogrids_view_settings
+	fotogrids_watermark_config_hash fotogrids_watermark_settings"
 
-KEPT="fotogrids_version fotogrids_db_version fotogrids_activated_time
-	fotogrids_deactivated_time fotogrids_site_id fotogrids_license_key
-	fotogrids_license_data fotogrids_license_secret
-	fotogrids_license_last_valid_response fotogrids_license_last_check_time"
+KEPT="fotogrids_activated_time fotogrids_allow_google_fonts
+	fotogrids_allow_news_updates fotogrids_caps_version fotogrids_custom_sizes
+	fotogrids_db_version fotogrids_deactivated_time fotogrids_error_log
+	fotogrids_import_export_log fotogrids_license_data fotogrids_license_key
+	fotogrids_license_last_check_time fotogrids_license_last_valid_response
+	fotogrids_license_secret fotogrids_marketing_allowed fotogrids_migration_log
+	fotogrids_notice_bar_dismissed fotogrids_remote_catalog_meta
+	fotogrids_review_stats fotogrids_settings_mode fotogrids_share_statistics
+	fotogrids_site_id fotogrids_unauthorised_settings_visibility
+	fotogrids_user_persona fotogrids_version"
 
-# In neither list. They survive a reset, and the route never decided that.
-UNLISTED="fotogrids_caps_version fotogrids_seo_settings
-	fotogrids_watermark_settings fotogrids_settings_mode fotogrids_user_persona
-	fotogrids_marketing_allowed"
+declared() {
+	$WP eval "echo implode( ' ', \\FotoGrids\\Options\\Option_Registry::keys( '$1' ) );"
+}
 
-# Derived rather than set: the reset clears media settings and reseeds them, and
-# the view router rewrites its own signature on the next load. Neither can be
-# asserted by planting a value, so both are checked on their own below.
-DERIVED="fotogrids_media_settings fotogrids_view_rewrite_version"
+assert_eq "$( echo $RESET )" "$( declared reset )" "the registry clears exactly the options listed here"
+assert_eq "$( echo $KEPT )" "$( declared keep )" "and keeps exactly the others"
 
-for option in $RESET $KEPT $UNLISTED; do
+for option in $RESET $KEPT; do
 	$WP option update "$option" "planted-$option" --quiet
 done
+
+$WP eval 'global $wpdb;
+	$wpdb->insert( $wpdb->prefix . "fotogrids_render_cache", array(
+		"object_type" => "gallery", "object_id" => 1, "cache_key" => "planted",
+		"html" => "<div></div>", "expires_at" => "2099-01-01 00:00:00" ) );'
+assert_eq 1 "$( rows_in render_cache )" "a gallery render is cached before the reset"
 
 reset=$( post_as_admin /admin/maintenance/reset-options )
 assert_contains "$reset" '"success":true' "the reset reported success"
 
-gone=0 stayed=0
+# A cleared option either reads back as absent (exit 1) or as the value its
+# owner reseeded. Any other exit status is a failed boot, not a cleared option.
+before=$FG_LIFECYCLE_FAILURES
 for option in $RESET; do
-	[ "$( $WP option get "$option" 2>/dev/null )" = "planted-$option" ] \
-		&& fail "$option survived the reset" || gone=$(( gone + 1 ))
+	value=$( $WP option get "$option" 2>/dev/null )
+	status=$?
+	if [ "$status" -gt 1 ]; then
+		fail "reading $option after the reset exited $status"
+	elif [ "$value" = "planted-$option" ]; then
+		fail "$option survived the reset"
+	fi
 done
-pass "all $gone listed settings were cleared"
+[ "$FG_LIFECYCLE_FAILURES" -eq "$before" ] && pass "every reset option was cleared"
 
-for option in $KEPT $UNLISTED; do
+before=$FG_LIFECYCLE_FAILURES
+for option in $KEPT; do
 	[ "$( $WP option get "$option" 2>/dev/null )" = "planted-$option" ] \
-		&& stayed=$(( stayed + 1 )) || fail "$option was cleared by the reset"
+		|| fail "$option was changed by the reset"
 done
-pass "all $stayed preserved and unlisted options survived"
+[ "$FG_LIFECYCLE_FAILURES" -eq "$before" ] && pass "every kept option is unchanged"
 
+assert_eq 0 "$( rows_in render_cache )" "the render cache was flushed"
 assert_contains "$( $WP option get fotogrids_media_settings --format=json )" '{' \
 	"media settings were cleared and reseeded with defaults, not left wiped"
 signature=$( $WP option get fotogrids_view_rewrite_version )
-[ -n "$signature" ] && pass "the view router's signature is still there" \
-	|| fail "the view router's signature was cleared"
+[ -n "$signature" ] && pass "the view router stamped its signature again on the next load" \
+	|| fail "the view router's signature was not rebuilt"
 
-# The groups above must account for every option the plugin owns. An option added
-# without a decision about the reset lands here rather than in a bug report from
-# a site owner whose settings did or did not survive.
-known=" $( echo $RESET $KEPT $UNLISTED $DERIVED ) "
+# Every option on the site must be one the registry declares.
+known=" $( echo $RESET $KEPT ) "
 unaccounted=""
 for option in $( $WP option list --search='fotogrids_*' --field=option_name ); do
 	case "$known" in
@@ -122,6 +138,6 @@ for option in $( $WP option list --search='fotogrids_*' --field=option_name ); d
 		*) unaccounted="$unaccounted $option" ;;
 	esac
 done
-assert_eq "" "$unaccounted" "every option the plugin owns is accounted for by one of the groups"
+assert_eq "" "$unaccounted" "every option the plugin owns is declared"
 
 scratch_teardown
