@@ -623,8 +623,6 @@ class Admin_Init {
 
 		$boolean_settings = array(
 			'fotogrids_autosave',
-			'fotogrids_auto_clear_cache',
-			'fotogrids_enable_statistics',
 			'fotogrids_share_statistics',
 			'fotogrids_marketing_allowed',
 		);
