@@ -10,7 +10,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
  * The scheduled statistics cleanup applies the retention period to the
- * per-day history as well as to the totals.
+ * per-day history and keeps every totals row.
  *
  * Daily rows carry the site-local date, so the boundary day is checked in
  * timezones on both sides of UTC. The cleanup is fired through wp-cron.php,
@@ -178,6 +178,25 @@ test.describe( 'statistics retention', () => {
 		}
 	} );
 
+	test( 'a gallery unviewed for longer than the retention period keeps its totals', { tag: [ '@admin' ] }, async ( {
+		page,
+		request,
+	} ) => {
+		seed( galleryId, [ 400, 0 ], 400 );
+
+		const before: Record< number, string > = {};
+		for ( const days of [ 7, 30, 90 ] ) {
+			before[ days ] = await statsScreen( page, days );
+		}
+
+		await runCleanup( request );
+
+		expect( totalsRows() ).toBe( 1 );
+		for ( const days of [ 7, 30, 90 ] ) {
+			expect( await statsScreen( page, days ), `${ days }-day view` ).toBe( before[ days ] );
+		}
+	} );
+
 	test( 'a filtered retention period applies to the daily history', { tag: [ '@admin' ] }, async ( {
 		request,
 	} ) => {
@@ -240,5 +259,34 @@ test.describe( 'statistics retention', () => {
 
 		expect( viewsToday() ).toBe( before + 1 );
 		expect( dailyRows().map( ( r ) => r.date ) ).toEqual( [ today ] );
+	} );
+
+	test( 'the gallery and album editors show the Retain Statistics window they saved', { tag: [ '@admin', '@settings' ] }, async ( {
+		page,
+	} ) => {
+		const albumId = fixture( 'F-album', 'album' );
+
+		for ( const id of [ galleryId, albumId ] ) {
+			const retain = () =>
+				page
+					.locator( '.fotogrids-button-group', {
+						has: page.getByText( 'Retain Statistics', { exact: true } ),
+					} );
+
+			try {
+				await page.goto( `/wp-admin/post.php?post=${ id }&action=edit` );
+				await page.locator( 'button.fotogrids-settings-tab', { hasText: 'Advanced' } ).click();
+				await retain().locator( 'button[title="30 Days"]' ).click();
+				await expect
+					.poll( () => wpEval( `echo get_post_meta( ${ id }, 'fotogrids_retain_statistics', true );` ).trim() )
+					.toBe( '30' );
+
+				await page.reload();
+				await page.locator( 'button.fotogrids-settings-tab', { hasText: 'Advanced' } ).click();
+				await expect( retain().locator( 'button.fg-is-active' ) ).toHaveAttribute( 'title', '30 Days' );
+			} finally {
+				wpEval( `delete_post_meta( ${ id }, 'fotogrids_retain_statistics' );` );
+			}
+		}
 	} );
 } );
