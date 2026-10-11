@@ -260,4 +260,33 @@ test.describe( 'statistics retention', () => {
 		expect( viewsToday() ).toBe( before + 1 );
 		expect( dailyRows().map( ( r ) => r.date ) ).toEqual( [ today ] );
 	} );
+
+	test( 'the gallery and album editors show the Retain Statistics window they saved', { tag: [ '@admin', '@settings' ] }, async ( {
+		page,
+	} ) => {
+		const albumId = fixture( 'F-album', 'album' );
+
+		for ( const id of [ galleryId, albumId ] ) {
+			const retain = () =>
+				page
+					.locator( '.fotogrids-button-group', {
+						has: page.getByText( 'Retain Statistics', { exact: true } ),
+					} );
+
+			try {
+				await page.goto( `/wp-admin/post.php?post=${ id }&action=edit` );
+				await page.locator( 'button.fotogrids-settings-tab', { hasText: 'Advanced' } ).click();
+				await retain().locator( 'button[title="30 Days"]' ).click();
+				await expect
+					.poll( () => wpEval( `echo get_post_meta( ${ id }, 'fotogrids_retain_statistics', true );` ).trim() )
+					.toBe( '30' );
+
+				await page.reload();
+				await page.locator( 'button.fotogrids-settings-tab', { hasText: 'Advanced' } ).click();
+				await expect( retain().locator( 'button.fg-is-active' ) ).toHaveAttribute( 'title', '30 Days' );
+			} finally {
+				wpEval( `delete_post_meta( ${ id }, 'fotogrids_retain_statistics' );` );
+			}
+		}
+	} );
 } );
