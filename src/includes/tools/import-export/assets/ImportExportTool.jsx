@@ -652,7 +652,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	if (phase === 'done') {
 		return (
 			<Panel
-				title={__('Select export file', 'fotogrids')}
+				title={__('Import result', 'fotogrids')}
 				titleTag="h3"
 				equalBodyPadding
 			>

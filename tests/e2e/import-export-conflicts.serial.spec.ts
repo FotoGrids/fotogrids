@@ -212,6 +212,7 @@ test( 'Skip existing leaves the gallery and album as they are', { tag: [ '@admin
 	expect( layoutOf( own.album ) ).toBe( 'grid' );
 
 	await expect( page.getByRole( 'heading', { name: 'Nothing was imported' } ) ).toBeVisible();
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
 	await expect( page.getByText( 'Every record you selected was skipped.' ) ).toBeVisible();
 	expect( await resultRow( page, 'Imported' ) ).toEqual( [] );
 	expect( await resultRow( page, 'Skipped' ) ).toEqual( [ '1 Gallery', '1 Album' ] );
@@ -241,6 +242,7 @@ test( 'Overwrite writes the file\'s settings onto the existing gallery and album
 	expect( layoutOf( own.album ) ).toBe( 'masonry' );
 
 	await expect( page.getByRole( 'heading', { name: 'Import complete' } ) ).toBeVisible();
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
 	await expect( page.getByText( 'Your data has been imported successfully.' ) ).toBeVisible();
 	expect( await resultRow( page, 'Imported' ) ).toEqual( [ '1 Gallery', '1 Album' ] );
 	expect( await resultRow( page, 'Skipped' ) ).toEqual( [] );
@@ -283,6 +285,7 @@ test( 'Duplicate adds a copy of each under a new slug, the copied album holding 
 	expect( galleriesIn( own.album ) ).toEqual( [ own.gallery ] );
 
 	await expect( page.getByRole( 'heading', { name: 'Import complete' } ) ).toBeVisible();
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
 	expect( await resultRow( page, 'Imported' ) ).toEqual( [ '1 Gallery', '1 Album' ] );
 } );
 
@@ -309,6 +312,7 @@ test( 'galleries and albums each follow their own choice', { tag: [ '@admin', '@
 	expect( idsTitled( 'fotogrids_album', `${ own.title } album` ) ).toEqual( [ own.album ] );
 
 	await expect( page.getByRole( 'heading', { name: 'Import complete' } ) ).toBeVisible();
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
 	await expect(
 		page.getByText( 'Your data has been imported. Some records were skipped.' )
 	).toBeVisible();
