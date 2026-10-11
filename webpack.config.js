@@ -545,57 +545,6 @@ const mainConfig = {
                     filter: (resourcePath) => {
                         return !resourcePath.includes('ajax-save.js') && !resourcePath.includes('meta-boxes.js');
                     },
-                    transform(content, absoluteFilename) {
-                        if (isProduction && absoluteFilename.endsWith('.js')) {
-                            if (!content || content.length === 0) {
-                                console.warn('Empty content for', absoluteFilename);
-                                return content;
-                            }
-
-                            const terser = require('terser');
-
-                            try {
-                                const sourceCode = Buffer.isBuffer(content) ? content.toString('utf8') : String(content);
-
-                                if (!sourceCode.trim()) {
-                                    console.warn('Empty source code for', absoluteFilename);
-                                    return content;
-                                }
-
-                                const result = terser.minify(sourceCode, {
-                                    compress: {
-                                        drop_console: true,
-                                        drop_debugger: true,
-                                        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-                                    },
-                                    mangle: {
-                                        toplevel: false,
-                                        reserved: ['jQuery', '$', 'wp', 'ajaxurl'],
-                                        properties: false,
-                                    },
-                                    format: {
-                                        comments: false,
-                                    },
-                                });
-
-                                if (result.error) {
-                                    console.warn('Terser error for', absoluteFilename, ':', result.error);
-                                    return content;
-                                }
-
-                                if (!result.code) {
-                                    console.info('No minified code generated for', absoluteFilename);
-                                    return content;
-                                }
-
-                                return Buffer.from(result.code, 'utf8');
-                            } catch (error) {
-                                console.warn('Failed to minify', absoluteFilename, ':', error.message);
-                                return content;
-                            }
-                        }
-                        return content;
-                    },
                 },
                 {
                     from: 'src/assets/admin/images/**/*',
