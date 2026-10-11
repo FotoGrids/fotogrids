@@ -7,6 +7,7 @@ import StatsTable from '../shared/StatsTable';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import { collectionPlaceholder } from '../../utils/collection-title';
+import { isLeavingPage } from '../../utils/leaving-page';
 
 const { __, sprintf } = wp.i18n;
 
@@ -585,7 +586,12 @@ const StatsPage = () => {
 				setTopContent(Array.isArray(topRes) ? topRes : []);
 			} catch (err) {
 				if (!cancelled) {
-					console.error('FotoGrids Stats: failed to load stats', err);
+					if (!isLeavingPage()) {
+						console.error(
+							'FotoGrids Stats: failed to load stats',
+							err
+						);
+					}
 					setError(
 						__(
 							'Could not load statistics. Please refresh the page.',

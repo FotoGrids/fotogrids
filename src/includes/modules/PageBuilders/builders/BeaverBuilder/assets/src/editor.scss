@@ -1,0 +1,78 @@
+/**
+ * Beaver Builder: gallery and album picker, and the builder-only placeholder.
+ */
+
+@use "sass:meta";
+@use "../../../../../../../assets/admin/src/styles/colors.scss" as *;
+
+// Restore button styles overridden by the settings lightbox.
+.fl-lightbox .fl-builder-settings .fg-pb-bb-picker {
+    @include meta.load-css("../../../../../../../assets/admin/src/styles/fg-button/fg-button");
+
+    .fg-button * {
+        color: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+}
+
+// Button colours in Beaver Builder's dark skin.
+@layer fg-pb-bb-picker {
+    .fl-builder-ui-skin--dark .fg-pb-bb-picker {
+        .fg-button--variant-primary {
+            color: #fff !important;
+        }
+
+        .fg-button--variant-secondary {
+            color: var(--fg-text-secondary) !important;
+        }
+
+        .fg-button * {
+            color: inherit !important;
+        }
+    }
+}
+
+// Above Beaver Builder's settings lightbox.
+body.fl-builder-edit .fg-modal {
+    z-index: calc(var(--fg-modal-z, 100000) + 1000000);
+}
+
+// Hide the raw ID field once the picker has mounted.
+.fg-pb-bb-collection.is-fg-pb-ready .fg-pb-bb-collection__input {
+    display: none;
+}
+
+.fg-pb-bb-picker__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .fg-pb-inspector-summary {
+        margin-bottom: 0;
+    }
+}
+
+.fg-pb-bb-picker__empty {
+    margin: 0;
+}
+
+.fg-pb-bb-picker__actions {
+    display: flex;
+    gap: 4px;
+
+    > .fg-button {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+.fg-pb-bb-placeholder {
+    padding: 24px;
+    border: 1px dashed var(--fg-border-dark);
+    border-radius: 4px;
+    background: var(--fg-background-secondary);
+    color: var(--fg-text-secondary);
+    font-size: 14px;
+    text-align: center;
+}

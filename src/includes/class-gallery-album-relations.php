@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Album;
 use FotoGrids\Hooks\Actions_Gallery;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -57,6 +58,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Add gallery to album
 	 *
+	 * Fires `Actions_Album::GALLERY_ADDED` when the gallery is added.
+	 *
 	 * @param int $gallery_id Gallery post ID
 	 * @param int $album_id Album post ID
 	 * @param int $position Position in album (optional)
@@ -102,11 +105,15 @@ class Gallery_Album_Relations {
 
 		self::clear_caches( $gallery_id, $album_id );
 
+		do_action( Actions_Album::GALLERY_ADDED, $gallery_id, $album_id );
+
 		return $wpdb->insert_id;
 	}
 
 	/**
 	 * Remove gallery from album
+	 *
+	 * Fires `Actions_Album::GALLERY_REMOVED` when the gallery was in the album.
 	 *
 	 * @param int $gallery_id Gallery post ID
 	 * @param int $album_id Album post ID
@@ -134,6 +141,10 @@ class Gallery_Album_Relations {
 		);
 
 		self::clear_caches( $gallery_id, $album_id );
+
+		if ( $result ) {
+			do_action( Actions_Album::GALLERY_REMOVED, $gallery_id, $album_id );
+		}
 
 		return false !== $result;
 	}
@@ -223,6 +234,33 @@ class Gallery_Album_Relations {
 	}
 
 	/**
+	 * Get the IDs of every gallery in an album, whatever their post status.
+	 *
+	 * @since 1.3.0
+	 * @param int $album_id Album post ID.
+	 * @return int[] Gallery post IDs.
+	 */
+	public static function get_gallery_ids_for_album( $album_id ): array {
+		global $wpdb;
+
+		$album_id = absint( $album_id );
+		if ( ! $album_id ) {
+			return array();
+		}
+
+		return array_map(
+			'intval',
+			$wpdb->get_col(
+				$wpdb->prepare(
+					'SELECT gallery_id FROM %i WHERE album_id = %d',
+					self::get_table_name(),
+					$album_id
+				)
+			)
+		);
+	}
+
+	/**
 	 * Get albums for gallery
 	 *
 	 * @param int $gallery_id Gallery post ID
@@ -284,6 +322,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Reorder galleries in album
 	 *
+	 * Fires `Actions_Album::REORDERED` with the new order.
+	 *
 	 * @param int $album_id Album post ID
 	 * @param array $gallery_ids Array of gallery IDs in new order
 	 * @return bool Success
@@ -299,6 +339,7 @@ class Gallery_Album_Relations {
 		$table_name = self::get_table_name();
 
 		$position = 0;
+		$ordered  = array();
 		foreach ( $gallery_ids as $gallery_id ) {
 			$gallery_id = absint( $gallery_id );
 			if ( ! $gallery_id ) {
@@ -316,10 +357,13 @@ class Gallery_Album_Relations {
 				array( '%d', '%d' )
 			);
 
+			$ordered[] = $gallery_id;
 			++$position;
 		}
 
 		self::clear_caches( null, $album_id );
+
+		do_action( Actions_Album::REORDERED, $album_id, $ordered );
 
 		return true;
 	}
@@ -548,6 +592,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Delete all relationships for a post (when post is deleted)
 	 *
+	 * Fires `Actions_Album::GALLERY_REMOVED` for every relationship removed.
+	 *
 	 * @param int $post_id Post ID
 	 */
 	public static function delete_post_relationships( $post_id ) {
@@ -558,13 +604,25 @@ class Gallery_Album_Relations {
 			return;
 		}
 
+		$post_id    = (int) $post->ID;
 		$table_name = self::get_table_name();
 
 		if ( 'fotogrids_gallery' === $post->post_type ) {
+			$album_ids = array_map(
+				'intval',
+				$wpdb->get_col( $wpdb->prepare( 'SELECT album_id FROM %i WHERE gallery_id = %d', $table_name, $post_id ) )
+			);
 			$wpdb->delete( $table_name, array( 'gallery_id' => $post_id ), array( '%d' ) );
+			foreach ( $album_ids as $album_id ) {
+				do_action( Actions_Album::GALLERY_REMOVED, $post_id, $album_id );
+			}
 			do_action( Actions_Gallery::DELETED, $post_id );
 		} elseif ( 'fotogrids_album' === $post->post_type ) {
+			$gallery_ids = self::get_gallery_ids_for_album( $post_id );
 			$wpdb->delete( $table_name, array( 'album_id' => $post_id ), array( '%d' ) );
+			foreach ( $gallery_ids as $gallery_id ) {
+				do_action( Actions_Album::GALLERY_REMOVED, $gallery_id, $post_id );
+			}
 		}
 	}
 
