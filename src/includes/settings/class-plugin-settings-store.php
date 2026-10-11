@@ -10,20 +10,9 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Plugin_Settings_Store
  *
- * Single source of truth for the plugin-wide "general" (responsiveness) and
- * "advanced" (boolean) settings: their defaults, sanitisation, read, and
- * write. Lives in includes/settings/ which is required unconditionally at
- * bootstrap, so it is available on BOTH admin requests (Settings API via
- * Admin_Init) and frontend/REST requests (Admin_Data) - unlike Admin_Init,
- * which only loads when is_admin() is true.
- *
- * The "general" settings keys (mobile_breakpoint / tablet_breakpoint /
- * detect_responsive_by_browser) are the canonical ones the public frontend
- * renderer (Breakpoint_Config) reads.
- *
- * The uninstall flag is exposed to the UI as "delete on uninstall" but
- * persisted as its inverse, fotogrids_preserve_data_on_uninstall, which is
- * the option the uninstaller actually checks.
+ * Defaults, sanitisation, reads and writes for the general (responsiveness)
+ * and advanced (boolean) plugin settings. Loaded on every request, so REST
+ * and frontend code can use it.
  *
  * @package FotoGrids\Settings
  * @since   1.0.0
@@ -33,8 +22,7 @@ final class Plugin_Settings_Store {
 	const OPTION_GENERAL = 'fotogrids_general_settings';
 
 	/**
-	 * Freemius permissions the usage-data choice covers: name and email,
-	 * site details, usage events, and the installed plugins and themes.
+	 * Freemius permissions covered by the usage-data choice.
 	 *
 	 * @since 1.3.0
 	 * @var array<int, string>
@@ -75,10 +63,7 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Sanitise general settings.
-	 *
-	 * Clamps the breakpoints (mobile must not exceed tablet) and coerces the
-	 * detection flag from any truthy form posted by the UI.
+	 * Sanitise general settings. Mobile may not exceed tablet.
 	 *
 	 * @param mixed $value Raw option value.
 	 * @return array<string, mixed>
@@ -103,10 +88,7 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Sanitise and persist general settings.
-	 *
-	 * A change flushes the render cache, which holds the breakpoints in
-	 * cached CSS and markup.
+	 * Sanitise and persist general settings. A change flushes the render cache.
 	 *
 	 * @param mixed $value Raw input.
 	 * @return array<string, mixed> The stored, merged settings.
@@ -131,8 +113,7 @@ final class Plugin_Settings_Store {
 		$share_raw = get_option( 'fotogrids_share_statistics', null );
 		return array(
 			'autosave'                 => (bool) get_option( 'fotogrids_autosave', true ),
-			// Tolerant cast - see `Admin_Init::resolve_share_statistics_state()`
-			// for the same logic. Defaults to off on fresh install.
+			// Off unless explicitly on.
 			'share_statistics'         => ! (
 				null === $share_raw ||
 				false === $share_raw ||
@@ -143,7 +124,7 @@ final class Plugin_Settings_Store {
 			'marketing_allowed'        => (bool) get_option( 'fotogrids_marketing_allowed', false ),
 			'allow_google_fonts'       => (bool) get_option( 'fotogrids_allow_google_fonts', true ),
 			'allow_news_updates'       => (bool) get_option( 'fotogrids_allow_news_updates', true ),
-			// UI: "delete on uninstall" - persisted as the inverse "preserve" flag.
+			// Stored inverted as the flag the uninstaller reads.
 			'delete_data_on_uninstall' => ! (bool) get_option( 'fotogrids_preserve_data_on_uninstall', true ),
 		);
 	}
@@ -158,14 +139,10 @@ final class Plugin_Settings_Store {
 	public static function save_advanced( array $input ): array {
 		self::save_bool( 'fotogrids_autosave', self::truthy( $input['autosave'] ?? false ) );
 
-		// share_statistics has a Freemius side-effect; route through the
-		// shared helper so this REST path and the wizard's AJAX path
-		// both stay in sync (option + Freemius opt-in/out).
 		$share_on = self::truthy( $input['share_statistics'] ?? false );
 		self::apply_share_statistics_consent( $share_on );
 
-		// Marketing consent only applies when usage data sharing is on;
-		// when it is off, apply_share_statistics_consent already revoked it.
+		// When sharing is off, marketing consent was already revoked.
 		if ( $share_on ) {
 			self::apply_marketing_consent( self::truthy( $input['marketing_allowed'] ?? false ) );
 		}
@@ -174,7 +151,6 @@ final class Plugin_Settings_Store {
 
 		self::save_bool( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
 
-		// Persist the inverse "preserve" flag the uninstaller reads.
 		$delete = self::truthy( $input['delete_data_on_uninstall'] ?? false );
 		self::save_bool( 'fotogrids_preserve_data_on_uninstall', ! $delete );
 
@@ -184,10 +160,7 @@ final class Plugin_Settings_Store {
 	/**
 	 * Sanitise a map of collection defaults.
 	 *
-	 * Keys not in the resolved defaults are dropped, and each value is coerced
-	 * to the shape its default declares. Lives here rather than in `Admin_Init`
-	 * because the REST write path runs outside `is_admin()`, where that class is
-	 * never loaded.
+	 * Unknown keys are dropped; each value is coerced to its default's type.
 	 *
 	 * @param  mixed $input Raw map of setting key => value.
 	 * @return array<string, mixed>
@@ -209,8 +182,7 @@ final class Plugin_Settings_Store {
 
 			if ( is_array( $default_value ) ) {
 				if ( is_string( $value ) ) {
-					// No stripslashes(): REST bodies arrive unslashed, and
-					// stripping here would eat legitimate JSON escapes.
+					// REST bodies are unslashed: no stripslashes().
 					$decoded = json_decode( $value, true );
 					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
 						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
@@ -238,16 +210,10 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Persist a boolean option as the string '1' or '0'.
+	 * Persist a boolean option as '1' or '0'.
 	 *
-	 * `update_option()` returns early when the new value matches the current
-	 * one, and `get_option()` answers `false` for a row that does not exist.
-	 * Writing a raw `false` to an option that has never been written is
-	 * therefore a silent no-op, which leaves any option whose default is true
-	 * stuck on - the user switches it off and it comes back on. The '1'/'0'
-	 * strings are never equal to that `false`, and are what
-	 * `Admin_Init::ajax_update_plugin_setting()` already stores, so both write
-	 * paths agree on the stored shape. Every reader treats '0' as falsey.
+	 * A raw `false` is not written to a missing option, so a default-true
+	 * option could never be switched off.
 	 *
 	 * @param  string $option Option name.
 	 * @param  bool   $value  Value to store.
@@ -258,18 +224,11 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Apply the user's usage-data sharing choice.
+	 * Apply the usage-data sharing choice and mirror it into Freemius.
 	 *
-	 * Writes the local `fotogrids_share_statistics` option as `'1'` / `'0'`
-	 * and mirrors the change into Freemius. A site with no Freemius account
-	 * is registered by `opt_in()` when the choice is on. A site that has one
-	 * goes through the SDK's own opt-out and opt-in, which update the
-	 * permissions on the Freemius server, schedule or clear its daily sync,
-	 * and disconnect or reconnect the account; if Freemius refuses the
-	 * opt-out, the site is opted out locally instead. Turning the choice off
-	 * also revokes marketing consent first, while the account can still be
-	 * reached. Both the Settings tab REST path and the wizard's path call
-	 * this so the option and Freemius state can't drift out of sync.
+	 * Turning it off revokes marketing consent first, while the account can
+	 * still be reached. If Freemius refuses the opt-out, the site is opted
+	 * out locally.
 	 *
 	 * @since 1.0.0
 	 * @param bool $opted_in
@@ -281,7 +240,7 @@ final class Plugin_Settings_Store {
 		$after_option  = get_option( 'fotogrids_share_statistics', null );
 
 		$fs_before = self::probe_freemius_state();
-		$fs_after  = $fs_before; // updated below if we successfully mirror
+		$fs_after  = $fs_before;
 
 		if ( ! $opted_in ) {
 			self::apply_marketing_consent( false );
@@ -301,9 +260,7 @@ final class Plugin_Settings_Store {
 						}
 						$fs_after = self::probe_freemius_state();
 					} elseif ( $opted_in ) {
-						// is_marketing_allowed is false: this consent covers
-						// diagnostics only, never promotional email. redirect is
-						// false because this runs in a REST/AJAX request.
+						// No marketing consent and no redirect.
 						$identity = self::current_user_identity();
 						$fs->opt_in(
 							$identity['email'],
@@ -348,11 +305,7 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Stop Freemius sending anything from this site without reaching its API.
-	 *
-	 * Used when the API refuses or cannot be reached while the choice is being
-	 * turned off: tracking is switched off locally and the account is put in
-	 * anonymous mode, so no sync sends data until the choice is turned on.
+	 * Opt the site out of Freemius without calling its API.
 	 *
 	 * @since  1.3.0
 	 * @param  \Freemius $fs The FotoGrids Freemius instance.
@@ -369,10 +322,8 @@ final class Plugin_Settings_Store {
 	/**
 	 * Switch the Freemius permissions behind the usage-data choice.
 	 *
-	 * Calls `Freemius::toggle_permission_tracking()`, the method behind the
-	 * SDK's own Opt Out dialog. It is private, so it is reached through
-	 * reflection; `FreemiusConsentContractTest` fails if a vendored SDK update
-	 * changes it.
+	 * Calls the private `Freemius::toggle_permission_tracking()`, guarded by
+	 * `FreemiusConsentContractTest`.
 	 *
 	 * @since  1.3.0
 	 * @param  \Freemius $fs      The FotoGrids Freemius instance.
@@ -391,10 +342,7 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Snapshot of Freemius's current tracking state, used for debug
-	 * logging around `apply_share_statistics_consent` and
-	 * `resolve_share_statistics_state` so log lines pin down whether a
-	 * desync is in FotoGrids or on the Freemius side.
+	 * Freemius tracking state, for debug logging.
 	 *
 	 * @return array<string,mixed>
 	 */
@@ -420,10 +368,6 @@ final class Plugin_Settings_Store {
 			$state['is_registered']       = method_exists( $fs, 'is_registered' ) ? (bool) $fs->is_registered() : null;
 			$state['tracking_allowed']    = method_exists( $fs, 'is_tracking_allowed' ) ? (bool) $fs->is_tracking_allowed() : null;
 			$state['tracking_prohibited'] = method_exists( $fs, 'is_tracking_prohibited' ) ? (bool) $fs->is_tracking_prohibited() : null;
-			// Probe for an install without touching the private $_site
-			// property. get_site() / has_active_valid_license() are
-			// public; the presence of *any* install also makes
-			// is_registered() true.
 			if ( method_exists( $fs, 'get_site' ) ) {
 				$state['install_exists'] = is_object( $fs->get_site() );
 			} else {
@@ -462,15 +406,8 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Apply the user's promotional-email (marketing) consent.
-	 *
-	 * Separate from usage-data sharing: this maps to Freemius's per-user
-	 * `is_marketing_allowed` flag and governs promotional email only. It
-	 * is only meaningful once the site is registered, which happens when
-	 * usage-data sharing is enabled. If consent is granted while the site
-	 * is somehow still anonymous, `opt_in()` registers it with marketing
-	 * granted. The local option is the source of truth for the toggle;
-	 * the Freemius flag is mirrored on change only.
+	 * Apply the promotional-email consent and mirror it into Freemius's
+	 * `is_marketing_allowed` flag when it changes.
 	 *
 	 * @since  1.0.0
 	 * @param  bool $allowed
@@ -480,7 +417,6 @@ final class Plugin_Settings_Store {
 		$before = (bool) get_option( 'fotogrids_marketing_allowed', false );
 		self::save_bool( 'fotogrids_marketing_allowed', $allowed );
 
-		// Idempotent: nothing changed, so skip the Freemius API round-trip.
 		if ( $before === $allowed ) {
 			return $allowed;
 		}
@@ -496,15 +432,13 @@ final class Plugin_Settings_Store {
 
 		try {
 			if ( method_exists( $fs, 'is_registered' ) && $fs->is_registered() ) {
-				// Per-plugin user PUT - the same call the SDK's own GDPR
-				// opt-in notice makes to set the marketing flag.
+				// Same call as the SDK's GDPR opt-in notice.
 				$fs->get_api_user_scope()->call(
 					'?plugin_id=' . $fs->get_id(),
 					'put',
 					array( 'is_marketing_allowed' => $allowed )
 				);
 			} elseif ( $allowed ) {
-				// No install yet: register and grant marketing together.
 				$identity = self::current_user_identity();
 				$fs->opt_in(
 					$identity['email'],
@@ -555,7 +489,7 @@ final class Plugin_Settings_Store {
 	// ---------------------------------------------------------------------
 
 	/**
-	 * Coerce any of the truthy forms the UI may post into a strict bool.
+	 * Coerce a posted truthy value to a bool.
 	 *
 	 * @param mixed $value
 	 * @return bool
