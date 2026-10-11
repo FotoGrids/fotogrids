@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.4\n"
+"Project-Id-Version: FotoGrids 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T15:54:04+00:00\n"
+"POT-Creation-Date: 2026-10-11T06:32:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -23,6 +23,7 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
+#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:93
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:129
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:166
 #: assets/admin/src/components/setup-wizard/StepWelcome.jsx:120
@@ -44,20 +45,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:249
+#: fotogrids.php:255
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:250
-#: fotogrids.php:259
+#: fotogrids.php:256
+#: fotogrids.php:265
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:258
+#: fotogrids.php:264
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:274
+#: fotogrids.php:280
 #: includes/class-admin-init.php:174
 #: includes/class-admin-init.php:175
 #: includes/tools/import-export/assets/ImportExportTool.jsx:54
@@ -65,11 +66,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:292
+#: fotogrids.php:298
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:317
+#: fotogrids.php:323
 #: assets/admin/src/components/dashboard/LearnSection.jsx:86
 msgid "Help Center"
 msgstr ""
@@ -90,6 +91,8 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:91
 #: includes/admin/class-dashboard-widget.php:187
 #: includes/metaboxes/class-collection-save-pipeline.php:162
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:46
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:63
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
 #: includes/rest/admin/admin-data.php:1487
@@ -248,6 +251,8 @@ msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:184
 #: includes/metaboxes/class-collection-save-pipeline.php:163
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:47
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:64
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
 #: includes/rest/admin/admin-data.php:1487
@@ -3999,37 +4004,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:671
+#: includes/class-admin-init.php:669
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:681
+#: includes/class-admin-init.php:679
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:691
-#: includes/class-admin-init.php:749
+#: includes/class-admin-init.php:689
+#: includes/class-admin-init.php:747
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:754
+#: includes/class-admin-init.php:752
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:1016
+#: includes/class-admin-init.php:1014
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:1017
+#: includes/class-admin-init.php:1015
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1154
+#: includes/class-admin-init.php:1152
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1160
+#: includes/class-admin-init.php:1158
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4037,8 +4042,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1173
-#: includes/class-admin-init.php:1187
+#: includes/class-admin-init.php:1171
+#: includes/class-admin-init.php:1185
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4046,7 +4051,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1206
+#: includes/class-admin-init.php:1204
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4054,32 +4059,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1218
-#: includes/class-admin-init.php:1232
+#: includes/class-admin-init.php:1216
+#: includes/class-admin-init.php:1230
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1250
-#: includes/class-admin-init.php:1433
+#: includes/class-admin-init.php:1248
+#: includes/class-admin-init.php:1431
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1253
+#: includes/class-admin-init.php:1251
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1256
+#: includes/class-admin-init.php:1254
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1293
+#: includes/class-admin-init.php:1291
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1296
+#: includes/class-admin-init.php:1294
 msgid "Choose an album..."
 msgstr ""
 
@@ -6185,17 +6190,31 @@ msgstr ""
 msgid "Gallery and album editing metaboxes in the post editor."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:47
+msgid "Display a FotoGrids album."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:70
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:77
+msgid "Album ID"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:48
+msgid "Display a FotoGrids gallery."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:71
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:79
+msgid "Gallery ID"
+msgstr ""
+
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:588
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:77
-msgid "Album ID"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:87
@@ -6260,14 +6279,10 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:873
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:79
-msgid "Gallery ID"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:99
@@ -6297,8 +6312,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:392
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:677
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:184
 msgid "Loading preview…"
 msgstr ""
@@ -6382,8 +6396,7 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:386
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:482
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
@@ -6403,8 +6416,7 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:671
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:767
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -6458,11 +6470,11 @@ msgstr ""
 msgid "Imported gallery (%s)"
 msgstr ""
 
-#: includes/modules/PageBuilders/Module.php:86
+#: includes/modules/PageBuilders/Module.php:88
 msgid "Page Builders"
 msgstr ""
 
-#: includes/modules/PageBuilders/Module.php:90
+#: includes/modules/PageBuilders/Module.php:92
 msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi and Bricks."
 msgstr ""
 
@@ -7190,31 +7202,31 @@ msgstr ""
 msgid "Gallery the item is shown in. Required unless the current user can edit the item; also selects which EXIF fields are read live."
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:151
+#: includes/rest/maintenance/maintenance-data.php:107
 msgid "Plugin settings reset to defaults. Your galleries, albums and licence are untouched."
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:201
+#: includes/rest/maintenance/maintenance-data.php:157
 msgid "Database tables reinstalled. No data was deleted."
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:239
+#: includes/rest/maintenance/maintenance-data.php:195
 msgid "Logging is switched off"
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:240
+#: includes/rest/maintenance/maintenance-data.php:196
 msgid "FotoGrids is not writing any debug-log lines, so these channels have no effect. Add define( 'WP_DEBUG', true ); to your wp-config.php file to switch logging on."
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:242
+#: includes/rest/maintenance/maintenance-data.php:198
 msgid "Lines are not being saved to a file"
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:243
+#: includes/rest/maintenance/maintenance-data.php:199
 msgid "Log lines are not collected in wp-content/debug.log. Depending on your host they may go to the server error log instead, or nowhere at all. Add define( 'WP_DEBUG_LOG', true ); to your wp-config.php file to save them to a file."
 msgstr ""
 
-#: includes/rest/maintenance/maintenance-data.php:252
+#: includes/rest/maintenance/maintenance-data.php:208
 msgid "Each channel can also be locked from your wp-config.php file using the constant shown under its name - for example define( 'FOTOGRIDS_DEBUG_CATALOG', true );. A channel whose constant is set ignores the toggle here and shows as locked."
 msgstr ""
 
@@ -9723,7 +9735,7 @@ msgid "Reset all settings?"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:126
-msgid "This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics and Pro licence are not affected."
+msgid "This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics, permissions, Pro licence and privacy choices are not affected."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:130
@@ -9763,7 +9775,7 @@ msgid "Reset all settings"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:275
-msgid "Restores every Plugin Settings tab to defaults. Galleries, albums, statistics and your Pro licence are preserved."
+msgid "Restores Plugin Settings to defaults. Galleries, albums, statistics, permissions, your Pro licence and your privacy choices are preserved."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:306
@@ -11143,14 +11155,12 @@ msgstr ""
 msgid "Choose gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:423
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:441
-msgid "This album has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+msgid "This gallery has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:708
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:726
-msgid "This gallery has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+msgid "This album has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:336

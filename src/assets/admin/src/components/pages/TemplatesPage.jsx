@@ -12,6 +12,7 @@ import { Button } from '../shared/Button';
 import Checkbox from '../shared/Checkbox';
 import LoadingIcon from '../shared/LoadingIcon';
 import { activateOnKey } from '../../utils/activate-on-key';
+import { isLeavingPage } from '../../utils/leaving-page';
 
 const { __ } = wp.i18n;
 
@@ -222,7 +223,9 @@ const TemplatesPage = () => {
 				);
 			}
 		} catch (error) {
-			console.error('Error loading templates:', error);
+			if (!isLeavingPage()) {
+				console.error('Error loading templates:', error);
+			}
 			if (window.fotogridsToast) {
 				window.fotogridsToast.error(
 					__('Failed to load templates.', 'fotogrids')

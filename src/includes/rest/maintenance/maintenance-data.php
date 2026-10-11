@@ -3,6 +3,8 @@ namespace FotoGrids\REST\Maintenance;
 
 use FotoGrids\Hooks\Actions_Maintenance;
 use FotoGrids\Hooks\Filters_Maintenance;
+use FotoGrids\Options\Abstract_Option_Declaration;
+use FotoGrids\Options\Option_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -12,9 +14,10 @@ if ( ! defined( 'WPINC' ) ) {
  * Handler methods for the Maintenance REST resource.
  *
  * Three concerns:
- *  - Reset all plugin-wide settings to first-activation defaults, preserving
- *    install metadata, the licence cache, and any keys contributed via the
- *    `fotogrids/maintenance/reset_options/preserve_keys` filter.
+ *  - Reset all plugin-wide settings to first-activation defaults. Which
+ *    options are cleared and which are kept is declared per feature under
+ *    `includes/options/declarations/`; keys contributed via the
+ *    `fotogrids/maintenance/reset_options/preserve_keys` filter are kept too.
  *  - Reinstall the custom database tables by re-running the dbDelta-based
  *    activator. Tables are NOT truncated - dbDelta only adds missing tables,
  *    columns and indexes; existing rows survive.
@@ -26,66 +29,23 @@ if ( ! defined( 'WPINC' ) ) {
 class Maintenance_Data {
 
 	/**
-	 * Option keys that the reset action clears. Reseeded where a first-
-	 * activation default exists; otherwise just deleted so the next read
-	 * falls back to the option's runtime default.
+	 * Option keys that the reset action clears.
 	 *
 	 * @since 1.0.0
 	 * @return array<int, string>
 	 */
 	private static function resettable_option_keys(): array {
-		return array(
-			// Plugin-wide settings (Plugin Settings tabs)
-			'fotogrids_general_settings',
-			'fotogrids_permission_settings',
-			'fotogrids_integration_settings',
-			'fotogrids_gallery_defaults',
-			'fotogrids_album_defaults',
-			'fotogrids_media_settings',
-			'fotogrids_sharing_settings',
-			'fotogrids_view_settings',
-
-			// Advanced tab booleans
-			'fotogrids_autosave',
-			'fotogrids_share_statistics',
-			'fotogrids_allow_google_fonts',
-			'fotogrids_allow_news_updates',
-			'fotogrids_preserve_data_on_uninstall',
-
-			// In-product UX state
-			'fotogrids_notice_bar_dismissed',
-			'fotogrids_review_stats',
-
-			// Maintenance > Debug Log
-			'fotogrids_debug_channels',
-		);
+		return Option_Registry::keys( Abstract_Option_Declaration::RESET );
 	}
 
 	/**
-	 * Option keys that the reset action MUST NOT touch. Includes install
-	 * metadata, the db-version pointer, and the entire licence cache.
+	 * Option keys that the reset action MUST NOT touch.
 	 *
 	 * @since 1.0.0
 	 * @return array<int, string>
 	 */
 	private static function preserved_option_keys(): array {
-		$defaults = array(
-			// Install metadata - regenerating these would orphan analytics
-			// and break the activation/upgrade gate.
-			'fotogrids_version',
-			'fotogrids_db_version',
-			'fotogrids_activated_time',
-			'fotogrids_deactivated_time',
-			'fotogrids_site_id',
-
-			// Licence cache. Resetting these would force a re-activation
-			// flow on Pro users for what is meant to be a settings reset.
-			'fotogrids_license_key',
-			'fotogrids_license_data',
-			'fotogrids_license_secret',
-			'fotogrids_license_last_valid_response',
-			'fotogrids_license_last_check_time',
-		);
+		$defaults = Option_Registry::keys( Abstract_Option_Declaration::KEEP );
 
 		/**
 		 * Filter the list of option keys that survive "Reset all settings".
@@ -108,8 +68,9 @@ class Maintenance_Data {
 	/**
 	 * POST /admin/maintenance/reset-options
 	 *
-	 * Wipes the curated list of plugin-wide options and reseeds defaults
-	 * where a first-activation default exists. Fires
+	 * Deletes every option declared RESET under `includes/options/declarations/`,
+	 * lets each declaration restore what it needs, and flushes the render cache
+	 * so galleries pick up the defaults. Fires
 	 * `fotogrids/maintenance/options_reset` so Pro and modules can clear
 	 * their own option state in the same request.
 	 *
@@ -125,14 +86,9 @@ class Maintenance_Data {
 			delete_option( $option_key );
 		}
 
-		// Reseed first-activation defaults for the options that have them.
-		if ( ! get_option( 'fotogrids_media_settings' ) ) {
-			update_option(
-				'fotogrids_media_settings',
-				\FotoGrids\Image_Size_Manager::get_plugin_size_defaults(),
-				false
-			);
-		}
+		Option_Registry::run_after_reset( $resettable );
+
+		\FotoGrids\FotoGrids_Cache::flush_all();
 
 		/**
 		 * Fires after the Maintenance reset has cleared and reseeded
