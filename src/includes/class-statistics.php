@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Albums\Album_Repository;
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Filters_Settings;
 
@@ -213,36 +215,88 @@ class Statistics {
 	/**
 	 * Clean up old statistics data
 	 *
-	 * Deletes totals rows not viewed within the retention period and daily
-	 * rows dated before it.
+	 * Deletes daily rows dated before the retention period. Totals rows are
+	 * kept, so lifetime figures do not drop. A period of zero or less deletes
+	 * nothing.
 	 *
-	 * @param int $days Number of days to keep (older data will be deleted)
+	 * @param int $days Number of days of daily history to keep.
 	 * @return int Number of rows deleted
 	 */
 	public static function cleanup_old_data( $days = 365 ) {
 		global $wpdb;
 
-		$table       = $wpdb->prefix . 'fotogrids_statistics';
+		$days = (int) $days;
+
+		if ( $days <= 0 ) {
+			return 0;
+		}
+
 		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
-		$cutoff      = time() - ( (int) $days * DAY_IN_SECONDS );
+		$cutoff      = time() - ( $days * DAY_IN_SECONDS );
 
-		$deleted = $wpdb->query(
-			$wpdb->prepare(
-				'DELETE FROM %i WHERE last_viewed < %s',
-				$table,
-				gmdate( 'Y-m-d H:i:s', $cutoff )
-			)
-		);
-
-		$deleted_daily = $wpdb->query(
+		return (int) $wpdb->query(
 			$wpdb->prepare(
 				'DELETE FROM %i WHERE viewed_date < %s',
 				$daily_table,
 				wp_date( 'Y-m-d', $cutoff )
 			)
 		);
+	}
 
-		return (int) $deleted + (int) $deleted_daily;
+	/**
+	 * Deletes the statistics of galleries and albums that have gone longer
+	 * without a view than their Retain Statistics setting allows.
+	 *
+	 * Collections set to Forever keep their statistics. Item statistics are
+	 * not covered.
+	 *
+	 * @since 1.3.0
+	 * @return int Number of rows deleted.
+	 */
+	private static function cleanup_expired_collections() {
+		global $wpdb;
+
+		$table       = $wpdb->prefix . 'fotogrids_statistics';
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT object_type, object_id, last_viewed FROM %i WHERE object_type IN ('gallery', 'album')",
+				$table
+			),
+			ARRAY_A
+		);
+
+		if ( empty( $rows ) ) {
+			return 0;
+		}
+
+		update_meta_cache( 'post', array_map( 'intval', wp_list_pluck( $rows, 'object_id' ) ) );
+
+		$now     = time();
+		$deleted = 0;
+
+		foreach ( $rows as $row ) {
+			$object_id = (int) $row['object_id'];
+			$settings  = 'album' === $row['object_type']
+				? Album_Repository::get_settings( $object_id )
+				: Gallery_Repository::get_settings( $object_id );
+			$window    = $settings['retain_statistics'] ?? 'forever';
+			$days      = is_numeric( $window ) ? (int) $window : 0;
+
+			if ( $days <= 0 || strtotime( $row['last_viewed'] . ' UTC' ) >= $now - ( $days * DAY_IN_SECONDS ) ) {
+				continue;
+			}
+
+			$where    = array(
+				'object_type' => $row['object_type'],
+				'object_id'   => $object_id,
+			);
+			$deleted += (int) $wpdb->delete( $table, $where, array( '%s', '%d' ) );
+			$deleted += (int) $wpdb->delete( $daily_table, $where, array( '%s', '%d' ) );
+		}
+
+		return $deleted;
 	}
 
 	/**
@@ -260,6 +314,7 @@ class Statistics {
 	public static function run_scheduled_cleanup() {
 		$days_to_keep = apply_filters( Filters_Settings::STATS_RETENTION_DAYS, 365 );
 		self::cleanup_old_data( $days_to_keep );
+		self::cleanup_expired_collections();
 	}
 
 	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
