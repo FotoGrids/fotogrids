@@ -33,6 +33,32 @@ describe('renderButtonGroup', () => {
 		expect(container.textContent).toContain('Pick');
 	});
 
+	it('marks the active option when a numeric value meets string option values', () => {
+		const opts = [
+			{ value: '150', label: 'Fast' },
+			{ value: '300', label: 'Normal' },
+		];
+		const { container } = renderElement(
+			build({ key: 'k', options: opts }, 300, false)
+		);
+		expect(container.querySelector('.fg-is-active').textContent).toBe(
+			'Normal'
+		);
+	});
+
+	it('marks the active option when a string value meets numeric option values', () => {
+		const opts = [
+			{ value: 4, label: 'Four' },
+			{ value: 6, label: 'Six' },
+		];
+		const { container } = renderElement(
+			build({ key: 'k', options: opts }, '6', false)
+		);
+		expect(container.querySelector('.fg-is-active').textContent).toBe(
+			'Six'
+		);
+	});
+
 	it('updates the setting on click', () => {
 		const updateSetting = jest.fn();
 		const { container } = renderElement(
