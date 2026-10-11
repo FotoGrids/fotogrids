@@ -106,9 +106,10 @@ test.describe('the markup a layout renders', () => {
 
 /**
  * LAY-02 and LAY-03. Four layouts hand every item to JS carrying
- * `fg-item-hidden` and rely on it to reveal them, so with JS off the gallery is
- * blank. The markup is there either way, which is what makes this worth
- * asserting: a crawler sees the items, a visitor without JS does not.
+ * `fg-item-hidden` and rely on it to reveal them. Every layout also starts each
+ * image in the loading state, which keeps it transparent until JS marks it
+ * loaded - so "visible" here is read off the image's opacity, not just its box,
+ * which Playwright counts as visible at opacity 0.
  */
 test.describe('the hidden-then-revealed contract', () => {
 	for (const { layout, hidden } of LAYOUTS) {
@@ -131,15 +132,23 @@ test.describe('the hidden-then-revealed contract', () => {
 				await expect(
 					gallery.root.locator('.fg-item.fg-item-hidden')
 				).toHaveCount(0);
+
+				const first = gallery.items().first();
+				await expect(first).toHaveAttribute(
+					'data-fg-media-state',
+					'loaded'
+				);
+				await expect(first.locator('img').first()).toHaveCSS(
+					'opacity',
+					'1'
+				);
 			}
 		);
 	}
 
 	for (const { layout, hidden } of LAYOUTS) {
 		test(
-			`LAY-02: with JS off, ${layout} is ${
-				hidden ? 'blank' : 'still a gallery'
-			}`,
+			`LAY-02: with JS off, ${layout} still ships its items in the HTML`,
 			{ tag: '@layout' },
 			async ({ browser }) => {
 				const { id, url } = galleryPage({ layout });
@@ -154,19 +163,22 @@ test.describe('the hidden-then-revealed contract', () => {
 					const root = noJs.locator(`[data-fg-gallery-id="${id}"]`);
 					await expect(root).toBeAttached();
 
+					// What a crawler reads: the items and their image sources.
 					const items = root.locator('.fg-item');
+					expect(await items.count()).toBeGreaterThan(0);
 					expect(
-						await items.count(),
-						'the items are in the HTML either way'
-					).toBeGreaterThan(0);
+						await items
+							.first()
+							.locator('img')
+							.first()
+							.getAttribute('src')
+					).toBeTruthy();
 
 					if (hidden) {
 						await expect(
 							items.first(),
 							'this layout depends on JS to reveal its items'
 						).toBeHidden();
-					} else {
-						await expect(items.first()).toBeVisible();
 					}
 				} finally {
 					await context.close();
