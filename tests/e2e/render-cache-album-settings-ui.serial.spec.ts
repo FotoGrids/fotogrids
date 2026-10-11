@@ -1,6 +1,4 @@
 import fs from 'fs';
-import os from 'os';
-import path from 'path';
 import type { Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { album, galleryPage } from './support/collections';
@@ -28,7 +26,7 @@ test.beforeEach( () => {
 
 test.afterEach( () => {
 	wpEval(
-		`global $wpdb; foreach ( json_decode( base64_decode( '${ options }' ), true ) as $row ) { $wpdb->replace( $wpdb->options, $row ); } wp_cache_flush(); flush_rewrite_rules();`
+		`global $wpdb; $kept = json_decode( base64_decode( '${ options }' ), true ); $names = array_column( $kept, 'option_name' ); foreach ( $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'fotogrids\\\\_%'" ) as $name ) { if ( ! in_array( $name, $names, true ) ) { delete_option( $name ); } } foreach ( $kept as $row ) { $wpdb->replace( $wpdb->options, $row ); } wp_cache_flush(); flush_rewrite_rules();`
 	);
 } );
 
@@ -47,11 +45,7 @@ test( 'a new album segment on the View Pages screen reaches the next visitor', {
 	await openSettings( page, 'view_pages' );
 	const saved = page.waitForResponse( ( r ) => r.url().includes( 'view-settings' ) && 'POST' === r.request().method() );
 	await page.locator( '#fg-view-base-album' ).fill( segment );
-	const save = page.getByRole( 'button', { name: /^Save/ } );
-	if ( await save.count() ) {
-		await save.first().click();
-	}
-	expect( ( await saved ).status() ).toBe( 200 );
+	expect( ( await saved ).status(), 'Autosave did not save the segment' ).toBe( 200 );
 
 	const [ seen, uncached ] = await servedAndUncached( browser, gallery );
 	expect( seen ).toEqual( uncached );
@@ -70,14 +64,10 @@ test( 'Maintenance > Reset settings reaches the next visitor', { tag: '@cache' }
 
 	await openSettings( page, 'maintenance' );
 	const reset = page.waitForResponse( ( r ) => r.url().includes( 'reset-options' ) );
-	await page.getByRole( 'button', { name: /Reset (all )?settings/i } ).first().click();
+	await page.getByRole( 'button', { name: 'Reset settings' } ).click();
 	const dialog = page.locator( '.fg-modal' );
-	const typed = dialog.locator( 'input[type=text]' );
-	if ( await typed.count() ) {
-		const word = ( await dialog.textContent() )?.match( /type\s+["“]?([A-Z]+)["”]?/i );
-		await typed.fill( word ? word[ 1 ] : 'RESET' );
-	}
-	await dialog.getByRole( 'button', { name: /Reset/i } ).last().click();
+	await dialog.locator( 'input' ).fill( 'CONFIRM' );
+	await dialog.getByRole( 'button', { name: 'Reset settings' } ).click();
 	expect( ( await reset ).status() ).toBe( 200 );
 
 	const [ seen, uncached ] = await servedAndUncached( browser, gallery );
@@ -85,12 +75,12 @@ test( 'Maintenance > Reset settings reaches the next visitor', { tag: '@cache' }
 	expect( seen.href ).not.toContain( `/${ segment }/` );
 } );
 
-test( 'an import through the Import screen that adds a gallery to an album reaches the next visitor', { tag: '@cache' }, async ( { browser, page } ) => {
+test( 'an import through the Import screen that adds a gallery to an album reaches the next visitor', { tag: '@cache' }, async ( { browser, page }, testInfo ) => {
 	const gallery = galleryPage( { enable_cache: true } );
 	album( [ gallery.id ], NAVIGATION );
 	const second = album( [], NAVIGATION );
 	const field = ( id: number ) => wp( [ 'post', 'get', String( id ), '--field=post_name' ] );
-	const file = path.join( os.tmpdir(), `fg-album-import-${ gallery.id }.json` );
+	const file = testInfo.outputPath( 'album-import.json' );
 	fs.writeFileSync(
 		file,
 		JSON.stringify( {
@@ -105,14 +95,13 @@ test( 'an import through the Import screen that adds a gallery to an album reach
 
 	await page.goto( '/wp-admin/admin.php?page=fotogrids-tools&tool=import-export' );
 	await page.waitForLoadState( 'networkidle' );
-	await page.getByRole( 'tab', { name: 'Import' } ).or( page.locator( 'button:has-text("Import")' ).first() ).first().click();
+	await page.getByRole( 'tab', { name: 'Import' } ).click();
 	const analysed = page.waitForResponse( ( r ) => r.url().includes( 'import-export' ) && ( r.request().postData() ?? '' ).includes( 'analyse' ) );
 	await page.setInputFiles( '#fg-ie-import-file', file );
 	await analysed;
 	const executed = page.waitForResponse( ( r ) => r.url().includes( 'import-export' ) && ( r.request().postData() ?? '' ).includes( 'execute' ) );
 	await page.getByRole( 'button', { name: /^Import$/ } ).last().click();
 	expect( ( await executed ).status() ).toBe( 200 );
-	fs.unlinkSync( file );
 
 	const [ seen, uncached ] = await servedAndUncached( browser, gallery );
 	expect( seen ).toEqual( uncached );

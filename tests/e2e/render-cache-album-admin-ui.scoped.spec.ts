@@ -115,13 +115,9 @@ test.describe( 'album editor', () => {
 
 		await openAlbum( page, parent.id );
 		const item = page.locator( '.fotogrids-assigned-galleries > *' ).filter( { hasText: title } );
-		await restWrite( page, `/admin/albums/${ parent.id }/galleries/${ gallery.id }`, async () => {
-			await item.locator( '.fg-action-button--remove' ).click();
-			const confirm = page.locator( '.fg-modal button.is-primary' );
-			if ( await confirm.count() ) {
-				await confirm.first().click();
-			}
-		} );
+		await restWrite( page, `/admin/albums/${ parent.id }/galleries/${ gallery.id }`, () =>
+			item.locator( '.fg-action-button--remove' ).click()
+		);
 
 		const [ seen, uncached ] = await servedAndUncached( browser, gallery );
 		expect( seen ).toEqual( uncached );
@@ -235,13 +231,9 @@ test.describe( 'gallery editor Albums box', () => {
 
 		await cached( browser, gallery.url, gallery.id );
 		await openEditor( page, gallery.id );
-		await restWrite( page, `/admin/galleries/${ gallery.id }/albums/${ second.id }`, async () => {
-			await page.locator( '.fotogrids-assigned-album' ).filter( { hasText: secondTitle } ).locator( '.fg-action-button--remove' ).click();
-			const confirm = page.locator( '.fg-modal button.is-primary' );
-			if ( await confirm.count() ) {
-				await confirm.first().click();
-			}
-		} );
+		await restWrite( page, `/admin/galleries/${ gallery.id }/albums/${ second.id }`, () =>
+			page.locator( '.fotogrids-assigned-album' ).filter( { hasText: secondTitle } ).locator( '.fg-action-button--remove' ).click()
+		);
 
 		const [ left, leftUncached ] = await servedAndUncached( browser, gallery );
 		expect( left ).toEqual( leftUncached );
