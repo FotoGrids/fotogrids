@@ -4,16 +4,12 @@ import path from 'path';
 import type { Browser, Frame, Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { album, galleryPage } from './support/collections';
-import { storageStateFor, wpCli, wpEval } from './support/roles';
+import { roles, storageStateFor, wpCli, wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 
 /**
- * The FotoGrids Gallery and FotoGrids Album modules in Beaver Builder.
- *
- * Installs Beaver Builder Lite, builds layouts through its own model API, and
- * checks the modules in the builder and on the published page, where they must
- * render exactly what the shortcode renders.
+ * The Gallery and Album modules in Beaver Builder.
  *
  * Serial: activates a page builder for the whole site.
  */
@@ -25,7 +21,7 @@ const BUILDER_VERSION = '2.11.0.6';
 
 let builderWasActive = false;
 
-/** Pages this spec created; deleted afterwards, since the theme lists every page in its navigation. */
+/** Pages this spec created, deleted afterwards. */
 const createdPages: number[] = [];
 
 type Module = [ string, Record< string, string > ];
@@ -87,8 +83,7 @@ function builderUrl( url: string ): string {
 }
 
 /**
- * A collection wrapper's markup as the server sent it, with the per-request
- * instance counter and the page-specific login redirect taken out.
+ * A collection wrapper's server markup, without per-request values.
  */
 async function serverMarkup( browser: Browser, url: string, selector: string ): Promise< string > {
 	const context = await browser.newContext( { javaScriptEnabled: false } );
@@ -189,8 +184,10 @@ test.beforeAll( () => {
 		wp( [ 'plugin', 'activate', BUILDER ] );
 	}
 
-	// Skips the first-launch tour prompt, which covers the module panel.
-	wp( [ 'user', 'meta', 'update', process.env.WP_ADMIN_USER ?? 'admin', '_fl_builder_launched', '1' ] );
+	// Skip the first-launch tour.
+	for ( const user of [ process.env.WP_ADMIN_USER ?? 'admin', roles().roles.editor.user ] ) {
+		wp( [ 'user', 'meta', 'update', user, '_fl_builder_launched', '1' ] );
+	}
 } );
 
 test.afterAll( () => {
@@ -315,11 +312,12 @@ test.describe( 'in the builder', () => {
 		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
 	} );
 
-	test( 'the modules are listed under FotoGrids, and a dropped gallery module publishes', { tag: [ '@admin', '@layout' ] }, async ( {
+	test( 'the modules are listed under FotoGrids, and a gallery picked for a dropped module publishes', { tag: [ '@admin', '@layout' ] }, async ( {
 		page,
 		browser,
 	} ) => {
-		const { id } = galleryPage();
+		const title = `Beaver Builder pick ${ Date.now() }`;
+		const { id } = galleryPage( {}, undefined, title );
 		const target = emptyPage();
 		const logFrom = debugLogSize();
 		const pageErrors: string[] = [];
@@ -342,11 +340,36 @@ test.describe( 'in the builder', () => {
 
 		await dropModule( page, frame, 'fotogrids-gallery' );
 
-		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
-		await expect( field ).toBeVisible( { timeout: 15000 } );
-		await field.click();
-		await page.keyboard.type( String( id ), { delay: 50 } );
+		const card = page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' );
+		await expect( card ).toContainText( 'No gallery selected yet.', { timeout: 15000 } );
+		await expect( page.locator( 'form.fl-builder-settings input[name="gallery_id"]' ) ).toBeHidden();
+
+		await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
+		const modal = page.locator( '.fg-modal' );
+		await expect( modal ).toBeVisible();
+
+		// Beaver Builder shortcuts: P previews, R enters responsive editing.
+		await page.keyboard.press( 'p' );
+		await page.keyboard.press( 'r' );
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
+		await expect( page.locator( 'body' ) ).not.toHaveClass( /fl-builder-ui-iframe-responsive-editing/ );
+		for ( let press = 0; press < 20; press++ ) {
+			await page.keyboard.press( 'Tab' );
+		}
+		await expect( modal.locator( ':focus' ) ).toHaveCount( 1 );
+
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toHaveCount( 0 );
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
+
+		await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
+		await modal.locator( '.fg-pb-picker-card', { hasText: title } ).first().click();
+		await expect( modal ).toHaveCount( 0 );
+		await expect( page.locator( '.fg-pb-bb-picker__modal-host' ) ).toHaveCount( 0 );
 		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+		await expect( card ).toContainText( title );
+		await expect( card ).toContainText( '5 items' );
+		await expect( card.getByRole( 'button', { name: 'Change gallery' } ) ).toBeVisible();
 
 		await page.locator( '.fl-builder-settings-save' ).click();
 		await expect( page.locator( 'form.fl-builder-settings' ) ).toHaveCount( 0 );
@@ -359,6 +382,37 @@ test.describe( 'in the builder', () => {
 		await gallery.waitFor();
 		await expect( gallery.items() ).toHaveCount( 5 );
 		await visitor.close();
+
+		expect( pageErrors ).toEqual( [] );
+		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
+	} );
+} );
+
+test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
+	test.use( {
+		storageState: storageStateFor( 'editor' ),
+		allowConsoleErrors: 'Beaver Builder\'s own UI logs errors, such as its welcome video failing to load',
+		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
+	} );
+
+	test( 'a dropped module keeps the plain ID field, and an entered ID previews', { tag: [ '@admin', '@layout' ] }, async ( { page } ) => {
+		const { id } = galleryPage();
+		const target = emptyPage();
+		const logFrom = debugLogSize();
+		const pageErrors: string[] = [];
+		page.on( 'pageerror', ( error ) => pageErrors.push( error.message ) );
+
+		const frame = await openBuilder( page, target.url );
+		await dropModule( page, frame, 'fotogrids-gallery' );
+
+		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
+		await expect( field ).toBeVisible( { timeout: 15000 } );
+		await expect( page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' ) ).toHaveCount( 0 );
+
+		await field.click();
+		await page.keyboard.type( String( id ), { delay: 50 } );
+		await page.keyboard.press( 'Tab' );
+		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
 
 		expect( pageErrors ).toEqual( [] );
 		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
