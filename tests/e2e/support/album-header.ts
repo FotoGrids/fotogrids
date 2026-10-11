@@ -41,7 +41,8 @@ export function permalink( postId: number ): string {
 
 /** What a logged-out visitor's page shows of the gallery's album. */
 export async function header( browser: Browser, url: string ): Promise< Header > {
-	const visitor = await browser.newContext();
+	// An explicit empty session: a spec's test.use( storageState ) also applies to browser.newContext().
+	const visitor = await browser.newContext( { storageState: { cookies: [], origins: [] } } );
 	const page = await visitor.newPage();
 	await page.goto( url );
 
