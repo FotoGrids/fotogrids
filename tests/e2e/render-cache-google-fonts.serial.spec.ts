@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { galleryPage } from './support/collections';
 import { GalleryRender } from './support/gallery-render';
+import { wpEval } from './support/roles';
 import { getOption, setOption } from './support/site';
 
 /**
@@ -29,6 +30,14 @@ async function fontStylesheetCount( page: Page, url: string, galleryId: number )
 	return page.locator( 'link[rel="stylesheet"][href*="fonts.googleapis.com"]' ).count();
 }
 
+function cachedRows( galleryId: number ): number {
+	return Number(
+		wpEval(
+			`global $wpdb; echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}fotogrids_render_cache WHERE object_type = 'gallery' AND object_id = %d", ${ galleryId } ) );`
+		).trim()
+	);
+}
+
 test.beforeEach( async ( { page } ) => {
 	saved = getOption( OPTION );
 	setOption( OPTION, '1' );
@@ -54,4 +63,17 @@ test( 'turning Load Google Fonts off stops a cached gallery loading them', { tag
 
 	setOption( OPTION, '1' );
 	expect( await fontStylesheetCount( page, url, id ), 'from the cache, setting back on' ).toBe( 1 );
+} );
+
+test( 'turning Load Google Fonts on reaches a gallery cached while it was off', { tag: [ '@cache', '@settings' ] }, async ( {
+	page,
+} ) => {
+	const { id, url } = galleryPage( { enable_cache: true, caption_title_font_family: 'Roboto' } );
+
+	setOption( OPTION, '0' );
+	expect( await fontStylesheetCount( page, url, id ), 'filling the cache, setting off' ).toBe( 0 );
+	expect( cachedRows( id ), 'the gallery was not cached' ).toBe( 1 );
+
+	setOption( OPTION, '1' );
+	expect( await fontStylesheetCount( page, url, id ), 'from the cache, setting on' ).toBe( 1 );
 } );

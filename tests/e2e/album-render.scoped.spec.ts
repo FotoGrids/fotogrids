@@ -18,7 +18,7 @@ import { wpEval } from './support/roles';
  * them there and read the result off the gallery's own page.
  */
 
-const FIVE = fixture<number[]>('F-small', 'items');
+const five = (): number[] => fixture<number[]>('F-small', 'items');
 
 /** Breadcrumbs on, on a direct visit too, so a row can switch one thing off. */
 const CRUMBS = {
@@ -27,7 +27,7 @@ const CRUMBS = {
 };
 
 function gallery(settings: Record<string, unknown> = {}): number {
-	return galleryPage({ layout: 'grid', ...settings }, FIVE.slice(0, 2)).id;
+	return galleryPage({ layout: 'grid', ...settings }, five().slice(0, 2)).id;
 }
 
 /** The gallery's own view page. */
