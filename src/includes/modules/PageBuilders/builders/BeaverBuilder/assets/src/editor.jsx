@@ -20,6 +20,12 @@ const READY_CLASS = 'is-fg-pb-ready';
 const LAYOUT_FRAME_SELECTOR = 'iframe.fl-builder-ui-iframe';
 const PAGINATION_SELECTOR = '.fg-pagination, .fg-pagination__btn';
 const EMPTY_STATE_CTA_SELECTOR = '.fg-pb-bb-preview .fg-pb-empty-state__cta';
+const PREVIEW_SELECTOR = '.fg-pb-bb-preview';
+const CLICKABLE_CLASS = 'is-fg-pb-clickable';
+const FROZEN_CLASS = 'is-fg-pb-pagination-frozen';
+const ITEM_CONTROL_SELECTOR = '.fg-item, a, button';
+const OPEN_LIGHTBOX_SELECTOR =
+	'dialog.fg-lightbox[open], .fg-lb-mini, .fg-lb-grid, .fg-lb-mv';
 
 const roots = new Map();
 const cache = { gallery: null, album: null };
@@ -274,7 +280,31 @@ const CollectionPicker = ({ kind, input }) => {
 };
 
 /**
- * Keep frozen pagination inert and open empty-state links in a new tab.
+ * Mute Beaver Builder's keyboard shortcuts while a FotoGrids Lightbox is open.
+ *
+ * @param {Document} targetDocument Document holding the builder layout.
+ */
+const muteShortcutsInLightbox = (targetDocument) => {
+	const Mousetrap = targetDocument.defaultView?.Mousetrap;
+	if (
+		!Mousetrap?.prototype?.stopCallback ||
+		Mousetrap.prototype.fgPbBbMuted
+	) {
+		return;
+	}
+	const stopCallback = Mousetrap.prototype.stopCallback;
+	Mousetrap.prototype.stopCallback = function (...args) {
+		if (targetDocument.querySelector(OPEN_LIGHTBOX_SELECTOR)) {
+			return true;
+		}
+		return stopCallback.apply(this, args);
+	};
+	Mousetrap.prototype.fgPbBbMuted = true;
+};
+
+/**
+ * Handle preview clicks: frozen pagination, empty-state links, and live
+ * clicks that must not open the module settings.
  *
  * @param {Document} targetDocument Document holding the builder layout.
  */
@@ -283,6 +313,13 @@ const bindLayoutClicks = (targetDocument) => {
 		return;
 	}
 	targetDocument.fgPbBbClicksBound = true;
+
+	// Shortcuts may load after binding.
+	targetDocument.addEventListener(
+		'keydown',
+		() => muteShortcutsInLightbox(targetDocument),
+		true
+	);
 
 	targetDocument.addEventListener(
 		'click',
@@ -300,13 +337,29 @@ const bindLayoutClicks = (targetDocument) => {
 				}
 				return;
 			}
-			if (
-				target.closest('.is-fg-pb-pagination-frozen') &&
-				target.closest(PAGINATION_SELECTOR)
-			) {
+			const preview = target.closest(PREVIEW_SELECTOR);
+			if (!preview) {
+				return;
+			}
+			const frozen = preview.classList.contains(FROZEN_CLASS);
+			if (frozen && target.closest(PAGINATION_SELECTOR)) {
 				event.preventDefault();
 				event.stopPropagation();
 				event.stopImmediatePropagation();
+				return;
+			}
+			const live =
+				(!frozen && target.closest(PAGINATION_SELECTOR)) ||
+				(preview.classList.contains(CLICKABLE_CLASS) &&
+					target.closest(ITEM_CONTROL_SELECTOR));
+			const module = live && preview.closest('.fl-module');
+			if (module) {
+				// Stop at the module, after FotoGrids' handlers.
+				module.addEventListener(
+					'click',
+					(moduleEvent) => moduleEvent.stopPropagation(),
+					{ once: true }
+				);
 			}
 		},
 		true

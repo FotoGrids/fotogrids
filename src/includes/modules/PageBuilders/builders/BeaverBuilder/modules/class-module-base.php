@@ -197,8 +197,9 @@ abstract class Module_Base extends \FLBuilderModule {
 		$preview_options = Preview_Options::normalise( is_object( $this->settings ) ? get_object_vars( $this->settings ) : array() );
 
 		$markup = sprintf(
-			'<div class="fg-pb-bb-preview%1$s">%2$s</div>',
+			'<div class="fg-pb-bb-preview%1$s%2$s">%3$s</div>',
 			$preview_options['pagination'] ? '' : ' is-fg-pb-pagination-frozen',
+			$preview_options['click_behavior'] ? ' is-fg-pb-clickable' : '',
 			$this->render_preview( $collection_id, $preview_options )
 		);
 		echo wp_kses( $markup, \FotoGrids\Kses::rules( $markup ) );
