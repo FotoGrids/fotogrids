@@ -479,6 +479,10 @@ function tryBindIframe() {
 	if ($contents && $contents.length) {
 		const previewDoc = $contents[0];
 		bindPaginationGuard(previewDoc);
+		if (!previewDoc.__fgPbEmptyStateBound) {
+			previewDoc.__fgPbEmptyStateBound = true;
+			previewDoc.addEventListener('click', openEmptyStateUrl, true);
+		}
 		return true;
 	}
 	return false;
@@ -513,34 +517,24 @@ document.addEventListener('click', (event) => {
 	}
 });
 
-// ─── Empty-state CTA bridge ─────────────────────────────────────────────────
-// When a gallery/album widget renders its empty-state panel inside the
-// Elementor preview iframe, the inline "Add items/galleries" button
-// can't open a new tab itself (the iframe blocks target=_blank /
-// window.open). It postMessages the URL up here; we open it from the
-// editor window where popup permissions are normal.
-function isAllowedEmptyStateMessage(event) {
-	if (
-		!event ||
-		typeof event.data !== 'object' ||
-		event.data === null ||
-		event.data.type !== 'fg-pb-empty-state:open' ||
-		typeof event.data.url !== 'string'
-	) {
-		return false;
-	}
-	// Same-origin only - the preview iframe shares the editor's origin.
-	try {
-		const url = new URL(event.data.url, window.location.origin);
-		return url.origin === window.location.origin;
-	} catch (e) {
-		return false;
-	}
-}
-
-window.addEventListener('message', (event) => {
-	if (!isAllowedEmptyStateMessage(event)) {
+/**
+ * Open an empty-state call to action from the editor window; the preview
+ * iframe cannot open a new tab itself.
+ *
+ * @param {MouseEvent} event Click in the preview document.
+ */
+function openEmptyStateUrl(event) {
+	const target = event.target;
+	if (!target || !target.closest) {
 		return;
 	}
-	window.open(event.data.url, '_blank', 'noopener,noreferrer');
-});
+	const button = target.closest(
+		'.fg-pb-elementor-preview .fg-pb-empty-state__cta'
+	);
+	if (!button || !button.dataset.fgEditUrl) {
+		return;
+	}
+	event.preventDefault();
+	event.stopPropagation();
+	window.open(button.dataset.fgEditUrl, '_blank', 'noopener,noreferrer');
+}

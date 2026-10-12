@@ -121,6 +121,7 @@ abstract class Abstract_Tool implements Tool_Interface {
 				self::asset_version( $script_url ),
 				true // Load in footer - fotogrids-admin and the DOM are ready.
 			);
+			wp_set_script_translations( 'fotogrids-tool-' . $this->get_id(), 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 		}
 
 		// Styles are also always enqueued on the Tools page for the same
