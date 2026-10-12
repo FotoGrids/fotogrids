@@ -128,8 +128,8 @@ class SEO_Conflict_Guard {
 			array_filter(
 				(array) $presenters,
 				static function ( $presenter ) use ( $keep_title ) {
-					return $presenter instanceof \Yoast\WP\SEO\Presenters\Meta_Description_Presenter
-						|| ( $keep_title && $presenter instanceof \Yoast\WP\SEO\Presenters\Title_Presenter );
+					return is_a( $presenter, 'Yoast\WP\SEO\Presenters\Meta_Description_Presenter' )
+						|| ( $keep_title && is_a( $presenter, 'Yoast\WP\SEO\Presenters\Title_Presenter' ) );
 				}
 			)
 		);
