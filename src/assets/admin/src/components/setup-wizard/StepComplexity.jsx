@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import { persistSetting } from './persist-setting';
-
-const { __ } = wp.i18n;
 
 /**
  * Step 3 - Setup mode (Easy vs Advanced).

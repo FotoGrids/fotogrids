@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -8,8 +9,6 @@ import {
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
 import { Button } from '../../shared/Button';
-
-const { __ } = wp.i18n;
 
 const DEFAULTS = {
 	enable_open_graph: true,

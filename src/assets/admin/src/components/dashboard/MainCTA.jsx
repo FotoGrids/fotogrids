@@ -3,8 +3,7 @@
  * Shows different CTAs based on whether galleries exist
  */
 import React from 'react';
-
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
 const MainCTA = ({ galleriesCount, itemsCount }) => {
 	if (galleriesCount === 0) {

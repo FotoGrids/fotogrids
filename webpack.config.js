@@ -6,6 +6,25 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+const terserOptions = (compress = {}) => ({
+    compress: {
+        drop_console: isProduction,
+        drop_debugger: true,
+        pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
+        ...compress,
+    },
+    mangle: {
+        toplevel: false,
+        reserved: ['jQuery', '$', 'wp', 'ajaxurl', '__', '_x', '_n', '_nx'],
+        properties: false,
+    },
+    format: {
+        comments: /translators:/i,
+    },
+});
+
+const PLAIN_ADMIN_SCRIPTS = /assets[\\/]admin[\\/]plain[\\/]/;
+
 const ENTRY_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.scss'];
 
 /**
@@ -55,10 +74,6 @@ function discoverToolEntries() {
  *
  *   <Name>/core/assets/src/              -> entries `module-<Name>-<surface>`
  *   <Name>/builders/<B>/assets/src/      -> entries `module-<Name>-<B>-<surface>`
- *
- * This supports umbrella modules with a shared `core/` and per-builder
- * sub-modules (e.g. PageBuilders/{core,builders/Gutenberg}) without
- * forcing every umbrella to flatten its bundles into the top level.
  *
  * Each match produces an entry whose output is routed by the
  * `output.filename` and `MiniCssExtractPlugin.filename` callbacks below.
@@ -186,14 +201,7 @@ const mainConfig = {
         'admin-header': './src/assets/admin/src/admin-header.js',
         'upgrade-modal': './src/assets/admin/src/styles/upgrade-modal.scss',
         'error-boundary': './src/assets/admin/src/styles/error-boundary.scss',
-        // Aggregated shared-component stylesheet for every surface that
-        // uses FG components outside the FotoGrids admin pages
-        // (Gutenberg + Elementor editors today, Divi/Bricks tomorrow).
-        // Registered once as the `fotogrids-fg-shared` WP handle by
-        // PageBuilders\Module so every editor declares a single style
-        // dep and gets Modal + Button + Checkbox + FormField + Icon
-        // styling. The `admin` bundle still includes the same partials
-        // via admin.scss for FotoGrids admin pages.
+        // Shared component styles for page-builder editors (the `fotogrids-fg-shared` handle).
         'fg-shared-styles': './src/assets/admin/src/styles/fg-shared/fg-shared.scss',
         'dashboard-widget': './src/assets/admin/src/dashboard-widget.js',
         'dashboard-widget-styles': './src/assets/admin/src/styles/dashboard-widget.scss',
@@ -202,9 +210,7 @@ const mainConfig = {
         'ui-state-manager': './src/assets/admin/src/utils/ui-state-manager.js',
         'deactivation-feedback': './src/assets/admin/src/deactivation/deactivation-feedback.js',
         'fg-modal-styles': './src/assets/admin/src/styles/fg-modal-standalone.scss',
-        // Per-tool and per-module entries are discovered automatically from the
-        // filesystem. The routing for these chunks lives in the output.filename
-        // and MiniCssExtractPlugin.filename callbacks below.
+        // Per-tool and per-module entries are discovered from the filesystem.
         ...discoverToolEntries(),
         ...discoverModuleEntries(),
     },
@@ -336,20 +342,7 @@ const mainConfig = {
                         return relativePath.replace('src/', '');
                     },
                     globOptions: {
-                        // The native Divi 5 bundle's BUILD-ARTIFACT dirs
-                        // (build/, styles/, modules-json/) are written into
-                        // dist/ exclusively by the `divi-native` config's
-                        // afterEmit mirror - including their index.php silence
-                        // files. Excluding them here guarantees a SINGLE writer
-                        // to those dist dirs. Two writers targeting the same
-                        // native/build dir is what broke the build: the copy
-                        // collided with the mirror's rmSync/cpSync, webpack
-                        // exited non-zero, and the dist sync to the live plugin
-                        // never completed - leaving stale frontend JS (items
-                        // stuck in data-fg-media-state="loading") and 404s on
-                        // the native bundle. The native PHP render classes
-                        // (native/php/*.php) and native/index.php are NOT
-                        // excluded - those still ship via this pattern.
+                        // The native Divi build dirs are written to dist/ only by the `divi-native` config.
                         ignore: [
                             '**/.DS_Store',
                             '**/Divi/native/build/**',
@@ -359,10 +352,7 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Bundled watermark fonts (TTF + licences). Referenced at
-                    // runtime by a PHP-emitted @font-face and by the server-side
-                    // watermark engine, so they are copied verbatim rather than
-                    // resolved through a webpack url() import.
+                    // Bundled watermark fonts (TTF + licences), copied verbatim.
                     from: 'src/assets/fonts/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
@@ -380,10 +370,7 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Standalone diagnostics scripts. These are enqueued directly
-                    // by PHP rather than built as webpack entries (entry discovery
-                    // only covers tools/ and modules/), and the broad copy pattern
-                    // above matches *.php only, so they need their own pattern.
+                    // Standalone diagnostics scripts, enqueued directly by PHP.
                     from: 'src/includes/diagnostics/assets/**/*.js',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
@@ -391,10 +378,7 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Block.json metadata for the PageBuilders Gutenberg sub-module
-                    // (and any future module that ships Gutenberg blocks). Copied
-                    // verbatim into dist/; register_block_type() reads them from
-                    // the runtime dist path.
+                    // block.json metadata, read by register_block_type() from dist/.
                     from: 'src/includes/modules/**/blocks/**/block.json',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
@@ -407,18 +391,8 @@ const mainConfig = {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
                     },
-                    // loading-icons-waapi.json stores one self-contained
-                    // `function animate(svg){...}` source string per icon, each
-                    // carrying the full shared helper block with its JSDoc and
-                    // inline comments. PHP emits the selected icon's string
-                    // verbatim as inline frontend JS, so those comments are dead
-                    // weight on both disk and the page. In production builds we
-                    // run each function string through Terser (comments off,
-                    // whitespace collapsed) before it lands in dist/. The
-                    // committed src/config copy is left untouched and readable.
-                    // Identifiers are preserved (no mangle/compress) so the
-                    // emitted JS stays one safe step from the source - the only
-                    // change is comment/whitespace removal.
+                    // Production builds strip comments and whitespace from each icon's
+                    // function string. Identifiers are preserved.
                     async transform(content, absoluteFilename) {
                         if (
                             !isProduction ||
@@ -467,14 +441,6 @@ const mainConfig = {
                         return Buffer.from(JSON.stringify(out, null, 2), 'utf8');
                     },
                 },
-                // NOTE: the native Divi 5 VB bundle (build/, styles/,
-                // modules-json/) is intentionally NOT copied here. It's built
-                // and mirrored into dist/ by the separate `divi-native`
-                // webpack config (see the second config in this array's
-                // export). Keeping it out of the `main` config means a
-                // native-side issue can never interfere with the front-end
-                // build - see the long note on `diviNativeConfig` for why
-                // that isolation matters (stuck `data-fg-media-state` bug).
                 {
                     from: 'src/fotogrids.php',
                     to: 'fotogrids.php',
@@ -502,12 +468,8 @@ const mainConfig = {
                         ignore: [
                             '**/.DS_Store',
                             '**/*.php',
-                            // Pricing page is disabled in our Freemius config
-                            // ('pricing' => false), so its React widget (~488KB)
-                            // is dead weight in the release zip.
+                            // The pricing page is disabled in the Freemius config.
                             '**/freemius/assets/js/pricing/**',
-                            // .pot is a translation source artifact, not runtime;
-                            // compiled .mo locales are kept.
                             '**/freemius/languages/*.pot',
                         ],
                     },
@@ -521,57 +483,6 @@ const mainConfig = {
                     filter: (resourcePath) => {
                         return !resourcePath.includes('ajax-save.js') && !resourcePath.includes('meta-boxes.js');
                     },
-                    transform(content, absoluteFilename) {
-                        if (isProduction && absoluteFilename.endsWith('.js')) {
-                            if (!content || content.length === 0) {
-                                console.warn('Empty content for', absoluteFilename);
-                                return content;
-                            }
-
-                            const terser = require('terser');
-
-                            try {
-                                const sourceCode = Buffer.isBuffer(content) ? content.toString('utf8') : String(content);
-
-                                if (!sourceCode.trim()) {
-                                    console.warn('Empty source code for', absoluteFilename);
-                                    return content;
-                                }
-
-                                const result = terser.minify(sourceCode, {
-                                    compress: {
-                                        drop_console: true,
-                                        drop_debugger: true,
-                                        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-                                    },
-                                    mangle: {
-                                        toplevel: false,
-                                        reserved: ['jQuery', '$', 'wp', 'ajaxurl'],
-                                        properties: false,
-                                    },
-                                    format: {
-                                        comments: false,
-                                    },
-                                });
-
-                                if (result.error) {
-                                    console.warn('Terser error for', absoluteFilename, ':', result.error);
-                                    return content;
-                                }
-
-                                if (!result.code) {
-                                    console.info('No minified code generated for', absoluteFilename);
-                                    return content;
-                                }
-
-                                return Buffer.from(result.code, 'utf8');
-                            } catch (error) {
-                                console.warn('Failed to minify', absoluteFilename, ':', error.message);
-                                return content;
-                            }
-                        }
-                        return content;
-                    },
                 },
                 {
                     from: 'src/assets/admin/images/**/*',
@@ -581,10 +492,7 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Bundled third-party admin vendor scripts (e.g. Chart.js).
-                    // Shipped verbatim with their source map so WordPress.org's
-                    // "include source for minified files" rule is satisfied; we
-                    // do NOT load these from a CDN.
+                    // Bundled third-party admin vendor scripts (e.g. Chart.js), with their source maps.
                     from: 'src/assets/admin/vendor/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
@@ -592,10 +500,7 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Self-hosted admin web fonts (Poppins and JetBrains Mono,
-                    // both SIL OFL). Bundled locally instead of loading from
-                    // fonts.googleapis.com so no visitor/admin data is sent to
-                    // Google.
+                    // Self-hosted admin web fonts (Poppins and JetBrains Mono).
                     from: 'src/assets/admin/fonts/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
@@ -673,38 +578,20 @@ const mainConfig = {
         minimize: isProduction,
         minimizer: [
             new TerserPlugin({
-                // Vendored third-party libraries are copied verbatim by
-                // CopyWebpackPlugin and ship with their upstream source map.
-                // Terser would otherwise re-minify the copied asset, which
-                // invalidates the map and has produced broken output before
-                // (Chart.js: `let` narrowed to `const` -> "Assignment to
-                // constant variable" at runtime).
-                exclude: /assets[\\/]admin[\\/]vendor[\\/]/,
-                terserOptions: {
-                    compress: {
-                        drop_console: isProduction,
-                        drop_debugger: true,
-                        pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
-                    },
-                    mangle: {
-                        toplevel: false,
-                        reserved: ['jQuery', '$', 'wp', 'ajaxurl'],
-                        properties: false,
-                    },
-                    format: {
-                        comments: false,
-                    },
-                },
+                // Vendored libraries ship with their upstream source maps and are not re-minified.
+                exclude: [/assets[\\/]admin[\\/]vendor[\\/]/, PLAIN_ADMIN_SCRIPTS],
+                terserOptions: terserOptions(),
+                extractComments: false,
+            }),
+            new TerserPlugin({
+                include: PLAIN_ADMIN_SCRIPTS,
+                terserOptions: terserOptions({ conditionals: false }),
                 extractComments: false,
             }),
         ],
         splitChunks: {
-            // Exclude bundles loaded standalone by WordPress (no awareness of
-            // sibling chunk files): metabox, per-tool, per-module, per-layout,
-            // and global-modal-init. Splitting them causes a silent runtime
-            // failure - the dynamic import for the split-out chunk file fails
-            // because WP never enqueued it, and webpack's __webpack_require__.O
-            // defers the entry indefinitely with no console error.
+            // Bundles WordPress enqueues standalone are never split: their split chunks
+            // would not be enqueued.
             chunks: (chunk) =>
                 chunk.name !== 'metabox' &&
                 chunk.name !== 'featured-image-picker' &&
@@ -740,31 +627,9 @@ const mainConfig = {
 /**
  * Native Divi 5 module bundle.
  *
- * The native module package (PageBuilders/builders/Divi/native/) is built
- * as part of the plugin's own `npm run dev` / `npm run build` - there is no
- * separate build step. Its VB bundle is fundamentally different from every
- * other entry: it consumes Divi's own runtime (`@divi/*`), React, and a
- * couple of WordPress packages off the `window.divi` / `vendor` / `wp`
- * globals that Divi enqueues in the Visual Builder, so all of those are
- * webpack `externals` and never bundled. Because they're externals, the
- * `@divi/*` type packages are only needed for type-checking - we transpile
- * with `transpileOnly` and skip them at build time.
- *
  * Output lands directly in the package's committed artifact dirs under
  * `src/.../native/{build,styles,modules-json}`, and an afterEmit hook
  * mirrors those into `dist/`.
- *
- * IMPORTANT: this config is intentionally INDEPENDENT of the `main` config
- * - there is no `dependencies: ['divi-native']` coupling. webpack-cli runs
- * a multi-config array as a multi-compiler, and if one config errors the
- * whole run is treated as failed; with a dependency link, a failure (or
- * even a transient dist permission error) in this native config would leave
- * the main config's frontend bundles UNWRITTEN/STALE - which manifested as
- * gallery items stuck in `data-fg-media-state="loading"` because the
- * loading-icon JS never refreshed. Keeping the two configs decoupled means
- * a native-side problem can never break the front-end build. The dist
- * mirror below also makes this config self-sufficient, so it doesn't rely
- * on the main config's copy pass or any build ordering.
  */
 const diviNativeBase = path.resolve(
     __dirname,
@@ -812,13 +677,9 @@ const diviNativeConfig = {
                 use: {
                     loader: 'ts-loader',
                     options: {
-                        // The `@divi/*` types aren't installed (they're only
-                        // needed for type-checking, and the runtime is an
-                        // external), so transpile without type-checking.
+                        // The `@divi/*` types are not installed, so transpile without type-checking.
                         transpileOnly: true,
                         compilerOptions: {
-                            // Self-contained: don't depend on the package's
-                            // tsconfig (which referenced the example repo).
                             jsx: 'react',
                             target: 'es2018',
                             module: 'esnext',
@@ -869,12 +730,7 @@ const diviNativeConfig = {
         new MiniCssExtractPlugin({
             filename: '../styles/[name].css',
         }),
-        // Emit `vb-bundle.css` as an identical sibling of `bundle.css`. The
-        // runtime enqueues a separate VB stylesheet handle; here the VB and
-        // front-end CSS are the same rules, so we duplicate the emitted asset
-        // rather than maintain a second source file. If the two ever diverge,
-        // split them into `style.scss` (VB) + `module.scss` (front end) and
-        // route via MiniCssExtractPlugin filenames instead.
+        // Emit `vb-bundle.css` as an identical copy of `bundle.css`.
         {
             apply(compiler) {
                 const { RawSource } = compiler.webpack.sources;
@@ -901,22 +757,14 @@ const diviNativeConfig = {
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    // Compiled module metadata: copied from each component's
-                    // module.json into modules-json/<name>/module.json, which
-                    // is what the PHP side passes to register_module().
+                    // Each component's module.json, copied to modules-json/<name>/module.json.
                     from: '**/module.json',
                     context: 'src/components',
                     to: path.resolve(diviNativeBase, 'modules-json'),
                 },
             ],
         }),
-        // Mirror the freshly-built artifacts from src/ into dist/ so the
-        // plugin folder a Local site serves is self-contained, including
-        // under `webpack --watch`. Runs on afterEmit (assets already on
-        // disk). Failures here are swallowed with a warning so a dist
-        // permission hiccup can never fail this config (which, in a
-        // multi-compiler run, must never be allowed to take the front-end
-        // build down with it).
+        // Mirror the built artifacts from src/ into dist/. Failures only warn.
         {
             apply(compiler) {
                 compiler.hooks.afterEmit.tapPromise('FgMirrorNativeToDist', async () => {
