@@ -28,6 +28,11 @@ class Import_Export_Data {
 	const LOG_MAX    = 50;
 
 	/**
+	 * Post statuses a gallery or album is exported with and may be imported as.
+	 */
+	const COLLECTION_STATUSES = array( 'publish', 'future', 'draft', 'pending', 'private' );
+
+	/**
 	 * GET /fotogrids/v1/admin/tools/import-export/export
 	 *
 	 * Query params:
@@ -186,7 +191,7 @@ class Import_Export_Data {
 			$posts = get_posts(
 				array(
 					'post_type'      => 'fotogrids_gallery',
-					'post_status'    => 'publish',
+					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
 					'order'          => 'ASC',
@@ -212,7 +217,7 @@ class Import_Export_Data {
 			$posts = get_posts(
 				array(
 					'post_type'      => 'fotogrids_album',
-					'post_status'    => 'publish',
+					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
 					'order'          => 'ASC',
@@ -671,9 +676,21 @@ class Import_Export_Data {
 			$old_id = (int) ( $post_data['id'] ?? 0 );
 			$slug   = sanitize_title( $post_data['slug'] ?? '' );
 			$title  = sanitize_text_field( $post_data['title'] ?? '' );
+			$status = sanitize_key( $post_data['status'] ?? '' );
+			$date   = (string) ( $post_data['date'] ?? '' );
 			$meta   = is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array();
 
-			$existing = get_page_by_path( $slug, OBJECT, $post_type );
+			if ( ! in_array( $status, self::COLLECTION_STATUSES, true ) ) {
+				$status = 'publish';
+			}
+			if ( ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $date ) ) {
+				$date = '';
+			}
+
+			// Drafts and pending collections usually have no slug, so they are matched on title and date.
+			$existing = '' !== $slug
+				? get_page_by_path( $slug, OBJECT, $post_type )
+				: self::find_by_title_and_date( $title, $date, $post_type );
 
 			if ( $existing ) {
 				if ( 'skip' === $conflict_mode ) {
@@ -691,7 +708,9 @@ class Import_Export_Data {
 					continue;
 				}
 				// 'duplicate' - fall through to insert with a new slug.
-				$slug = self::unique_slug( $slug, $post_type );
+				if ( '' !== $slug ) {
+					$slug = self::unique_slug( $slug, $post_type );
+				}
 			}
 
 			$new_id = wp_insert_post(
@@ -699,7 +718,8 @@ class Import_Export_Data {
 					'post_type'   => $post_type,
 					'post_title'  => $title,
 					'post_name'   => $slug,
-					'post_status' => 'publish',
+					'post_status' => $status,
+					'post_date'   => $date,
 				),
 				true
 			);
@@ -939,6 +959,39 @@ class Import_Export_Data {
 
 		update_user_meta( $user_id, 'fotogrids_user_templates', wp_json_encode( $existing ) );
 		return array( $imported );
+	}
+
+	/**
+	 * Find a gallery or album with exactly this title and date.
+	 *
+	 * @param  string $title     Post title.
+	 * @param  string $date      Post date, Y-m-d H:i:s in site time.
+	 * @param  string $post_type Collection post type.
+	 * @return \WP_Post|null
+	 */
+	private static function find_by_title_and_date( string $title, string $date, string $post_type ): ?\WP_Post {
+		if ( '' === $date ) {
+			return null;
+		}
+
+		$candidates = get_posts(
+			array(
+				'post_type'      => $post_type,
+				'post_status'    => self::COLLECTION_STATUSES,
+				'title'          => $title,
+				'posts_per_page' => -1,
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+			)
+		);
+
+		foreach ( $candidates as $candidate ) {
+			if ( $candidate->post_date === $date ) {
+				return $candidate;
+			}
+		}
+
+		return null;
 	}
 
 	/** Generate a slug that doesn't collide with any existing post of the given type. */
