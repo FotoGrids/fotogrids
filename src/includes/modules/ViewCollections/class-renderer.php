@@ -116,12 +116,35 @@ class Renderer {
 	}
 
 	/**
-	 * Robots / canonical meta for the document head.
+	 * Whether the site hands the view page head over to its SEO plugin.
 	 *
-	 * @since 1.0.0
-	 * @return string
+	 * @since 1.3.0
+	 * @return bool
 	 */
-	public function head_meta(): string {
+	public function defers_to_seo_plugins(): bool {
+		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
+
+		return ! empty( $seo['defer_to_seo_plugins'] );
+	}
+
+	/**
+	 * Whether the standalone shell prints its own `<title>`.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	public function prints_document_title(): bool {
+		return ! $this->defers_to_seo_plugins()
+			|| ( ! current_theme_supports( 'title-tag' ) && ! has_action( 'wp_head', '_block_template_render_title_tag' ) );
+	}
+
+	/**
+	 * Whether the view page is excluded from search engines.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	public function is_noindex(): bool {
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
 		// Noindex chain (lowest to highest precedence):
@@ -142,7 +165,39 @@ class Renderer {
 		 * @param bool     $noindex
 		 * @param \WP_Post $post
 		 */
-		$noindex = (bool) apply_filters( Filters_View::ROBOTS, $noindex, $this->post );
+		return (bool) apply_filters( Filters_View::ROBOTS, $noindex, $this->post );
+	}
+
+	/**
+	 * Add the view page's noindex to `wp_robots`. Nothing when deferring.
+	 *
+	 * @since 1.3.0
+	 * @param array<string,bool|string> $robots Robots directives.
+	 * @return array<string,bool|string>
+	 */
+	public static function filter_robots( array $robots ): array {
+		$post = Router::current_post();
+		if ( ! $post instanceof \WP_Post ) {
+			return $robots;
+		}
+
+		$view = self::for_post( $post );
+		if ( ! $view->defers_to_seo_plugins() && $view->is_noindex() ) {
+			$robots['noindex']  = true;
+			$robots['nofollow'] = true;
+		}
+
+		return $robots;
+	}
+
+	/**
+	 * Canonical and Open Graph meta for the document head.
+	 *
+	 * @since 1.0.0
+	 * @return string
+	 */
+	public function head_meta(): string {
+		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
 		// Canonical: per-collection override wins; otherwise the permalink.
 		$canonical = '' !== $seo['canonical_override'] ? $seo['canonical_override'] : get_permalink( $this->post );
@@ -161,10 +216,7 @@ class Renderer {
 		$canonical = (string) apply_filters( Filters_View::CANONICAL, $canonical, $this->post );
 
 		$meta = '';
-		if ( $noindex ) {
-			$meta .= '<meta name="robots" content="noindex, nofollow">' . "\n";
-		}
-		if ( '' !== $canonical ) {
+		if ( '' !== $canonical && ! $this->defers_to_seo_plugins() ) {
 			$meta .= '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
 		}
 		$meta .= $this->open_graph_meta( $seo );
@@ -174,7 +226,7 @@ class Renderer {
 		 *
 		 * This is the catch-all string filter that runs after every granular
 		 * filter (og/title, og/description, og/image, og/url, og/type,
-		 * og/enabled, view/robots, view/canonical). Prefer the granular
+		 * og/enabled, view/canonical). Prefer the granular
 		 * filters for targeted changes - this one is for sites that need to
 		 * rewrite or completely replace the markup.
 		 *
