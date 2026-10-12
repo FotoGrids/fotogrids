@@ -689,7 +689,7 @@ class Import_Export_Data {
 
 			// Drafts and pending collections usually have no slug, so they are matched on title and date.
 			$existing = '' !== $slug
-				? get_page_by_path( $slug, OBJECT, $post_type )
+				? get_page_by_path( $slug, OBJECT, array( $post_type ) )
 				: self::find_by_title_and_date( $title, $date, $post_type );
 
 			if ( $existing ) {
@@ -998,7 +998,7 @@ class Import_Export_Data {
 	private static function unique_slug( string $base, string $post_type ): string {
 		$slug    = $base;
 		$counter = 1;
-		while ( get_page_by_path( $slug, OBJECT, $post_type ) ) {
+		while ( get_page_by_path( $slug, OBJECT, array( $post_type ) ) ) {
 			$slug = $base . '-' . $counter;
 			++$counter;
 		}
