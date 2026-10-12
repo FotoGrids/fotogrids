@@ -829,11 +829,12 @@ class Import_Export_Data {
 			$text[ $key ] = isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ? (string) $item[ $key ] : '';
 		}
 
-		$post = array_filter(
+		$unfiltered = current_user_can( 'unfiltered_html' );
+		$post       = array_filter(
 			array(
 				'post_title'   => sanitize_text_field( $text['title'] ),
-				'post_excerpt' => wp_kses_post( $text['caption'] ),
-				'post_content' => wp_kses_post( $text['description'] ),
+				'post_excerpt' => $unfiltered ? $text['caption'] : wp_kses_post( $text['caption'] ),
+				'post_content' => $unfiltered ? $text['description'] : wp_kses_post( $text['description'] ),
 			),
 			'strlen'
 		);
@@ -851,8 +852,9 @@ class Import_Export_Data {
 	/**
 	 * Import item rows.
 	 *
-	 * An item the site did not use before the import also receives the file's
-	 * title, caption, description and alt text.
+	 * An entry carrying item data creates the item's row. An item the site did not
+	 * use before the import also receives the entry's title, caption, description
+	 * and alt text.
 	 *
 	 * @param array<int, array<string, mixed>> $items          Exported item entries.
 	 * @param array<int, int>                  $gallery_id_map Old gallery ID => new gallery ID.
@@ -865,6 +867,13 @@ class Import_Export_Data {
 		$lists    = array();
 
 		foreach ( $items as $item ) {
+			// An empty or null element in an XML file parses to an array.
+			$item          = array_map(
+				static function ( $value ) {
+					return is_array( $value ) ? null : $value;
+				},
+				(array) $item
+			);
 			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
 
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
@@ -882,8 +891,7 @@ class Import_Export_Data {
 				continue;
 			}
 
-			$saved = Item_Meta::save(
-				$attachment_id,
+			$fields = array_intersect_key(
 				array(
 					'item_type'    => sanitize_text_field( $item['item_type'] ?? 'image' ),
 					'credit'       => sanitize_text_field( $item['credit'] ?? '' ),
@@ -892,8 +900,11 @@ class Import_Export_Data {
 					'link_target'  => sanitize_text_field( $item['link_target'] ?? '' ),
 					'exif_data'    => $item['exif_data'] ?? null,
 					'custom_data'  => $item['custom_data'] ?? null,
-				)
+				),
+				$item
 			);
+
+			$saved = $fields ? Item_Meta::save( $attachment_id, $fields ) : ! isset( $known[ $attachment_id ] );
 
 			if ( $saved ) {
 				if ( ! isset( $known[ $attachment_id ] ) ) {

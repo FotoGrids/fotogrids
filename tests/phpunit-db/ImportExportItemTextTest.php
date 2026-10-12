@@ -14,12 +14,13 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 	private const TEXT = array(
 		'title'       => 'Harbour at dawn',
 		'caption'     => "Boats leaving\nbefore sunrise",
-		'description' => 'Shot from the <a href="https://example.com/pier">north pier</a>, C:\\Photos\\raw.',
+		'description' => 'Shot from the <a href="https://example.com/pier">north pier</a> & the quay, C:\\Photos\\raw.',
 		'alt'         => 'Fishing boats in a harbour at dawn',
 	);
 
 	public function set_up(): void {
 		parent::set_up();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		rest_get_server();
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/import-export/class-import-export-data.php';
 	}
@@ -139,6 +140,7 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 	public function test_a_round_trip_through_xml_restores_the_text(): void {
 		$id = $this->attachment();
 		$this->gallery_with( $id );
+		Item_Meta::save( $id, array( 'credit' => 'Jane Doe' ) );
 		$data = self::call( 'collect_export_data', array( 'items' ) );
 		$xml  = self::call( 'serialise_xml', $data );
 
@@ -147,6 +149,7 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 		$this->import( $parsed['items'] );
 
 		$this->assertSame( self::TEXT, $this->text_of( $id ) );
+		$this->assertSame( 'Jane Doe', Item_Meta::get( $id )['credit'] );
 	}
 
 	public function test_an_item_already_in_a_gallery_keeps_its_text(): void {
@@ -190,10 +193,58 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 	public function test_import_leaves_the_item_row_caption_and_description_empty(): void {
 		$id = $this->attachment();
 
-		$this->import( array( array_merge( array( 'attachment_id' => $id ), self::TEXT ) ) );
+		$this->import( array( array_merge( array( 'attachment_id' => $id, 'credit' => 'Jane Doe' ), self::TEXT ) ) );
 
 		$row = Item_Meta::get( $id );
+		$this->assertSame( 'Jane Doe', $row['credit'] );
 		$this->assertEmpty( $row['caption'] );
 		$this->assertEmpty( $row['description'] );
+	}
+
+	public function test_an_entry_with_only_text_writes_the_text_and_no_row(): void {
+		$id = $this->attachment( array_fill_keys( array_keys( self::TEXT ), '' ) );
+
+		$this->assertSame( array( 1, 0 ), $this->import( array( array_merge( array( 'attachment_id' => $id, 'gallery_id' => 0 ), self::TEXT ) ) ) );
+
+		$this->assertSame( self::TEXT, $this->text_of( $id ) );
+		$this->assertNull( Item_Meta::get( $id ) );
+	}
+
+	public function test_an_entry_with_only_text_for_an_item_in_a_gallery_is_skipped(): void {
+		$id = $this->attachment();
+		$this->gallery_with( $id );
+
+		$this->assertSame( array( 0, 1 ), $this->import( array( array( 'attachment_id' => $id, 'gallery_id' => 0, 'caption' => 'From the file' ) ) ) );
+
+		$this->assertSame( self::TEXT, $this->text_of( $id ) );
+		$this->assertNull( Item_Meta::get( $id ) );
+	}
+
+	public function test_an_entry_without_some_item_fields_keeps_their_column_defaults(): void {
+		$id = $this->attachment();
+
+		$this->import( array( array( 'attachment_id' => $id, 'credit' => 'Jane Doe' ) ) );
+
+		$row = Item_Meta::get( $id );
+		$this->assertSame( 'global', $row['link_target'] );
+		$this->assertSame( 'image', $row['item_type'] );
+	}
+
+	public function test_a_user_without_unfiltered_html_has_markup_filtered(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+		$id = $this->attachment( array_fill_keys( array_keys( self::TEXT ), '' ) );
+
+		$this->import(
+			array(
+				array(
+					'attachment_id' => $id,
+					'caption'       => 'Pier<script>alert(1)</script>',
+					'description'   => '<a href="https://example.com/pier">north pier</a><script>alert(1)</script>',
+				),
+			)
+		);
+
+		$this->assertSame( 'Pieralert(1)', $this->text_of( $id )['caption'] );
+		$this->assertSame( '<a href="https://example.com/pier">north pier</a>alert(1)', $this->text_of( $id )['description'] );
 	}
 }
