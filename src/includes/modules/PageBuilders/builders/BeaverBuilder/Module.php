@@ -203,12 +203,16 @@ final class Module {
 			return true;
 		}
 
-		if ( ! $post instanceof \WP_Post || ! class_exists( 'FLBuilderModel' ) ) {
+		if ( ! $post instanceof \WP_Post ) {
 			return false;
 		}
 
 		if ( ! get_post_meta( $post->ID, '_fl_builder_enabled', true ) ) {
 			return self::inserted_layouts_have_fotogrids_content( (string) $post->post_content, 0 );
+		}
+
+		if ( ! class_exists( 'FLBuilderModel' ) ) {
+			return false;
 		}
 
 		$status = \FLBuilderModel::is_builder_active() ? 'draft' : 'published';
@@ -322,17 +326,39 @@ final class Module {
 	 * @return bool
 	 */
 	private static function inserted_layouts_have_fotogrids_content( string $content, int $depth ): bool {
-		if ( $depth >= self::MAX_INSERT_DEPTH || ! class_exists( 'FLBuilderModel' ) ) {
+		if ( $depth >= self::MAX_INSERT_DEPTH ) {
 			return false;
 		}
 
 		foreach ( self::inserted_layout_ids( $content ) as $layout_id ) {
-			if ( self::layout_has_fotogrids_content( \FLBuilderModel::get_layout_data( 'published', $layout_id ), $depth + 1 ) ) {
+			if ( ! get_post_meta( $layout_id, '_fl_builder_enabled', true ) ) {
+				if ( self::post_content_has_fotogrids_content( (string) get_post_field( 'post_content', $layout_id ), $depth + 1 ) ) {
+					return true;
+				}
+				continue;
+			}
+
+			if ( class_exists( 'FLBuilderModel' ) && self::layout_has_fotogrids_content( \FLBuilderModel::get_layout_data( 'published', $layout_id ), $depth + 1 ) ) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether the content of an inserted post that does not use the builder holds FotoGrids content.
+	 *
+	 * @param string $content Post content.
+	 * @param int    $depth   Levels of inserted layouts above the content.
+	 * @return bool
+	 */
+	private static function post_content_has_fotogrids_content( string $content, int $depth ): bool {
+		return has_shortcode( $content, 'fotogrids_gallery' )
+			|| has_shortcode( $content, 'fotogrids_album' )
+			|| has_block( 'fotogrids/gallery', $content )
+			|| has_block( 'fotogrids/album', $content )
+			|| self::inserted_layouts_have_fotogrids_content( $content, $depth );
 	}
 
 	/**

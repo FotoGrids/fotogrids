@@ -113,6 +113,76 @@ class BeaverBuilderDetectionTest extends WP_UnitTestCase {
 		$this->assertSame( array(), Module::inserted_layout_ids( '[fl_builder_insert_layout slug="fg-saved-layout" type="post"]' ) );
 	}
 
+	public function test_a_post_inserting_a_page_without_the_builder_is_detected_through_its_content(): void {
+		$shortcode = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_content' => '[fotogrids_gallery id="553"]',
+			)
+		);
+		$block     = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_content' => '<!-- wp:fotogrids/gallery {"galleryId":553} /-->',
+			)
+		);
+		$plain     = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_content' => '<p>No gallery.</p>',
+			)
+		);
+
+		$this->assertTrue( Module::detect_in_beaver_builder( false, self::inserting( $shortcode ) ) );
+		$this->assertTrue( Module::detect_in_beaver_builder( false, self::inserting( $block ) ) );
+		$this->assertFalse( Module::detect_in_beaver_builder( false, self::inserting( $plain ) ) );
+	}
+
+	public function test_inserts_nested_through_pages_are_followed_to_the_depth_limit(): void {
+		$inner = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_content' => '[fotogrids_album id="12"]',
+			)
+		);
+		$two   = self::inserting( $inner );
+		$three = self::inserting( $two->ID );
+		$four  = self::inserting( $three->ID );
+		$five  = self::inserting( $four->ID );
+
+		$this->assertTrue( Module::detect_in_beaver_builder( false, $four ) );
+		$this->assertFalse( Module::detect_in_beaver_builder( false, $five ) );
+	}
+
+	public function test_inserts_that_loop_back_stop(): void {
+		$first  = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$second = self::inserting( $first );
+		wp_update_post(
+			array(
+				'ID'           => $first,
+				'post_content' => '[fl_builder_insert_layout id="' . $second->ID . '"]',
+			)
+		);
+
+		$this->assertFalse( Module::detect_in_beaver_builder( false, $second ) );
+	}
+
+	/**
+	 * A page whose content inserts the given post.
+	 *
+	 * @param int $inserted_id Post to insert.
+	 */
+	private static function inserting( int $inserted_id ): WP_Post {
+		$id = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_content' => '[fl_builder_insert_layout id="' . $inserted_id . '"]',
+			)
+		);
+
+		return get_post( $id );
+	}
+
 	public function test_escaped_and_missing_insert_shortcodes_find_nothing(): void {
 		$this->assertSame( array(), Module::inserted_layout_ids( '[[fl_builder_insert_layout id="45"]]' ) );
 		$this->assertSame( array(), Module::inserted_layout_ids( '[fl_builder_insert_layout]' ) );
