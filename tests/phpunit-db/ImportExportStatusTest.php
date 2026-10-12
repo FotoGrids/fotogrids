@@ -190,6 +190,48 @@ class ImportExportStatusTest extends WP_UnitTestCase {
 		$this->assertSame( '', get_post_meta( $auto_draft, 'fotogrids_import_marker', true ) );
 	}
 
+	private function attachment( string $slug ): int {
+		return self::factory()->attachment->create_object(
+			array(
+				'file'           => "$slug.jpg",
+				'post_name'      => $slug,
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+	}
+
+	public function test_skip_ignores_an_attachment_with_the_same_slug(): void {
+		$attachment = $this->attachment( 'beach' );
+		$gallery    = self::factory()->post->create(
+			array(
+				'post_type' => 'fotogrids_gallery',
+				'post_name' => 'beach',
+			)
+		);
+		$file       = $this->call( 'serialise_json', $this->export() );
+		wp_delete_post( $gallery, true );
+
+		$result = $this->import( $file, 'skip' );
+
+		$this->assertSame( 1, $result['imported']['galleries'] );
+		$this->assertInstanceOf( WP_Post::class, get_page_by_path( 'beach', OBJECT, array( 'fotogrids_gallery' ) ) );
+		$this->assertSame( 'attachment', get_post_type( $attachment ) );
+	}
+
+	public function test_duplicate_does_not_step_over_an_attachment_slug(): void {
+		self::factory()->post->create(
+			array(
+				'post_type' => 'fotogrids_gallery',
+				'post_name' => 'beach',
+			)
+		);
+		$this->attachment( 'beach-1' );
+
+		$this->import( $this->call( 'serialise_json', $this->export() ), 'duplicate' );
+
+		$this->assertInstanceOf( WP_Post::class, get_page_by_path( 'beach-1', OBJECT, array( 'fotogrids_gallery' ) ) );
+	}
+
 	public function test_duplicate_creates_a_second_slugless_draft(): void {
 		$this->collection( 'fotogrids_gallery', 'draft', 'My draft' );
 
