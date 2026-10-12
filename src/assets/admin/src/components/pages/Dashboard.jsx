@@ -2,6 +2,7 @@
  * Main Dashboard Component
  */
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import { fetchDashboardStats } from '../../utils/api';
 import { createGalleryFromImages } from '../../utils/gallery';
 
@@ -14,8 +15,6 @@ import LearnSection from '../dashboard/LearnSection';
 import ProFeatures from '../dashboard/ProFeatures';
 import OverviewStats from '../dashboard/OverviewStats';
 import LoadingIcon from '../shared/LoadingIcon';
-
-const { __ } = wp.i18n;
 
 const Dashboard = () => {
 	const [stats, setStats] = useState({

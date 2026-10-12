@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Spinner, Notice } from '@wordpress/components';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { Modal } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import { FormField } from '../shared/FormField';
 
-const { __, sprintf, _n } = wp.i18n;
 const apiFetch = wp.apiFetch;
 
 /**

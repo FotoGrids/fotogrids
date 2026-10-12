@@ -211,6 +211,7 @@ final class RenderCacheInlineAssetsTest {
         self::test_schema_3_envelope_without_fonts_is_a_miss();
         self::test_capture_records_fonts_an_earlier_gallery_collected();
         self::test_replayed_fonts_respect_the_google_fonts_option();
+        self::test_fonts_cached_while_google_fonts_are_off_load_once_turned_on();
         self::test_emitter_is_inert_during_a_rest_render();
     }
 
@@ -354,6 +355,31 @@ final class RenderCacheInlineAssetsTest {
         $GLOBALS['fg_options']['fotogrids_allow_google_fonts'] = true;
         $resolver->collect_families( array( 'Merriweather', '', 42 ) );
         self::assert_contains( 'family=Merriweather', $resolver->get_collected_fonts_url(), 'Replayed fonts should reach the combined stylesheet URL.' );
+    }
+
+    private static function test_fonts_cached_while_google_fonts_are_off_load_once_turned_on(): void {
+        self::reset();
+        $resolver = Font_Resolver::instance();
+
+        $GLOBALS['fg_options']['fotogrids_allow_google_fonts'] = false;
+        $resolver->begin_capture();
+        $resolver->resolve_font_family( 'Oswald' );
+        $captured = $resolver->end_capture();
+
+        self::assert_same( array( 'Oswald' ), $captured, 'Capture should record Google Fonts while they are turned off.' );
+        self::assert_true(
+            false === strpos( $resolver->get_collected_fonts_url(), 'Oswald' ),
+            'A font resolved while Google Fonts are off must not load.'
+        );
+
+        FotoGrids_Cache::put( 77, 'key-fonts-off', '<div></div>', array(), array(), '', '', '', 24, $captured );
+
+        $GLOBALS['fg_options']['fotogrids_allow_google_fonts'] = true;
+        $cached = FotoGrids_Cache::get( 77, 'key-fonts-off' );
+        self::assert_true( is_array( $cached ), 'A stored entry should come back as a hit.' );
+        $resolver->collect_families( $cached['fonts'] );
+
+        self::assert_contains( 'family=Oswald', $resolver->get_collected_fonts_url(), 'An entry cached while Google Fonts were off should load them once they are back on.' );
     }
 
     private static function test_emitter_is_inert_during_a_rest_render(): void {

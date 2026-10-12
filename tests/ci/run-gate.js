@@ -13,7 +13,7 @@
 
 const { execFileSync, spawnSync } = require( 'child_process' );
 const path = require( 'path' );
-const { EVERYTHING } = require( './impact' );
+const { EVERYTHING, listedTests } = require( './impact' );
 
 const ROOT = path.join( __dirname, '..', '..' );
 
@@ -33,18 +33,6 @@ function impactTags() {
 	);
 
 	return out.split( '\n' ).filter( Boolean );
-}
-
-/** Tests a set of arguments would run. */
-function count( args ) {
-	const listed = spawnSync( 'npx', [ ...args, '--list' ], {
-		cwd: ROOT,
-		encoding: 'utf8',
-	} );
-
-	const reported = ( listed.stdout ?? '' ).match( /Total: (\d+) test/ );
-
-	return reported ? Number( reported[ 1 ] ) : 0;
 }
 
 const tags = impactTags();
@@ -77,7 +65,7 @@ const plan = [ 'readonly', 'scoped', 'serial' ].map( ( project ) => {
 		args.push( '--grep', grep );
 	}
 
-	return { project, args, tests: count( args ) };
+	return { project, args, tests: listedTests( args.slice( 2 ) ) };
 } );
 
 const total = plan.reduce( ( sum, step ) => sum + step.tests, 0 );

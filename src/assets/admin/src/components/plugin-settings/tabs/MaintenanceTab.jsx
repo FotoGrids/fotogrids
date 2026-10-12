@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __, sprintf } from '@wordpress/i18n';
 import Toggle from '../../shared/Toggle';
 import { Confirm } from '../../shared/Modal';
 import { Button } from '../../shared/Button';
@@ -11,8 +12,6 @@ import {
 	DangerZone,
 	SaveBar,
 } from '../../shared/settings';
-
-const { __, sprintf } = wp.i18n;
 
 // Untranslated on purpose: the user has to type this string exactly.
 const CONFIRM_KEYWORD = 'CONFIRM';
@@ -124,7 +123,7 @@ const MaintenanceTab = () => {
 		reset: {
 			title: __('Reset all settings?', 'fotogrids'),
 			body: __(
-				'This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics and Pro licence are not affected.',
+				'This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics, permissions, Pro licence and privacy choices are not affected.',
 				'fotogrids'
 			),
 			actionLabel: __('Reset settings', 'fotogrids'),
@@ -273,7 +272,7 @@ const MaintenanceTab = () => {
 				<DangerZone
 					title={__('Reset all settings', 'fotogrids')}
 					description={__(
-						'Restores every Plugin Settings tab to defaults. Galleries, albums, statistics and your Pro licence are preserved.',
+						'Restores Plugin Settings to defaults. Galleries, albums, statistics, permissions, your Pro licence and your privacy choices are preserved.',
 						'fotogrids'
 					)}
 					icon="settings"

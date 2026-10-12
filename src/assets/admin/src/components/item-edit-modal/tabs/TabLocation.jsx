@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import MetadataTab from './MetadataTab';
-
-const { __ } = wp.i18n;
 
 /**
  * GeoMapPlaceholder - a lightweight inline SVG dot showing the location's

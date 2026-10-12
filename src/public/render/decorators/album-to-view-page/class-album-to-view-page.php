@@ -58,6 +58,9 @@ final class Album_To_View_Page implements Decorator {
 		if ( Collection_Kind::ALBUM !== $render_context->meta->collection_kind ) {
 			return false;
 		}
+		if ( 'nothing' === ( $render_context->settings['item_click_behavior'] ?? null ) ) {
+			return false;
+		}
 		// Default to view-page navigation if the setting is missing.
 		return empty( $render_context->settings['use_ajax_from_album'] );
 	}

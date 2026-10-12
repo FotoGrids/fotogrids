@@ -378,12 +378,17 @@ final class View_Settings_Store {
 	/**
 	 * Sanitise and persist view page settings.
 	 *
+	 * A change flushes the render cache, which holds view page links in
+	 * cached markup.
+	 *
 	 * @since 1.0.0
 	 * @param mixed $value Raw input.
 	 * @return array<string, mixed> The stored, merged settings.
 	 */
 	public static function save( $value ): array {
-		update_option( self::OPTION, self::sanitize( $value ) );
+		if ( update_option( self::OPTION, self::sanitize( $value ) ) ) {
+			\FotoGrids\FotoGrids_Cache::flush_all();
+		}
 
 		// The rewrite base may have moved; drop the stamp so the routes are
 		// rebuilt on the next load rather than at Settings > Permalinks.

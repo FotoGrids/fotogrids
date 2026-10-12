@@ -224,6 +224,24 @@
         font-size: 13px;
         color: var(--fg-text-secondary);
     }
+
+    &--nothing-imported .fotogrids-icon svg {
+        color: var(--fg-status-warning-text);
+    }
+
+    &__result {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    &__result-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--fg-text-secondary);
+    }
 }
 
 .fg-ie-empty {
