@@ -308,6 +308,7 @@ final class Preview_Data {
 	 *     items: [
 	 *       {
 	 *         id,
+	 *         can_edit,          // whether the user can edit it
 	 *         title,
 	 *         item_count,
 	 *         featured_thumb,    // URL or null
@@ -335,10 +336,8 @@ final class Preview_Data {
 
 		$query_args = array(
 			'post_type'      => $post_type,
-			// Every status the picker is allowed to surface. `publish` is
-			// always public; the others are only visible to users with
-			// edit caps (the picker's permission gate enforces that).
 			'post_status'    => array( 'publish', 'private', 'draft', 'pending', 'future' ),
+			'perm'           => 'readable',
 			'posts_per_page' => $per_page,
 			'paged'          => $page,
 			'no_found_rows'  => false,
@@ -484,6 +483,7 @@ final class Preview_Data {
 
 		return array(
 			'id'             => $gallery_id,
+			'can_edit'       => current_user_can( 'edit_post', $gallery_id ),
 			'title'          => $post ? html_entity_decode( $post->post_title, ENT_QUOTES, 'UTF-8' ) : '',
 			'status'         => $status,
 			'status_label'   => self::status_label( $status ),
@@ -525,6 +525,7 @@ final class Preview_Data {
 
 		return array(
 			'id'             => $album_id,
+			'can_edit'       => current_user_can( 'edit_post', $album_id ),
 			'title'          => $post ? html_entity_decode( $post->post_title, ENT_QUOTES, 'UTF-8' ) : '',
 			'status'         => $status,
 			'status_label'   => self::status_label( $status ),

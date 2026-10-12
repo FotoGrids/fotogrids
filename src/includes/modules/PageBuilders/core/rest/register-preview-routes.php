@@ -175,7 +175,7 @@ final class Register_Preview_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( Preview_Data::class, 'get_picker_items' ),
-					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_picker_read' ),
 					'args'                => array(
 						'type'     => array(
 							'default'           => 'gallery',

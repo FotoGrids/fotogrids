@@ -17,23 +17,30 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Permission gates for `/preview/*` and `/picker/items`.
  *
- * All Page Builders endpoints are admin-only: the safe-preview pipeline
- * intentionally bypasses password gates, which would be a privacy hole if
- * exposed to unauthenticated callers. The capability check is
- * `manage_fotogrids` - the same capability that controls the gallery editor.
+ * Previews require `manage_fotogrids`: the safe-preview pipeline bypasses
+ * password gates. The picker listing is open to users who can edit posts.
  *
  * @since 1.0.0
  */
 final class Preview_Permissions {
 
 	/**
-	 * Whether the current user can request a gallery / album preview or
-	 * search the picker.
+	 * Whether the current user can request a gallery / album preview.
 	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	public static function check_preview_read(): bool {
 		return current_user_can( 'manage_fotogrids' );
+	}
+
+	/**
+	 * Whether the current user can list galleries and albums in the picker.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	public static function check_picker_read(): bool {
+		return current_user_can( 'edit_posts' );
 	}
 }

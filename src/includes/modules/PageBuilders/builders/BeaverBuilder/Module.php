@@ -179,7 +179,8 @@ final class Module {
 			self::EDITOR_HANDLE,
 			'fotogridsPbBeaverBuilder',
 			array(
-				'canPick'          => current_user_can( 'manage_fotogrids' ),
+				'canCreateGallery' => self::can_create( 'fotogrids_gallery' ),
+				'canCreateAlbum'   => self::can_create( 'fotogrids_album' ),
 				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
 				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
@@ -359,6 +360,18 @@ final class Module {
 			|| has_block( 'fotogrids/gallery', $content )
 			|| has_block( 'fotogrids/album', $content )
 			|| self::inserted_layouts_have_fotogrids_content( $content, $depth );
+	}
+
+	/**
+	 * Whether the current user can create posts of a type.
+	 *
+	 * @param string $post_type Post type.
+	 * @return bool
+	 */
+	private static function can_create( string $post_type ): bool {
+		$object = get_post_type_object( $post_type );
+
+		return $object instanceof \WP_Post_Type && current_user_can( $object->cap->create_posts );
 	}
 
 	/**
