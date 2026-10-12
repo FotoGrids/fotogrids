@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -8,8 +9,6 @@ import {
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
 import ToggleList from '../../shared/ToggleList';
-
-const { __ } = wp.i18n;
 
 const NETWORKS = [
 	{ key: 'facebook', label: __('Facebook', 'fotogrids') },

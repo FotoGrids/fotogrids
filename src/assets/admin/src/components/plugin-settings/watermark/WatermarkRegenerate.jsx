@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import InfoBlock from '../../shared/InfoBlock';
 import { Button } from '../../shared/Button';
-
-const { __, sprintf, _n } = wp.i18n;
 
 const STATUS_PATH = '/fotogrids/v1/admin/watermark/status';
 const REGEN_PATH = '/fotogrids/v1/admin/watermark/regenerate';

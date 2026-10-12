@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -8,8 +9,6 @@ import {
 	BreakpointPreview,
 	SaveBar,
 } from '../../shared/settings';
-
-const { __ } = wp.i18n;
 
 const DEFAULTS = {
 	mobile_breakpoint: 767,

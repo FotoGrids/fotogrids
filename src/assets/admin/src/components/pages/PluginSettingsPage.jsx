@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import ResponsivenessTab from '../plugin-settings/tabs/ResponsivenessTab';
@@ -12,8 +13,6 @@ import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
 import TabBar from '../shared/TabBar.jsx';
-
-const { __ } = wp.i18n;
 
 const TAB_IDS = [
 	'media',

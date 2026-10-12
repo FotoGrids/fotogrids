@@ -5,6 +5,7 @@
  * Templates are organized by type (Gallery/Album) with side tabs.
  */
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import PreviewTemplateModal from '../templates/PreviewTemplateModal';
 import ApplyTemplateModal from '../templates/ApplyTemplateModal';
 import Icon from '../shared/Icon';
@@ -13,8 +14,6 @@ import Checkbox from '../shared/Checkbox';
 import LoadingIcon from '../shared/LoadingIcon';
 import { activateOnKey } from '../../utils/activate-on-key';
 import { isLeavingPage } from '../../utils/leaving-page';
-
-const { __ } = wp.i18n;
 
 // Album templates are not ready for release; set to true to re-enable the tab.
 const ALBUM_TEMPLATES_ENABLED = false;

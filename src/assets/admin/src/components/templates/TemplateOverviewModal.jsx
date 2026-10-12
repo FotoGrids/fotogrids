@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import { Modal } from '../shared/Modal';
 import Icon from '../shared/Icon';
 import LoadingIcon from '../shared/LoadingIcon';
-
-const { __ } = wp.i18n;
 
 // Catalog tab indexes are cached per post type so reopening the Overview (or
 // previewing another template of the same kind) doesn't refetch.

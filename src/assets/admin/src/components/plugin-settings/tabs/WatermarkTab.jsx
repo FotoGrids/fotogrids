@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import {
 	SettingsPanel,
 	PanelRow,
@@ -14,8 +15,6 @@ import ProBadge from '../../ProBadge';
 import InfoBlock from '../../shared/InfoBlock';
 import WatermarkRegenerate from '../watermark/WatermarkRegenerate';
 import { Button } from '../../shared/Button';
-
-const { __ } = wp.i18n;
 
 /**
  * A PanelRow title that carries a Pro lock badge. Used for controls that are

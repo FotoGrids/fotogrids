@@ -23,8 +23,6 @@ class Admin_Init {
 		add_action( 'admin_init', array( __CLASS__, 'maybe_activation_redirect' ), 1 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
-		// Allow wp_safe_redirect() to reach the external hosts FotoGrids links
-		// out to (review page, upgrade/marketing).
 		add_filter( 'allowed_redirect_hosts', array( __CLASS__, 'allowed_redirect_hosts' ) );
 
 		add_action( 'admin_head', array( __CLASS__, 'suppress_admin_notices' ) );
@@ -43,8 +41,6 @@ class Admin_Init {
 		add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_bulk_album_selector_assets' ) );
 
-		// Registers the global modal API for every tier - the class gates the
-		// non-Pro upgrade-modal assets internally.
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
 		\FotoGrids\Admin\Upgrade_Modal_Integration::init();
@@ -64,9 +60,6 @@ class Admin_Init {
 	/**
 	 * Capability for the top-level menu entry.
 	 *
-	 * WordPress checks a post-type list screen in this menu against the
-	 * top-level capability, so it must be one the user holds.
-	 *
 	 * @return string
 	 */
 	private static function menu_parent_capability(): string {
@@ -80,8 +73,7 @@ class Admin_Init {
 	}
 
 	/**
-	 * Menu capability for a screen gated through Permission_Check, which
-	 * WordPress's own menu check does not consult.
+	 * Menu capability for a screen gated through Permission_Check.
 	 *
 	 * @param string $capability FotoGrids capability that gates the screen.
 	 * @return string 'read' when granted, 'do_not_allow' otherwise.
@@ -106,7 +98,7 @@ class Admin_Init {
 	public static function add_admin_menu() {
 		$dashboard_hook = add_menu_page(
 			__( 'FotoGrids', 'fotogrids' ),
-			__( 'FotoGrids', 'fotogrids' ),
+			'FotoGrids',
 			self::menu_parent_capability(),
 			'fotogrids',
 			array( __CLASS__, 'dashboard_page' ),
@@ -259,9 +251,6 @@ class Admin_Init {
 			true
 		);
 
-		// Enqueue Poppins - self-hosted (SIL OFL), no external CDN. The
-		// @font-face rules reference .ttf files relative to the stylesheet's
-		// own directory, so no path rewriting is needed.
 		wp_enqueue_style(
 			'fotogrids-google-fonts',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/poppins/poppins.css',
@@ -269,8 +258,6 @@ class Admin_Init {
 			FOTOGRIDS_VERSION
 		);
 
-		// JetBrains Mono, the admin monospace face - self-hosted on the same
-		// terms as Poppins.
 		wp_enqueue_style(
 			'fotogrids-jetbrains-mono',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/jetbrains-mono/jetbrains-mono.css',
@@ -292,8 +279,6 @@ class Admin_Init {
 			FOTOGRIDS_VERSION
 		);
 
-		// @font-face rules for the bundled watermark fonts, so the Watermark
-		// settings font picker can preview each option in its own typeface.
 		wp_add_inline_style(
 			'fotogrids-admin',
 			\FotoGrids\Settings\Watermark_Settings_Store::font_face_css()
@@ -365,8 +350,6 @@ class Admin_Init {
 		if ( 'fotogrids_page_fotogrids-library' === $hook || strpos( $hook, 'fotogrids-library' ) !== false ) {
 			$entity_types = \FotoGrids\REST\Metadata\Library_Data::get_entity_types();
 			$tab_slugs    = array_keys( $entity_types );
-			// Read-only tab routing for asset enqueue; sanitised and allowlisted
-			// below. No state change, so nonce verification is N/A.
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$requested   = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : '';
 			$initial_tab = in_array( $requested, $tab_slugs, true ) ? $requested : ( $tab_slugs[0] ?? 'tags' );
@@ -386,10 +369,6 @@ class Admin_Init {
 		}
 
 		if ( 'fotogrids_page_fotogrids-templates' === $hook || strpos( $hook, 'fotogrids-templates' ) !== false ) {
-			// The Template Overview groups a template's settings into the same
-			// admin tabs as the gallery editor by reading the assembled catalog.
-			// The Templates page doesn't load the full settings panel, so it only
-			// needs the lightweight catalog loader plus its REST config.
 			wp_enqueue_script(
 				'fotogrids-settings-loader',
 				FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/collection-settings/index.js',
@@ -411,7 +390,6 @@ class Admin_Init {
 		if ( 'fotogrids_page_fotogrids-settings' === $hook || strpos( $hook, 'fotogrids-settings' ) !== false ) {
 			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true );
 
-			// Read-only routing, sanitised; no state change so nonce is N/A.
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$subtab    = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
 			$post_type = ( 'album' === $subtab ) ? 'album' : 'gallery';
@@ -502,9 +480,7 @@ class Admin_Init {
 	 *
 	 * Reads the full atomic-cap list from Permission_Registry and calls
 	 * current_user_can() on each. Localised to the React side as
-	 * `fotogrids.capabilities` so client components can render the right
-	 * controls (enabled / disabled / hidden) without making per-cap REST
-	 * roundtrips.
+	 * `fotogrids.capabilities`.
 	 *
 	 * @since 1.0.0
 	 * @return array<string, bool>
@@ -519,9 +495,7 @@ class Admin_Init {
 		\FotoGrids\Permissions\Permission_Registry::boot();
 		foreach ( \FotoGrids\Permissions\Permission_Registry::get_all() as $def ) {
 			if ( $def->is_logical() || $def->is_meta_cap ) {
-				// Logical caps are not real WP caps. Meta caps require a
-				// post id - calling current_user_can on them globally
-				// triggers a _doing_it_wrong notice in WP 6.1+.
+				// Logical and meta caps cannot be checked without a post.
 				continue;
 			}
 			$snapshot[ $def->key ] = current_user_can( $def->key );
@@ -531,9 +505,6 @@ class Admin_Init {
 
 	/**
 	 * Return general settings merged with defaults.
-	 *
-	 * Public so the REST settings endpoints can read the same canonical
-	 * shape the Settings API and the frontend renderer use.
 	 *
 	 * @return array<string, mixed>
 	 */
@@ -600,10 +571,6 @@ class Admin_Init {
 	/**
 	 * Sanitize a boolean setting submitted via a Toggle component.
 	 *
-	 * Toggle uses a hidden input that is always present in POST with value
-	 * '1' (on) or '0' (off), so absence-from-POST is not a valid signal.
-	 * The raw value is cast directly.
-	 *
 	 * @since  1.0.0
 	 * @param  mixed $value Raw option value from options.php.
 	 * @return bool
@@ -654,7 +621,6 @@ class Admin_Init {
 		$setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
 		$value   = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-		// Allowlist split into boolean / string buckets so each is coerced correctly.
 		$boolean_settings = array(
 			'fotogrids_autosave',
 			'fotogrids_share_statistics',
@@ -673,15 +639,12 @@ class Admin_Init {
 		if ( in_array( $setting, $string_settings, true ) ) {
 			$allowed_values = self::allowed_values_for_string_setting( $setting );
 
-			// An empty value is "clear the persona" - accepted; anything
-			// else has to come from the allowlist for the setting.
 			if ( '' !== $value && ! in_array( $value, $allowed_values, true ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid value', 'fotogrids' ) ) );
 			}
 
 			$result = update_option( $setting, $value, true );
-			// update_option returns false when the new value matches the
-			// existing one - that's still success from the caller's POV.
+			// update_option() returns false when the value is unchanged.
 			if ( $result || (string) get_option( $setting, '' ) === $value ) {
 				wp_send_json_success( array( 'value' => $value ) );
 			}
@@ -693,18 +656,11 @@ class Admin_Init {
 		if ( in_array( $setting, $boolean_settings, true ) ) {
 			$sanitized_bool = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 
-			// `fotogrids_share_statistics` has a Freemius side-effect, so
-			// route it through the shared helper to keep the wizard and the
-			// Settings tab in sync. Every boolean option stores `'1'` / `'0'`;
-			// both cast correctly, since `'0'` is falsey in PHP.
 			if ( 'fotogrids_share_statistics' === $setting ) {
 				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_share_statistics_consent( $sanitized_bool );
 				wp_send_json_success( array( 'value' => $applied ) );
 			}
 
-			// Promotional-email consent. Separate Freemius side-effect
-			// (per-user is_marketing_allowed) and a distinct, affirmative
-			// opt-in - never inherited from the usage-data toggle.
 			if ( 'fotogrids_marketing_allowed' === $setting ) {
 				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_marketing_consent( $sanitized_bool );
 				wp_send_json_success( array( 'value' => $applied ) );
@@ -713,10 +669,6 @@ class Admin_Init {
 			$sanitized_value = $sanitized_bool ? '1' : '0';
 
 			global $wpdb;
-			// The row's existence decides add_option() (to force autoload='yes' on
-			// first create) vs update_option(); get_option() cannot tell a missing
-			// row from a falsey stored value. The query is prepared; no object cache
-			// applies to this one-off check.
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$option_exists = $wpdb->get_var(
 				$wpdb->prepare(
@@ -779,8 +731,6 @@ class Admin_Init {
 	 */
 	private static function resolve_share_statistics_state(): bool {
 		$option_raw = get_option( 'fotogrids_share_statistics', null );
-		// Tolerant cast: `(bool) '0'` is true in PHP, so '', '0', 0, false and
-		// null all read as off.
 		$option_bool = ! (
 			null === $option_raw ||
 			false === $option_raw ||
@@ -789,8 +739,6 @@ class Admin_Init {
 			0 === $option_raw
 		);
 
-		// The local option is the single source of truth for the in-product
-		// toggle; it is mirrored to Freemius on write but never read back.
 		$resolved = $option_bool;
 
 		if ( \FotoGrids\Debug_Log::should_log( 'license' ) ) {
@@ -869,10 +817,8 @@ class Admin_Init {
 	/**
 	 * Templates admin page.
 	 *
-	 * Render is owned by the Templates module. The menu item stays here so
-	 * submenu ordering is centralized, but the page body is delegated to the
-	 * module's render_page(). Falls back to the shared renderer if the module
-	 * is unavailable.
+	 * Delegates the page body to the Templates module's render_page(), and
+	 * falls back to the shared renderer if the module is unavailable.
 	 */
 	public static function templates_page() {
 		$entry = \FotoGrids\Modules\Module_Registry::get_by_id( 'templates' );
@@ -932,9 +878,7 @@ class Admin_Init {
 	/**
 	 * Redirect the Upgrade submenu page to the external upgrade URL.
 	 *
-	 * Runs on admin_init before any page output is sent. The submenu page
-	 * callback fires during page rendering, after the admin header has already
-	 * been output, so wp_safe_redirect() cannot send headers from there.
+	 * Runs on admin_init, before any page output is sent.
 	 *
 	 * @since 1.0.0
 	 */
@@ -971,8 +915,6 @@ class Admin_Init {
 	 * Get custom menu icon
 	 */
 	private static function get_menu_icon() {
-		// Custom SVG icon as base64 data URI. WP admin forces the menu-icon
-		// colour via core CSS, so the icon uses the neutral admin grey.
 		$svg = \FotoGrids\Svg::fotogrids_icon( array( 'fill' => '#a7aaad' ) );
 		return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Benign data encoding, not code obfuscation.
 	}
@@ -1026,17 +968,12 @@ class Admin_Init {
 			return $redirect_to;
 		}
 
-		// WordPress core verifies the bulk-action nonce before this filter fires;
-		// re-check it explicitly here before reading any request data.
 		check_admin_referer( 'bulk-posts' );
 
 		if ( empty( $post_ids ) ) {
 			return $redirect_to;
 		}
 
-		// Stamp a nonce onto the redirect URL so bulk_action_admin_notices()
-		// can confirm the result flags it renders were set here, not forged in
-		// a crafted URL. add_query_arg() preserves it across the branches below.
 		$redirect_to = add_query_arg(
 			'_fg_bulk_notice',
 			wp_create_nonce( 'fotogrids_bulk_notice' ),
@@ -1130,10 +1067,6 @@ class Admin_Init {
 			return;
 		}
 
-		// The result flags read below come from the post-redirect URL set by
-		// handle_gallery_bulk_actions() (itself nonce-verified). Verify the
-		// nonce it stamped before rendering, so a crafted URL cannot spoof a
-		// notice. Every value read is a read-only display count, absint()'d.
 		$notice_nonce = isset( $_REQUEST['_fg_bulk_notice'] )
 			? sanitize_text_field( wp_unslash( $_REQUEST['_fg_bulk_notice'] ) )
 			: '';
@@ -1346,8 +1279,7 @@ class Admin_Init {
 					updateVisibility();
 				});
 
-				// Keep top/bottom selects in sync so submitting from either row
-				// posts the user's pick.
+				// Keep top/bottom selects in sync.
 				var albumSelects = document.querySelectorAll('select[data-fg-album-select]');
 				albumSelects.forEach(function (sel) {
 					sel.addEventListener('change', function () {
@@ -1359,9 +1291,6 @@ class Admin_Init {
 					});
 				});
 
-				// Disable the unused (hidden) select on submit so only one
-				// album_id field is sent - the one tied to the row the user
-				// actually used to submit.
 				var postsFilter = document.getElementById('posts-filter');
 				if (!postsFilter) {
 					return;
@@ -1510,9 +1439,6 @@ class Admin_Init {
 	/**
 	 * Whether a notice callback belongs to FotoGrids itself.
 	 *
-	 * Used to keep FotoGrids' own notices while every other notice callback is
-	 * removed on FotoGrids admin pages.
-	 *
 	 * @since  1.0.0
 	 * @param  array $callback A WP filter/action callback registration.
 	 * @return bool
@@ -1542,9 +1468,8 @@ class Admin_Init {
 	/**
 	 * Enqueue FotoGrids admin chrome CSS as inline additions on a head handle.
 	 *
-	 * Notice-suppression CSS is added only on FotoGrids screens (its selectors
-	 * are not self-scoping); the upgrade-menu link style is added on every
-	 * admin screen for non-Pro users because the menu item is global.
+	 * Notice-suppression CSS is added on FotoGrids screens; the upgrade-menu
+	 * link style on every admin screen for non-Pro users.
 	 *
 	 * @since  1.0.0
 	 * @param  string $hook Current admin page hook suffix.
@@ -1572,12 +1497,6 @@ class Admin_Init {
 
 	/**
 	 * CSS that hides notices injected outside the standard notice hooks.
-	 *
-	 * Backstop for {@see self::suppress_admin_notices()}: some plugins print
-	 * notices via footer scripts or their own markup rather than the
-	 * `admin_notices` action, so unhooking callbacks alone cannot remove them.
-	 * FotoGrids' own notices are scoped under the FotoGrids page wrappers and
-	 * are left visible.
 	 *
 	 * @since  1.0.0
 	 * @return string

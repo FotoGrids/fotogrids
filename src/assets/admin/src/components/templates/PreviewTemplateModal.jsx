@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import { Modal } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import { FormField } from '../shared/FormField';
@@ -8,8 +9,6 @@ import NumberField from '../shared/NumberField';
 import TemplateOverviewModal from './TemplateOverviewModal';
 import { buildRestUrl } from '../../utils/rest-url';
 import ApplyTemplateModal from './ApplyTemplateModal';
-
-const { __ } = wp.i18n;
 
 // Device preset widths (px) used to constrain the preview iframe so the
 // template's responsive columns render at real breakpoints.

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import Modal from '../shared/Modal/Modal';
-
-const { __ } = wp.i18n;
 
 /**
  * What's New drawer.

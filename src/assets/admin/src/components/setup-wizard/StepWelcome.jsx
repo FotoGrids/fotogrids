@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import Toggle from '../shared/Toggle';
 import Button from '../shared/Button';
 import Modal from '../shared/Modal/Modal';
 import Icon from '../shared/Icon';
 import { fgGoUrl } from '../../utils/go-url';
 import { persistSetting } from './persist-setting';
-
-const { __ } = wp.i18n;
 
 const TELEMETRY_LEARN_MORE_URL = 'https://freemius.com/privacy/usage-tracking/';
 const PRIVACY_POLICY_URL = fgGoUrl('privacy', 'setup-wizard', 'privacy');
