@@ -58,7 +58,7 @@ class Admin_Init {
 	}
 
 	/**
-	 * Capability for the top-level menu entry.
+	 * Capability for the top-level menu entry and the Dashboard.
 	 *
 	 * @return string
 	 */
@@ -83,35 +83,26 @@ class Admin_Init {
 	}
 
 	/**
-	 * Refuses the top-level Dashboard to users who reach the menu only
-	 * through a post-type capability.
-	 */
-	public static function require_manage_capability(): void {
-		if ( ! current_user_can( 'manage_fotogrids' ) ) {
-			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'fotogrids' ), '', array( 'response' => 403 ) );
-		}
-	}
-
-	/**
 	 * Add admin menu and submenus
 	 */
 	public static function add_admin_menu() {
-		$dashboard_hook = add_menu_page(
+		$menu_capability = self::menu_parent_capability();
+
+		add_menu_page(
 			__( 'FotoGrids', 'fotogrids' ),
 			'FotoGrids',
-			self::menu_parent_capability(),
+			$menu_capability,
 			'fotogrids',
 			array( __CLASS__, 'dashboard_page' ),
 			self::get_menu_icon(),
 			30
 		);
-		add_action( 'load-' . $dashboard_hook, array( __CLASS__, 'require_manage_capability' ) );
 
 		add_submenu_page(
 			'fotogrids',
 			__( 'Dashboard', 'fotogrids' ),
 			__( 'Dashboard', 'fotogrids' ),
-			'manage_fotogrids',
+			$menu_capability,
 			'fotogrids-dashboard',
 			array( __CLASS__, 'dashboard_page' )
 		);

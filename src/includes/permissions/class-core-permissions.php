@@ -152,7 +152,7 @@ final class Core_Permissions {
 					'description'         => __( 'Open the Statistics screen and see view and share counts for galleries, albums and items.', 'fotogrids' ),
 					'group'               => 'stats',
 					'panel'               => 'advanced',
-					'default_lowest_role' => 'editor',
+					'default_lowest_role' => 'author',
 				)
 			)
 		);
@@ -550,7 +550,7 @@ final class Core_Permissions {
 					'group'               => 'stats',
 					'panel'               => 'simple',
 					'underlying_caps'     => array( 'view_fotogrids_stats' ),
-					'default_lowest_role' => 'editor',
+					'default_lowest_role' => 'author',
 				)
 			)
 		);

@@ -5,8 +5,9 @@ import type { Role } from './support/roles';
 import { restoreRoles, snapshotRoles } from './support/site';
 
 /**
- * MENU-01 to MENU-07. Reaching the Galleries and Albums screens through the
- * FotoGrids menu, for every role the menu is shown to.
+ * MENU-01 to MENU-07. Reaching the Dashboard, Galleries and Albums screens
+ * through the FotoGrids menu, for every role the menu is shown to, and what
+ * the Dashboard offers each of them.
  *
  * Serial: creates users, roles and collections, and grants capabilities.
  */
@@ -60,6 +61,48 @@ async function expectList( page: Page, response: Response, kind: Kind ) {
 	await expect( menu.locator( '.wp-submenu li.current a' ) ).toHaveText( LISTS[ kind ] );
 }
 
+/**
+ * Open the Dashboard at `path`, wait for its figures, and return the FotoGrids
+ * REST requests that were refused on the way.
+ */
+async function openDashboard( page: Page, path: string ): Promise< string[] > {
+	const refused: string[] = [];
+	const record = ( r: Response ) => {
+		const url = decodeURIComponent( r.url() );
+		if ( url.includes( '/fotogrids/v1/' ) && r.status() >= 400 ) {
+			refused.push( `${ r.status() } ${ url }` );
+		}
+	};
+
+	page.on( 'response', record );
+	try {
+		const response = await page.goto( path );
+		expect( response?.status(), path ).toBe( 200 );
+
+		await expect( page.locator( '#fotogrids-main-page .fotogrids-dashboard' ) ).toBeVisible();
+		await expect( page.locator( '.fotogrids-overview .fg-stat-card' ) ).toHaveCount( 5 );
+		await expect( page.locator( '.fotogrids-overview .fg-stat-card__spinner' ) ).toHaveCount( 0 );
+		await expect( page.locator( '.fg-abc-checklist, .fg-abc-recently-edited' ) ).toHaveCount( 1 );
+		await expect( page.locator( '.fg-abc-recently-edited-loading' ) ).toHaveCount( 0 );
+	} finally {
+		page.off( 'response', record );
+	}
+
+	return refused;
+}
+
+/** The Create card's options: label, and whether it is a working link. */
+async function createOptions( page: Page ): Promise< Record< string, boolean > > {
+	const options = await page.locator( '.fg-abc-create-options .create-option' ).evaluateAll( ( nodes ) =>
+		nodes.map( ( node ) => [
+			( node.querySelector( ':scope > span:not(.fotogrids-icon)' )?.textContent ?? '' ).trim(),
+			'A' === node.tagName && ! node.classList.contains( 'is-disabled' ),
+		] )
+	);
+
+	return Object.fromEntries( options );
+}
+
 /** Insert a published collection owned by `login`; returns its id. */
 function insertCollection( kind: Kind, title: string, login: string ): number {
 	return Number(
@@ -96,7 +139,7 @@ for ( const role of [ 'administrator', 'editor', 'author' ] as const satisfies r
 			}
 		} );
 
-		test( `MENU-02: the top-level FotoGrids entry lands on a screen they can use`, { tag: [ '@admin', '@permissions' ] }, async ( {
+		test( `MENU-02: the top-level FotoGrids entry lands on the Dashboard`, { tag: [ '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
 			await page.goto( '/wp-admin/' );
@@ -105,12 +148,7 @@ for ( const role of [ 'administrator', 'editor', 'author' ] as const satisfies r
 			const response = await follow( page, () => top.click() );
 
 			expect( response.status() ).toBe( 200 );
-
-			if ( 'administrator' === role ) {
-				expect( page.url() ).toContain( 'page=fotogrids-dashboard' );
-			} else {
-				await expectList( page, response, 'fotogrids_gallery' );
-			}
+			expect( page.url() ).toContain( 'page=fotogrids-dashboard' );
 		} );
 	} );
 }
@@ -217,7 +255,7 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 		[ 'gallery', 'fotogrids_gallery', 'fotogrids_album' ],
 		[ 'album', 'fotogrids_album', 'fotogrids_gallery' ],
 	] as const ) {
-		test( `MENU-05: a ${ one }-only role - the menu leads to their list and nowhere else`, { tag: [ '@admin', '@permissions' ] }, async ( {
+		test( `MENU-05: a ${ one }-only role - the menu leads to the Dashboard and their list, and nowhere else`, { tag: [ '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
 			await signIn( page, `fg-menu-${ one }` );
@@ -226,17 +264,28 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 			const links = await fotogridsMenu( page )
 				.locator( '.wp-submenu a' )
 				.allInnerTexts();
-			expect( links ).toEqual( [ LISTS[ kind ] ] );
+			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ] ] );
 
 			const top = fotogridsMenu( page ).locator( 'a.menu-top' );
 			const response = await follow( page, () => top.click() );
-			await expectList( page, response, kind );
+			expect( response.status() ).toBe( 200 );
+			expect( page.url() ).toContain( 'page=fotogrids-dashboard' );
 
 			const refused = await page.goto( `/wp-admin/edit.php?post_type=${ other }` );
 			expect( refused?.status() ).toBe( 403 );
 
-			const dashboard = await page.goto( '/wp-admin/admin.php?page=fotogrids' );
-			expect( dashboard?.status() ).toBe( 403 );
+			expect( await openDashboard( page, '/wp-admin/admin.php?page=fotogrids' ) ).toEqual( [] );
+
+			expect( await createOptions( page ) ).toEqual( {
+				'New Gallery': 'gallery' === one,
+				'New Album': 'album' === one,
+				'Browse Templates': false,
+				'Finetune Settings': false,
+			} );
+			await expect( page.locator( '.fotogrids-overview' ) ).toContainText(
+				"Your role can't open Statistics."
+			);
+			await expect( page.locator( '.fotogrids-overview a.fg-stat-card' ) ).toHaveCount( 0 );
 		} );
 	}
 } );
@@ -255,38 +304,43 @@ test.describe( 'an editor granted manage_fotogrids', () => {
 		restoreRoles( roles );
 	} );
 
-	test( 'MENU-06: gets the Dashboard back as the top-level entry', { tag: [ '@admin', '@permissions' ] }, async ( {
+	test( 'MENU-06: gets Templates on the Dashboard, and Settings stays locked', { tag: [ '@admin', '@permissions' ] }, async ( {
 		page,
 	} ) => {
-		await page.goto( '/wp-admin/' );
+		expect( await openDashboard( page, '/wp-admin/admin.php?page=fotogrids-dashboard' ) ).toEqual( [] );
 
-		const top = fotogridsMenu( page ).locator( 'a.menu-top' );
-		await expect( top ).toHaveAttribute( 'href', /page=fotogrids-dashboard/ );
-
-		const response = await follow( page, () => top.click() );
-		expect( response.status() ).toBe( 200 );
-
-		const dashboard = await page.goto( '/wp-admin/admin.php?page=fotogrids' );
-		expect( dashboard?.status() ).toBe( 200 );
+		expect( await createOptions( page ) ).toEqual( {
+			'New Gallery': true,
+			'New Album': true,
+			'Browse Templates': true,
+			'Finetune Settings': false,
+		} );
 	} );
 } );
 
 test.describe( 'an editor and an author', () => {
-	test.use( {
-		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
-	} );
-
 	for ( const role of [ 'editor', 'author' ] as const satisfies readonly Role[] ) {
 		test.describe( role, () => {
 			test.use( { storageState: storageStateFor( role ) } );
 
-			test( `MENU-07: ${ role } is refused the Dashboard by every URL`, { tag: [ '@admin', '@permissions' ] }, async ( {
+			test( `MENU-07: ${ role } opens the Dashboard by every URL, with what they cannot do disabled`, { tag: [ '@admin', '@permissions' ] }, async ( {
 				page,
 			} ) => {
 				for ( const slug of [ 'fotogrids', 'fotogrids-dashboard' ] ) {
-					const response = await page.goto( `/wp-admin/admin.php?page=${ slug }` );
-					expect( response?.status(), slug ).toBe( 403 );
+					expect( await openDashboard( page, `/wp-admin/admin.php?page=${ slug }` ), slug ).toEqual( [] );
 				}
+
+				expect( await createOptions( page ) ).toEqual( {
+					'New Gallery': true,
+					'New Album': true,
+					'Browse Templates': false,
+					'Finetune Settings': false,
+				} );
+				const create = page.locator( '.fg-abc-create-options' );
+				await expect( create ).toContainText( "Your role can't use templates." );
+				await expect( create ).toContainText( "Your role can't change settings." );
+
+				await expect( page.locator( '.fotogrids-overview a.fg-stat-card' ) ).toHaveCount( 5 );
 			} );
 		} );
 	}

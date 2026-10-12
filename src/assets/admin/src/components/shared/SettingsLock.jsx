@@ -1,20 +1,7 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
-
-/**
- * Read the localised capabilities snapshot. Returns null if the bag isn't
- * present (uncommon - this would mean class-admin-init hasn't run, e.g. a
- * non-admin page), which is treated as "allowed" so unrelated surfaces are
- * never locked by accident.
- */
-const userHasCap = (cap) => {
-	const bag = window.fotogridsAdmin?.capabilities;
-	if (!bag) {
-		return true;
-	}
-	return bag[cap] === true;
-};
+import { userCan } from '../../utils/capabilities';
 
 /**
  * SettingsLock - read-only gate around the Collection Settings and Templates
@@ -40,7 +27,7 @@ const userHasCap = (cap) => {
  * @param {string}          [props.className] Extra class on the root.
  */
 const SettingsLock = ({ cap, children, title, message, className = '' }) => {
-	if (!cap || userHasCap(cap)) {
+	if (!cap || userCan(cap)) {
 		return <>{children}</>;
 	}
 
@@ -88,5 +75,5 @@ export const canModifyCollectionSettings = (postType) => {
 		postType === 'fotogrids_album'
 			? 'modify_fotogrids_album_settings'
 			: 'modify_fotogrids_gallery_settings';
-	return userHasCap(cap);
+	return userCan(cap);
 };
