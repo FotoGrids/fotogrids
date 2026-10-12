@@ -250,6 +250,7 @@ class Admin_Init {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-toast-init', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_enqueue_style(
 			'fotogrids-google-fonts',
