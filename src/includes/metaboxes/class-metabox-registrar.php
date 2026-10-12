@@ -288,6 +288,7 @@ final class Metabox_Registrar {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-metabox', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_enqueue_script(
 			'fotogrids-collection-state-manager',
@@ -335,6 +336,7 @@ final class Metabox_Registrar {
 				FOTOGRIDS_VERSION,
 				true
 			);
+			wp_set_script_translations( 'fotogrids-album-assignment', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 		}
 
 		if ( 'fotogrids_album' === $post_type ) {
@@ -656,6 +658,7 @@ final class Metabox_Registrar {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-album-galleries', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		global $post;
 		if ( ! ( $post instanceof \WP_Post ) || 'fotogrids_album' !== $post->post_type ) {
