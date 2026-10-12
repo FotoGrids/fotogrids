@@ -1,6 +1,6 @@
 <?php
 /**
- * Preview_Renderer - instance IDs and inline CSS of server-rendered builder previews.
+ * Preview_Renderer - instance IDs, inline CSS and empty state of server-rendered builder previews.
  *
  * Elementor renders its editor preview through Preview_Renderer over admin-ajax,
  * one widget per request.
@@ -89,5 +89,15 @@ class PreviewRendererTest extends WP_UnitTestCase {
 		Preview_Renderer::render_gallery_html( $this->gallery, self::OPTIONS, 'a1b2c3d' );
 
 		$this->assertSame( '', Preview_Renderer::take_ajax_inline_css() );
+	}
+
+	public function test_the_empty_state_keeps_its_styles_and_edit_url_through_the_builders_kses_rules(): void {
+		$markup = Preview_Renderer::render_empty_state_html( 'gallery', $this->gallery );
+		$kept   = wp_kses( $markup, array_merge( \FotoGrids\Kses::rules( $markup ), array( 'style' => array() ) ) );
+
+		$this->assertSame( $markup, $kept );
+		$this->assertStringStartsWith( '<style>.fg-pb-empty-state{', $kept );
+		$this->assertStringContainsString( 'data-fg-edit-url="', $kept );
+		$this->assertStringNotContainsString( 'onclick', $kept );
 	}
 }
