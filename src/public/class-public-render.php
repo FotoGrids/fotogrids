@@ -9,6 +9,7 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Render\Internal\Render_Controller;
 use FotoGrids\Render\Internal\Render_Result;
 use FotoGrids\Render\Sorters\Random\Random_Sorter;
@@ -471,9 +472,11 @@ class Public_Render {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 
+		$instance_id = Instance_Id_Factory::instance()->generate( $gallery_id );
+
 		$cache_key = null;
 		if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {
-			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts );
+			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts, $instance_id );
 			$cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
 			if ( false !== $cached ) {
 				// Order matters: replay_cached_assets() registers
@@ -487,7 +490,7 @@ class Public_Render {
 		}
 
 		Font_Resolver::instance()->begin_capture();
-		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
 		$fonts = Font_Resolver::instance()->end_capture();
 
 		if ( null !== $cache_key ) {
