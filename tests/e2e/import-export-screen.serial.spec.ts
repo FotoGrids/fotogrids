@@ -1,223 +1,287 @@
+import { execFileSync } from 'child_process';
 import { readFileSync } from 'fs';
-import type { Page } from '@playwright/test';
+import type { Page, Response } from '@playwright/test';
 import { test, expect } from './support/test';
-import { firstItem } from './support/fixtures';
-import { storageStateFor, wpEval } from './support/roles';
+import { galleryPage } from './support/collections';
+import { storageStateFor, wpCli } from './support/roles';
 
 test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
- * Item links to tags and people across an export and an import made on the
- * Import / Export screen, checked in the Library.
+ * Tools > Import / Export: the Export and History tabs, the Import tab's file
+ * handling, and the banner shown while an operation runs.
  *
- * Serial: these write to the site-wide Library tables and import into the
- * whole site. Each test removes what it created.
+ * Serial: exports and imports write the operation log, which is put back.
  */
 
 test.describe.configure( { mode: 'serial' } );
 
-const TOOL = '/wp-admin/admin.php?page=fotogrids-tools&tool=import-export';
-const LIBRARY = '/wp-admin/admin.php?page=fotogrids-library';
+const SCREEN = '/wp-admin/admin.php?page=fotogrids-tools&tool=import-export';
+const ROUTES = '/fotogrids/v1/admin/tools/import-export/';
+const LOG_OPTION = 'fotogrids_import_export_log';
 
-const run = Date.now().toString( 36 );
-
-function attachment(): number {
-	return firstItem( 'F-small' );
-}
-
-/** Add a Library entry, link it to the test attachment and return its id. */
-function linkedEntry( type: 'tag' | 'person', name: string ): number {
-	return Number(
-		wpEval( `
-			$entry = \\FotoGrids\\Metadata_Manager::add_or_get_metadata( '${ type }', '${ name }' );
-			\\FotoGrids\\Metadata_Manager::link_${ type }_to_item( ${ attachment() }, (int) $entry->id );
-			echo $entry->id;
-		` ).trim()
-	);
-}
-
-/** Delete every Library entry with these names, and their links. */
-function removeEntries( names: string[] ): void {
-	for ( const name of names ) {
-		wpEval( `
-			global $wpdb;
-			foreach ( $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM %i WHERE name = %s', $wpdb->prefix . 'fotogrids_tags', '${ name }' ) ) as $id ) {
-				\\FotoGrids\\Metadata_Manager::delete_metadata( (int) $id );
-			}
-		` );
+function readLog(): string | null {
+	try {
+		return execFileSync( wpCli(), [ 'option', 'get', LOG_OPTION, '--format=json' ], {
+			encoding: 'utf8',
+			stdio: [ 'ignore', 'pipe', 'ignore' ],
+		} ).trim();
+	} catch {
+		return null;
 	}
 }
 
-/** The ids of the entries with this name that link to the test attachment. */
-function linkedIds( type: string, name: string ): number[] {
-	return (
-		JSON.parse(
-			wpEval( `
-				global $wpdb;
-				echo wp_json_encode( $wpdb->get_col( $wpdb->prepare(
-					'SELECT t.id FROM %i t JOIN %i l ON l.metadata_id = t.id AND l.metadata_type = t.type WHERE t.type = %s AND t.name = %s AND l.attachment_id = %d',
-					$wpdb->prefix . 'fotogrids_tags',
-					$wpdb->prefix . 'fotogrids_item_metadata',
-					'${ type }',
-					'${ name }',
-					${ attachment() }
-				) ) );
-			` )
-		) as string[]
-	).map( Number );
-}
-
-/** The Items column of a Library entry, found through the tab's search; null when it is not listed. */
-async function itemsInLibrary( page: Page, tab: string, name: string ): Promise< string | null > {
-	await page.goto( LIBRARY );
-	await page.locator( '.fotogrids-library-sidebar-tabs' ).getByText( tab, { exact: true } ).first().click();
-	await page.locator( '.fotogrids-library-toolbar-search input' ).fill( name );
-	await expect( page.locator( '.fotogrids-library-loading' ) ).toHaveCount( 0 );
-
-	const row = page.locator( '.fotogrids-library-table tbody tr' ).filter( {
-		has: page.locator( '.fotogrids-library-name-button', { hasText: name } ),
-	} );
-	await expect( row.or( page.locator( '.fotogrids-library-empty' ) ).first() ).toBeVisible();
-
-	return ( await row.count() ) ? ( await row.locator( '.fotogrids-library-table__column-usage' ).innerText() ).trim() : null;
-}
-
-async function deleteInLibrary( page: Page, tab: string, name: string ): Promise< void > {
-	await page.goto( LIBRARY );
-	await page.locator( '.fotogrids-library-sidebar-tabs' ).getByText( tab, { exact: true } ).first().click();
-	const row = page.locator( '.fotogrids-library-table tbody tr' ).filter( {
-		has: page.locator( '.fotogrids-library-name-button', { hasText: name } ),
-	} );
-	await row.getByRole( 'button', { name: 'Delete' } ).click();
-	await page.locator( '.fotogrids-library-delete-popover' ).getByRole( 'button', { name: 'Delete' } ).click();
-	await expect( row ).toHaveCount( 0 );
-}
-
-/** Export items, item links and the Library from the Export tab; returns the file path. */
-async function exportFile( page: Page, format: 'JSON' | 'XML' ): Promise< string > {
-	const keep = [ 'Items', 'Item Metadata', 'Tags' ];
-
-	await page.goto( TOOL );
-	await page.locator( '.fotogrids-tab-bar__tab', { hasText: 'Export' } ).click();
-	for ( const label of [ 'Galleries', 'Albums', 'Items', 'Item Metadata', 'Tags', 'Settings', 'Statistics', 'Templates' ] ) {
-		const toggle = page.getByRole( 'switch', { name: label, exact: true } );
-		if ( ( 'true' === ( await toggle.getAttribute( 'aria-checked' ) ) ) !== keep.includes( label ) ) {
-			await toggle.click();
-		}
+function writeLog( value: string | null ): void {
+	if ( null === value ) {
+		execFileSync( wpCli(), [ 'option', 'delete', LOG_OPTION ], {
+			encoding: 'utf8',
+			stdio: [ 'ignore', 'pipe', 'ignore' ],
+		} );
+		return;
 	}
-	await page.getByRole( 'radio', { name: format, exact: true } ).click();
+	execFileSync( wpCli(), [ 'option', 'update', LOG_OPTION, '--format=json', value ], {
+		encoding: 'utf8',
+	} );
+}
 
+async function openTab( page: Page, name: 'Export' | 'Import' | 'History' ): Promise< void > {
+	await page.goto( SCREEN );
+	await page.getByRole( 'tab', { name } ).click();
+}
+
+/** Click Export and return the downloaded file's name and contents. */
+async function exportThroughUi( page: Page ): Promise< { name: string; body: string } > {
 	const [ download ] = await Promise.all( [
 		page.waitForEvent( 'download' ),
-		page.locator( '.fg-ie-actions' ).getByRole( 'button', { name: 'Export', exact: true } ).click(),
+		page.getByRole( 'button', { name: 'Export', exact: true } ).click(),
 	] );
-	const file = test.info().outputPath( `export.${ format.toLowerCase() }` );
-	await download.saveAs( file );
 
-	return file;
+	return {
+		name: download.suggestedFilename(),
+		body: readFileSync( ( await download.path() ) as string, 'utf8' ),
+	};
 }
 
-/** Import a file from the Import tab, switching off the listed types first. */
-async function importFile( page: Page, file: string, off: string[] = [] ): Promise< void > {
-	await page.goto( TOOL );
-	await page.locator( '.fotogrids-tab-bar__tab', { hasText: 'Import' } ).click();
-	await page.locator( 'input[type=file]' ).setInputFiles( file );
+/** Each chip in one History row as "count label", with its variant. */
+function historyChips( page: Page, row: number ): Promise< string[] > {
+	return page
+		.locator( '.fg-ie-log-table tbody tr' )
+		.nth( row )
+		.locator( '.fg-ie-chip' )
+		.evaluateAll( ( chips ) =>
+			chips.map(
+				( chip ) =>
+					`${ Array.from( chip.children, ( part ) => part.textContent ).join( ' ' ) } [${ chip.className.replace( 'fg-ie-chip fg-ie-chip--', '' ) }]`
+			)
+		);
+}
 
-	await expect( page.locator( '#fg-ie-import-items' ) ).toBeVisible();
-	await expect( page.locator( '#fg-ie-import-tags' ) ).toBeVisible();
-	for ( const key of off ) {
-		await page.locator( `#fg-ie-import-${ key }` ).click();
-	}
-
-	const executed = page.waitForResponse(
+/** Upload a file on the Import tab and wait for the route to analyse it. */
+async function chooseFile( page: Page, name: string, body: string ): Promise< Response > {
+	const analysed = page.waitForResponse(
 		( r ) =>
-			decodeURIComponent( r.url() ).includes( 'import-export/import' ) &&
-			( r.request().postData() ?? '' ).includes( '"execute"' )
+			decodeURIComponent( r.url() ).includes( `${ ROUTES }import` ) &&
+			'analyse' === r.request().postDataJSON()?.phase
 	);
-	await page.getByRole( 'button', { name: 'Import', exact: true } ).last().click();
-	expect( ( await executed ).status() ).toBe( 200 );
-	await expect( page.locator( '.fg-ie-done' ) ).toBeVisible();
+	await page.locator( '#fg-ie-import-file' ).setInputFiles( {
+		name,
+		mimeType: 'application/json',
+		buffer: Buffer.from( body ),
+	} );
+
+	return analysed;
 }
 
-test.describe( 'the Import / Export screen and the Library', { tag: [ '@admin' ] }, () => {
-	const names: string[] = [];
-	let createdItemRow = false;
-
-	test.beforeAll( () => {
-		// The Import tab offers Items only when the file carries an item row; Edit Item writes one.
-		createdItemRow =
-			'1' ===
-			wpEval( `
-				if ( null === \\FotoGrids\\Galleries\\Item_Meta::get( ${ attachment() } ) ) {
-					\\FotoGrids\\Galleries\\Item_Meta::save( ${ attachment() }, array( 'credit' => '' ) );
-					echo 1;
-				}
-			` ).trim();
+/** An export file holding one item whose media this site does not have. */
+function orphanItemFile( size?: number ): string {
+	const body = JSON.stringify( {
+		meta: { version: '1.2.0' },
+		items: [ { attachment_id: 987654321, gallery_id: 0, position: 0, caption: 'Orphan' } ],
 	} );
 
-	test.afterEach( () => {
-		removeEntries( names.splice( 0 ) );
-	} );
+	return undefined === size ? body : body.padEnd( size, ' ' );
+}
 
-	test.afterAll( () => {
-		if ( createdItemRow ) {
-			wpEval( `
-				global $wpdb;
-				$wpdb->delete( $wpdb->prefix . 'fotogrids_item_meta', array( 'attachment_id' => ${ attachment() } ) );
-			` );
+let log: string | null;
+
+test.beforeAll( () => {
+	log = readLog();
+} );
+
+test.afterAll( () => {
+	writeLog( log );
+} );
+
+test( 'Export downloads the selected types in the chosen format', { tag: [ '@admin' ] }, async ( {
+	page,
+} ) => {
+	const own = galleryPage( {}, undefined, `Export screen ${ Date.now() }` );
+
+	await openTab( page, 'Export' );
+
+	const json = await exportThroughUi( page );
+	expect( json.name ).toBe( 'fotogrids-export.json' );
+	const all = JSON.parse( json.body );
+	expect( Object.keys( all ) ).toEqual(
+		expect.arrayContaining( [ 'meta', 'galleries', 'albums', 'items', 'tags', 'settings' ] )
+	);
+	expect( all.galleries.map( ( g: { id: number } ) => g.id ) ).toContain( own.id );
+
+	await page.locator( '#fg-ie-export-select-all' ).click();
+	await expect( page.getByRole( 'button', { name: 'Export', exact: true } ) ).toBeDisabled();
+	await expect( page.getByText( 'Select at least one item to export.' ) ).toBeVisible();
+
+	await page.locator( '#fg-ie-export-galleries' ).click();
+	await page.getByRole( 'radiogroup', { name: 'Export file format' } ).getByRole( 'radio', { name: 'XML' } ).click();
+	await expect(
+		page.getByText( 'XML is more verbose and can be edited in any text editor.' )
+	).toBeVisible();
+
+	const xml = await exportThroughUi( page );
+	expect( xml.name ).toBe( 'fotogrids-export.xml' );
+	expect( xml.body ).toMatch( /^<\?xml/ );
+	expect( xml.body ).toContain( '<galleries>' );
+	expect( xml.body ).toContain( `<id>${ own.id }</id>` );
+	expect( xml.body ).not.toContain( '<albums>' );
+	expect( xml.body ).not.toContain( '<settings>' );
+} );
+
+test( 'a running export shows the do-not-close banner until it finishes', { tag: [ '@admin' ] }, async ( {
+	page,
+} ) => {
+	let release: () => void = () => {};
+	const held = new Promise< void >( ( resolve ) => {
+		release = resolve;
+	} );
+	await page.route(
+		( url ) => decodeURIComponent( url.href ).includes( `${ ROUTES }export` ),
+		async ( route ) => {
+			await held;
+			await route.continue();
 		}
-	} );
+	);
 
-	for ( const format of [ 'JSON', 'XML' ] as const ) {
-		test( `a tag and a person deleted in the Library come back with their item after a round trip through ${ format }`, async ( { page } ) => {
-			const tag = `Harbour ${ format } ${ run }`;
-			const person = `Ada ${ format } ${ run }`;
-			names.push( tag, person );
-			const oldTag = linkedEntry( 'tag', tag );
-			const oldPerson = linkedEntry( 'person', person );
+	await openTab( page, 'Export' );
+	const download = page.waitForEvent( 'download' );
+	await page.getByRole( 'button', { name: 'Export', exact: true } ).click();
 
-			const file = await exportFile( page, format );
-			expect( readFileSync( file, 'utf8' ) ).toContain( tag );
+	const banner = page.locator( '.fg-ie-banner' );
+	await expect( banner ).toHaveText( 'Exporting - please do not close this window…' );
+	await expect( page.getByRole( 'button', { name: 'Exporting…' } ) ).toBeVisible();
 
-			await deleteInLibrary( page, 'Tags', tag );
-			await deleteInLibrary( page, 'People', person );
-			expect( linkedIds( 'tag', tag ) ).toEqual( [] );
+	release();
+	await download;
+	await expect( banner ).toHaveCount( 0 );
+} );
 
-			await importFile( page, file );
+test( 'History lists each logged operation with its type, details and status', { tag: [ '@admin' ] }, async ( {
+	page,
+} ) => {
+	writeLog(
+		JSON.stringify( [
+			{
+				id: 'e2e-import',
+				date: '2026-10-11T18:29:04+00:00',
+				type: 'import',
+				summary: '3 galleries, 1 items · 2 skipped',
+				status: 'partial',
+			},
+			{
+				id: 'e2e-export',
+				date: '2026-10-11T18:20:00+00:00',
+				type: 'export',
+				summary: '12 galleries, 1 albums, 0 templates, settings · JSON',
+				status: 'complete',
+			},
+		] )
+	);
 
-			const [ newTag ] = linkedIds( 'tag', tag );
-			const [ newPerson ] = linkedIds( 'person', person );
-			expect( newTag ).toBeGreaterThan( oldTag );
-			expect( newPerson ).toBeGreaterThan( oldPerson );
-			expect( await itemsInLibrary( page, 'Tags', tag ) ).toBe( '1' );
-			expect( await itemsInLibrary( page, 'People', person ) ).toBe( '1' );
-		} );
-	}
+	await openTab( page, 'History' );
 
-	test( 'with Tags switched off, an import links the item to the tag the Library already has and adds nothing', async ( {
-		page,
-	} ) => {
-		const kept = `Lighthouse ${ run }`;
-		const gone = `Grace ${ run }`;
-		names.push( kept, gone );
-		linkedEntry( 'tag', kept );
-		linkedEntry( 'person', gone );
+	const rows = page.locator( '.fg-ie-log-table tbody tr' );
+	await expect( rows ).toHaveCount( 2 );
 
-		const file = await exportFile( page, 'JSON' );
-		await deleteInLibrary( page, 'Tags', kept );
-		await deleteInLibrary( page, 'People', gone );
+	await expect( rows.nth( 0 ).locator( '.fg-ie-type-pill--import' ) ).toHaveText( 'Import' );
+	await expect( rows.nth( 0 ).locator( '.fg-ie-status-pill--partial' ) ).toHaveText( 'Partial' );
+	expect( await historyChips( page, 0 ) ).toEqual( [
+		'3 Galleries [count]',
+		'1 Item [count]',
+		'2 skipped [skipped]',
+	] );
 
-		await page.goto( LIBRARY );
-		await page.locator( '.fotogrids-library-sidebar-tabs' ).getByText( 'Tags', { exact: true } ).first().click();
-		await page.getByRole( 'button', { name: 'Add Tag' } ).click();
-		await page.fill( '#fg-library-create-name', kept );
-		await page.getByRole( 'button', { name: 'Create', exact: true } ).click();
-		await expect( page.locator( '.fotogrids-library-name-button', { hasText: kept } ) ).toBeVisible();
+	await expect( rows.nth( 1 ).locator( '.fg-ie-type-pill--export' ) ).toHaveText( 'Export' );
+	await expect( rows.nth( 1 ).locator( '.fg-ie-status-pill--complete' ) ).toHaveText( 'Complete' );
+	expect( await historyChips( page, 1 ) ).toEqual( [
+		'12 Galleries [count]',
+		'1 Album [count]',
+		'0 Templates [empty]',
+		'Settings [count]',
+		'JSON [format]',
+	] );
+} );
 
-		await importFile( page, file, [ 'tags' ] );
+test( 'History says so when nothing has been logged', { tag: [ '@admin' ] }, async ( { page } ) => {
+	writeLog( null );
 
-		expect( linkedIds( 'tag', kept ) ).toHaveLength( 1 );
-		expect( await itemsInLibrary( page, 'Tags', kept ) ).toBe( '1' );
-		expect( await itemsInLibrary( page, 'People', gone ) ).toBeNull();
+	await openTab( page, 'History' );
+
+	await expect(
+		page.getByText( 'No operations recorded yet. Export or import data to see a log here.' )
+	).toBeVisible();
+	await expect( page.locator( '.fg-ie-log-table' ) ).toHaveCount( 0 );
+} );
+
+test( 'a chosen file is summarised and can be swapped for another', { tag: [ '@admin' ] }, async ( {
+	page,
+} ) => {
+	await openTab( page, 'Import' );
+	await expect( page.getByRole( 'heading', { name: 'Select export file' } ) ).toBeVisible();
+
+	await chooseFile( page, 'items.json', orphanItemFile( 15360 ) );
+
+	await expect( page.getByRole( 'heading', { name: 'Selected export file' } ) ).toBeVisible();
+	await expect( page.locator( '.fg-ie-summary__file-name' ) ).toHaveText( 'items.json' );
+	await expect( page.locator( '.fg-ie-summary__file-size' ) ).toHaveText( '15 KB' );
+	await expect( page.locator( '.fg-ie-summary__chip' ) ).toHaveText( [ '1 Items' ] );
+	await expect( page.getByRole( 'heading', { name: 'What to import' } ) ).toBeVisible();
+
+	await page.getByRole( 'button', { name: 'Choose a different file' } ).click();
+
+	await expect( page.getByRole( 'heading', { name: 'Select export file' } ) ).toBeVisible();
+	await expect( page.locator( '#fg-ie-import-file' ) ).toHaveCount( 1 );
+	await expect( page.getByRole( 'heading', { name: 'What to import' } ) ).toHaveCount( 0 );
+} );
+
+test( 'Import another file returns from the result to the file picker', { tag: [ '@admin' ] }, async ( {
+	page,
+} ) => {
+	await openTab( page, 'Import' );
+	await chooseFile( page, 'items.json', orphanItemFile() );
+
+	await page.getByRole( 'button', { name: 'Import', exact: true } ).click();
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
+	await expect( page.getByRole( 'heading', { name: 'Nothing was imported' } ) ).toBeVisible();
+
+	await page.getByRole( 'button', { name: 'Import another file' } ).click();
+
+	await expect( page.getByRole( 'heading', { name: 'Select export file' } ) ).toBeVisible();
+	await expect( page.locator( '#fg-ie-import-file' ) ).toHaveCount( 1 );
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toHaveCount( 0 );
+} );
+
+test.describe( 'a file the route cannot parse', () => {
+	test.use( { allowConsoleErrors: 'the analyse request answers 422, which Chrome logs' } );
+
+	test( 'is reported and leaves the file picker in place', { tag: [ '@admin' ] }, async ( { page } ) => {
+		await openTab( page, 'Import' );
+
+		const answer = await chooseFile( page, 'broken.json', '{ not json' );
+		expect( answer.status() ).toBe( 422 );
+
+		await expect( page.getByRole( 'alert' ) ).toHaveText(
+			'The file could not be parsed. Please ensure it is a valid FotoGrids JSON export.'
+		);
+		await expect( page.locator( '#fg-ie-import-file' ) ).toHaveCount( 1 );
+		await expect( page.getByRole( 'heading', { name: 'What to import' } ) ).toHaveCount( 0 );
 	} );
 } );
