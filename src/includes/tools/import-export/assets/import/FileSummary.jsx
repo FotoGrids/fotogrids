@@ -1,6 +1,6 @@
 import React from 'react';
+import { formatFileSize } from '@/admin/src/utils/format-file-size';
 import { EXPORT_TYPES } from '../constants.js';
-import { formatBytes } from '../utils.js';
 
 const FileSummary = ({ file, summary }) => {
 	const counts = summary?.contents ?? {};
@@ -13,7 +13,7 @@ const FileSummary = ({ file, summary }) => {
 			<div className="fg-ie-summary__file">
 				<span className="fg-ie-summary__file-name">{file.name}</span>
 				<span className="fg-ie-summary__file-size">
-					{formatBytes(file.size)}
+					{formatFileSize(file.size)}
 				</span>
 			</div>
 			{chips.length > 0 && (

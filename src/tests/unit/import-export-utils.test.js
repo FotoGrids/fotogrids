@@ -2,19 +2,10 @@
  * Import / Export tool helpers.
  */
 import {
-	formatBytes,
 	formatDate,
 	importResultChips,
 	parseSummary,
 } from '../../includes/tools/import-export/assets/utils.js';
-
-describe( 'formatBytes', () => {
-	it( 'reports bytes, kilobytes and megabytes', () => {
-		expect( formatBytes( 512 ) ).toBe( '512 B' );
-		expect( formatBytes( 1536 ) ).toBe( '1.5 KB' );
-		expect( formatBytes( 3 * 1048576 ) ).toBe( '3.0 MB' );
-	} );
-} );
 
 describe( 'formatDate', () => {
 	it( 'formats an ISO date for the locale', () => {
