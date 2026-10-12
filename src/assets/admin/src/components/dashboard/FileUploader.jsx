@@ -3,10 +3,10 @@
  * Handles file uploads, drag and drop, and media library selection
  */
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import MediaUpload from '../blocks/MediaUpload';
 import Icon from '../shared/Icon';
 
-const { __ } = wp.i18n;
 const { createInterpolateElement } = wp.element;
 
 const FileUploader = ({ onUploadComplete }) => {

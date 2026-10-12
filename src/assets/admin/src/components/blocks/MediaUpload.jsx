@@ -14,9 +14,8 @@
  */
 import React, { useCallback, useRef, useState } from 'react';
 import { uploadMedia } from '@wordpress/media-utils';
+import { __ } from '@wordpress/i18n';
 import UploadArea from './UploadArea';
-
-const { __ } = wp.i18n;
 
 const ALLOWED_TYPES = ['image'];
 

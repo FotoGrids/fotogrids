@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
-
-const { __ } = wp.i18n;
 
 const Select = ({
 	value,

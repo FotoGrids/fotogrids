@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import { __ } from '@wordpress/i18n';
 import useLibraryStats from './useLibraryStats';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import LibraryStatCard from './LibraryStatCard';
 import { Button } from '../shared/Button';
-
-const { __ } = wp.i18n;
 
 const FG_BLUE = '#3c46f0';
 const FG_BLUE_SOFT = 'rgba(60,70,240,0.08)';

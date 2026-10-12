@@ -2,13 +2,13 @@
  * Statistics Page Component
  */
 import React, { useState, useEffect, useRef } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 import StatCard from '../shared/StatCard';
 import StatsTable from '../shared/StatsTable';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import { collectionPlaceholder } from '../../utils/collection-title';
-
-const { __, sprintf } = wp.i18n;
+import { isLeavingPage } from '../../utils/leaving-page';
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
 
@@ -585,7 +585,12 @@ const StatsPage = () => {
 				setTopContent(Array.isArray(topRes) ? topRes : []);
 			} catch (err) {
 				if (!cancelled) {
-					console.error('FotoGrids Stats: failed to load stats', err);
+					if (!isLeavingPage()) {
+						console.error(
+							'FotoGrids Stats: failed to load stats',
+							err
+						);
+					}
 					setError(
 						__(
 							'Could not load statistics. Please refresh the page.',

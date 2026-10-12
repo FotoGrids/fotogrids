@@ -8,7 +8,7 @@
  * Prints one tag per line, or `*` for the whole tier.
  */
 
-const { execFileSync } = require( 'child_process' );
+const { execFileSync, spawnSync } = require( 'child_process' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 
@@ -96,8 +96,37 @@ function main( argv ) {
 	process.stdout.write( `${ [ ...tags ].sort().join( '\n' ) }\n` );
 }
 
+/**
+ * How many tests `playwright test --list` selects with these arguments.
+ *
+ * An empty selection is an answer. A spec that fails to load is not: Playwright
+ * then lists the project as `Total: 0`, which would read as nothing to run.
+ *
+ * @param {string[]} args Arguments after `playwright test`.
+ * @return {number} The selected test count.
+ * @throws {Error} When a spec fails to load.
+ */
+function listedTests( args ) {
+	const listed = spawnSync( 'npx', [ 'playwright', 'test', ...args, '--list' ], {
+		cwd: path.join( __dirname, '..', '..' ),
+		encoding: 'utf8',
+	} );
+
+	const failure = ( listed.stderr ?? '' )
+		.split( '\n' )
+		.find( ( line ) => /^\s*Error:/.test( line ) && ! /No tests found/.test( line ) );
+
+	if ( failure ) {
+		throw new Error( `playwright test ${ args.join( ' ' ) } --list could not load a spec.\n${ failure.trim() }` );
+	}
+
+	const reported = ( listed.stdout ?? '' ).match( /Total: (\d+) test/ );
+
+	return reported ? Number( reported[ 1 ] ) : 0;
+}
+
 if ( require.main === module ) {
 	main( process.argv.slice( 2 ) );
 }
 
-module.exports = { EVERYTHING, loadMap, tagsFor, toRegExp };
+module.exports = { EVERYTHING, listedTests, loadMap, tagsFor, toRegExp };

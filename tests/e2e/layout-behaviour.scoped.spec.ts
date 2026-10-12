@@ -15,7 +15,7 @@ import { GalleryRender } from './support/gallery-render';
  * scoped: each test renders its own galleries and reads them.
  */
 
-const FIVE = fixture<number[]>('F-small', 'items');
+const five = (): number[] => fixture<number[]>('F-small', 'items');
 
 /**
  * LAY-04. Single Item renders one item, chosen by the sorter. The count the
@@ -27,7 +27,7 @@ test.describe('Single Item', () => {
 		'LAY-04: renders one item out of a gallery of five',
 		{ tag: '@layout' },
 		async ({ page }) => {
-			const { id, url } = galleryPage({ layout: 'single-item' }, FIVE);
+			const { id, url } = galleryPage({ layout: 'single-item' }, five());
 			const gallery = new GalleryRender(page, id);
 
 			await page.goto(url);
@@ -58,7 +58,7 @@ test.describe('Single Item', () => {
 					item_click_behavior: 'lightbox',
 					lightbox_scope: 'gallery',
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -67,7 +67,7 @@ test.describe('Single Item', () => {
 
 			await expect(gallery.items()).toHaveCount(1);
 			expect(await gallery.attr('lightbox-extended')).toBe('true');
-			expect(await gallery.attr('total-items')).toBe(String(FIVE.length));
+			expect(await gallery.attr('total-items')).toBe(String(five().length));
 		}
 	);
 
@@ -83,14 +83,14 @@ test.describe('Single Item', () => {
 					single_item_auto_progress: true,
 					single_item_auto_progress_delay: 3,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
 			await page.goto(url);
 			await gallery.waitFor();
 
-			await expect(gallery.items()).toHaveCount(FIVE.length);
+			await expect(gallery.items()).toHaveCount(five().length);
 			expect(await gallery.attr('si-auto-progress')).toBe('1');
 			expect(await gallery.attr('si-delay')).toBe('3');
 
@@ -123,7 +123,7 @@ test.describe('Single Item', () => {
 					single_item_auto_progress: true,
 					single_item_auto_progress_delay: 0,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -212,7 +212,7 @@ test.describe('Featured Item', () => {
 		async ({ page }) => {
 			const { id, url } = galleryPage(
 				{ layout: 'featured-item', featured_thumbs_count: 4 },
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -355,7 +355,7 @@ test.describe('Instant Photos', () => {
 					},
 					enable_cache: false,
 				},
-				FIVE
+				five()
 			);
 
 			await page.goto(url);
@@ -364,7 +364,7 @@ test.describe('Instant Photos', () => {
 			await page.goto(url);
 			const second = await rotations(page, id);
 
-			expect(first).toHaveLength(FIVE.length);
+			expect(first).toHaveLength(five().length);
 			expect(second).toEqual(first);
 
 			// A seed that produced one angle for every tile would be stable and
@@ -391,13 +391,13 @@ test.describe('Instant Photos', () => {
 						mobile: 0,
 					},
 				},
-				FIVE
+				five()
 			);
 
 			await page.goto(url);
 
 			expect(await rotations(page, id)).toEqual(
-				Array(FIVE.length).fill('0deg')
+				Array(five().length).fill('0deg')
 			);
 		}
 	);
@@ -414,7 +414,7 @@ test.describe('Instant Photos', () => {
 					instant_photo_elevation: true,
 					instant_photo_sticker: true,
 				},
-				FIVE
+				five()
 			);
 			const gallery = new GalleryRender(page, id);
 
@@ -423,7 +423,7 @@ test.describe('Instant Photos', () => {
 
 			await expect(
 				gallery.root.locator('.fg-instant-photo--elevated')
-			).toHaveCount(FIVE.length);
+			).toHaveCount(five().length);
 			await expect(
 				gallery.root.locator('.fg-instant-photo--stickered'),
 				'elevation and the sticker both applied'
@@ -443,7 +443,7 @@ test.describe('Instant Photos', () => {
 			).toHaveCount(0);
 			await expect(
 				gallery.root.locator('.fg-instant-photo--stickered')
-			).toHaveCount(FIVE.length);
+			).toHaveCount(five().length);
 		}
 	);
 });

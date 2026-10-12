@@ -4,12 +4,12 @@
  * Allows users to select, apply, and save templates for galleries/albums
  */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { __ } from '@wordpress/i18n';
 import Select from './shared/Select';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon';
 import LoadingIcon from './shared/LoadingIcon';
-
-const { __ } = wp.i18n;
+import { isLeavingPage } from '../utils/leaving-page';
 
 const SaveButton = ({ strings, postId, postType, onSaveSuccess }) => {
 	const config = window.fotogridsTemplatesMetabox || {};
@@ -112,7 +112,9 @@ const TemplatesMetabox = () => {
 				setTemplates(response.templates);
 			}
 		} catch (error) {
-			console.error('Error loading templates:', error);
+			if (!isLeavingPage()) {
+				console.error('Error loading templates:', error);
+			}
 			if (window.fotogridsToast) {
 				window.fotogridsToast.error(strings.failedToLoadTemplates);
 			}
