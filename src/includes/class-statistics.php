@@ -22,6 +22,9 @@ class Statistics {
 	/**
 	 * Increment a statistic counter
 	 *
+	 * Uses INSERT … ON DUPLICATE KEY UPDATE, so two first writes for an object
+	 * arriving together both count.
+	 *
 	 * @param string $object_type Type of object (gallery, album, item)
 	 * @param int $object_id ID of the object
 	 * @param string $field Field to increment (views, shares)
@@ -50,48 +53,29 @@ class Statistics {
 
 		$now = current_time( 'mysql', true );
 
-		$updated = $wpdb->query(
+		$written = $wpdb->query(
 			$wpdb->prepare(
-				'UPDATE %i
-             SET %i = %i + %d,
-                 last_viewed = %s,
-                 updated_at = %s
-             WHERE object_type = %s AND object_id = %d',
+				'INSERT INTO %i (object_type, object_id, views, shares, last_viewed, created_at, updated_at)
+             VALUES (%s, %d, %d, %d, %s, %s, %s)
+             ON DUPLICATE KEY UPDATE %i = %i + %d, last_viewed = %s, updated_at = %s',
 				$table,
+				$object_type,
+				$object_id,
+				'views' === $field ? $amount : 0,
+				'shares' === $field ? $amount : 0,
+				$now,
+				$now,
+				$now,
 				$field,
 				$field,
 				$amount,
 				$now,
-				$now,
-				$object_type,
-				$object_id
+				$now
 			)
 		);
 
-		if ( false === $updated ) {
+		if ( false === $written ) {
 			return false;
-		}
-
-		if ( 0 === $updated ) {
-			$data = array(
-				'object_type' => $object_type,
-				'object_id'   => $object_id,
-				'views'       => ( 'views' === $field ) ? $amount : 0,
-				'shares'      => ( 'shares' === $field ) ? $amount : 0,
-				'last_viewed' => $now,
-				'created_at'  => $now,
-				'updated_at'  => $now,
-			);
-
-			$inserted = $wpdb->insert(
-				$table,
-				$data,
-				array( '%s', '%d', '%d', '%d', '%s', '%s', '%s' )
-			);
-
-			if ( false === $inserted ) {
-				return false;
-			}
 		}
 
 		// Also record in the per-day table so time-series charts are accurate.
