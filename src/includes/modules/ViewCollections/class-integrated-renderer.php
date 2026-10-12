@@ -290,8 +290,7 @@ class Integrated_Renderer {
 	 *
 	 * Returning a non-empty string from `pre_get_document_title` short-circuits
 	 * `wp_get_document_title`. Reusing `Renderer::page_title()` keeps the
-	 * title format identical to standalone mode. Left to WordPress and the
-	 * SEO plugin when the site defers to it.
+	 * title format identical to standalone mode. Skipped when deferring.
 	 *
 	 * @since 1.0.0
 	 * @param string $title Title from earlier filters (typically empty).
@@ -317,9 +316,8 @@ class Integrated_Renderer {
 	 *
 	 * Runs at wp_head priority 5 so SEO plugins (which typically run at 1-3)
 	 * still emit first; FotoGrids' SEO_Conflict_Guard handles suppression
-	 * when FotoGrids is set to take over. Core's `rel_canonical` is removed
-	 * unless the site defers to its SEO plugin, so the page carries one
-	 * canonical link.
+	 * when FotoGrids is set to take over. Replaces core's `rel_canonical`
+	 * unless deferring.
 	 *
 	 * @since 1.0.0
 	 * @return void

@@ -6,11 +6,9 @@ import { fixture } from './support/fixtures';
 import { wpCli, wpEval } from './support/roles';
 
 /**
- * A view page's document head carries one title, one viewport meta, one
- * canonical link and one robots meta, in both layout modes, on a block theme
- * and on a classic one.
+ * One title, viewport, canonical and robots tag per view page head.
  *
- * Serial: it switches the active theme and the site-wide view page layout mode.
+ * Serial: switches the theme and the view page layout mode.
  */
 
 test.describe.configure( { mode: 'serial' } );
@@ -35,7 +33,7 @@ function setLayoutMode( mode: string ): void {
 	);
 }
 
-/** The head tags a crawler reads, as the server sent them. */
+/** Head tags in the server's response. */
 async function head( request: APIRequestContext, url: string ) {
 	const response = await request.get( url );
 	expect( response.ok() ).toBe( true );

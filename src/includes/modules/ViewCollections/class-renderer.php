@@ -128,10 +128,7 @@ class Renderer {
 	}
 
 	/**
-	 * Whether the standalone shell prints the document title itself.
-	 *
-	 * When deferring, WordPress and the SEO plugin print it wherever the theme
-	 * lets core render a title tag.
+	 * Whether the standalone shell prints its own `<title>`.
 	 *
 	 * @since 1.3.0
 	 * @return bool
@@ -172,10 +169,7 @@ class Renderer {
 	}
 
 	/**
-	 * Add the view page's noindex to WordPress' robots meta.
-	 *
-	 * Hooked to `wp_robots`, so the document head carries a single robots tag.
-	 * When the site defers to its SEO plugin, only a draft preview is noindexed.
+	 * Add the view page's noindex to `wp_robots`. When deferring, drafts only.
 	 *
 	 * @since 1.3.0
 	 * @param array<string,bool|string> $robots Robots directives.
@@ -199,9 +193,6 @@ class Renderer {
 
 	/**
 	 * Canonical and Open Graph meta for the document head.
-	 *
-	 * Empty before the `fotogrids/view/head_meta` filter when the site defers
-	 * to its SEO plugin.
 	 *
 	 * @since 1.0.0
 	 * @return string

@@ -1,8 +1,6 @@
 <?php
 /**
- * What a view page request registers for its document head: the SEO conflict
- * guard engaging before the SEO plugins read their switches, and the noindex
- * reaching WordPress' robots meta.
+ * The SEO conflict guard and the view page noindex.
  *
  * @package FotoGrids
  */

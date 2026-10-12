@@ -301,10 +301,9 @@ class Router {
 	}
 
 	/**
-	 * The collection the main query resolves to, when the current user may see
-	 * its view page: published, or editable for a draft preview.
+	 * The collection whose view page the current request can show.
 	 *
-	 * Available from the `wp` action onwards, before the template is routed.
+	 * Available from `wp` onwards.
 	 *
 	 * @since 1.3.0
 	 * @return \WP_Post|null

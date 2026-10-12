@@ -25,11 +25,8 @@ if ( ! defined( 'WPINC' ) ) {
  * suppression filters and disables them only while the request is rendering
  * a FotoGrids view page.
  *
- * Detection: a view-page request is one where `Router::view_post()` resolves
- * the main query to a FotoGrids gallery or album when `wp` fires. The
- * suppression filters are registered at that point, ahead of the SEO plugins
- * that read them on `wp`; nothing is registered for non-view-page requests so
- * SEO plugins continue to manage every other URL on the site.
+ * Engages on `wp` at priority 1, before the SEO plugins read their
+ * switches, and only when `Router::view_post()` finds a view page.
  *
  * Escape hatch: site owners can opt out of suppression entirely via the
  * `fotogrids/view/seo_conflict_guard/enabled` filter. When the broader
@@ -101,10 +98,7 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress Yoast SEO's frontend output on this request.
 	 *
-	 * Drops every presenter except the meta description, which FotoGrids does
-	 * not emit, and the title on theme-rendered pages, where Yoast replaces
-	 * core's title tag with its own presenter. Yoast's robots directives reach
-	 * the page through `wp_robots`, where they merge with the view page's own.
+	 * Keeps its meta description, and its title on theme-rendered pages.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -114,8 +108,8 @@ class SEO_Conflict_Guard {
 	}
 
 	/**
-	 * Keep only Yoast's meta description presenter, plus its title presenter
-	 * unless the standalone shell has printed its own title.
+	 * Keep Yoast's meta description presenter, and its title presenter unless
+	 * the standalone shell printed a title.
 	 *
 	 * @since 1.3.0
 	 * @param mixed $presenters Presenter instances.
@@ -138,8 +132,7 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress RankMath's frontend output on this request.
 	 *
-	 * RankMath gates its frontend presenter through `rank_math/frontend/disable_integration`,
-	 * which it reads on `wp` and exits without emitting head metadata when true.
+	 * RankMath reads `rank_math/frontend/disable_integration` on `wp`.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -151,10 +144,7 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress All in One SEO's frontend output on this request.
 	 *
-	 * `aioseo_disable` turns off its head output and title rewrites. AIOSEO
-	 * also clears every `wp_robots` filter at `wp_head` priority -1 so that
-	 * only its own robots tag prints; that step is removed so core's robots
-	 * meta, carrying the view page's noindex, still prints.
+	 * Also unhooks AIOSEO's clearing of `wp_robots`, so the noindex survives.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -170,9 +160,7 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress SEOPress's frontend output on this request.
 	 *
-	 * Empties its canonical and robots tags through `seopress_titles_canonical`
-	 * and `seopress_titles_robots`, and unhooks the loader for its Open Graph
-	 * and Twitter tags. Its title and meta description are left in place.
+	 * Drops its canonical, robots, Open Graph and Twitter tags.
 	 *
 	 * @since 1.0.0
 	 * @return void
