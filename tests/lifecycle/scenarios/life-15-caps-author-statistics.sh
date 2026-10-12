@@ -4,7 +4,7 @@
 # The 1.3 state is rebuilt by hand: activation grants today's defaults, so the
 # capability a 1.3 activation left out is removed again before the load.
 
-scratch_install life14
+scratch_install life15
 scratch_activate
 
 load() {
