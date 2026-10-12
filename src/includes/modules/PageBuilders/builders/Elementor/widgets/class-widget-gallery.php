@@ -263,7 +263,7 @@ class Widget_Gallery extends Widget_Base {
 				$fg_markup = '<div class="fg-pb-elementor-preview fg-pb-elementor-preview--empty">'
 					. Preview_Renderer::render_empty_state_html( 'gallery', $gallery_id )
 					. '</div>';
-				echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
+				echo wp_kses( $fg_markup, array_merge( \FotoGrids\Kses::rules( $fg_markup ), array( 'style' => array() ) ) );
 				return;
 			}
 
