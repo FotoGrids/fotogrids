@@ -815,6 +815,40 @@ class Import_Export_Data {
 	}
 
 	/**
+	 * Write an item's exported text onto its attachment. Empty values leave the
+	 * attachment's own value in place.
+	 *
+	 * @since 1.2.0
+	 * @param int                  $attachment_id Attachment ID.
+	 * @param array<string, mixed> $item          Exported item entry.
+	 * @return void
+	 */
+	private static function import_item_text( int $attachment_id, array $item ): void {
+		$text = array();
+		foreach ( array( 'title', 'caption', 'description', 'alt' ) as $key ) {
+			$text[ $key ] = isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ? (string) $item[ $key ] : '';
+		}
+
+		$post = array_filter(
+			array(
+				'post_title'   => sanitize_text_field( $text['title'] ),
+				'post_excerpt' => wp_kses_post( $text['caption'] ),
+				'post_content' => wp_kses_post( $text['description'] ),
+			),
+			'strlen'
+		);
+		if ( $post ) {
+			$post['ID'] = $attachment_id;
+			wp_update_post( wp_slash( $post ) );
+		}
+
+		$alt = sanitize_text_field( $text['alt'] );
+		if ( '' !== $alt ) {
+			update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
+		}
+	}
+
+	/**
 	 * Import item rows.
 	 *
 	 * An item the site did not use before the import also receives the file's
@@ -882,40 +916,6 @@ class Import_Export_Data {
 		}
 
 		return array( $imported, $skipped );
-	}
-
-	/**
-	 * Write an item's exported text onto its attachment. Empty values leave the
-	 * attachment's own value in place.
-	 *
-	 * @since 1.2.0
-	 * @param int                  $attachment_id Attachment ID.
-	 * @param array<string, mixed> $item          Exported item entry.
-	 * @return void
-	 */
-	private static function import_item_text( int $attachment_id, array $item ): void {
-		$text = array();
-		foreach ( array( 'title', 'caption', 'description', 'alt' ) as $key ) {
-			$text[ $key ] = isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ? (string) $item[ $key ] : '';
-		}
-
-		$post = array_filter(
-			array(
-				'post_title'   => sanitize_text_field( $text['title'] ),
-				'post_excerpt' => wp_kses_post( $text['caption'] ),
-				'post_content' => wp_kses_post( $text['description'] ),
-			),
-			'strlen'
-		);
-		if ( $post ) {
-			$post['ID'] = $attachment_id;
-			wp_update_post( wp_slash( $post ) );
-		}
-
-		$alt = sanitize_text_field( $text['alt'] );
-		if ( '' !== $alt ) {
-			update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
-		}
 	}
 
 	/** Import item_metadata (tag/person/location join rows). */
