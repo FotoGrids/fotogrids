@@ -70,7 +70,7 @@ class ViewPageHeadTest extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'noindex', $robots );
 	}
 
-	public function test_deferring_keeps_the_noindex_for_draft_previews_only(): void {
+	public function test_deferring_adds_no_noindex_even_to_a_draft_preview(): void {
 		\FotoGrids\Settings\SEO_Settings_Store::save(
 			array_merge( \FotoGrids\Settings\SEO_Settings_Store::get(), array( 'defer_to_seo_plugins' => true ) )
 		);
@@ -89,6 +89,6 @@ class ViewPageHeadTest extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->go_to( get_permalink( $draft ) );
 		Router::route( 'index.php' );
-		$this->assertTrue( apply_filters( 'wp_robots', array() )['noindex'] ?? false );
+		$this->assertArrayNotHasKey( 'noindex', apply_filters( 'wp_robots', array() ) );
 	}
 }

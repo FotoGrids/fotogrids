@@ -169,7 +169,7 @@ class Renderer {
 	}
 
 	/**
-	 * Add the view page's noindex to `wp_robots`. When deferring, drafts only.
+	 * Add the view page's noindex to `wp_robots`. Nothing when deferring.
 	 *
 	 * @since 1.3.0
 	 * @param array<string,bool|string> $robots Robots directives.
@@ -181,9 +181,8 @@ class Renderer {
 			return $robots;
 		}
 
-		$view    = self::for_post( $post );
-		$noindex = $view->defers_to_seo_plugins() ? $view->is_draft_preview() : $view->is_noindex();
-		if ( $noindex ) {
+		$view = self::for_post( $post );
+		if ( ! $view->defers_to_seo_plugins() && $view->is_noindex() ) {
 			$robots['noindex']  = true;
 			$robots['nofollow'] = true;
 		}
