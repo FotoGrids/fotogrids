@@ -14,15 +14,15 @@ import type { Page } from '@playwright/test';
  * scoped: each test makes its own album.
  */
 
-const FIVE = fixture<number[]>('F-small', 'items');
+const five = (): number[] => fixture<number[]>('F-small', 'items');
 
 const TRIGGER = '[data-fg-album-ajax-trigger]';
 
 /** An album of two galleries, with the Back button the swap relies on. */
 function twoGalleryAlbum() {
 	const galleries = [
-		galleryPage({ layout: 'grid' }, FIVE.slice(0, 3)).id,
-		galleryPage({ layout: 'grid' }, FIVE.slice(3, 5)).id,
+		galleryPage({ layout: 'grid' }, five().slice(0, 3)).id,
+		galleryPage({ layout: 'grid' }, five().slice(3, 5)).id,
 	];
 
 	const made = album(galleries, {
