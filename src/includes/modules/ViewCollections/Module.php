@@ -78,6 +78,8 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
 		Shared_Base::init();
 		Base_Fallback_Redirect::init();
 
+		add_filter( 'wp_robots', array( Renderer::class, 'filter_robots' ) );
+
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
 

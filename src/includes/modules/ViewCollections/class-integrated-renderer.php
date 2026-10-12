@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  * WordPress resolve the singular template normally; the theme owns the
  * document. This class is what makes that document actually show the gallery:
  * it injects the rendered gallery/album into `the_content`, emits the document
- * title via `pre_get_document_title`, the head meta (robots, canonical, OG)
+ * title via `pre_get_document_title`, the head meta (canonical, OG)
  * via `wp_head`, the body classes via `body_class`, enqueues the gallery
  * assets via `wp_enqueue_scripts`, and records the view stat from
  * `template_redirect`.
@@ -310,11 +310,12 @@ class Integrated_Renderer {
 	}
 
 	/**
-	 * Emit head meta (robots, canonical, OG, Twitter) on integrated pages.
+	 * Emit head meta (canonical, OG, Twitter) on integrated pages.
 	 *
 	 * Runs at wp_head priority 5 so SEO plugins (which typically run at 1-3)
 	 * still emit first; FotoGrids' SEO_Conflict_Guard handles suppression
-	 * when FotoGrids is set to take over.
+	 * when FotoGrids is set to take over. Core's `rel_canonical` is removed
+	 * so the page carries one canonical link.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -328,6 +329,8 @@ class Integrated_Renderer {
 		if ( ! $post instanceof \WP_Post ) {
 			return;
 		}
+
+		remove_action( 'wp_head', 'rel_canonical' );
 
 		echo wp_kses( Renderer::for_post( $post )->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 	}

@@ -40,6 +40,12 @@ $fotogrids_view->track_view();
 	 */
 	do_action( Actions_View::HEAD, $fotogrids_post );
 
+	// The shell prints its own title, viewport and canonical above.
+	remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
+	remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
+	remove_action( 'wp_head', 'rel_canonical' );
+
 	wp_head();
 	?>
 </head>

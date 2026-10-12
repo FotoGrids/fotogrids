@@ -228,16 +228,8 @@ class Router {
 	 * @return string
 	 */
 	public static function route( string $template ): string {
-		if ( ! is_singular( self::POST_TYPES ) ) {
-			return $template;
-		}
-
-		$post = get_queried_object();
-		if ( ! $post instanceof \WP_Post ) {
-			return $template;
-		}
-
-		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post->ID ) ) {
+		$post = self::view_post();
+		if ( null === $post ) {
 			return $template;
 		}
 
@@ -306,6 +298,32 @@ class Router {
 			FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ViewCollections/templates/view-collection.php',
 			$post
 		);
+	}
+
+	/**
+	 * The collection the main query resolves to, when the current user may see
+	 * its view page: published, or editable for a draft preview.
+	 *
+	 * Available from the `wp` action onwards, before the template is routed.
+	 *
+	 * @since 1.3.0
+	 * @return \WP_Post|null
+	 */
+	public static function view_post(): ?\WP_Post {
+		if ( ! is_singular( self::POST_TYPES ) ) {
+			return null;
+		}
+
+		$post = get_queried_object();
+		if ( ! $post instanceof \WP_Post ) {
+			return null;
+		}
+
+		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post->ID ) ) {
+			return null;
+		}
+
+		return $post;
 	}
 
 	/**
