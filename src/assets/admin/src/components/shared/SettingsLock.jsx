@@ -1,7 +1,6 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
-
-const { __ } = wp.i18n;
 
 /**
  * Read the localised capabilities snapshot. Returns null if the bag isn't

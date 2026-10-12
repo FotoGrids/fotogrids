@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import { Button } from '../../Button';
-
-const { __ } = wp.i18n;
 
 /**
  * SaveBar - a sticky bottom bar showing save state and actions.

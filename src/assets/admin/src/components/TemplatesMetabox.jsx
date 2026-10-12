@@ -4,13 +4,12 @@
  * Allows users to select, apply, and save templates for galleries/albums
  */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { __ } from '@wordpress/i18n';
 import Select from './shared/Select';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon';
 import LoadingIcon from './shared/LoadingIcon';
 import { isLeavingPage } from '../utils/leaving-page';
-
-const { __ } = wp.i18n;
 
 const SaveButton = ({ strings, postId, postType, onSaveSuccess }) => {
 	const config = window.fotogridsTemplatesMetabox || {};

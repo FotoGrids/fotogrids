@@ -15,9 +15,8 @@
  * @param {string}                 [props.inputId]            HTML id for the hidden file input.
  */
 import React, { useState, useRef } from 'react';
+import { __ } from '@wordpress/i18n';
 import UploadArea from './UploadArea';
-
-const { __ } = wp.i18n;
 
 const FileUpload = ({
 	onFileReady,

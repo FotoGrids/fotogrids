@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import Toggle from '../../shared/Toggle';
 import { Confirm } from '../../shared/Modal';
 import {
@@ -8,8 +9,6 @@ import {
 	DangerZone,
 	SaveBar,
 } from '../../shared/settings';
-
-const { __ } = wp.i18n;
 
 // Untranslated on purpose: the user has to type this string exactly.
 const CONFIRM_KEYWORD = 'CONFIRM';
