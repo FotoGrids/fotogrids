@@ -674,10 +674,10 @@ class Import_Export_Data {
 
 		foreach ( $posts as $post_data ) {
 			$old_id = (int) ( $post_data['id'] ?? 0 );
-			$slug   = sanitize_title( $post_data['slug'] ?? '' );
+			$slug   = is_string( $post_data['slug'] ?? null ) ? sanitize_title( $post_data['slug'] ) : '';
 			$title  = sanitize_text_field( $post_data['title'] ?? '' );
 			$status = sanitize_key( $post_data['status'] ?? '' );
-			$date   = (string) ( $post_data['date'] ?? '' );
+			$date   = is_string( $post_data['date'] ?? null ) ? $post_data['date'] : '';
 			$meta   = is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array();
 
 			if ( ! in_array( $status, self::COLLECTION_STATUSES, true ) ) {

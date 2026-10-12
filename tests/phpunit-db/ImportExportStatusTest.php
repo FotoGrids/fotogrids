@@ -141,6 +141,20 @@ class ImportExportStatusTest extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_an_untitled_draft_survives_an_xml_round_trip(): void {
+		$draft = $this->collection( 'fotogrids_gallery', 'draft', '' );
+		$file  = $this->call( 'serialise_xml', $this->export() );
+		wp_delete_post( $draft, true );
+
+		$result = $this->import( $file, 'skip' );
+
+		$this->assertSame( 1, $result['imported']['galleries'] );
+		$posts = $this->find( 'fotogrids_gallery', '' );
+		$this->assertCount( 1, $posts );
+		$this->assertSame( 'draft', $posts[0]->post_status );
+		$this->assertSame( '', $posts[0]->post_title );
+	}
+
 	public function test_skip_matches_a_slugless_draft_to_itself(): void {
 		$this->collection( 'fotogrids_gallery', 'auto-draft', '' );
 		$this->collection( 'fotogrids_gallery', 'draft', 'Other draft' );
