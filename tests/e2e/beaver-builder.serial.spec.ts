@@ -215,6 +215,27 @@ test.describe( 'on the published page', () => {
 		await expect( gallery.root.locator( '[data-fg-media-state="loaded"]' ) ).toHaveCount( 5 );
 	} );
 
+	test( 'three gallery modules of one gallery keep three instance IDs from the render cache', { tag: [ '@cache', '@layout' ] }, async ( {
+		browser,
+	} ) => {
+		const { id } = galleryPage( { enable_cache: true, enable_statistics: false } );
+		const module: Module = [ 'fotogrids-gallery', { gallery_id: String( id ) } ];
+		const { url } = builderPage( [ module, module, module ] );
+
+		for ( const label of [ 'filling the cache', 'served from the cache' ] ) {
+			const visitor = await browser.newContext();
+			const page = await visitor.newPage();
+			await page.goto( url );
+
+			const wrappers = page.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` );
+			await expect( wrappers ).toHaveCount( 3 );
+			const ids = await wrappers.evaluateAll( ( nodes ) => nodes.map( ( node ) => node.id ) );
+			expect( new Set( ids ).size, `${ label }: an ID shared by two modules` ).toBe( 3 );
+
+			await visitor.close();
+		}
+	} );
+
 	test( 'the album module renders the album', { tag: [ '@layout' ] }, async ( { page } ) => {
 		const first = galleryPage();
 		const second = galleryPage();
