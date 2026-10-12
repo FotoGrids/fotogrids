@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids\Tools\ImportExport;
 
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
@@ -244,10 +245,12 @@ class Import_Export_Data {
 
 		if ( in_array( 'items', $include_types, true ) ) {
 			$table         = $wpdb->prefix . 'fotogrids_item_meta';
-			$data['items'] = $wpdb->get_results(
-				$wpdb->prepare( 'SELECT * FROM %i ORDER BY gallery_id, position', $table ),
-				ARRAY_A
-			) ?: array();
+			$data['items'] = self::export_items(
+				$wpdb->get_results(
+					$wpdb->prepare( 'SELECT * FROM %i ORDER BY gallery_id, position', $table ),
+					ARRAY_A
+				) ?: array()
+			);
 
 			$meta_table            = $wpdb->prefix . 'fotogrids_item_metadata';
 			$data['item_metadata'] = $wpdb->get_results(
@@ -302,6 +305,41 @@ class Import_Export_Data {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Build the exported item entries: every item row, plus every attachment in a
+	 * published gallery that has no row, each carrying the attachment's own text.
+	 *
+	 * @since 1.2.0
+	 * @param array<int, array<string, mixed>> $rows Item meta rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function export_items( array $rows ): array {
+		$exported = array_flip( array_map( 'intval', array_column( $rows, 'attachment_id' ) ) );
+
+		foreach ( Gallery_Repository::all_item_ids( array( 'publish' ) ) as $item_id ) {
+			if ( ! isset( $exported[ $item_id ] ) && 'attachment' === get_post_type( $item_id ) ) {
+				$rows[]               = array(
+					'attachment_id' => $item_id,
+					'gallery_id'    => Item_Meta::GALLERY_ID,
+				);
+				$exported[ $item_id ] = true;
+			}
+		}
+
+		foreach ( $rows as $index => $row ) {
+			$attachment = get_post( (int) $row['attachment_id'] );
+			if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
+				continue;
+			}
+			$rows[ $index ]['title']       = $attachment->post_title;
+			$rows[ $index ]['caption']     = $attachment->post_excerpt;
+			$rows[ $index ]['description'] = $attachment->post_content;
+			$rows[ $index ]['alt']         = (string) get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+		}
+
+		return $rows;
 	}
 
 	/**
@@ -487,6 +525,7 @@ class Import_Export_Data {
 		$imported = array();
 		$skipped  = array();
 		$errors   = array();
+		$known    = self::known_item_ids();
 
 		$wpdb->query( 'START TRANSACTION' );
 
@@ -527,7 +566,7 @@ class Import_Export_Data {
 
 			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
-				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map );
+				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map, $known );
 				$imported['items'] = $imp;
 				$skipped['items']  = $skip;
 			}
@@ -760,10 +799,33 @@ class Import_Export_Data {
 	}
 
 	/**
-	 * Import item rows.
-	 * Returns [imported_count, skipped_count].
+	 * Attachment IDs this site already uses as items: those with an item row or
+	 * in any gallery.
+	 *
+	 * @since 1.2.0
+	 * @return array<int, true> Keyed by attachment ID.
 	 */
-	private static function import_items( array $items, array $gallery_id_map ): array {
+	private static function known_item_ids(): array {
+		global $wpdb;
+
+		$with_row = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT attachment_id FROM %i', Item_Meta::table() ) );
+		$in_lists = Gallery_Repository::all_item_ids( array_values( get_post_stati() ) );
+
+		return array_fill_keys( array_map( 'intval', array_merge( (array) $with_row, $in_lists ) ), true );
+	}
+
+	/**
+	 * Import item rows.
+	 *
+	 * An item the site did not use before the import also receives the file's
+	 * title, caption, description and alt text.
+	 *
+	 * @param array<int, array<string, mixed>> $items          Exported item entries.
+	 * @param array<int, int>                  $gallery_id_map Old gallery ID => new gallery ID.
+	 * @param array<int, true>                 $known          Attachment IDs already used as items.
+	 * @return array{0: int, 1: int} Imported and skipped counts.
+	 */
+	private static function import_items( array $items, array $gallery_id_map, array $known ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$lists    = array();
@@ -790,8 +852,6 @@ class Import_Export_Data {
 				$attachment_id,
 				array(
 					'item_type'    => sanitize_text_field( $item['item_type'] ?? 'image' ),
-					'caption'      => sanitize_text_field( $item['caption'] ?? '' ),
-					'description'  => wp_kses_post( $item['description'] ?? '' ),
 					'credit'       => sanitize_text_field( $item['credit'] ?? '' ),
 					'location'     => sanitize_text_field( $item['location'] ?? '' ),
 					'external_url' => esc_url_raw( $item['external_url'] ?? '' ),
@@ -802,6 +862,9 @@ class Import_Export_Data {
 			);
 
 			if ( $saved ) {
+				if ( ! isset( $known[ $attachment_id ] ) ) {
+					self::import_item_text( $attachment_id, $item );
+				}
 				++$imported;
 			} else {
 				++$skipped;
@@ -819,6 +882,40 @@ class Import_Export_Data {
 		}
 
 		return array( $imported, $skipped );
+	}
+
+	/**
+	 * Write an item's exported text onto its attachment. Empty values leave the
+	 * attachment's own value in place.
+	 *
+	 * @since 1.2.0
+	 * @param int                  $attachment_id Attachment ID.
+	 * @param array<string, mixed> $item          Exported item entry.
+	 * @return void
+	 */
+	private static function import_item_text( int $attachment_id, array $item ): void {
+		$text = array();
+		foreach ( array( 'title', 'caption', 'description', 'alt' ) as $key ) {
+			$text[ $key ] = isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ? (string) $item[ $key ] : '';
+		}
+
+		$post = array_filter(
+			array(
+				'post_title'   => sanitize_text_field( $text['title'] ),
+				'post_excerpt' => wp_kses_post( $text['caption'] ),
+				'post_content' => wp_kses_post( $text['description'] ),
+			),
+			'strlen'
+		);
+		if ( $post ) {
+			$post['ID'] = $attachment_id;
+			wp_update_post( wp_slash( $post ) );
+		}
+
+		$alt = sanitize_text_field( $text['alt'] );
+		if ( '' !== $alt ) {
+			update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
+		}
 	}
 
 	/** Import item_metadata (tag/person/location join rows). */
