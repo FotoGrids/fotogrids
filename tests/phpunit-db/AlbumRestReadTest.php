@@ -124,7 +124,7 @@ class AlbumRestReadTest extends WP_UnitTestCase {
 		$this->assertSame( 'album_not_found', $response->get_data()['code'] );
 	}
 
-	public function test_gallery_route_reports_no_album_id(): void {
+	public function test_gallery_route_carries_no_album_id(): void {
 		$gallery = $this->gallery();
 		$this->album( array( $gallery ) );
 		update_post_meta( $gallery, 'fotogrids_album_id', 123 );
@@ -132,7 +132,6 @@ class AlbumRestReadTest extends WP_UnitTestCase {
 		$response = $this->get( "/gallery/$gallery" );
 
 		$this->assertSame( 200, $response->get_status() );
-		$this->assertArrayHasKey( 'album_id', $response->get_data()['meta'] );
-		$this->assertNull( $response->get_data()['meta']['album_id'] );
+		$this->assertSame( array( 'layout', 'columns' ), array_keys( $response->get_data()['meta'] ) );
 	}
 }

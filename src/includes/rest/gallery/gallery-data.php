@@ -98,11 +98,7 @@ class Gallery_Data {
 	 * Supports preview mode for unpublished galleries. Automatically increments
 	 * view count unless in preview mode.
 	 *
-	 * `meta.album_id` is deprecated and always null; a gallery can belong to
-	 * several albums.
-	 *
 	 * @since 1.0.0
-	 * @since 1.3.0 `meta.album_id` is always null.
 	 * @param \WP_REST_Request $request The REST API request object containing gallery ID and preview flag
 	 * @return \WP_REST_Response|\WP_Error Gallery data or error response
 	 */
@@ -125,9 +121,8 @@ class Gallery_Data {
 		}
 
 		$meta = array(
-			'layout'   => get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid',
-			'columns'  => (int) get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3,
-			'album_id' => null,
+			'layout'  => get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid',
+			'columns' => (int) get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3,
 		);
 
 		$items = self::get_gallery_items( $gallery_id );

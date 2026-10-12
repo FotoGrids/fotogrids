@@ -7,8 +7,6 @@ export interface Gallery {
 	meta: {
 		layout: string;
 		columns: number;
-		/** @deprecated Always null. */
-		album_id: null;
 	};
 	items: GalleryItem[];
 	shortcode: string;
