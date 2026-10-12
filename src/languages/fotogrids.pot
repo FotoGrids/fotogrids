@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-11T22:21:22+00:00\n"
+"POT-Creation-Date: 2026-10-12T08:46:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -18,15 +18,14 @@ msgstr ""
 #. Author of the plugin
 #: fotogrids.php
 #: includes/catalog/catalog-strings.php:357
-#: includes/class-admin-init.php:108
-#: includes/class-admin-init.php:109
+#: includes/class-admin-init.php:100
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
-#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:93
+#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:224
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:129
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:166
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:120
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:119
 msgid "FotoGrids"
 msgstr ""
 
@@ -59,8 +58,8 @@ msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
 #: fotogrids.php:280
-#: includes/class-admin-init.php:174
-#: includes/class-admin-init.php:175
+#: includes/class-admin-init.php:166
+#: includes/class-admin-init.php:167
 #: includes/tools/import-export/assets/constants.js:42
 #: includes/tools/import-export/assets/constants.js:107
 msgid "Settings"
@@ -71,7 +70,7 @@ msgid "Get FotoGrids Pro"
 msgstr ""
 
 #: fotogrids.php:323
-#: assets/admin/src/components/dashboard/LearnSection.jsx:86
+#: assets/admin/src/components/dashboard/LearnSection.jsx:85
 msgid "Help Center"
 msgstr ""
 
@@ -90,15 +89,16 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:91
 #: includes/admin/class-dashboard-widget.php:187
-#: includes/metaboxes/class-collection-save-pipeline.php:162
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:46
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:63
+#: includes/metaboxes/class-collection-save-pipeline.php:165
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:47
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:64
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:71
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
 #: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:446
-#: assets/admin/src/components/pages/TemplatesPage.jsx:449
+#: assets/admin/src/components/pages/TemplatesPage.jsx:451
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:45
 #: includes/tools/import-export/assets/constants.js:103
 msgid "Album"
@@ -107,7 +107,7 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:92
 #: includes/admin/class-settings-localizer.php:275
 #: includes/catalog/catalog-strings.php:464
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:84
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:83
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:171
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:215
 msgid "Layout"
@@ -115,8 +115,8 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:93
 #: includes/admin/class-dashboard-widget.php:142
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:27
-#: assets/admin/src/components/library/LibraryTabBase.jsx:457
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:26
+#: assets/admin/src/components/library/LibraryTabBase.jsx:451
 #: assets/admin/src/components/pages/StatsPage.jsx:241
 #: includes/tools/import-export/assets/constants.js:21
 #: includes/tools/import-export/assets/constants.js:104
@@ -127,9 +127,9 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:215
 #: includes/catalog/catalog-strings.php:439
 #: includes/metaboxes/class-metabox-strings.php:261
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:39
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:38
 #: assets/admin/src/components/pages/StatsPage.jsx:254
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:110
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:109
 msgid "Interactions"
 msgstr ""
 
@@ -155,14 +155,14 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:214
 #: includes/admin/class-dashboard-widget.php:126
-#: includes/class-admin-init.php:129
-#: includes/class-admin-init.php:130
+#: includes/class-admin-init.php:121
+#: includes/class-admin-init.php:122
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:15
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:14
 #: assets/admin/src/components/pages/StatsPage.jsx:229
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:348
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:31
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:347
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
 #: includes/tools/import-export/assets/constants.js:6
 #: includes/tools/import-export/assets/constants.js:102
 #: includes/tools/migration/assets/MigrationTool.jsx:22
@@ -213,23 +213,23 @@ msgid "Unable to load news and updates."
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:91
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:116
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:115
 msgid "No news available at this time."
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:92
 #: includes/metaboxes/class-metabox-strings.php:149
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:53
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:52
 msgid "New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:134
-#: includes/class-admin-init.php:138
-#: includes/class-admin-init.php:139
+#: includes/class-admin-init.php:130
+#: includes/class-admin-init.php:131
 #: includes/diagnostics/class-system-report.php:161
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:21
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:20
 #: assets/admin/src/components/pages/StatsPage.jsx:235
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:32
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:31
 #: includes/tools/import-export/assets/constants.js:15
 #: includes/tools/import-export/assets/constants.js:103
 msgid "Albums"
@@ -240,8 +240,8 @@ msgid "Engagement"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:167
-#: includes/class-admin-init.php:120
-#: includes/class-admin-init.php:121
+#: includes/class-admin-init.php:112
+#: includes/class-admin-init.php:113
 msgid "Dashboard"
 msgstr ""
 
@@ -250,15 +250,16 @@ msgid "Create New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:184
-#: includes/metaboxes/class-collection-save-pipeline.php:163
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:47
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:64
+#: includes/metaboxes/class-collection-save-pipeline.php:166
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:69
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:86
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:107
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
 #: includes/rest/admin/admin-data.php:1487
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:447
-#: assets/admin/src/components/pages/TemplatesPage.jsx:448
+#: assets/admin/src/components/pages/TemplatesPage.jsx:450
 #: assets/admin/src/utils/gallery.js:18
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:46
 #: includes/tools/import-export/assets/constants.js:102
@@ -267,12 +268,12 @@ msgid "Gallery"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:209
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:144
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:143
 msgid "Recently Edited"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:231
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:124
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:123
 msgid "No recently edited galleries or albums."
 msgstr ""
 
@@ -316,12 +317,12 @@ msgstr ""
 #: includes/metaboxes/class-metabox-strings.php:90
 #: includes/modules/Templates/Module.php:333
 #: assets/admin/plain/render-settings/renderBulkModal.js:242
-#: assets/admin/src/components/library/LibraryTabBase.jsx:167
-#: assets/admin/src/components/library/LibraryTabBase.jsx:227
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1284
+#: assets/admin/src/components/library/LibraryTabBase.jsx:165
+#: assets/admin/src/components/library/LibraryTabBase.jsx:225
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1278
 #: assets/admin/src/components/library/MergeDialog.jsx:214
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:167
-#: assets/admin/src/components/shared/Modal/wrappers/Prompt.jsx:132
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:165
+#: assets/admin/src/components/shared/Modal/wrappers/Prompt.jsx:130
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:87
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:227
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:363
@@ -365,8 +366,8 @@ msgstr ""
 
 #: includes/admin/class-deactivation-feedback.php:197
 #: includes/exif/class-exif-formatter.php:274
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:310
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:329
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:309
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:328
 msgid "Other"
 msgstr ""
 
@@ -377,7 +378,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:276
 #: includes/catalog/catalog-strings.php:738
 #: includes/class-upgrade-modal.php:52
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:251
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:250
 msgid "Styling"
 msgstr ""
 
@@ -390,10 +391,10 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-strings.php:281
 #: assets/admin/plain/collection-settings.js:2311
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:100
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:306
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:423
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:34
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:99
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:305
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:422
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:33
 msgid "Advanced"
 msgstr ""
 
@@ -414,10 +415,10 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderSelect.js:61
 #: assets/admin/plain/render-settings/renderTextInput.js:18
 #: assets/admin/plain/render-settings/renderToggle.js:20
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:246
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:232
-#: assets/admin/src/components/pages/TemplatesPage.jsx:388
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:391
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:245
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:231
+#: assets/admin/src/components/pages/TemplatesPage.jsx:390
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:390
 msgid "Pro"
 msgstr ""
 
@@ -488,7 +489,7 @@ msgid "Action on Hover"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:36
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:131
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:130
 msgid "Active"
 msgstr ""
 
@@ -533,7 +534,7 @@ msgid "Adjustment Window"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:47
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:23
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:22
 msgid "Administrator"
 msgstr ""
 
@@ -629,7 +630,7 @@ msgid "Aperture"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:71
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:96
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:95
 msgid "Appearance"
 msgstr ""
 
@@ -687,7 +688,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:85
 #: includes/diagnostics/class-system-report.php:369
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:24
 msgid "Author"
 msgstr ""
 
@@ -763,7 +764,7 @@ msgid "Background Blur Intensity"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:103
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:299
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:298
 msgid "Background Color"
 msgstr ""
 
@@ -1013,7 +1014,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:164
 #: includes/metaboxes/class-metabox-strings.php:218
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:137
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:136
 msgid "Captions"
 msgstr ""
 
@@ -1022,7 +1023,7 @@ msgid "Carousel"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:166
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:127
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:126
 msgid "Center"
 msgstr ""
 
@@ -1035,7 +1036,7 @@ msgid "Change the vertical alignment of the caption inside the overlay."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:169
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:322
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:321
 msgid "Check out {title} - {url}"
 msgstr ""
 
@@ -1116,7 +1117,7 @@ msgid "Column-major"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:189
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:134
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:133
 msgid "Columns"
 msgstr ""
 
@@ -1149,7 +1150,7 @@ msgid "Contrast Amount"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:197
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:26
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
 msgid "Contributor"
 msgstr ""
 
@@ -1174,7 +1175,7 @@ msgid "Controls the title, description and image that appear when someone shares
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:203
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:23
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:22
 msgid "Copy Link"
 msgstr ""
 
@@ -1207,8 +1208,8 @@ msgid "Cursor Style"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:211
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:198
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:286
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:197
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:285
 msgid "Custom"
 msgstr ""
 
@@ -1257,14 +1258,14 @@ msgid "Custom Thumbnail Size"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:223
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:310
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:309
 msgid "Custom share text"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:224
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:472
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:350
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:282
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:471
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:349
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:281
 msgid "Dark"
 msgstr ""
 
@@ -1538,7 +1539,7 @@ msgid "Edit Permissions"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:290
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:24
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:23
 msgid "Editor"
 msgstr ""
 
@@ -1548,7 +1549,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:293
 #: public/render/decorators/sharing/class-sharing-decorator.php:64
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:22
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:21
 msgid "Email"
 msgstr ""
 
@@ -1672,7 +1673,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:323
 #: public/render/decorators/sharing/class-sharing-decorator.php:57
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:15
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:14
 msgid "Facebook"
 msgstr ""
 
@@ -1913,7 +1914,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:383
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:1390
-#: assets/admin/src/components/shared/settings/DimensionsField.jsx:29
+#: assets/admin/src/components/shared/settings/DimensionsField.jsx:28
 msgid "Height"
 msgstr ""
 
@@ -2228,8 +2229,8 @@ msgid "Keep Natural"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:462
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:298
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:331
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:297
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:330
 msgid "Large"
 msgstr ""
 
@@ -2276,15 +2277,15 @@ msgid "Letter Spacing"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:474
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:468
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:346
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:278
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:467
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:345
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:277
 msgid "Light"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:475
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:37
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:138
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:36
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:137
 msgid "Lightbox"
 msgstr ""
 
@@ -2350,7 +2351,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:491
 #: public/render/decorators/sharing/class-sharing-decorator.php:60
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:18
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:17
 msgid "LinkedIn"
 msgstr ""
 
@@ -2399,8 +2400,8 @@ msgid "Loop Gallery"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:502
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:106
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:267
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:105
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:266
 msgid "Maintenance"
 msgstr ""
 
@@ -2412,7 +2413,7 @@ msgid "Manual"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:504
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:406
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:405
 msgid "Margin"
 msgstr ""
 
@@ -2469,12 +2470,12 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:54
 #: includes/diagnostics/class-system-report.php:354
 #: includes/metaboxes/class-metabox-strings.php:374
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:52
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:51
 msgid "Media"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:518
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:294
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:293
 msgid "Medium"
 msgstr ""
 
@@ -2515,7 +2516,7 @@ msgid "Navigation Arrows"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:528
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:206
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:205
 msgid "Networks"
 msgstr ""
 
@@ -2539,7 +2540,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:532
 #: includes/diagnostics/class-system-report.php:624
 #: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:364
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:363
 msgid "No"
 msgstr ""
 
@@ -2583,7 +2584,7 @@ msgid "Only registered users"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:540
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:396
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:395
 msgid "Opacity"
 msgstr ""
 
@@ -2764,7 +2765,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:584
 #: public/render/decorators/sharing/class-sharing-decorator.php:59
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:17
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:16
 msgid "Pinterest"
 msgstr ""
 
@@ -2798,8 +2799,8 @@ msgid "Popover List"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:592
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:384
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:83
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:383
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:82
 msgid "Position"
 msgstr ""
 
@@ -2885,13 +2886,13 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:613
 #: public/render/decorators/sharing/class-sharing-decorator.php:63
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:21
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:20
 msgid "Reddit"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:614
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:132
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:327
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:131
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:326
 msgid "Regular"
 msgstr ""
 
@@ -2955,8 +2956,8 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:629
 #: includes/class-upgrade-modal.php:34
 #: includes/metaboxes/class-metabox-strings.php:280
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:88
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:162
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:87
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:161
 msgid "SEO"
 msgstr ""
 
@@ -3079,8 +3080,8 @@ msgid "Share block won't appear"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:658
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:76
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:183
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:75
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:182
 msgid "Sharing"
 msgstr ""
 
@@ -3262,8 +3263,8 @@ msgid "Slow"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:703
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:290
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:323
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:289
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:322
 msgid "Small"
 msgstr ""
 
@@ -3408,7 +3409,7 @@ msgid "Styling Settings"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:740
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:27
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:26
 msgid "Subscriber"
 msgstr ""
 
@@ -3432,7 +3433,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:744
 #: public/render/decorators/sharing/class-sharing-decorator.php:62
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:20
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:19
 msgid "Telegram"
 msgstr ""
 
@@ -3492,8 +3493,8 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:55
 #: includes/diagnostics/class-system-report.php:382
 #: includes/metaboxes/class-metabox-strings.php:384
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:458
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:462
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:457
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:461
 msgid "Theme"
 msgstr ""
 
@@ -3523,8 +3524,8 @@ msgid "Thumbnail Strip Location"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:765
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:42
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:456
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:41
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:455
 msgid "Thumbnails"
 msgstr ""
 
@@ -3702,12 +3703,12 @@ msgid "Videos will use the gallery lightbox"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:808
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:29
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:28
 msgid "View Page"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:809
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:70
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:69
 msgid "View Pages"
 msgstr ""
 
@@ -3749,7 +3750,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:819
 #: public/render/decorators/sharing/class-sharing-decorator.php:61
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:19
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:18
 msgid "WhatsApp"
 msgstr ""
 
@@ -3867,8 +3868,8 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:848
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:1389
-#: assets/admin/src/components/shared/settings/DimensionsField.jsx:28
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:251
+#: assets/admin/src/components/shared/settings/DimensionsField.jsx:27
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:250
 msgid "Width"
 msgstr ""
 
@@ -3897,7 +3898,7 @@ msgid "WordPress generates image sizes at upload time. After changing these sett
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:855
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:16
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:15
 msgid "X (Twitter)"
 msgstr ""
 
@@ -3908,7 +3909,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:857
 #: includes/diagnostics/class-system-report.php:624
 #: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:363
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:362
 msgid "Yes"
 msgstr ""
 
@@ -3953,12 +3954,12 @@ msgstr ""
 msgid "{postType} Password"
 msgstr ""
 
-#: includes/class-admin-init.php:99
+#: includes/class-admin-init.php:91
 msgid "Sorry, you are not allowed to access this page."
 msgstr ""
 
-#: includes/class-admin-init.php:147
-#: includes/class-admin-init.php:148
+#: includes/class-admin-init.php:139
+#: includes/class-admin-init.php:140
 #: includes/class-upgrade-modal.php:97
 #: includes/modules/Templates/Module.php:43
 #: includes/modules/Templates/Module.php:118
@@ -3967,35 +3968,35 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: includes/class-admin-init.php:156
-#: includes/class-admin-init.php:157
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
+#: includes/class-admin-init.php:148
+#: includes/class-admin-init.php:149
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:32
 msgid "Library"
 msgstr ""
 
-#: includes/class-admin-init.php:165
-#: includes/class-admin-init.php:166
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
+#: includes/class-admin-init.php:157
+#: includes/class-admin-init.php:158
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
 #: includes/tools/import-export/assets/constants.js:50
 msgid "Statistics"
 msgstr ""
 
-#: includes/class-admin-init.php:183
-#: includes/class-admin-init.php:184
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:35
+#: includes/class-admin-init.php:175
+#: includes/class-admin-init.php:176
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
 msgid "Tools"
 msgstr ""
 
-#: includes/class-admin-init.php:193
-#: includes/class-admin-init.php:194
+#: includes/class-admin-init.php:185
+#: includes/class-admin-init.php:186
 #: includes/metaboxes/class-metabox-strings.php:290
 #: includes/modules/Templates/Module.php:322
 #: assets/admin/plain/collection-settings.js:2546
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:642
-#: includes/metaboxes/class-collection-save-pipeline.php:97
+#: includes/class-admin-init.php:609
+#: includes/metaboxes/class-collection-save-pipeline.php:98
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
 #: includes/rest/admin/admin-data.php:255
@@ -4004,37 +4005,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:669
+#: includes/class-admin-init.php:635
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:679
+#: includes/class-admin-init.php:643
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:689
-#: includes/class-admin-init.php:747
+#: includes/class-admin-init.php:652
+#: includes/class-admin-init.php:699
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:752
+#: includes/class-admin-init.php:704
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:1014
+#: includes/class-admin-init.php:956
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:1015
+#: includes/class-admin-init.php:957
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1152
+#: includes/class-admin-init.php:1085
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1158
+#: includes/class-admin-init.php:1091
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4042,8 +4043,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1171
-#: includes/class-admin-init.php:1185
+#: includes/class-admin-init.php:1104
+#: includes/class-admin-init.php:1118
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4051,7 +4052,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1204
+#: includes/class-admin-init.php:1137
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4059,32 +4060,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1216
-#: includes/class-admin-init.php:1230
+#: includes/class-admin-init.php:1149
+#: includes/class-admin-init.php:1163
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1248
-#: includes/class-admin-init.php:1431
+#: includes/class-admin-init.php:1181
+#: includes/class-admin-init.php:1360
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1251
+#: includes/class-admin-init.php:1184
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1254
+#: includes/class-admin-init.php:1187
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1291
+#: includes/class-admin-init.php:1224
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1294
+#: includes/class-admin-init.php:1227
 msgid "Choose an album..."
 msgstr ""
 
@@ -4220,8 +4221,8 @@ msgid "Add New Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:122
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:34
-#: assets/admin/src/components/dashboard/MainCTA.jsx:55
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:33
+#: assets/admin/src/components/dashboard/MainCTA.jsx:54
 msgid "New Gallery"
 msgstr ""
 
@@ -4334,7 +4335,7 @@ msgid "Add New Album"
 msgstr ""
 
 #: includes/class-post-types.php:191
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:44
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:43
 msgid "New Album"
 msgstr ""
 
@@ -4436,7 +4437,7 @@ msgstr ""
 #: includes/class-post-types.php:384
 #: includes/metaboxes/class-metabox-registrar.php:274
 #: assets/admin/plain/render-settings/renderImagePicker.js:102
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:280
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:279
 msgid "Replace image"
 msgstr ""
 
@@ -4449,17 +4450,17 @@ msgstr ""
 #: includes/metaboxes/class-metabox-strings.php:198
 #: assets/admin/plain/render-settings/renderImagePicker.js:169
 #: assets/admin/plain/render-settings/renderTokenSelect.js:427
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:290
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:289
 msgid "Remove"
 msgstr ""
 
 #: includes/class-post-types.php:459
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:269
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:268
 msgid "gallery"
 msgstr ""
 
 #: includes/class-post-types.php:462
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:294
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:293
 msgid "album"
 msgstr ""
 
@@ -4621,13 +4622,13 @@ msgstr ""
 
 #: includes/class-upgrade-modal.php:147
 #: assets/admin/plain/render-settings/renderPromo.js:98
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:73
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:420
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:72
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:419
 msgid "Upgrade Now"
 msgstr ""
 
 #: includes/class-upgrade-modal.php:148
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:81
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:80
 msgid "Free vs. Pro"
 msgstr ""
 
@@ -4869,8 +4870,8 @@ msgid "FotoGrids custom sizes"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:367
-#: assets/admin/src/components/library/LibraryTabBase.jsx:431
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1196
+#: assets/admin/src/components/library/LibraryTabBase.jsx:425
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1190
 #: assets/admin/src/components/pages/StatsPage.jsx:148
 #: assets/admin/src/components/pages/StatsPage.jsx:176
 msgid "Name"
@@ -4972,12 +4973,12 @@ msgid "Copyright"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:194
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1218
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1212
 msgid "Latitude"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:201
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1238
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1232
 msgid "Longitude"
 msgstr ""
 
@@ -5139,29 +5140,29 @@ msgstr ""
 msgid "Use %s instead."
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:93
+#: includes/metaboxes/class-collection-save-pipeline.php:94
 msgid "Security check failed"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:102
+#: includes/metaboxes/class-collection-save-pipeline.php:103
 msgid "Invalid post ID"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:107
+#: includes/metaboxes/class-collection-save-pipeline.php:108
 msgid "Invalid collection"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:111
+#: includes/metaboxes/class-collection-save-pipeline.php:112
 #: includes/metaboxes/class-item-ajax-endpoints.php:481
 msgid "Cannot edit this gallery"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:143
+#: includes/metaboxes/class-collection-save-pipeline.php:144
 msgid "Failed to update gallery"
 msgstr ""
 
 #. translators: %s: collection type (Gallery or Album).
-#: includes/metaboxes/class-collection-save-pipeline.php:168
+#: includes/metaboxes/class-collection-save-pipeline.php:171
 #, php-format
 msgid "%s saved successfully"
 msgstr ""
@@ -5210,7 +5211,7 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:272
 #: assets/admin/plain/render-settings/renderImagePicker.js:81
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:107
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:106
 msgid "Use this image"
 msgstr ""
 
@@ -5603,7 +5604,7 @@ msgid "Upload & Add"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:157
-#: assets/admin/src/components/blocks/UploadArea.jsx:126
+#: assets/admin/src/components/blocks/UploadArea.jsx:125
 msgid "Uploading…"
 msgstr ""
 
@@ -5896,8 +5897,8 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:286
 #: public/render/lightbox/classic/class-lightbox.php:219
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:152
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:346
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:151
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:345
 msgid "Dimensions"
 msgstr ""
 
@@ -6081,8 +6082,8 @@ msgid "with map integration"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:355
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:108
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:236
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:107
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:235
 msgid "AI Facial Recognition"
 msgstr ""
 
@@ -6145,7 +6146,7 @@ msgid "Open in new tab"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:387
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:383
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:382
 msgid "Regenerate thumbnails"
 msgstr ""
 
@@ -6190,22 +6191,115 @@ msgstr ""
 msgid "Gallery and album editing metaboxes in the post editor."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:47
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:117
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:143
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:156
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:195
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:208
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:352
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:369
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:159
+msgid "Off"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:118
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:142
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:155
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:194
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:207
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:351
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:368
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:159
+msgid "On"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:122
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:174
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:129
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:181
+#: includes/rest/templates/templates-data.php:607
+#: assets/admin/src/components/pages/TemplatesPage.jsx:89
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:168
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:33
+msgid "Preview"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:129
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:246
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:139
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:191
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:35
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:68
+msgid "Make items clickable"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:137
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:255
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:152
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:204
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:44
+#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:77
+msgid "Enable pagination controls"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/class-module-base.php:138
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:256
+msgid "When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:48
 msgid "Display a FotoGrids album."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:70
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:77
-msgid "Album ID"
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:123
+msgid "Choose an album in the module settings."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:48
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:133
+msgid "When disabled, item clicks open the module settings in the builder instead of opening the album action. Published pages are not affected."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:70
 msgid "Display a FotoGrids gallery."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:71
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:79
-msgid "Gallery ID"
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:93
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
+#: includes/tools/migration/assets/MigrationTool.jsx:105
+#: includes/tools/system-info/assets/SystemInfoTool.jsx:278
+msgid "Source"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:96
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:99
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:118
+msgid "Gallery Picker"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:97
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:198
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:119
+msgid "Dynamic"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:113
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:109
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:143
+msgid "Dynamic Gallery ID"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:114
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:119
+#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:147
+msgid "Bind a dynamic source that outputs a gallery ID."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:175
+msgid "Choose a gallery in the module settings."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:185
+msgid "When disabled, item clicks open the module settings in the builder instead of opening the gallery action. Published pages are not affected."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
@@ -6217,6 +6311,10 @@ msgstr ""
 msgid "FotoGrids Album"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:77
+msgid "Album ID"
+msgstr ""
+
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:87
 msgid "Choose an album in the element settings."
 msgstr ""
@@ -6225,47 +6323,6 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:99
 #, php-format
 msgid "FotoGrids album #%d"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:174
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:129
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:181
-#: includes/rest/templates/templates-data.php:607
-#: assets/admin/src/components/pages/TemplatesPage.jsx:89
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:169
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:33
-msgid "Preview"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:195
-#: includes/tools/migration/assets/MigrationTool.jsx:105
-#: includes/tools/system-info/assets/SystemInfoTool.jsx:278
-msgid "Source"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:198
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:119
-msgid "Dynamic"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:246
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:139
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:191
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:35
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:68
-msgid "Make items clickable"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:255
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:152
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:204
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:44
-#: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsToolbar.jsx:77
-msgid "Enable pagination controls"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:256
-msgid "When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-base.php:269
@@ -6285,19 +6342,8 @@ msgstr ""
 msgid "FotoGrids Gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:99
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:118
-msgid "Gallery Picker"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:109
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:143
-msgid "Dynamic Gallery ID"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:119
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:147
-msgid "Bind a dynamic source that outputs a gallery ID."
+#: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:79
+msgid "Gallery ID"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:129
@@ -6344,6 +6390,7 @@ msgid "Browse all"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:102
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:272
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:261
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:200
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:110
@@ -6351,6 +6398,7 @@ msgid "Edit album"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:103
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:273
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:262
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:244
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:111
@@ -6358,6 +6406,7 @@ msgid "Edit gallery"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:117
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:177
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:173
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:99
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:372
@@ -6366,26 +6415,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:140
 msgid "When disabled, item clicks select the widget in the editor instead of opening the album action. Published pages are not affected."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:142
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:155
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:194
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:207
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:352
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:369
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
-msgid "On"
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:143
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:156
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:195
-#: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:208
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:353
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:370
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:160
-msgid "Off"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:153
@@ -6405,6 +6434,7 @@ msgid "Gallery source"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:164
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:178
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:174
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:100
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:373
@@ -6442,8 +6472,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:323
-#: includes/rest/gallery/gallery-data.php:592
+#: includes/rest/gallery/gallery-data.php:327
+#: includes/rest/gallery/gallery-data.php:596
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
@@ -6514,12 +6544,12 @@ msgid "With a {pro_badge} license, you will be able to save the current album se
 msgstr ""
 
 #: includes/modules/Templates/Module.php:321
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:226
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:225
 msgid "Dismiss"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:323
-#: assets/admin/src/components/pages/TemplatesPage.jsx:561
+#: assets/admin/src/components/pages/TemplatesPage.jsx:563
 msgid "Loading templates"
 msgstr ""
 
@@ -6553,7 +6583,7 @@ msgid "Description (optional)"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:331
-#: assets/admin/src/components/library/LibraryTabBase.jsx:160
+#: assets/admin/src/components/library/LibraryTabBase.jsx:158
 msgid "Save"
 msgstr ""
 
@@ -6570,7 +6600,7 @@ msgid "User Templates"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:337
-#: assets/admin/src/components/pages/TemplatesPage.jsx:508
+#: assets/admin/src/components/pages/TemplatesPage.jsx:510
 msgid "FotoGrids Templates"
 msgstr ""
 
@@ -6583,7 +6613,7 @@ msgid "Template name is required."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:340
-#: assets/admin/src/components/pages/TemplatesPage.jsx:228
+#: assets/admin/src/components/pages/TemplatesPage.jsx:230
 msgid "Failed to load templates."
 msgstr ""
 
@@ -6622,6 +6652,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
 #: includes/modules/ViewCollections/class-renderer.php:742
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:153
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:63
@@ -6638,6 +6669,7 @@ msgstr[1] ""
 #: includes/modules/ViewCollections/class-renderer.php:744
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:158
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:154
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:150
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:148
@@ -6965,20 +6997,24 @@ msgstr ""
 msgid "Gallery is not part of this album."
 msgstr ""
 
-#: includes/rest/album/album-data.php:109
-msgid "Album not found"
-msgstr ""
-
-#: includes/rest/album/album-data.php:117
-msgid "Album is not published"
-msgstr ""
-
-#: includes/rest/album/album-permissions.php:61
+#: includes/rest/album/album-permissions.php:65
 msgid "Invalid album ID."
 msgstr ""
 
-#: includes/rest/album/album-permissions.php:68
+#: includes/rest/album/album-permissions.php:72
 msgid "You do not have permission to edit this album."
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:94
+msgid "Album not found"
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:102
+msgid "Album is not published"
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:111
+msgid "You do not have access to this album."
 msgstr ""
 
 #: includes/rest/gallery/gallery-data.php:60
@@ -6993,26 +7029,26 @@ msgstr ""
 msgid "The featured item could not be saved."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:113
-#: includes/rest/gallery/gallery-data.php:165
-#: includes/rest/gallery/gallery-data.php:200
+#: includes/rest/gallery/gallery-data.php:117
+#: includes/rest/gallery/gallery-data.php:169
+#: includes/rest/gallery/gallery-data.php:204
 msgid "Gallery not found"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:210
+#: includes/rest/gallery/gallery-data.php:214
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:221
+#: includes/rest/gallery/gallery-data.php:225
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:314
+#: includes/rest/gallery/gallery-data.php:318
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:331
+#: includes/rest/gallery/gallery-data.php:335
 #: includes/rest/gallery/gallery-permissions.php:76
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
@@ -7351,7 +7387,7 @@ msgid "and %s more"
 msgstr ""
 
 #: includes/rest/metadata/library-data.php:51
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:64
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:63
 #: includes/tools/import-export/assets/constants.js:105
 msgid "Tag"
 msgstr ""
@@ -7654,8 +7690,8 @@ msgstr ""
 msgid "Galleries stored as FooGallery posts, with album support."
 msgstr ""
 
-#: includes/tools/migration/sources/class-gallery-writer.php:33
-#: includes/tools/migration/sources/class-wp-core-source.php:347
+#: includes/tools/migration/sources/class-gallery-writer.php:43
+#: includes/tools/migration/sources/class-wp-core-source.php:355
 msgid "Imported gallery"
 msgstr ""
 
@@ -7766,7 +7802,7 @@ msgid "(no title)"
 msgstr ""
 
 #. translators: 1: source post title, 2: gallery number within the post
-#: includes/tools/migration/sources/class-wp-core-source.php:355
+#: includes/tools/migration/sources/class-wp-core-source.php:363
 #, php-format
 msgid "%1$s (gallery %2$d)"
 msgstr ""
@@ -7964,7 +8000,7 @@ msgstr ""
 
 #: public/render/decorators/image-zoom/class-image-zoom.php:52
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:126
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:266
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:265
 msgid "Image"
 msgstr ""
 
@@ -7994,8 +8030,8 @@ msgstr ""
 
 #: public/render/features/collection-header/class-collection-header.php:410
 #: public/render/lightbox/grid/class-lightbox-grid.php:61
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:216
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:217
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:215
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:216
 msgid "Back"
 msgstr ""
 
@@ -8178,7 +8214,7 @@ msgstr ""
 #. translators: 1: item position, 2: total number of items.
 #. translators: 1: current page, 2: total pages.
 #: public/render/lightbox/grid/class-lightbox-grid.php:69
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1141
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1135
 #, php-format,js-format
 msgid "%1$d of %2$d"
 msgstr ""
@@ -8266,14 +8302,14 @@ msgid "Configure Gallery defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2233
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:64
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:339
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:221
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:63
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:338
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:220
 msgid "Defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2258
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:83
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:82
 msgid "Setup mode"
 msgstr ""
 
@@ -8286,12 +8322,12 @@ msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2310
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:19
 msgid "Easy"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2337
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:166
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:165
 msgid "Autosave"
 msgstr ""
 
@@ -8305,8 +8341,8 @@ msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2570
 #: assets/admin/plain/render-settings/renderPromo.js:81
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:272
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:261
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:271
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:260
 msgid "Learn more"
 msgstr ""
 
@@ -8443,7 +8479,7 @@ msgid "Apply URL to All"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:496
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:170
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:169
 msgid "Saving…"
 msgstr ""
 
@@ -8464,12 +8500,12 @@ msgid "No fonts found for this search."
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderFontFamily.js:470
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:121
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:120
 msgid "System"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderFontFamily.js:478
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:245
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:244
 msgid "Google Fonts"
 msgstr ""
 
@@ -8505,7 +8541,7 @@ msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:77
 #: assets/admin/plain/render-settings/renderImagePicker.js:103
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:281
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:280
 msgid "Choose image"
 msgstr ""
 
@@ -8535,34 +8571,34 @@ msgid "Could not retrieve the saved password. Please try again."
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderPromo.js:44
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:17
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:16
 #: assets/admin/src/components/pages/TemplatesPage.jsx:55
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:400
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:75
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:399
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:74
 #: assets/admin/src/components/TemplatesMetabox.jsx:80
 msgid "PRO"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:269
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:725
-#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:20
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:185
+#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:19
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:184
 msgid "Desktop"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:274
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:730
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:150
-#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:25
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:190
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:149
+#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:24
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:189
 msgid "Tablet"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:279
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:735
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:131
-#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:30
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:195
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:130
+#: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:29
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:194
 msgid "Mobile"
 msgstr ""
 
@@ -8587,7 +8623,7 @@ msgid "Link values"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderSelect.js:287
-#: assets/admin/src/components/library/LibraryTabBase.jsx:287
+#: assets/admin/src/components/library/LibraryTabBase.jsx:284
 msgid "Search…"
 msgstr ""
 
@@ -8626,7 +8662,7 @@ msgstr ""
 #. translators: %1$d: number of items processed; %2$d: total number of items.
 #. translators: 1: done count, 2: total count.
 #: assets/admin/plain/render-settings/renderWatermarkStatus.js:208
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:152
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:151
 #, js-format
 msgid "Regenerating… %1$d of %2$d"
 msgstr ""
@@ -8636,7 +8672,7 @@ msgid "The site watermark is on for this gallery, but these images don’t have 
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderWatermarkStatus.js:236
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:172
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:171
 msgid "Regenerating…"
 msgstr ""
 
@@ -8644,67 +8680,67 @@ msgstr ""
 msgid "Regenerate this gallery"
 msgstr ""
 
-#: assets/admin/src/components/blocks/FileUpload.jsx:25
+#: assets/admin/src/components/blocks/FileUpload.jsx:24
 #: includes/tools/import-export/assets/import/ImportPanel.jsx:148
 msgid "Select file to import"
 msgstr ""
 
-#: assets/admin/src/components/blocks/FileUpload.jsx:26
+#: assets/admin/src/components/blocks/FileUpload.jsx:25
 msgid "or drag and drop your file here"
 msgstr ""
 
-#: assets/admin/src/components/blocks/FileUpload.jsx:60
+#: assets/admin/src/components/blocks/FileUpload.jsx:59
 msgid "Could not read the file. Please try again."
 msgstr ""
 
-#: assets/admin/src/components/blocks/MediaUpload.jsx:99
+#: assets/admin/src/components/blocks/MediaUpload.jsx:98
 msgid "Select files to upload"
 msgstr ""
 
-#: assets/admin/src/components/blocks/MediaUpload.jsx:100
+#: assets/admin/src/components/blocks/MediaUpload.jsx:99
 msgid "or drag and drop files here"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:37
+#: assets/admin/src/components/dashboard/Checklist.jsx:36
 msgid "Plugin installed and activated"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:41
+#: assets/admin/src/components/dashboard/Checklist.jsx:40
 msgid "Dashboard page visited"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:45
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:161
+#: assets/admin/src/components/dashboard/Checklist.jsx:44
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:160
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:103
 msgid "Create your first gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:50
+#: assets/admin/src/components/dashboard/Checklist.jsx:49
 msgid "Configure display settings"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:55
+#: assets/admin/src/components/dashboard/Checklist.jsx:54
 msgid "Publish gallery on your site"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:97
+#: assets/admin/src/components/dashboard/Checklist.jsx:96
 msgid "Complete Your Setup"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:17
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1291
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:16
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1285
 msgid "Create"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:19
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:18
 msgid "Create a new gallery, browse pre-defined templates and adjust settings to your own likes and needs."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:54
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:53
 msgid "Browse Templates"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:64
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:63
 msgid "Finetune Settings"
 msgstr ""
 
@@ -8717,7 +8753,7 @@ msgid "Create Gallery"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/FileUploader.jsx:60
-#: assets/admin/src/components/pages/Dashboard.jsx:75
+#: assets/admin/src/components/pages/Dashboard.jsx:74
 msgid "Failed to create gallery."
 msgstr ""
 
@@ -8733,56 +8769,56 @@ msgstr ""
 msgid "or <link>choose existing files</link> from media library"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/LearnSection.jsx:18
+#: assets/admin/src/components/dashboard/LearnSection.jsx:17
 msgid "Learn & Get Inspired"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/LearnSection.jsx:37
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:122
+#: assets/admin/src/components/dashboard/LearnSection.jsx:36
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:121
 msgid "Getting Started"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/LearnSection.jsx:55
+#: assets/admin/src/components/dashboard/LearnSection.jsx:54
 msgid "Explore Integrations"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/LearnSection.jsx:73
+#: assets/admin/src/components/dashboard/LearnSection.jsx:72
 msgid "Productivity Hacks"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:15
+#: assets/admin/src/components/dashboard/MainCTA.jsx:14
 msgid "Create Your"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:16
+#: assets/admin/src/components/dashboard/MainCTA.jsx:15
 msgid "First Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:19
+#: assets/admin/src/components/dashboard/MainCTA.jsx:18
 msgid "Build the first beautiful photo gallery in minutes."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:28
+#: assets/admin/src/components/dashboard/MainCTA.jsx:27
 msgid "Get Started"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:38
+#: assets/admin/src/components/dashboard/MainCTA.jsx:37
 msgid "Grow Your Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:41
+#: assets/admin/src/components/dashboard/MainCTA.jsx:40
 msgid "Add photos to your galleries to bring them to life."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:45
+#: assets/admin/src/components/dashboard/MainCTA.jsx:44
 msgid "Create more galleries or explore advanced features to showcase your photos."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:62
+#: assets/admin/src/components/dashboard/MainCTA.jsx:61
 msgid "Add Photos"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:33
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:32
 #: assets/admin/src/components/pages/StatsPage.jsx:160
 #: assets/admin/src/components/pages/StatsPage.jsx:188
 #: assets/admin/src/components/pages/StatsPage.jsx:247
@@ -8790,224 +8826,224 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:47
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:228
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:46
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:227
 msgid "Overview"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:19
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:18
 msgid "Unlock PRO Features"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:24
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:23
 msgid "Advanced Layouts"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:28
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:27
 msgid "SEO Optimization"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:32
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:31
 msgid "E-Commerce"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:36
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:35
 msgid "Custom Styling"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:40
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:39
 msgid "Priority Support"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:44
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:43
 msgid "Advanced Analytics"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:48
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:47
 msgid "Powerful Integrations"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:52
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:51
 msgid "Bulk Operations"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:62
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:61
 msgid "Plus many more powerful features designed to save time, optimize performance, and help you grow."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:15
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:14
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:110
 msgid "Draft"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:16
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:15
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:112
 msgid "Private"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:114
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:113
 msgid "Loading recently edited galleries and albums"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:155
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:154
 msgid "View all galleries"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:165
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:164
 msgid "View all albums"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:28
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:27
 msgid "Location map"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:96
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:95
 msgid "Smart Location Suggestions"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:99
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:98
 msgid "Automatically suggest locations from EXIF GPS data and map galleries geographically."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:143
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:142
 msgid "No coordinates for this location."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:155
+#: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:154
 msgid "Add coordinates in Library →"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:54
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:53
 msgid "Unknown person"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:73
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:72
 msgid "Add new…"
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:111
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:110
 msgid "Automatically detect and tag people in your images - no manual tagging needed."
 msgstr ""
 
-#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:138
+#: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:137
 msgid "AI detected faces"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:137
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:136
 msgid "Total Locations"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:142
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:141
 msgid "With Coordinates"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:144
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:143
 msgid "geo-mapped"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:149
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:134
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:198
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:122
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:148
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:133
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:197
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:121
 msgid "Unused"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:151
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:150
 msgid "no tagged items"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:157
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:156
 msgid "Top Locations by Usage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:170
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:169
 msgid "Geo Coverage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:180
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:179
 msgid "World map showing location dots"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:234
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:233
 msgid "No coordinates stored yet"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:250
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:249
 msgid "Interactive Map View"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:252
+#: assets/admin/src/components/library/LibraryLocationsHeader.jsx:251
 msgid "With smart EXIF locations"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:133
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:132
 msgid "Occasional"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:187
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:186
 msgid "Total People"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:192
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:191
 msgid "In Galleries"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:194
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:193
 msgid "have tagged items"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:200
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:191
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:199
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:190
 msgid "in visible list"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:206
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:205
 msgid "Most-tagged People"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:219
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:218
 msgid "Tag Frequency"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:238
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:237
 msgid "Auto-detect people in images"
 msgstr ""
 
 #. translators: %s: entry name.
 #. translators: %s: gallery title
-#: assets/admin/src/components/library/LibraryTabBase.jsx:54
+#: assets/admin/src/components/library/LibraryTabBase.jsx:52
 #: includes/tools/migration/assets/MigrationTool.jsx:117
 #, js-format
 msgid "Select %s"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:89
+#: assets/admin/src/components/library/LibraryTabBase.jsx:87
 msgid "Click to rename"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:110
+#: assets/admin/src/components/library/LibraryTabBase.jsx:108
 msgid "Lat"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:125
+#: assets/admin/src/components/library/LibraryTabBase.jsx:123
 msgid "Lng"
 msgstr ""
 
 #. translators: %s: entry name.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:178
+#: assets/admin/src/components/library/LibraryTabBase.jsx:176
 #, js-format
 msgid "Delete %s"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:182
-#: assets/admin/src/components/library/LibraryTabBase.jsx:220
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1176
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:29
+#: assets/admin/src/components/library/LibraryTabBase.jsx:180
+#: assets/admin/src/components/library/LibraryTabBase.jsx:218
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1170
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:27
 msgid "Delete"
 msgstr ""
 
 #. translators: 1: entry name, 2: number of items using it.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:196
+#: assets/admin/src/components/library/LibraryTabBase.jsx:194
 #, js-format
 msgid "Delete \"%1$s\"? This will remove it from %2$d item."
 msgid_plural "Delete \"%1$s\"? This will remove it from %2$d items."
@@ -9015,141 +9051,141 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: entry name.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:207
+#: assets/admin/src/components/library/LibraryTabBase.jsx:205
 #, js-format
 msgid "Delete \"%s\"? It is not used by any items."
 msgstr ""
 
 #. translators: %s: plural entry type, e.g. "tags".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:284
+#: assets/admin/src/components/library/LibraryTabBase.jsx:281
 #, js-format
 msgid "Search %s…"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:297
+#: assets/admin/src/components/library/LibraryTabBase.jsx:294
 msgid "Unused only"
 msgstr ""
 
 #. translators: %s: singular entry type, e.g. "tag".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:313
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1188
+#: assets/admin/src/components/library/LibraryTabBase.jsx:310
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1182
 #, js-format
 msgid "Add %s"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:315
-#: assets/admin/src/components/library/LibraryTabBase.jsx:695
-#: assets/admin/src/components/library/LibraryTabBase.jsx:710
-#: assets/admin/src/components/library/LibraryTabBase.jsx:742
-#: assets/admin/src/components/library/LibraryTabBase.jsx:818
-#: assets/admin/src/components/library/LibraryTabBase.jsx:874
-#: assets/admin/src/components/library/LibraryTabBase.jsx:924
-#: assets/admin/src/components/library/LibraryTabBase.jsx:982
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1190
+#: assets/admin/src/components/library/LibraryTabBase.jsx:312
+#: assets/admin/src/components/library/LibraryTabBase.jsx:689
+#: assets/admin/src/components/library/LibraryTabBase.jsx:704
+#: assets/admin/src/components/library/LibraryTabBase.jsx:736
+#: assets/admin/src/components/library/LibraryTabBase.jsx:812
+#: assets/admin/src/components/library/LibraryTabBase.jsx:868
+#: assets/admin/src/components/library/LibraryTabBase.jsx:918
+#: assets/admin/src/components/library/LibraryTabBase.jsx:976
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1184
 msgid "entry"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:327
+#: assets/admin/src/components/library/LibraryTabBase.jsx:324
 msgid "Recalculate counts"
 msgstr ""
 
 #. translators: %d: number of selected entries.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:346
+#: assets/admin/src/components/library/LibraryTabBase.jsx:342
 #, js-format
 msgid "%d selected"
 msgid_plural "%d selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:361
+#: assets/admin/src/components/library/LibraryTabBase.jsx:357
 msgid "Delete selected"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:369
+#: assets/admin/src/components/library/LibraryTabBase.jsx:365
 msgid "Merge…"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:416
+#: assets/admin/src/components/library/LibraryTabBase.jsx:410
 msgid "Select all on this page"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:444
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:345
+#: assets/admin/src/components/library/LibraryTabBase.jsx:438
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:344
 msgid "Slug"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:466
+#: assets/admin/src/components/library/LibraryTabBase.jsx:460
 msgid "Latitude / Longitude"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:473
+#: assets/admin/src/components/library/LibraryTabBase.jsx:467
 msgid "Actions"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:554
+#: assets/admin/src/components/library/LibraryTabBase.jsx:548
 msgid "Failed to load entries."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:692
+#: assets/admin/src/components/library/LibraryTabBase.jsx:686
 #, js-format
 msgid "Saved the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: %s: entity type singular (e.g. "tag")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:707
+#: assets/admin/src/components/library/LibraryTabBase.jsx:701
 #, js-format
 msgid "Could not save %s."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:757
+#: assets/admin/src/components/library/LibraryTabBase.jsx:751
 #, js-format
 msgid "Deleted the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:769
+#: assets/admin/src/components/library/LibraryTabBase.jsx:763
 #, js-format
 msgid "Could not delete the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:809
+#: assets/admin/src/components/library/LibraryTabBase.jsx:803
 #, js-format
 msgid "Deleted %1$d %2$s."
 msgid_plural "Deleted %1$d %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:820
-#: assets/admin/src/components/library/LibraryTabBase.jsx:837
-#: assets/admin/src/components/library/LibraryTabBase.jsx:925
-#: assets/admin/src/components/library/LibraryTabBase.jsx:984
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1001
+#: assets/admin/src/components/library/LibraryTabBase.jsx:814
+#: assets/admin/src/components/library/LibraryTabBase.jsx:831
+#: assets/admin/src/components/library/LibraryTabBase.jsx:919
+#: assets/admin/src/components/library/LibraryTabBase.jsx:978
+#: assets/admin/src/components/library/LibraryTabBase.jsx:995
 msgid "entries"
 msgstr ""
 
 #. translators: %s: entity type plural (e.g. "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:831
+#: assets/admin/src/components/library/LibraryTabBase.jsx:825
 #, js-format
 msgid "Could not delete the selected %s."
 msgstr ""
 
 #. translators: 1: entity type singular (e.g. "tag"), 2: entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:889
+#: assets/admin/src/components/library/LibraryTabBase.jsx:883
 #, js-format
 msgid "Created the %1$s \"%2$s\"."
 msgstr ""
 
 #. translators: %s: entity type singular (e.g. "tag")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:901
+#: assets/admin/src/components/library/LibraryTabBase.jsx:895
 #, js-format
 msgid "Could not create %s."
 msgstr ""
 
 #. translators: 1: number of merged entries, 2: entity type (singular or plural), 3: target entry name
-#: assets/admin/src/components/library/LibraryTabBase.jsx:932
+#: assets/admin/src/components/library/LibraryTabBase.jsx:926
 #, js-format
 msgid "Merged %1$d %2$s into \"%3$s\"."
 msgid_plural "Merged %1$d %2$s into \"%3$s\"."
@@ -9157,7 +9193,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of merged entries, 2: entity type (singular or plural)
-#: assets/admin/src/components/library/LibraryTabBase.jsx:944
+#: assets/admin/src/components/library/LibraryTabBase.jsx:938
 #, js-format
 msgid "Merged %1$d %2$s."
 msgid_plural "Merged %1$d %2$s."
@@ -9165,7 +9201,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:973
+#: assets/admin/src/components/library/LibraryTabBase.jsx:967
 #, js-format
 msgid "Recalculated counts for %1$d %2$s."
 msgid_plural "Recalculated counts for %1$d %2$s."
@@ -9173,84 +9209,84 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: entity type plural (e.g. "tags")
-#: assets/admin/src/components/library/LibraryTabBase.jsx:995
+#: assets/admin/src/components/library/LibraryTabBase.jsx:989
 #, js-format
 msgid "Could not recalculate counts for %s."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1075
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1069
 msgid "No unused entries."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1077
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1071
 msgid "No entries match your search."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1081
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1075
 msgid "No entries yet."
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1088
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1082
 msgid "Entries are usually created from the Item Edit modal inside a gallery. You can also add one directly using the button above."
 msgstr ""
 
 #. translators: %d: number of entries.
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1126
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1120
 #, js-format
 msgid "%d entry"
 msgid_plural "%d entries"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1164
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1158
 msgid "Delete selected entries?"
 msgstr ""
 
 #. translators: 1: number of entries, 2: plural entry type, e.g. "tags".
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1167
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1161
 #, js-format
 msgid "You are about to delete %1$d entry. Linked items will lose this %2$s."
 msgid_plural "You are about to delete %1$d entries. Linked items will lose these %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:1261
+#: assets/admin/src/components/library/LibraryTabBase.jsx:1255
 msgid "Details (optional)"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:119
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:118
 msgid "High"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:120
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:119
 msgid "Mid"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:121
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:120
 msgid "Low"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:169
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:168
 msgid "Total Tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:174
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:173
 msgid "Tag Uses"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:185
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:184
 msgid "across top tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:189
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:188
 msgid "Unused Tags"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:197
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:196
 msgid "Top Tags by Usage"
 msgstr ""
 
-#: assets/admin/src/components/library/LibraryTagsHeader.jsx:210
+#: assets/admin/src/components/library/LibraryTagsHeader.jsx:209
 msgid "Usage Distribution"
 msgstr ""
 
@@ -9294,79 +9330,79 @@ msgstr ""
 msgid "Merge"
 msgstr ""
 
-#: assets/admin/src/components/pages/Dashboard.jsx:67
+#: assets/admin/src/components/pages/Dashboard.jsx:66
 msgid "Gallery created successfully!"
 msgstr ""
 
-#: assets/admin/src/components/pages/Dashboard.jsx:92
+#: assets/admin/src/components/pages/Dashboard.jsx:91
 msgid "Loading setup progress"
 msgstr ""
 
-#: assets/admin/src/components/pages/LibraryPage.jsx:87
+#: assets/admin/src/components/pages/LibraryPage.jsx:86
 msgid "No library entity types are registered."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:33
 msgid "Gallery Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:39
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:38
 msgid "Album Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:58
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:57
 msgid "Responsiveness"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:82
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:189
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:81
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:188
 msgid "Watermark"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:94
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:507
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:93
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:506
 msgid "Permissions Manager"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:112
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:111
 msgid "Setup Wizard"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:120
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:119
 msgid "Setup"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:340
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:339
 msgid "Default settings applied to new Galleries and Albums."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:375
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:374
 msgid "Select a tab to configure settings"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:390
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:389
 msgid "Settings sections"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:173
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:172
 msgid "Setup progress"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:185
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:184
 msgid "FotoGrids Setup Wizard"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:208
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:207
 msgid "Skip for now"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:224
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:223
 msgid "Finish"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:225
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:19
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:24
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:224
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:17
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:22
 msgid "Continue"
 msgstr ""
 
@@ -9388,7 +9424,7 @@ msgstr ""
 
 #: assets/admin/src/components/pages/StatsPage.jsx:154
 #: assets/admin/src/components/pages/StatsPage.jsx:182
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:236
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:235
 #: includes/tools/import-export/assets/history/HistoryPanel.jsx:62
 msgid "Type"
 msgstr ""
@@ -9423,67 +9459,67 @@ msgstr ""
 msgid "%1$s views (%2$d%%)"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:590
+#: assets/admin/src/components/pages/StatsPage.jsx:595
 msgid "Could not load statistics. Please refresh the page."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:624
+#: assets/admin/src/components/pages/StatsPage.jsx:629
 msgid "Time period"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:648
+#: assets/admin/src/components/pages/StatsPage.jsx:653
 msgid "Refresh stats"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:650
+#: assets/admin/src/components/pages/StatsPage.jsx:655
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:265
 msgid "Refresh"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:664
+#: assets/admin/src/components/pages/StatsPage.jsx:669
 msgid "No statistics yet"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:667
+#: assets/admin/src/components/pages/StatsPage.jsx:672
 msgid "Your gallery stats will appear here once visitors start viewing your galleries."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:694
+#: assets/admin/src/components/pages/StatsPage.jsx:699
 msgid "Views Over Time"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:716
+#: assets/admin/src/components/pages/StatsPage.jsx:721
 msgid "Most Popular Galleries"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:728
+#: assets/admin/src/components/pages/StatsPage.jsx:733
 msgid "No gallery views in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:751
+#: assets/admin/src/components/pages/StatsPage.jsx:756
 msgid "Recently Viewed"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:756
+#: assets/admin/src/components/pages/StatsPage.jsx:761
 msgid "Nothing was viewed in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:762
+#: assets/admin/src/components/pages/StatsPage.jsx:767
 msgid "Top Performing Content"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:767
+#: assets/admin/src/components/pages/StatsPage.jsx:772
 msgid "No data available for this period."
 msgstr ""
 
 #: assets/admin/src/components/pages/TemplatesPage.jsx:104
-#: assets/admin/src/components/pages/TemplatesPage.jsx:621
+#: assets/admin/src/components/pages/TemplatesPage.jsx:623
 msgid "Use this template"
 msgstr ""
 
 #: assets/admin/src/components/pages/TemplatesPage.jsx:105
-#: assets/admin/src/components/pages/TemplatesPage.jsx:622
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:241
+#: assets/admin/src/components/pages/TemplatesPage.jsx:624
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:240
 msgid "Apply"
 msgstr ""
 
@@ -9491,88 +9527,88 @@ msgstr ""
 msgid "Template library refreshed."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:285
-#: assets/admin/src/components/pages/TemplatesPage.jsx:295
+#: assets/admin/src/components/pages/TemplatesPage.jsx:287
+#: assets/admin/src/components/pages/TemplatesPage.jsx:297
 msgid "Could not create a gallery from this template."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:320
+#: assets/admin/src/components/pages/TemplatesPage.jsx:322
 msgid "Save valuable time"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:321
+#: assets/admin/src/components/pages/TemplatesPage.jsx:323
 msgid "Launch new galleries in minutes using ready-made layouts instead of rebuilding designs from scratch."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:328
+#: assets/admin/src/components/pages/TemplatesPage.jsx:330
 msgid "Keep every gallery on-brand"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:329
+#: assets/admin/src/components/pages/TemplatesPage.jsx:331
 msgid "Apply the same spacing, colors and interactions across multiple galleries and albums with one click."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:336
+#: assets/admin/src/components/pages/TemplatesPage.jsx:338
 msgid "Create your own templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:337
+#: assets/admin/src/components/pages/TemplatesPage.jsx:339
 msgid "Turn your best-performing gallery and album designs into reusable templates that your whole team can apply in a few clicks."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:364
+#: assets/admin/src/components/pages/TemplatesPage.jsx:366
 msgid "What are Templates?"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:366
+#: assets/admin/src/components/pages/TemplatesPage.jsx:368
 msgid "Templates are complete, ready-to-use gallery and album configurations."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:372
+#: assets/admin/src/components/pages/TemplatesPage.jsx:374
 msgid "Templates bundle layout, spacing, hover effects and styling into reusable presets that you can apply in one click."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:460
+#: assets/admin/src/components/pages/TemplatesPage.jsx:462
 msgid "Pick a template and we’ll open a new gallery with it applied."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:479
+#: assets/admin/src/components/pages/TemplatesPage.jsx:481
 msgid "Gallery Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:492
+#: assets/admin/src/components/pages/TemplatesPage.jsx:494
 msgid "Album Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:503
+#: assets/admin/src/components/pages/TemplatesPage.jsx:505
 msgid "Your Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:519
+#: assets/admin/src/components/pages/TemplatesPage.jsx:521
 msgid "Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:529
+#: assets/admin/src/components/pages/TemplatesPage.jsx:531
 msgid "Last synced {time} ago"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:536
+#: assets/admin/src/components/pages/TemplatesPage.jsx:538
 msgid "Showing built-in templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:551
+#: assets/admin/src/components/pages/TemplatesPage.jsx:553
 msgid "Refresh library"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:568
+#: assets/admin/src/components/pages/TemplatesPage.jsx:570
 msgid "My Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:581
+#: assets/admin/src/components/pages/TemplatesPage.jsx:583
 msgid "FotoGrids {type} Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:601
+#: assets/admin/src/components/pages/TemplatesPage.jsx:603
 msgid "No templates available."
 msgstr ""
 
@@ -9606,1022 +9642,1022 @@ msgstr ""
 msgid "Coming soon"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:162
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:161
 msgid "Saving"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:163
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:162
 msgid "How FotoGrids saves your work."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:167
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:166
 msgid "Writes every change as you make it - in the gallery and album editors, and on these settings screens. Turn it off to save with a button instead."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:176
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:175
 msgid "Save automatically"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:182
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:181
 msgid "Privacy & analytics"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:183
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:182
 msgid "Decide what FotoGrids shares about plugin usage."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:189
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:188
 msgid "Usage data"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:190
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:189
 msgid "Helps us spot bugs and decide what to build next. Shares your name, email, site, and plugin details - never your images, image URLs, or visitor data."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:212
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:211
 msgid "Share usage data"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:218
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:217
 msgid "Product emails"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:219
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:218
 msgid "Occasional FotoGrids news and offers, sent to your account email. Separate from usage data - off unless enabled."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:228
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:227
 msgid "Email me FotoGrids news and offers"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:238
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:237
 msgid "External resources"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:239
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:238
 msgid "Control third-party resources FotoGrids may load on your site."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:246
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:245
 msgid "When enabled, FotoGrids loads Google Fonts for galleries that use one. Disable to prevent Google Fonts from loading anywhere - in the editor and on the front end - so no request is ever made to Google. Useful when your theme or another plugin already provides fonts."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:255
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:254
 msgid "Load Google Fonts"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:260
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:259
 msgid "FotoGrids news"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:261
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:260
 msgid "When enabled, FotoGrids fetches the latest announcements from fotogrids.com for the dashboard widget and the What's New panel. The request is made from your server, sends no site or personal data, and is cached for 12 hours. Disable to stop it entirely."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:270
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:269
 msgid "Show news"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:276
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:275
 msgid "Uninstall"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:277
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:276
 msgid "What happens to your FotoGrids data if the plugin is deleted."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:283
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:282
 msgid "Delete all data on uninstall"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:284
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:283
 msgid "Removes every gallery, album, template, statistic and setting. This cannot be undone."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:312
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:311
 msgid "Delete all data on uninstall?"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:313
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:312
 msgid "If FotoGrids is deleted, every gallery, album, template, statistic and setting is removed permanently. This cannot be undone."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:317
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:316
 msgid "Enable data deletion"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:164
+#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:163
 msgid "Save defaults"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:80
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:79
 msgid "Plugin settings reset to defaults."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:85
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:84
 msgid "Settings could not be reset. Please try again."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:105
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:104
 msgid "Database tables reinstalled."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:110
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:109
 msgid "Tables could not be reinstalled. Please try again."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:125
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:124
 msgid "Reset all settings?"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:126
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:125
 msgid "This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics, permissions, Pro licence and privacy choices are not affected."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:130
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:293
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:129
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:292
 msgid "Reset settings"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:131
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:292
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:130
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:291
 msgid "Resetting…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:136
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:135
 msgid "Reinstall database tables?"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:137
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:136
 msgid "This re-runs the FotoGrids schema migration to recreate any missing tables, columns or indexes. No rows are deleted."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:141
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:324
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:140
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:323
 msgid "Reinstall tables"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:142
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:323
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:141
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:322
 msgid "Reinstalling…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:268
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:267
 msgid "Restore plugin settings and rebuild the database tables. These actions affect plugin-level state only - your galleries, albums and Pro licence are not touched."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:274
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:273
 msgid "Reset all settings"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:275
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:274
 msgid "Restores Plugin Settings to defaults. Galleries, albums, statistics, permissions, your Pro licence and your privacy choices are preserved."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:306
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:305
 msgid "Reinstall database tables"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:307
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:306
 msgid "Re-runs the FotoGrids schema migration to add any missing tables, columns or indexes. Existing data is preserved."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:338
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:337
 msgid "Debug Log"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:339
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:338
 msgid "Turn on only the channels you need - everything is off by default."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:367
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:366
 msgid "Not used"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:379
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:378
 msgid "Loading channels…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:388
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:387
 msgid "No channels available."
 msgstr ""
 
 #. translators: %s: PHP constant name.
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:406
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:405
 #, js-format
 msgid "Locked on by %s in wp-config.php"
 msgstr ""
 
 #. translators: %s: PHP constant name.
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:415
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:414
 #, js-format
 msgid "Locked off by %s in wp-config.php"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:461
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:460
 msgid "Note"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:53
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:52
 msgid "Failed to load media settings."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:105
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:104
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:181
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:82
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:81
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:251
 msgid "Loading…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:123
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:122
 msgid "Top Left"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:124
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:123
 msgid "Top Center"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:125
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:124
 msgid "Top Right"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:126
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:125
 msgid "Center Left"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:128
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:127
 msgid "Center Right"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:129
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:128
 msgid "Bottom Left"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:130
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:129
 msgid "Bottom Center"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:131
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:130
 msgid "Bottom Right"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:140
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:139
 msgid "Gallery thumbnails"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:141
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:140
 msgid "The size used in the gallery grid. Changing these requires regenerating thumbnails for existing images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:147
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:229
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:287
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:146
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:228
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:286
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:483
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:491
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:828
 msgid "Regenerate"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:153
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:152
 msgid "Width and height in pixels. Used for every grid thumbnail."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:174
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:181
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:173
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:180
 msgid "Crop mode"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:175
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:174
 msgid "Hard crop forces every thumbnail to the exact dimensions. Soft crop keeps the original aspect ratio."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:187
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:186
 msgid "Hard crop"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:192
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:191
 msgid "Soft crop"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:204
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:203
 msgid "Crop alignment"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:222
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:221
 msgid "Lightbox image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:223
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:222
 msgid "The full-size image shown in the Lightbox. Always proportional - never hard-cropped. Changing these requires regenerating thumbnails for existing images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:234
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:233
 msgid "Max width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:235
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:234
 msgid "A companion mobile size at half this width is generated automatically."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:250
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:249
 msgid "Mobile companion:"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:253
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:252
 msgid "generated automatically."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:260
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:259
 msgid "Max height"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:261
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:260
 msgid "Optional. Leave at 0 to keep images proportional."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:274
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:273
 msgid "0 = proportional (recommended)"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:280
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:279
 msgid "Layout-specific sizes"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:281
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:280
 msgid "Used by layouts where only one dimension is fixed - Masonry uses the width, Justified uses the height. The other dimension stays proportional, so these are never cropped. Changing these requires regenerating thumbnails for existing images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:292
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:291
 msgid "Masonry thumbnail width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:293
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:292
 msgid "Width in pixels for Masonry layouts. Height stays proportional to the original image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:308
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:307
 msgid "Height is automatic."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:313
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:312
 msgid "Justified thumbnail height"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:314
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:313
 msgid "Height in pixels for Justified Rows layouts. Width stays proportional to the original image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:329
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:328
 msgid "Width is automatic."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:336
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:335
 msgid "Gallery-custom sizes"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:337
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:336
 msgid "These sizes were created by individual gallery settings. They cannot be edited here."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:347
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:346
 msgid "Crop"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:36
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:35
 msgid "Modules"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:37
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:36
 msgid "Plugin"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:161
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:160
 msgid "Failed to load permissions."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:258
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:257
 msgid "Loading permissions…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:287
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:286
 msgid "How roles & capabilities work"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:288
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:287
 msgid "Pick the lowest role that should have each capability. Higher roles automatically inherit it. For example, setting a capability to \"Editor\" means editors and administrators have it; authors and below do not."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:295
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:303
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:294
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:302
 msgid "Unauthorised settings panels"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:296
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:295
 msgid "How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:317
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:316
 msgid "Read-only with notice"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:321
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:320
 msgid "Hide entirely"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:356
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:355
 msgid "Custom (configured in matrix)"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:403
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:402
 msgid "Take full control of every capability per role, override permissions per user, and grant access per gallery or album."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:497
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:496
 msgid "Capability Settings"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:498
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:497
 msgid "Quick lowest-role configuration for the most common permissions."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:508
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:507
 msgid "Full granular view of every FotoGrids capability per role."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:124
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:123
 msgid "Breakpoints"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:125
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:124
 msgid "Pixel widths where FotoGrids switches between mobile, tablet and desktop layouts."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:132
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:131
 msgid "Below this width, mobile layout rules apply."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:151
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:150
 msgid "Below this width and above the mobile breakpoint, tablet rules apply."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:170
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:169
 msgid "Three device sizes mapped to your current breakpoints."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:183
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:198
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:182
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:197
 msgid "Detection mode"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:185
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:184
 msgid "How FotoGrids decides which layout to serve."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:191
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:190
 msgid "Detect by"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:192
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:191
 msgid "Viewport width is the most predictable. Device capabilities is heuristic-based and can differ across browsers."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:213
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:212
 msgid "Viewport width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:218
+#: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:217
 msgid "Device & browser"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:106
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:105
 msgid "Choose default OG image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:163
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:162
 msgid "Defaults applied to every Gallery and Album view page. Individual collections can override the per-page fields from the SEO tab in their editor."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:169
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:168
 msgid "Defer to other SEO plugins"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:170
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:169
 msgid "Hand the view page over to Yoast, RankMath, AIOSEO or SEOPress instead of emitting tags from FotoGrids."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:177
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:176
 msgid "Defer"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:180
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:179
 msgid "Off by default - FotoGrids owns the meta on view pages and automatically silences the other plugins to prevent duplicates."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:186
 msgid "Enable Open Graph tags"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:188
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Emits `og:title` `og:description` `og:image` `og:url` and `og:type` so Facebook, LinkedIn, WhatsApp and iMessage can render rich previews."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:195
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:210
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:194
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:209
 msgid "Enable"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:202
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:201
 msgid "Enable Twitter / X cards"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:203
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:202
 msgid "Emits `twitter:card` `twitter:image` and `twitter:title` alongside the OG tags. Slack and X prefer these over OG."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:223
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:222
 msgid "Site-wide defaults used when a collection has no per-page override."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:229
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:237
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:228
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:236
 msgid "Default OG type"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:230
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:229
 msgid "`article` suits most photography work; `website` suits evergreen portfolios."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:243
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:242
 msgid "Article"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:247
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:246
 msgid "Website"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:253
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:252
 msgid "Default OG image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:254
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:253
 msgid "Fallback when a collection has no Featured Item, no Featured Gallery, and no custom image. Recommended size: 1200×630px."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:299
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:298
 msgid "Platform IDs"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:301
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:300
 msgid "Optional metadata used by some platforms to attribute shares to your account."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:307
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:306
 msgid "Facebook App ID"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:308
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:307
 msgid "Emits `fb:app_id`. Needed if you use Facebook Insights to track shares."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:326
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:325
 msgid "Twitter / X handle"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:327
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:326
 msgid "Emits `twitter:site`. The `@` is added automatically if you leave it off."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:30
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:29
 msgid "In the header or footer of a Gallery or Album's standalone view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:38
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:37
 msgid "Inside Lightboxes."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:43
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:42
 msgid "On each grid thumbnail, shown on hover, if enabled."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:184
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:183
 msgid "Let visitors easily share and copy links to your Albums, Galleries and individual items. These settings apply site-wide; individual Galleries and Albums can override them."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:190
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:189
 msgid "Enable sharing"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:191
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:190
 msgid "Show share controls on Galleries, Albums and view pages."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:208
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:207
 msgid "Choose which share buttons to show."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:227
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:226
 msgid "Placement"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:229
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:228
 msgid "Where share controls can appear."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:253
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:252
 msgid "How the share buttons look."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:258
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:260
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:257
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:259
 msgid "Button style"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:266
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:265
 msgid "Icons only"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:270
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:269
 msgid "Icons + labels"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:277
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:276
 msgid "Labels only"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:282
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:284
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:281
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:283
 msgid "Button size"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:311
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:310
 msgid "Text included when sharing. Use {title} and {url} as placeholders."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:332
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:331
 msgid "Track share clicks"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:333
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:332
 msgid "Record when visitors click a share button, for statistics."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:348
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:347
 msgid "Deep linking"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:350
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:349
 msgid "Give each image a shareable link that reopens the gallery on that image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:356
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:355
 msgid "Enable deep linking"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:357
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:356
 msgid "A link to a specific image opens the Lightbox on that image, and the address bar follows the image being viewed."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:369
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:368
 msgid "Embedded galleries share"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:370
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:369
 msgid "When a gallery is embedded in a page, choose what an image share links to."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:376
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:375
 msgid "Embedded share target"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:382
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:381
 msgid "The specific image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:389
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:388
 msgid "The page"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:183
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:182
 msgid "Address"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:184
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:183
 msgid "Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:192
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:191
 msgid "Plain permalinks are on"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:193
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:192
 msgid "View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:204
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:203
 msgid "Permalink settings"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:213
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:212
 msgid "Galleries and albums share one address"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:217
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:216
 msgid "Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:227
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:226
 msgid "These pages sit at the top level of your site"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:231
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:230
 msgid "An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:239
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:238
 msgid "Prefix"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:240
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:239
 msgid "The part both addresses below share. Clear it and they start straight after your domain."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:251
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:250
 msgid "fotogrids"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:257
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:256
 msgid "Gallery segment"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:258
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:257
 msgid "The word that marks a gallery in the address."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:282
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:281
 msgid "Album segment"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:283
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:282
 msgid "The word that marks an album in the address."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:308
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:307
 msgid "Before you change this"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:309
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:308
 msgid "Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:317
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:316
 msgid "Page layout"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:318
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:317
 msgid "Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:324
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:331
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:323
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:330
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:65
 msgid "Layout mode"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:325
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:324
 msgid "Integrated uses your theme’s header, footer and navigation. Standalone overrides the theme entirely."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:337
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:336
 msgid "Integrated"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:341
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:340
 msgid "Standalone"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:350
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:349
 msgid "Integrated view pages"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:351
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:350
 msgid "Behaviour for view pages rendered inside your theme. These settings control how the gallery acts as a normal post on your site."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:357
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:356
 msgid "Show title block above gallery"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:361
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:360
 msgid "Display the FotoGrids title and item count above the gallery. Most themes already render the post title, so this is off by default."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:375
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:374
 msgid "Hide featured image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:376
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:375
 msgid "Suppress your theme’s featured-image render on view pages. The gallery is the visual content, so an extra featured image above it is usually redundant."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:390
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:389
 msgid "Allow comments"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:391
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:390
 msgid "Let visitors leave comments on view pages if your theme renders them."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:405
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:404
 msgid "Include in author and date archives"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:409
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:408
 msgid "When on, view pages appear in your theme’s author and date archives alongside blog posts."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:423
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:422
 msgid "Previous / next navigation"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:424
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:423
 msgid "When on, previous/next post links on view pages stay within galleries or within albums. When off, navigation is suppressed."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:441
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:440
 msgid "Standalone appearance"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:442
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:441
 msgid "Look and feel of the theme-less shell. These settings apply to every Standalone view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:448
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:447
 msgid "Accent color"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:449
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:448
 msgid "Used for buttons, links and highlights."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:459
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:458
 msgid "The base colour scheme."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:479
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:478
 msgid "Maximum width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:480
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:479
 msgid "How wide the gallery content can grow on large screens."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:498
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:497
 msgid "Show page header"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:499
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:498
 msgid "Display the title and item count at the top of the view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:511
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:510
 msgid "Show page footer"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:512
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:511
 msgid "Display the sharing controls and footer credit at the bottom of the view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:529
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:528
 msgid "That address could not be saved"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:190
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:189
 msgid "Add a visible credit mark to the images shown in your galleries. Your original files stay untouched - FotoGrids applies the watermark only to the generated copies served on your site."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:196
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:195
 msgid "Enable watermark"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:197
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:196
 msgid "Add your credit to gallery images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:212
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:211
 msgid "Watermarking is enabled - existing images still need updating"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:216
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:215
 msgid "New uploads will be watermarked automatically. Images already used in your galleries need to be regenerated once before the watermark appears on them."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:238
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:237
 msgid "Use a text watermark now, or upgrade to add your own logo."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:246
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:255
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:245
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:254
 msgid "Watermark type"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:249
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:248
 msgid "Use your own logo as a watermark with Pro."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:262
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:274
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:261
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:273
 msgid "Text"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:276
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:275
 msgid "Add your name, studio name, website, or copyright notice to each image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:282
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:281
 msgid "Watermark text"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:290
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:289
 msgid "© Your Name"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:296
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:295
 msgid "Font family"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:308
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:315
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:307
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:314
 msgid "Font size"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:309
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:308
 msgid "Scales with each photo, so it reads the same on a thumbnail and a full-size image download."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:336
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:338
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:335
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:337
 msgid "Text colour"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:358
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:371
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:357
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:370
 msgid "Custom color"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:361
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:360
 msgid "Match the watermark to your brand or any custom color."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:377
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:376
 msgid "Position & styling"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:379
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:378
 msgid "Choose where the watermark appears and how visible it should be."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:386
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:385
 msgid "Watermark position"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:407
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:406
 msgid "Set the distance between the watermark and the image edge."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:425
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:424
 msgid "Unlock even more control over which image versions are watermarked and how the mark is applied."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:433
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:432
 msgid "Apply to"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:436
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:435
 msgid "Choose whether to watermark full images, thumbnails, or both with Pro."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:442
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:441
 msgid "Apply watermark to"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:452
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:451
 msgid "Full images"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:460
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:459
 msgid "Both"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:468
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:467
 msgid "Repeat watermark"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:471
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:470
 msgid "Repeat the watermark across the image to make it harder to crop out, with Pro."
 msgstr ""
 
 #. translators: %d: number of images.
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:111
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:110
 #, js-format
 msgid "%d image needs watermarking"
 msgid_plural "%d images need watermarking"
@@ -10629,7 +10665,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of images.
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:125
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:124
 #, js-format
 msgid "%d was uploaded before watermarking was on"
 msgid_plural "%d were uploaded before watermarking was on"
@@ -10637,258 +10673,258 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of images.
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:139
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:138
 #, js-format
 msgid "%d is out of date after a settings change"
 msgid_plural "%d are out of date after a settings change"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:158
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:157
 msgid " · "
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:173
+#: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:172
 msgid "Regenerate now"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:22
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:21
 msgid "For sites where you only want to change the basics and let FotoGrids do the heavy lifting."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:26
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:25
 msgid "Most settings are set to default as per industry best practices. One just has to set it and forget it."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:36
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:35
 msgid "For advanced users who want to control every aspect of FotoGrids."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:40
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:39
 msgid "You are offered options to change everything and have full control over how galleries look and behave."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:71
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:70
 msgid "Pick a setup mode"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:74
+#: assets/admin/src/components/setup-wizard/StepComplexity.jsx:73
 msgid "You can switch any time in FotoGrids Settings."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:122
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:121
 msgid "Build from scratch"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:123
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:122
 msgid "Start with an empty gallery. Drop in photos, pick a layout, embed on a page."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:127
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:126
 msgid "Build custom"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:135
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:134
 msgid "Choose a template"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:136
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:135
 msgid "Start from a ready-made layout we’ll fill with your photos."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:140
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:139
 msgid "Browse templates"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:164
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:163
 msgid "You can always change layout, items, and style later."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:22
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:21
 msgid "Developer / Web Creator"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:23
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:22
 msgid "Building polished sites and galleries for client projects."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:31
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:30
 msgid "Photographer"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:32
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:31
 msgid "Showcasing your work, sharing galleries, and selling prints."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:40
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:39
 msgid "Personal Website"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:41
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:40
 msgid "Creating a blog, portfolio, hobby site, or creative archive."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:49
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:48
 msgid "Agency"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:50
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:49
 msgid "Managing websites and visual content across many client sites."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:58
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:57
 msgid "Business Owner"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:59
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:58
 msgid "Presenting your brand, services, team, products, or portfolio."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:67
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:66
 msgid "Online Shop"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:68
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:67
 msgid "Selling products with rich, flexible, photo-focused galleries."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:83
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:82
 msgid "What best describes you?"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:86
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:85
 msgid "It helps us keep improving FotoGrids — shared with us only if usage data is on in Settings. Skip if you’d rather not say."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepPersona.jsx:95
+#: assets/admin/src/components/setup-wizard/StepPersona.jsx:94
 msgid "Choose the option that best describes you"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:20
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:19
 msgid "Basic profile info"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:21
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:20
 msgid "Your WordPress user’s first & last name and email address."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:29
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:28
 msgid "Basic website info"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:30
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:29
 msgid "Homepage URL & title, WordPress and PHP versions, site language."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:38
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:37
 msgid "Basic plugin info"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:39
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:38
 msgid "Current FotoGrids & SDK versions, and whether they are active or being uninstalled."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:47
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:46
 msgid "Other plugins & themes"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:48
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:47
 msgid "Names, slugs, versions, and whether each one is active. Helps us catch conflicts early."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:176
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:175
 msgid "Welcome to FotoGrids"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:179
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:178
 msgid "Create your first gallery in 5 easy steps!"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:197
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:196
 msgid "Start Setup"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:210
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:209
 msgid "Skip for Now"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:219
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:218
 msgid "Help improve FotoGrids by sharing usage data"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:225
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:224
 msgid "You can turn this off anytime in FotoGrids Settings → Advanced."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:237
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:236
 msgid "Learn more about usage tracking"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:251
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:250
 msgid "Get occasional FotoGrids news and offers by email"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:255
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:254
 msgid "Optional and separate from usage tracking. You’ll only receive emails if you turn this on, and you can unsubscribe at any time."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:273
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:272
 msgid "About usage tracking"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:279
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:278
 msgid "Sharing this data is optional. It helps us constantly improve by catching bugs early, prioritising what to build next, and keeping FotoGrids compatible with your setup. None of it is sold, and we never collect image content, image URLs, or visitor data."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:315
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:314
 msgid "You can turn this off any time from FotoGrids → Settings → Advanced."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:326
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:325
 msgid "Read the full privacy policy"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:335
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:334
 msgid "See the underlying Freemius doc"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:347
+#: assets/admin/src/components/setup-wizard/StepWelcome.jsx:346
 msgid "Got it"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:14
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:13
 msgid "Top left"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:19
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:18
 msgid "Top centre"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:24
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:23
 msgid "Top right"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:29
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:28
 msgid "Centre left"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:34
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:33
 msgid "Centre"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:39
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:38
 msgid "Centre right"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:44
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:43
 msgid "Bottom left"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:49
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:48
 msgid "Bottom centre"
 msgstr ""
 
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:54
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:53
 msgid "Bottom right"
 msgstr ""
 
@@ -10900,14 +10936,14 @@ msgstr ""
 msgid "Hide sidebar"
 msgstr ""
 
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:14
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:34
-#: assets/admin/src/components/shared/Modal/wrappers/Prompt.jsx:140
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:12
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:32
+#: assets/admin/src/components/shared/Modal/wrappers/Prompt.jsx:138
 msgid "OK"
 msgstr ""
 
 #. translators: %s: the text the user must type.
-#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:136
+#: assets/admin/src/components/shared/Modal/wrappers/Confirm.jsx:134
 #, js-format
 msgid "Type %s to continue"
 msgstr ""
@@ -10921,40 +10957,40 @@ msgstr ""
 msgid "Clear search"
 msgstr ""
 
-#: assets/admin/src/components/shared/SettingsLock.jsx:55
+#: assets/admin/src/components/shared/SettingsLock.jsx:54
 msgid "Locked - administrator only"
 msgstr ""
 
-#: assets/admin/src/components/shared/SettingsLock.jsx:59
+#: assets/admin/src/components/shared/SettingsLock.jsx:58
 msgid "Your role can view these settings but cannot change them. Ask an administrator if you need to make changes here."
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:126
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:125
 msgid "Save failed"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:129
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:128
 msgid "Unsaved changes"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:132
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:131
 msgid "All changes saved"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:156
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:155
 msgid "Discard"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:171
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:170
 msgid "Save changes"
 msgstr ""
 
-#: assets/admin/src/components/shared/StatsTable.jsx:141
+#: assets/admin/src/components/shared/StatsTable.jsx:140
 msgid "No data available"
 msgstr ""
 
 #. translators: %s: column name.
-#: assets/admin/src/components/shared/StatsTable.jsx:196
+#: assets/admin/src/components/shared/StatsTable.jsx:195
 #, js-format
 msgid "Sort by %s"
 msgstr ""
@@ -11003,91 +11039,91 @@ msgstr ""
 msgid "Applying…"
 msgstr ""
 
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:179
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:178
 msgid "Preview device"
 msgstr ""
 
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:268
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:267
 msgid "Page Background"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:11
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:10
 msgid "About Templates"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:17
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:16
 msgid "What's a Gallery Template?"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:19
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:18
 msgid "A Gallery Template is a complete, ready-to-use gallery configuration that you can apply to any of your galleries."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:25
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:24
 msgid "It includes all the layout settings, styling options, hover effects, spacing, and display preferences that you'd expect in a professionally designed gallery."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:33
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:32
 msgid "What's an Album Template?"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:35
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:34
 msgid "An Album is a container that groups multiple galleries together."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:41
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:40
 msgid "An Album Template controls how that container looks - the album grid layout, cover styles, and how visitors browse between the galleries inside it."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:47
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:46
 msgid "Important: an Album Template only affects the album itself, not the individual galleries inside it. Each gallery keeps its own settings and template independently."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:56
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:55
 msgid "What's going on in the Template Library?"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:62
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:61
 msgid "Browse through our collection of pre-designed templates organized by category. Each template is optimized for different use cases - from simple grid layouts to complex masonry and justified galleries."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:68
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:67
 msgid "Preview any template to see exactly how it will look with your content. Once you've found the perfect match, apply it to your gallery with just a few clicks."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:77
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:76
 msgid "With a Pro license, you can save your own gallery configurations as reusable templates and share them across multiple galleries."
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateInfoModal.jsx:85
+#: assets/admin/src/components/templates/TemplateInfoModal.jsx:84
 msgid "Happy browsing!"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:133
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:132
 msgid "Layout style"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:135
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:134
 msgid "Item spacing"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:136
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:135
 msgid "Aspect ratio"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:139
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:138
 msgid "On click"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:356
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:355
 msgid "Template Overview"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:405
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:404
 msgid "Settings applied"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:428
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:427
 msgid "This template applies its settings when you preview it."
 msgstr ""
 
@@ -11095,62 +11131,68 @@ msgstr ""
 msgid "You are viewing templates in read-only mode."
 msgstr ""
 
-#: assets/admin/src/components/TemplatesMetabox.jsx:362
+#: assets/admin/src/components/TemplatesMetabox.jsx:364
 msgid "Read-only"
 msgstr ""
 
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:72
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:71
 msgid "Read more"
 msgstr ""
 
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:90
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:89
 msgid "Unable to load the latest news."
 msgstr ""
 
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:96
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:95
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:467
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:485
 msgid "Try again"
 msgstr ""
 
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:105
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:104
 msgid "News is turned off in FotoGrids Settings > Advanced."
 msgstr ""
 
-#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:136
+#: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:135
 msgid "What's New in FotoGrids"
 msgstr ""
 
-#: assets/admin/src/utils/gallery.js:42
+#: assets/admin/src/utils/gallery.js:41
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:251
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:240
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:53
 msgid "No album selected yet."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:252
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:241
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:54
 msgid "No gallery selected yet."
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:259
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:248
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:194
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:117
 msgid "Change album"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:260
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:249
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:238
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:118
 msgid "Change gallery"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:262
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:251
 msgid "Choose album"
 msgstr ""
 
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:263
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:252
 msgid "Choose gallery"
 msgstr ""
