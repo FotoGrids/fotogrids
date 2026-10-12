@@ -415,6 +415,20 @@ test.describe( 'in the builder', () => {
 		await expect( lightbox ).toBeHidden();
 		await expect( page.locator( 'body' ) ).not.toHaveClass( /fl-builder-ui-iframe-responsive-editing/ );
 	} );
+
+	test( 'with clicks off, an album cover opens the module settings and the album keeps its covers', { tag: [ '@admin', '@layout' ] }, async ( { page } ) => {
+		const { id } = album( [ galleryPage().id, galleryPage().id ] );
+		const target = builderPage( [ [ 'fotogrids-album', { album_id: String( id ) } ] ] );
+
+		const frame = await openBuilder( page, target.url );
+		const covers = frame.locator( '.fl-module-fotogrids-album .fg-item' );
+		await expect( covers ).toHaveCount( 2 );
+
+		await covers.first().click();
+		await expect( page.locator( 'form.fl-builder-settings' ) ).toBeVisible();
+		await expect( covers ).toHaveCount( 2 );
+		await expect( frame.locator( '.fl-module-fotogrids-album .fotogrids-gallery' ) ).toHaveCount( 0 );
+	} );
 } );
 
 test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
