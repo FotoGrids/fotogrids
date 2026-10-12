@@ -116,6 +116,32 @@ class Renderer {
 	}
 
 	/**
+	 * Whether the site hands the view page head over to its SEO plugin.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	public function defers_to_seo_plugins(): bool {
+		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
+
+		return ! empty( $seo['defer_to_seo_plugins'] );
+	}
+
+	/**
+	 * Whether the standalone shell prints the document title itself.
+	 *
+	 * When deferring, WordPress and the SEO plugin print it wherever the theme
+	 * lets core render a title tag.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	public function prints_document_title(): bool {
+		return ! $this->defers_to_seo_plugins()
+			|| ( ! current_theme_supports( 'title-tag' ) && ! has_action( 'wp_head', '_block_template_render_title_tag' ) );
+	}
+
+	/**
 	 * Whether the view page is excluded from search engines.
 	 *
 	 * @since 1.3.0
@@ -149,6 +175,7 @@ class Renderer {
 	 * Add the view page's noindex to WordPress' robots meta.
 	 *
 	 * Hooked to `wp_robots`, so the document head carries a single robots tag.
+	 * When the site defers to its SEO plugin, only a draft preview is noindexed.
 	 *
 	 * @since 1.3.0
 	 * @param array<string,bool|string> $robots Robots directives.
@@ -156,7 +183,13 @@ class Renderer {
 	 */
 	public static function filter_robots( array $robots ): array {
 		$post = Router::current_post();
-		if ( $post instanceof \WP_Post && self::for_post( $post )->is_noindex() ) {
+		if ( ! $post instanceof \WP_Post ) {
+			return $robots;
+		}
+
+		$view    = self::for_post( $post );
+		$noindex = $view->defers_to_seo_plugins() ? $view->is_draft_preview() : $view->is_noindex();
+		if ( $noindex ) {
 			$robots['noindex']  = true;
 			$robots['nofollow'] = true;
 		}
@@ -166,6 +199,9 @@ class Renderer {
 
 	/**
 	 * Canonical and Open Graph meta for the document head.
+	 *
+	 * Empty before the `fotogrids/view/head_meta` filter when the site defers
+	 * to its SEO plugin.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -190,7 +226,7 @@ class Renderer {
 		$canonical = (string) apply_filters( Filters_View::CANONICAL, $canonical, $this->post );
 
 		$meta = '';
-		if ( '' !== $canonical ) {
+		if ( '' !== $canonical && ! $this->defers_to_seo_plugins() ) {
 			$meta .= '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
 		}
 		$meta .= $this->open_graph_meta( $seo );

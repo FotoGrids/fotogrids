@@ -49,6 +49,7 @@ async function head( request: APIRequestContext, url: string ) {
 		viewports: ( markup.match( /<meta[^>]+name=["']viewport["']/g ) ?? [] ).length,
 		canonicals: canonicals.map( ( tag ) => ( tag.match( /href=["']([^"']+)/ ) ?? [] )[ 1 ] ),
 		robots: robots.map( ( tag ) => ( tag.match( /content=["']([^"']*)/ ) ?? [] )[ 1 ] ),
+		ogTitles: ( markup.match( /property=["']og:title["']/g ) ?? [] ).length,
 	};
 }
 
@@ -141,6 +142,32 @@ for ( const theme of THEMES ) {
 					expect( robots[ 0 ] ).toContain( 'nofollow' );
 				} finally {
 					wpEval( `delete_post_meta( ${ gallery.id }, 'fotogrids_noindex' );` );
+				}
+			} );
+
+			test( 'deferring to an SEO plugin leaves the head to WordPress', { tag: [ '@critical', '@layout' ] }, async ( {
+				request,
+			} ) => {
+				const seo = wpEval( `echo base64_encode( wp_json_encode( \\FotoGrids\\Settings\\SEO_Settings_Store::get() ) );` ).trim();
+				wpEval(
+					`\\FotoGrids\\Settings\\SEO_Settings_Store::save( array_merge( \\FotoGrids\\Settings\\SEO_Settings_Store::get(), array( 'defer_to_seo_plugins' => true ) ) );`
+				);
+				wpEval(
+					`update_post_meta( ${ gallery.id }, 'fotogrids_canonical_override', 'https://example.com/elsewhere/' ); update_post_meta( ${ gallery.id }, 'fotogrids_noindex', '1' );`
+				);
+
+				try {
+					const tags = await head( request, gallery.view );
+					expect( tags.titles ).toBe( 1 );
+					expect( tags.viewports ).toBe( 1 );
+					expect( tags.canonicals ).toEqual( [ gallery.view ] );
+					expect( tags.robots.join( ',' ) ).not.toContain( 'noindex' );
+					expect( tags.ogTitles ).toBe( 0 );
+				} finally {
+					wpEval(
+						`delete_post_meta( ${ gallery.id }, 'fotogrids_canonical_override' ); delete_post_meta( ${ gallery.id }, 'fotogrids_noindex' );`
+					);
+					wpEval( `\\FotoGrids\\Settings\\SEO_Settings_Store::save( json_decode( base64_decode( '${ seo }' ), true ) );` );
 				}
 			} );
 		} );

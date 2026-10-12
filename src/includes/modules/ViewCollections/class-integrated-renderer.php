@@ -290,7 +290,8 @@ class Integrated_Renderer {
 	 *
 	 * Returning a non-empty string from `pre_get_document_title` short-circuits
 	 * `wp_get_document_title`. Reusing `Renderer::page_title()` keeps the
-	 * title format identical to standalone mode.
+	 * title format identical to standalone mode. Left to WordPress and the
+	 * SEO plugin when the site defers to it.
 	 *
 	 * @since 1.0.0
 	 * @param string $title Title from earlier filters (typically empty).
@@ -306,7 +307,9 @@ class Integrated_Renderer {
 			return $title;
 		}
 
-		return Renderer::for_post( $post )->page_title();
+		$view = Renderer::for_post( $post );
+
+		return $view->defers_to_seo_plugins() ? $title : $view->page_title();
 	}
 
 	/**
@@ -315,7 +318,8 @@ class Integrated_Renderer {
 	 * Runs at wp_head priority 5 so SEO plugins (which typically run at 1-3)
 	 * still emit first; FotoGrids' SEO_Conflict_Guard handles suppression
 	 * when FotoGrids is set to take over. Core's `rel_canonical` is removed
-	 * so the page carries one canonical link.
+	 * unless the site defers to its SEO plugin, so the page carries one
+	 * canonical link.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -330,9 +334,12 @@ class Integrated_Renderer {
 			return;
 		}
 
-		remove_action( 'wp_head', 'rel_canonical' );
+		$view = Renderer::for_post( $post );
+		if ( ! $view->defers_to_seo_plugins() ) {
+			remove_action( 'wp_head', 'rel_canonical' );
+		}
 
-		echo wp_kses( Renderer::for_post( $post )->head_meta(), \FotoGrids\Kses::head_meta_rules() );
+		echo wp_kses( $view->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 	}
 
 	/**

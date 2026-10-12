@@ -28,7 +28,9 @@ $fotogrids_view->track_view();
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<?php if ( $fotogrids_view->prints_document_title() ) : ?>
 	<title><?php echo esc_html( $fotogrids_view->page_title() ); ?></title>
+	<?php endif; ?>
 	<?php
 	echo wp_kses( $fotogrids_view->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 
@@ -40,11 +42,15 @@ $fotogrids_view->track_view();
 	 */
 	do_action( Actions_View::HEAD, $fotogrids_post );
 
-	// The shell prints its own title, viewport and canonical above.
-	remove_action( 'wp_head', '_wp_render_title_tag', 1 );
-	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
+	// Core's copies of the tags the shell printed above.
 	remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
-	remove_action( 'wp_head', 'rel_canonical' );
+	if ( $fotogrids_view->prints_document_title() ) {
+		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+		remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
+	}
+	if ( ! $fotogrids_view->defers_to_seo_plugins() ) {
+		remove_action( 'wp_head', 'rel_canonical' );
+	}
 
 	wp_head();
 	?>
