@@ -213,12 +213,19 @@ async function importThroughUi(
 		mimeType: 'xml' === format ? 'application/xml' : 'application/json',
 		buffer: Buffer.from( body ),
 	} );
-	await analysed;
+	const { contents } = await ( await analysed ).json();
+	const chosen: Record< string, Choice > = {};
 
-	for ( const label of [ 'Galleries', 'Albums' ] ) {
-		const group = page.getByRole( 'radiogroup', { name: `${ label } conflict handling` } );
-		if ( await group.count() ) {
-			await group.getByRole( 'radio', { name: CHOICES[ choice ] } ).click();
+	for ( const [ type, label ] of [
+		[ 'galleries', 'Galleries' ],
+		[ 'albums', 'Albums' ],
+	] as const ) {
+		if ( contents[ type ] ) {
+			await page
+				.getByRole( 'radiogroup', { name: `${ label } conflict handling` } )
+				.getByRole( 'radio', { name: CHOICES[ choice ] } )
+				.click();
+			chosen[ type ] = choice;
 		}
 	}
 
@@ -226,6 +233,7 @@ async function importThroughUi(
 	await page.getByRole( 'button', { name: 'Import', exact: true } ).click();
 	const response = await executed;
 	expect( response.status() ).toBe( 200 );
+	expect( response.request().postDataJSON() ).toMatchObject( chosen );
 	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
 
 	return response.json();
@@ -285,7 +293,9 @@ for ( const format of [ 'JSON', 'XML' ] as const ) {
 			} );
 		}
 
-		await page.goto( '/wp-admin/edit.php?post_type=fotogrids_gallery&post_status=draft' );
+		await page.goto(
+			`/wp-admin/edit.php?post_type=fotogrids_gallery&post_status=draft&s=${ encodeURIComponent( name ) }`
+		);
 		await expect(
 			page.getByRole( 'link', { name: `${ name } draft gallery`, exact: true } )
 		).toBeVisible();
