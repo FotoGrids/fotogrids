@@ -126,6 +126,35 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 		$this->assertSame( self::TEXT['caption'], $items[ $id ]['caption'] );
 	}
 
+	public function unpublished_status_provider(): array {
+		return array(
+			'draft'   => array( 'draft' ),
+			'pending' => array( 'pending' ),
+			'private' => array( 'private' ),
+			'future'  => array( 'future' ),
+		);
+	}
+
+	/**
+	 * @dataProvider unpublished_status_provider
+	 */
+	public function test_export_includes_an_item_without_a_row_in_an_unpublished_gallery( string $status ): void {
+		$id   = $this->attachment();
+		$args = array(
+			'post_type'   => 'fotogrids_gallery',
+			'post_status' => $status,
+		);
+		if ( 'future' === $status ) {
+			$args['post_date'] = gmdate( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS );
+		}
+		Gallery_Repository::set_item_ids( self::factory()->post->create( $args ), array( $id ) );
+
+		$items = $this->exported_items();
+
+		$this->assertArrayHasKey( $id, $items );
+		$this->assertSame( self::TEXT['caption'], $items[ $id ]['caption'] );
+	}
+
 	public function test_a_round_trip_restores_the_text_onto_the_attachment(): void {
 		$id = $this->attachment();
 		$this->gallery_with( $id );
