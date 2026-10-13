@@ -385,6 +385,21 @@ class Public_Render {
 	 * @return string Rendered gallery HTML
 	 */
 	public static function gallery_shortcode( $atts ) {
+		return self::render_gallery_embed( $atts );
+	}
+
+	/**
+	 * Renders one gallery embed from shortcode attributes.
+	 *
+	 * @since 1.3.0
+	 * @param array|string $atts        Shortcode attributes.
+	 * @param string       $instance_id Instance ID for a render that takes the place of
+	 *                                  one already on the page, such as an unlocked
+	 *                                  password gate. Empty takes the next ID from the
+	 *                                  request's counter.
+	 * @return string Rendered gallery HTML
+	 */
+	public static function render_gallery_embed( $atts, string $instance_id = '' ) {
 		$atts = shortcode_atts(
 			array(
 				'id'                => 0,
@@ -472,7 +487,9 @@ class Public_Render {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 
-		$instance_id = Instance_Id_Factory::instance()->generate( $gallery_id );
+		if ( ! Instance_Id_Factory::matches( $gallery_id, $instance_id ) ) {
+			$instance_id = Instance_Id_Factory::instance()->generate( $gallery_id );
+		}
 
 		$cache_key = null;
 		if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {

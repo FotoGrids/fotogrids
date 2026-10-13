@@ -5,7 +5,8 @@
  * album item). On click:
  *
  *   1. POST to the render URL carried in data-fg-render-url with the
- *      gallery's ID and nonce.
+ *      gallery's ID, an instance ID no element on the page uses, and the
+ *      nonce.
  *   2. Server returns { html, css: { handle: url } }.
  *   3. Inject any CSS handles that aren't already in <head> (mirrors the
  *      password-gate unlock pattern).
@@ -47,6 +48,14 @@
 	 * @type {WeakSet<Element>}
 	 */
 	const boundTriggers = new WeakSet();
+
+	/**
+	 * Instance IDs claimed by swaps still waiting for the server. Two swaps
+	 * started together must not pick the same free ID.
+	 *
+	 * @type {Set<string>}
+	 */
+	const claimedIds = new Set();
 
 	/**
 	 * Inject <link rel="stylesheet"> tags for any CSS handles the render
@@ -190,6 +199,26 @@
 	}
 
 	/**
+	 * Pick an instance ID for a gallery about to be swapped in.
+	 *
+	 * The server renders the gallery in a request of its own, whose counter
+	 * starts again at 1, so the page chooses: the first `fg-{gallery}-{n}`
+	 * that no element uses and no swap in flight has claimed.
+	 *
+	 * @param {number} galleryId
+	 * @returns {string}
+	 */
+	function freeInstanceId(galleryId) {
+		let n = 1;
+		let id = 'fg-' + galleryId + '-' + n;
+		while (document.getElementById(id) || claimedIds.has(id)) {
+			n++;
+			id = 'fg-' + galleryId + '-' + n;
+		}
+		return id;
+	}
+
+	/**
 	 * Resolve the album wrapper that owns a trigger. Used as the target
 	 * container for the swap.
 	 *
@@ -237,7 +266,9 @@
 		// Visit-context: forward the source album so the rendered gallery
 		// can build a "back to this album" breadcrumb. Falls back to the
 		// ?fg_via= already baked into the href on JS-off / fetch failure.
-		const requestBody = { gallery_id: galleryId };
+		const instanceId = freeInstanceId(galleryId);
+		claimedIds.add(instanceId);
+		const requestBody = { gallery_id: galleryId, instance_id: instanceId };
 		if (viaAlbumId > 0) {
 			requestBody.via_album_id = viaAlbumId;
 		}
@@ -307,6 +338,7 @@
 				}
 			})
 			.then(function () {
+				claimedIds.delete(instanceId);
 				albumEl.classList.remove('fotogrids-album--is-loading');
 			});
 	}

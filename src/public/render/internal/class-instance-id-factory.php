@@ -64,6 +64,23 @@ final class Instance_Id_Factory {
 	}
 
 	/**
+	 * Whether an instance ID has the shape this factory gives a collection.
+	 *
+	 * Matches `fg-{id}-{n}` and `fg-{id}-p{key}`. A request that renders into a
+	 * page it cannot see, such as a password unlock or an album swap, takes the
+	 * ID the page chose for it only when this returns true.
+	 *
+	 * @since   1.3.0
+	 * @param   int    $collection_id Gallery or album identifier.
+	 * @param   string $instance_id   Instance identifier to check.
+	 * @return  bool
+	 */
+	public static function matches( int $collection_id, string $instance_id ): bool {
+		return $collection_id > 0
+			&& 1 === preg_match( '/^fg-' . $collection_id . '-[0-9a-z]{1,33}$/D', $instance_id );
+	}
+
+	/**
 	 * Resets instance state for tests.
 	 *
 	 * @since   1.0.0

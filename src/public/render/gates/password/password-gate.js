@@ -249,7 +249,13 @@
 				'X-WP-Nonce': nonce,
 			},
 			credentials: 'same-origin',
-			body: JSON.stringify({ password }),
+			// The unlocked gallery keeps the lock screen's instance ID. The
+			// server renders in a request of its own, whose counter would
+			// otherwise start again at an ID the page may already use.
+			body: JSON.stringify({
+				password,
+				instance_id: wrapper && wrapper.id ? wrapper.id : '',
+			}),
 		})
 			.then(function (response) {
 				return response.json().then(function (data) {

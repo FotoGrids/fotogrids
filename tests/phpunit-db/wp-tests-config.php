@@ -24,6 +24,12 @@ define( 'DB_COLLATE', '' );
 
 $table_prefix = 'wptests_';
 
+// The secret keys every wp-config.php defines. Gallery passwords are encrypted
+// with a key derived from AUTH_KEY and SECURE_AUTH_KEY.
+foreach ( array( 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' ) as $fg_secret ) {
+	define( $fg_secret, 'fotogrids-db-tests-' . strtolower( $fg_secret ) );
+}
+
 define( 'WP_TESTS_DOMAIN', 'example.org' );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
 define( 'WP_TESTS_TITLE', 'FotoGrids DB tests' );

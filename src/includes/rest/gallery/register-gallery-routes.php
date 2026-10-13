@@ -81,20 +81,22 @@ class Register_Gallery_Routes {
 					'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'unlock_gallery' ),
 					'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_unlock' ),
 					'args'                => array(
-						'id'       => array(
+						'id'          => array(
 							'required'          => true,
 							'sanitize_callback' => 'absint',
 							'validate_callback' => function ( $param ) {
 								return is_numeric( $param ) && $param > 0;
 							},
 						),
-						'password' => array(
+						'password'    => array(
 							'required'          => true,
 							'sanitize_callback' => function ( $value ) {
 								// Preserve special characters - strip_tags only.
 								return wp_strip_all_tags( (string) $value );
 							},
 						),
+						// ID of the lock screen the unlocked gallery replaces.
+						'instance_id' => self::instance_id_arg( 'id' ),
 					),
 				),
 			)
@@ -214,6 +216,9 @@ class Register_Gallery_Routes {
 							'default'           => 0,
 							'sanitize_callback' => 'absint',
 						),
+						// Instance ID the album swap chose for the gallery, one
+						// no other element on the page uses.
+						'instance_id'     => self::instance_id_arg( 'gallery_id' ),
 					),
 				),
 			)
@@ -421,6 +426,28 @@ class Register_Gallery_Routes {
 					),
 				),
 			)
+		);
+	}
+
+	/**
+	 * Argument for an instance ID the page chose for a gallery it renders in place.
+	 *
+	 * Accepts an empty value, which leaves the ID to the request's counter, or an
+	 * ID of the shape the render pipeline gives the requested gallery.
+	 *
+	 * @since 1.3.0
+	 * @param string $gallery_param Request parameter that holds the gallery ID.
+	 * @return array<string, mixed>
+	 */
+	private static function instance_id_arg( string $gallery_param ): array {
+		return array(
+			'type'              => 'string',
+			'default'           => '',
+			'validate_callback' => function ( $param, $request ) use ( $gallery_param ) {
+				return '' === $param
+					|| ( is_string( $param )
+						&& \FotoGrids\Render\Internal\Instance_Id_Factory::matches( (int) $request[ $gallery_param ], $param ) );
+			},
 		);
 	}
 }
