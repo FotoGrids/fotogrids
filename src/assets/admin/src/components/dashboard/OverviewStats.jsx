@@ -4,6 +4,9 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import StatCard from '../shared/StatCard';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
 const STATS_PAGE_URL = 'admin.php?page=fotogrids-stats';
@@ -41,9 +44,14 @@ const OVERVIEW_CARDS = [
 ];
 
 const OverviewStats = ({ stats, loading }) => {
+	const canOpenStats = userCan(DASHBOARD_ACCESS.stats.cap);
+
 	return (
 		<div className="fotogrids-overview">
 			<h2>{__('Overview', 'fotogrids')}</h2>
+			{!canOpenStats && (
+				<LockedReason>{DASHBOARD_ACCESS.stats.reason}</LockedReason>
+			)}
 			<div className="fg-stats-cards">
 				{OVERVIEW_CARDS.map((card) => (
 					<StatCard
@@ -54,7 +62,7 @@ const OverviewStats = ({ stats, loading }) => {
 						accent={card.accent}
 						invert
 						loading={loading}
-						href={STATS_PAGE_URL}
+						href={canOpenStats ? STATS_PAGE_URL : undefined}
 					/>
 				))}
 			</div>

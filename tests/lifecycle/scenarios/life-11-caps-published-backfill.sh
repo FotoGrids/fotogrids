@@ -42,7 +42,7 @@ assert_eq no "$( role_has author edit_published_fotogrids_galleries )" \
 $WP option update fotogrids_caps_version 1.2 --quiet
 load
 
-assert_eq 1.3 "$( $WP option get fotogrids_caps_version )" "the stored version moved to 1.3"
+assert_eq 1.4 "$( $WP option get fotogrids_caps_version )" "the stored version moved to the current one"
 
 assert_eq yes "$( role_has author edit_published_fotogrids_galleries )" \
 	"an author who can publish galleries can now edit published ones"
@@ -64,11 +64,11 @@ for role in contributor subscriber; do
 	assert_eq 0 "$count" "$role still holds no plugin capabilities"
 done
 
-# The step runs once: at 1.3 a removed capability stays removed.
+# The step runs once: at the current version a removed capability stays removed.
 $WP eval 'get_role( "author" )->remove_cap( "edit_published_fotogrids_galleries" );'
 load
 assert_eq no "$( role_has author edit_published_fotogrids_galleries )" \
-	"a load at 1.3 does not run the step again"
+	"a load at the current version does not run the step again"
 
 $WP role delete fg-publisher --quiet
 scratch_teardown

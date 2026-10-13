@@ -6,6 +6,9 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import MediaUpload from '../blocks/MediaUpload';
 import Icon from '../shared/Icon';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
 
 const { createInterpolateElement } = wp.element;
 
@@ -67,8 +70,14 @@ const FileUploader = ({ onUploadComplete }) => {
 		mediaUploader.open();
 	};
 
+	const canCreate = userCan(DASHBOARD_ACCESS.gallery.cap);
+
 	return (
-		<div className="fotogrids-admin-block-card fg-abc-uploader">
+		<div
+			className={`fotogrids-admin-block-card fg-abc-uploader${
+				canCreate ? '' : ' is-disabled'
+			}`}
+		>
 			<div className="fotogrids-admin-block-card-header">
 				<Icon
 					name="upload"
@@ -82,29 +91,37 @@ const FileUploader = ({ onUploadComplete }) => {
 					)}
 				</p>
 			</div>
-			<div className="fotogrids-admin-block-card-content">
-				<MediaUpload
-					onUploadComplete={handleUploadComplete}
-					inputId="fotogrids-dashboard-upload-input"
-				/>
-				<p className="fotogrids-upload-or">
-					{createInterpolateElement(
-						__(
-							'or <link>choose existing files</link> from media library',
-							'fotogrids'
-						),
-						{
-							link: (
-								<button
-									type="button"
-									onClick={openMediaLibrary}
-									className="fotogrids-upload-or__link"
-								/>
+			{canCreate ? (
+				<div className="fotogrids-admin-block-card-content">
+					<MediaUpload
+						onUploadComplete={handleUploadComplete}
+						inputId="fotogrids-dashboard-upload-input"
+					/>
+					<p className="fotogrids-upload-or">
+						{createInterpolateElement(
+							__(
+								'or <link>choose existing files</link> from media library',
+								'fotogrids'
 							),
-						}
-					)}
-				</p>
-			</div>
+							{
+								link: (
+									<button
+										type="button"
+										onClick={openMediaLibrary}
+										className="fotogrids-upload-or__link"
+									/>
+								),
+							}
+						)}
+					</p>
+				</div>
+			) : (
+				<div className="fotogrids-admin-block-card-content">
+					<LockedReason>
+						{DASHBOARD_ACCESS.gallery.reason}
+					</LockedReason>
+				</div>
+			)}
 		</div>
 	);
 };
