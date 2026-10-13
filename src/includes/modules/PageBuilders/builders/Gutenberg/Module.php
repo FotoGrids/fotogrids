@@ -189,6 +189,7 @@ final class Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( self::SCRIPT_HANDLE_GALLERY, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_register_style(
 			self::SCRIPT_HANDLE_GALLERY,
@@ -204,6 +205,7 @@ final class Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( self::SCRIPT_HANDLE_ALBUM, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_register_style(
 			self::SCRIPT_HANDLE_ALBUM,

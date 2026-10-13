@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -24,11 +25,8 @@ if ( ! defined( 'WPINC' ) ) {
  * suppression filters and disables them only while the request is rendering
  * a FotoGrids view page.
  *
- * Detection: a view-page request is one where `Router::current_post()` is
- * non-null at the time `template_redirect` fires (the router has resolved
- * the request to a FotoGrids gallery or album). The suppression filters
- * are registered at that point; nothing is registered for non-view-page
- * requests so SEO plugins continue to manage every other URL on the site.
+ * Engages on `wp` at priority 1, before the SEO plugins read their
+ * switches, and only when `Router::view_post()` finds a view page.
  *
  * Escape hatch: site owners can opt out of suppression entirely via the
  * `fotogrids/view/seo_conflict_guard/enabled` filter. When the broader
@@ -47,7 +45,7 @@ class SEO_Conflict_Guard {
 	 * @return void
 	 */
 	public static function init(): void {
-		add_action( 'template_redirect', array( __CLASS__, 'maybe_engage' ), 1 );
+		add_action( 'wp', array( __CLASS__, 'maybe_engage' ), 1 );
 	}
 
 	/**
@@ -58,8 +56,8 @@ class SEO_Conflict_Guard {
 	 * @return void
 	 */
 	public static function maybe_engage(): void {
-		$post = Router::current_post();
-		if ( ! $post instanceof \WP_Post ) {
+		$post = Router::view_post();
+		if ( null === $post ) {
 			return;
 		}
 
@@ -100,24 +98,41 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress Yoast SEO's frontend output on this request.
 	 *
-	 * Yoast emits its presentation through a single `wpseo_frontend_presenters`
-	 * filter. Returning an empty array drops every presenter (OG, Twitter,
-	 * canonical, robots, schema, title), which is exactly the right surface
-	 * for a FotoGrids-owned page.
+	 * Keeps its meta description, and its title on theme-rendered pages.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private static function suppress_yoast(): void {
-		add_filter( 'wpseo_frontend_presenters', '__return_empty_array' );
+		add_filter( 'wpseo_frontend_presenters', array( __CLASS__, 'filter_yoast_presenters' ) );
+	}
+
+	/**
+	 * Keep Yoast's meta description presenter, and its title presenter unless
+	 * the standalone shell printed a title.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $presenters Presenter instances.
+	 * @return array
+	 */
+	public static function filter_yoast_presenters( $presenters ): array {
+		$keep_title = ! did_action( Actions_View::HEAD );
+
+		return array_values(
+			array_filter(
+				(array) $presenters,
+				static function ( $presenter ) use ( $keep_title ) {
+					return is_a( $presenter, 'Yoast\WP\SEO\Presenters\Meta_Description_Presenter' )
+						|| ( $keep_title && is_a( $presenter, 'Yoast\WP\SEO\Presenters\Title_Presenter' ) );
+				}
+			)
+		);
 	}
 
 	/**
 	 * Suppress RankMath's frontend output on this request.
 	 *
-	 * RankMath gates its frontend presenter through `rank_math/frontend/disable_integration`.
-	 * The plugin checks this filter early in `\RankMath\Frontend\Frontend` and
-	 * exits without emitting head metadata when true.
+	 * RankMath reads `rank_math/frontend/disable_integration` on `wp`.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -129,34 +144,30 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress All in One SEO's frontend output on this request.
 	 *
-	 * AIOSEO exposes per-surface disable filters; OG, Twitter, the page-level
-	 * meta block, schema graph and the robots header are all disabled so the
-	 * FotoGrids markup is the only voice on the page.
+	 * Also unhooks AIOSEO's clearing of `wp_robots`, so the noindex survives.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private static function suppress_aioseo(): void {
 		add_filter( 'aioseo_disable', '__return_true' );
-		add_filter( 'aioseo_disable_meta_tags', '__return_true' );
-		add_filter( 'aioseo_disable_schema', '__return_true' );
+
+		if ( function_exists( 'aioseo' ) && isset( aioseo()->meta->robots ) ) {
+			remove_action( 'wp_head', array( aioseo()->meta->robots, 'disableWpRobotsCore' ), -1 );
+		}
 	}
 
 	/**
 	 * Suppress SEOPress's frontend output on this request.
 	 *
-	 * SEOPress reads `seopress_titles_single_titles_disable` and a parallel
-	 * `seopress_titles_single_metadesc_disable` to skip title/description
-	 * output, plus dedicated filters for OG and Twitter. Combined, these
-	 * stop SEOPress from emitting anything on a FotoGrids view page.
+	 * Drops its canonical, robots, Open Graph and Twitter tags.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	private static function suppress_seopress(): void {
-		add_filter( 'seopress_titles_single_titles_disable', '__return_true' );
-		add_filter( 'seopress_titles_single_metadesc_disable', '__return_true' );
-		add_filter( 'seopress_social_og_disable', '__return_true' );
-		add_filter( 'seopress_social_twitter_card_disable', '__return_true' );
+		add_filter( 'seopress_titles_canonical', '__return_empty_string' );
+		add_filter( 'seopress_titles_robots', '__return_empty_string' );
+		remove_action( 'wp_head', 'seopress_load_social_options', 0 );
 	}
 }

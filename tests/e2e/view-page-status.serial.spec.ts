@@ -307,7 +307,9 @@ test.describe( 'a private gallery embedded in a page', () => {
 		await page.goto( c.private.embed );
 
 		await expect( rendered( page, c.private ) ).toHaveCount( 0 );
-		await expect( page.locator( '.fotogrids-error' ) ).toContainText( 'is not published' );
+		await expect( page.locator( '.fotogrids-error' ) ).toHaveCount( 1 );
+		await expect( page.locator( '.fotogrids-error' ) ).toBeHidden();
+		await expect( page.locator( 'body' ) ).not.toContainText( 'is not published' );
 		await context.close();
 	} );
 } );

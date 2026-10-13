@@ -441,25 +441,44 @@ class Public_Render {
 
 		$gallery_id = absint( $atts['id'] );
 		if ( ! $gallery_id ) {
-			return '<div class="fotogrids-error">FotoGrids: No gallery ID specified. Usage: [fotogrids_gallery id="1"]</div>';
+			return self::error_notice( __( 'No gallery ID specified. Usage: [fotogrids_gallery id="1"]', 'fotogrids' ) );
 		}
 
 		$gallery = \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id );
 		if ( ! $gallery ) {
-			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' not found.</div>';
+			return self::error_notice(
+				sprintf(
+					/* translators: %d: gallery ID. */
+					__( 'Gallery with ID %d not found.', 'fotogrids' ),
+					$gallery_id
+				)
+			);
 		}
 
 		$readable = 'publish' === $gallery->post_status
 			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) );
 		if ( ! $readable ) {
-			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' is not published (status: ' . esc_html( $gallery->post_status ) . ').</div>';
+			return self::error_notice(
+				sprintf(
+					/* translators: 1: gallery ID, 2: post status. */
+					__( 'Gallery with ID %1$d is not published (status: %2$s).', 'fotogrids' ),
+					$gallery_id,
+					$gallery->post_status
+				)
+			);
 		}
 
 		$settings = self::get_gallery_settings( $gallery_id );
 
 		$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
 		if ( empty( $item_ids ) ) {
-			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
+			return self::error_notice(
+				sprintf(
+					/* translators: %d: gallery ID. */
+					__( 'Gallery with ID %d exists but has no items.', 'fotogrids' ),
+					$gallery_id
+				)
+			);
 		}
 
 		self::maybe_bypass_page_cache( $settings, $gallery_id );
@@ -668,6 +687,24 @@ class Public_Render {
 	}
 
 	/**
+	 * Error block for a gallery that cannot be rendered.
+	 *
+	 * Users who can edit posts see the message; everyone else gets the
+	 * hidden block the render pipeline emits for its own errors.
+	 *
+	 * @since 1.3.0
+	 * @param string $message Translated message.
+	 * @return string
+	 */
+	private static function error_notice( string $message ): string {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return '<div class="fotogrids-error" hidden></div>';
+		}
+
+		return '<div class="fotogrids-error">FotoGrids: ' . esc_html( $message ) . '</div>';
+	}
+
+	/**
 	 * Render gallery preview (for admin)
 	 *
 	 * Similar to gallery_shortcode but allows previewing unpublished galleries
@@ -679,19 +716,31 @@ class Public_Render {
 	public static function render_gallery_preview( $gallery_id, $atts = array() ) {
 		$gallery_id = absint( $gallery_id );
 		if ( ! $gallery_id ) {
-			return '<div class="fotogrids-error">FotoGrids: No gallery ID specified.</div>';
+			return self::error_notice( __( 'No gallery ID specified.', 'fotogrids' ) );
 		}
 
 		$gallery = get_post( $gallery_id );
 		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
-			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' not found.</div>';
+			return self::error_notice(
+				sprintf(
+					/* translators: %d: gallery ID. */
+					__( 'Gallery with ID %d not found.', 'fotogrids' ),
+					$gallery_id
+				)
+			);
 		}
 
 		$settings = self::get_gallery_settings( $gallery_id );
 
 		$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
 		if ( empty( $item_ids ) ) {
-			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
+			return self::error_notice(
+				sprintf(
+					/* translators: %d: gallery ID. */
+					__( 'Gallery with ID %d exists but has no items.', 'fotogrids' ),
+					$gallery_id
+				)
+			);
 		}
 
 		return self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, Request_Source::PREVIEW_SAVED, true );

@@ -230,6 +230,7 @@ final class Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( self::EDITOR_SCRIPT_HANDLE, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_enqueue_style(
 			self::EDITOR_STYLE_HANDLE,
