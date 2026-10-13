@@ -15,32 +15,30 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Permission gates for `/preview/*` and `/picker/items`.
- *
- * Previews require `manage_fotogrids`: the safe-preview pipeline bypasses
- * password gates. The picker listing is open to users who can edit posts.
+ * Permission gates for `/preview/*`, `/picker/items` and `/import/core-gallery`.
  *
  * @since 1.0.0
  */
 final class Preview_Permissions {
 
 	/**
-	 * Whether the current user can request a gallery / album preview.
+	 * Whether the current user can list galleries and albums in the picker
+	 * and preview them. Each collection is checked again by the handler.
 	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	public static function check_preview_read(): bool {
-		return current_user_can( 'manage_fotogrids' );
+		return current_user_can( 'edit_posts' );
 	}
 
 	/**
-	 * Whether the current user can list galleries and albums in the picker.
+	 * Whether the current user can turn a core gallery into a FotoGrids gallery.
 	 *
 	 * @since 1.3.0
 	 * @return bool
 	 */
-	public static function check_picker_read(): bool {
-		return current_user_can( 'edit_posts' );
+	public static function check_import(): bool {
+		return current_user_can( 'manage_fotogrids' );
 	}
 }

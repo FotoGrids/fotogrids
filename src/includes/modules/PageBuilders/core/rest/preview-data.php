@@ -59,7 +59,7 @@ final class Preview_Data {
 	 *
 	 * Renders a gallery through the same public-render pipeline used on
 	 * the front-of-site, then flips `is_preview = true` on the meta so
-	 * preview-aware modules (password gate, etc.) take the admin path.
+	 * preview-aware modules take the preview path.
 	 *
 	 * `build_for_public()` rather than `build_for_preview()` gives the preview
 	 * the full sorter + filter + pagination behaviour, so paginated galleries
@@ -79,6 +79,10 @@ final class Preview_Data {
 				__( 'Gallery not found.', 'fotogrids' ),
 				array( 'status' => 404 )
 			);
+		}
+
+		if ( ! Preview_Renderer::can_preview( $gallery_id ) ) {
+			return self::forbidden();
 		}
 
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
@@ -169,13 +173,7 @@ final class Preview_Data {
 
 		$preview_meta = $context->meta->with( $meta_changes );
 
-		$preview_settings = array_merge(
-			$context->settings,
-			array(
-				'_preview_source'     => $source,
-				'_show_render_errors' => current_user_can( 'edit_posts' ),
-			)
-		);
+		$preview_settings = array_merge( $context->settings, Preview_Renderer::preview_settings( $collection_id, $source ) );
 
 		return new \FotoGrids\Render\Api\Render_Context(
 			$preview_meta,
@@ -233,8 +231,7 @@ final class Preview_Data {
 	 * `POST /preview/album/{id}`.
 	 *
 	 * Renders an album through the Render_Controller pipeline with
-	 * `is_preview = true` so the password gate is bypassed (same rule the
-	 * gallery preview follows).
+	 * `is_preview = true`, like the gallery preview.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -252,7 +249,11 @@ final class Preview_Data {
 			);
 		}
 
-		$child_gallery_ids = self::resolve_album_child_gallery_ids( $album_id );
+		if ( ! Preview_Renderer::can_preview( $album_id ) ) {
+			return self::forbidden();
+		}
+
+		$child_gallery_ids = Preview_Renderer::visible_child_gallery_ids( $album_id );
 
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return new \WP_Error(
@@ -272,8 +273,6 @@ final class Preview_Data {
 			$album_settings['item_click_behavior'] = 'nothing';
 		}
 
-		// Flip is_preview on the meta so the password gate (and other
-		// preview-aware modules) take the admin path.
 		$render_context = Context_Builder::for_preview()->build_for_album(
 			$album_id,
 			$album_settings,
@@ -334,9 +333,14 @@ final class Preview_Data {
 
 		$post_type = 'album' === $type ? 'fotogrids_album' : 'fotogrids_gallery';
 
+		$caps       = get_post_type_object( $post_type )->cap ?? null;
+		$all_drafts = $caps && current_user_can( $caps->edit_others_posts );
+		$own_drafts = ! $all_drafts && $caps && current_user_can( $caps->edit_posts );
 		$query_args = array(
 			'post_type'      => $post_type,
-			'post_status'    => array( 'publish', 'private', 'draft', 'pending', 'future' ),
+			'post_status'    => $all_drafts || $own_drafts
+				? array( 'publish', 'private', 'draft', 'pending', 'future' )
+				: array( 'publish', 'private' ),
 			'perm'           => 'readable',
 			'posts_per_page' => $per_page,
 			'paged'          => $page,
@@ -368,7 +372,22 @@ final class Preview_Data {
 				break;
 		}
 
+		$own_drafts_where = static function ( string $where ): string {
+			global $wpdb;
+
+			return $where . $wpdb->prepare(
+				" AND ( {$wpdb->posts}.post_status IN ( 'publish', 'private' ) OR {$wpdb->posts}.post_author = %d )",
+				get_current_user_id()
+			);
+		};
+
+		if ( $own_drafts ) {
+			add_filter( 'posts_where', $own_drafts_where );
+		}
+
 		$query = new \WP_Query( $query_args );
+
+		remove_filter( 'posts_where', $own_drafts_where );
 		$ids   = (array) $query->posts;
 		$total = (int) $query->found_posts;
 		$pages = (int) $query->max_num_pages;
@@ -479,11 +498,18 @@ final class Preview_Data {
 			? (array) \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id )
 			: array();
 
-		$status = $post ? $post->post_status : 'publish';
+		$status   = $post ? $post->post_status : 'publish';
+		$can_edit = current_user_can( 'edit_post', $gallery_id );
+
+		if ( ! $can_edit && ! empty( $settings['password_protect'] )
+			&& \FotoGrids\Password_Crypto::is_encrypted( (string) ( $settings['_password_encrypted'] ?? '' ) )
+		) {
+			$thumb = null;
+		}
 
 		return array(
 			'id'             => $gallery_id,
-			'can_edit'       => current_user_can( 'edit_post', $gallery_id ),
+			'can_edit'       => $can_edit,
 			'title'          => $post ? html_entity_decode( $post->post_title, ENT_QUOTES, 'UTF-8' ) : '',
 			'status'         => $status,
 			'status_label'   => self::status_label( $status ),
@@ -586,23 +612,7 @@ final class Preview_Data {
 	 * @return string|null
 	 */
 	private static function resolve_album_thumb_url( int $album_id ): ?string {
-		if ( ! class_exists( '\FotoGrids\Gallery_Album_Relations' ) ) {
-			return null;
-		}
-
-		$children = (array) \FotoGrids\Gallery_Album_Relations::get_galleries_for_album(
-			$album_id,
-			array(
-				'orderby' => 'position',
-				'order'   => 'ASC',
-			)
-		);
-
-		foreach ( $children as $child ) {
-			$child_id = is_object( $child ) ? (int) $child->ID : 0;
-			if ( $child_id <= 0 ) {
-				continue;
-			}
+		foreach ( Preview_Renderer::visible_child_gallery_ids( $album_id ) as $child_id ) {
 			$thumb = self::resolve_gallery_thumb_url( $child_id );
 			if ( $thumb ) {
 				return $thumb;
@@ -613,31 +623,17 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Resolve child gallery IDs for an album, in album-stored order.
+	 * Error for a collection the current user may not preview.
 	 *
-	 * @since 1.0.0
-	 * @param int $album_id Album ID.
-	 * @return int[]
+	 * @since 1.3.0
+	 * @return \WP_Error
 	 */
-	private static function resolve_album_child_gallery_ids( int $album_id ): array {
-		if ( ! class_exists( '\FotoGrids\Gallery_Album_Relations' ) ) {
-			return array();
-		}
-
-		$child_galleries = (array) \FotoGrids\Gallery_Album_Relations::get_galleries_for_album(
-			$album_id,
-			array(
-				'orderby' => 'position',
-				'order'   => 'ASC',
-			)
+	private static function forbidden(): \WP_Error {
+		return new \WP_Error(
+			'rest_forbidden',
+			__( 'Sorry, you are not allowed to preview this.', 'fotogrids' ),
+			array( 'status' => rest_authorization_required_code() )
 		);
-
-		$ids = array_map(
-			static fn ( $gallery_post ) => (int) ( is_object( $gallery_post ) ? $gallery_post->ID : 0 ),
-			$child_galleries
-		);
-
-		return array_values( array_filter( $ids ) );
 	}
 
 	/**

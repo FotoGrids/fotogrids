@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-13T07:02:46+00:00\n"
+"POT-Creation-Date: 2026-10-13T07:32:07+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
-#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:411
+#: includes/modules/PageBuilders/builders/BeaverBuilder/Module.php:424
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:129
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:166
 #: assets/admin/src/components/setup-wizard/StepWelcome.jsx:119
@@ -5841,7 +5841,7 @@ msgid "Add some items to this gallery and its preview will appear here."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:259
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:270
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:312
 msgid "Add items"
 msgstr ""
 
@@ -6386,7 +6386,7 @@ msgid "Browse all"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:102
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:272
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:317
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:261
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:200
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:110
@@ -6394,7 +6394,7 @@ msgid "Edit album"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:103
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:273
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:318
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:262
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:244
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:111
@@ -6402,7 +6402,7 @@ msgid "Edit gallery"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:117
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:177
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:211
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:173
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:99
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:372
@@ -6430,7 +6430,7 @@ msgid "Gallery source"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:164
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:178
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:212
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:174
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:100
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:373
@@ -6446,23 +6446,23 @@ msgstr ""
 msgid "Select a gallery to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:264
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:306
 msgid "This album has no galleries yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:265
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:307
 msgid "Add one or more galleries so this album has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:266
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:308
 msgid "Add galleries"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:268
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:310
 msgid "This gallery has no items yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:269
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:311
 msgid "Add images, videos, or other media so this gallery has something to display."
 msgstr ""
 
@@ -6476,24 +6476,28 @@ msgstr ""
 msgid "Gallery not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:87
-#: includes/modules/PageBuilders/core/rest/preview-data.php:260
+#: includes/modules/PageBuilders/core/rest/preview-data.php:91
+#: includes/modules/PageBuilders/core/rest/preview-data.php:261
 msgid "Render pipeline is not available."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:250
+#: includes/modules/PageBuilders/core/rest/preview-data.php:247
 #: includes/rest/album/album-data.php:36
 msgid "Album not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:425
+#: includes/modules/PageBuilders/core/rest/preview-data.php:443
 msgid "No attachments to import."
 msgstr ""
 
 #. translators: %s: date imported
-#: includes/modules/PageBuilders/core/rest/preview-data.php:434
+#: includes/modules/PageBuilders/core/rest/preview-data.php:452
 #, php-format
 msgid "Imported gallery (%s)"
+msgstr ""
+
+#: includes/modules/PageBuilders/core/rest/preview-data.php:634
+msgid "Sorry, you are not allowed to preview this."
 msgstr ""
 
 #: includes/modules/PageBuilders/Module.php:88
@@ -6648,7 +6652,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
 #: includes/modules/ViewCollections/class-renderer.php:794
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:153
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:157
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:63
@@ -6665,7 +6669,7 @@ msgstr[1] ""
 #: includes/modules/ViewCollections/class-renderer.php:796
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:158
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:162
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:154
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:150
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:148
@@ -8113,27 +8117,27 @@ msgid "Log In"
 msgstr ""
 
 #. translators: heading shown on the gallery password lock screen
-#: public/render/gates/password/class-password-gate.php:182
+#: public/render/gates/password/class-password-gate.php:190
 msgid "Gallery Protected"
 msgstr ""
 
 #. translators: instruction text shown below the lock screen heading
-#: public/render/gates/password/class-password-gate.php:184
+#: public/render/gates/password/class-password-gate.php:192
 msgid "Enter the password to view this gallery."
 msgstr ""
 
 #. translators: placeholder text inside the password input on the lock screen
-#: public/render/gates/password/class-password-gate.php:186
+#: public/render/gates/password/class-password-gate.php:194
 msgid "Password"
 msgstr ""
 
 #. translators: label/text for the submit button on the gallery lock screen
-#: public/render/gates/password/class-password-gate.php:188
+#: public/render/gates/password/class-password-gate.php:196
 msgid "Unlock"
 msgstr ""
 
 #. translators: error shown when the visitor enters an incorrect gallery password
-#: public/render/gates/password/class-password-gate.php:190
+#: public/render/gates/password/class-password-gate.php:198
 msgid "Incorrect password. Please try again."
 msgstr ""
 
@@ -11197,38 +11201,62 @@ msgstr ""
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:251
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:178
+msgid "Your role cannot edit or create albums."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:179
+msgid "Your role cannot edit or create galleries."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:183
+msgid "Your role cannot edit this album."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:184
+msgid "Your role cannot edit this gallery."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:188
+msgid "Your role cannot create albums."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:189
+msgid "Your role cannot create galleries."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:295
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:240
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:53
 msgid "No album selected yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:252
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:296
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:241
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:54
 msgid "No gallery selected yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:259
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:303
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:248
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:194
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:117
 msgid "Change album"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:260
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:304
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:249
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:238
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:118
 msgid "Change gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:262
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:306
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:251
 msgid "Choose album"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:263
+#: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:307
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:252
 msgid "Choose gallery"
 msgstr ""
