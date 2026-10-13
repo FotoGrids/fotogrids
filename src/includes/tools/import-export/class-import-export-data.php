@@ -314,7 +314,7 @@ class Import_Export_Data {
 
 	/**
 	 * Build the exported item entries: every item row, plus every attachment in a
-	 * published gallery that has no row, each carrying the attachment's own text.
+	 * gallery the export includes that has no row, each carrying the attachment's own text.
 	 *
 	 * @since 1.2.0
 	 * @param array<int, array<string, mixed>> $rows Item meta rows.
@@ -323,7 +323,7 @@ class Import_Export_Data {
 	private static function export_items( array $rows ): array {
 		$exported = array_flip( array_map( 'intval', array_column( $rows, 'attachment_id' ) ) );
 
-		foreach ( Gallery_Repository::all_item_ids( array( 'publish' ) ) as $item_id ) {
+		foreach ( Gallery_Repository::all_item_ids( self::COLLECTION_STATUSES ) as $item_id ) {
 			if ( ! isset( $exported[ $item_id ] ) && 'attachment' === get_post_type( $item_id ) ) {
 				$rows[]               = array(
 					'attachment_id' => $item_id,
