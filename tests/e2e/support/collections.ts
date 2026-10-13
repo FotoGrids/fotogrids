@@ -87,6 +87,13 @@ export function adopt(id: number): void {
 	collection(['op=adopt', `id=${id}`]);
 }
 
+/** Mark several collections at once, in one WordPress bootstrap. */
+export function adoptAll(ids: number[]): void {
+	if (ids.length) {
+		collection(['op=adopt', `id=${ids.join(',')}`]);
+	}
+}
+
 /** A page rendering a gallery the spec did not create. */
 export function pageFor(galleryId: number): { id: number; url: string } {
 	return JSON.parse(collection(['op=page', `gallery=${galleryId}`]));
