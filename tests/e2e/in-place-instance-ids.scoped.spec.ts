@@ -21,12 +21,12 @@ const LOCKED = { ...GRID, password_remember: false };
 
 type Instance = { id: string; kind: 'gate' | 'gallery' | 'album'; cols: string; styled: boolean };
 
-/** A page the purge removes, holding the given content verbatim. */
+/** A post the purge removes, holding the given content verbatim. */
 function postWith( content: string ): string {
 	const encoded = Buffer.from( content, 'utf8' ).toString( 'base64' );
 
 	return wpEval(
-		`$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'In-place instances', 'post_content' => base64_decode( '${ encoded }' ) ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
+		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'In-place instances', 'post_content' => base64_decode( '${ encoded }' ) ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
 	).trim();
 }
 
