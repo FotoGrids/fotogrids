@@ -14,6 +14,7 @@
  *   wp eval-file collection.php op=page gallery=41 atts='template="masonry"'
  *   wp eval-file collection.php op=page album=42 atts='template="grid"'
  *   wp eval-file collection.php op=adopt id=57
+ *   wp eval-file collection.php op=adopt id=57,58,59
  *   wp eval-file collection.php op=purge
  *
  * Every post carries FG_COLLECTION_MARKER, so `op=purge` removes the lot.
@@ -286,8 +287,10 @@ if ( 'settings' === $op ) {
 }
 
 if ( 'adopt' === $op ) {
-	// A collection the spec made through the UI, claimed so the purge finds it.
-	update_post_meta( (int) fg_col_arg( $args, 'id' ), FG_COLLECTION_MARKER, 1 );
+	// Collections the spec made through the UI, claimed so the purge finds them.
+	foreach ( array_filter( array_map( 'intval', explode( ',', fg_col_arg( $args, 'id' ) ) ) ) as $adopted ) {
+		update_post_meta( $adopted, FG_COLLECTION_MARKER, 1 );
+	}
 	return;
 }
 
