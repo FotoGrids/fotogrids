@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  * WordPress resolve the singular template normally; the theme owns the
  * document. This class is what makes that document actually show the gallery:
  * it injects the rendered gallery/album into `the_content`, emits the document
- * title via `pre_get_document_title`, the head meta (robots, canonical, OG)
+ * title via `pre_get_document_title`, the head meta (canonical, OG)
  * via `wp_head`, the body classes via `body_class`, enqueues the gallery
  * assets via `wp_enqueue_scripts`, and records the view stat from
  * `template_redirect`.
@@ -290,7 +290,7 @@ class Integrated_Renderer {
 	 *
 	 * Returning a non-empty string from `pre_get_document_title` short-circuits
 	 * `wp_get_document_title`. Reusing `Renderer::page_title()` keeps the
-	 * title format identical to standalone mode.
+	 * title format identical to standalone mode. Skipped when deferring.
 	 *
 	 * @since 1.0.0
 	 * @param string $title Title from earlier filters (typically empty).
@@ -306,15 +306,18 @@ class Integrated_Renderer {
 			return $title;
 		}
 
-		return Renderer::for_post( $post )->page_title();
+		$view = Renderer::for_post( $post );
+
+		return $view->defers_to_seo_plugins() ? $title : $view->page_title();
 	}
 
 	/**
-	 * Emit head meta (robots, canonical, OG, Twitter) on integrated pages.
+	 * Emit head meta (canonical, OG, Twitter) on integrated pages.
 	 *
 	 * Runs at wp_head priority 5 so SEO plugins (which typically run at 1-3)
 	 * still emit first; FotoGrids' SEO_Conflict_Guard handles suppression
-	 * when FotoGrids is set to take over.
+	 * when FotoGrids is set to take over. Replaces core's `rel_canonical`
+	 * unless deferring.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -329,7 +332,12 @@ class Integrated_Renderer {
 			return;
 		}
 
-		echo wp_kses( Renderer::for_post( $post )->head_meta(), \FotoGrids\Kses::head_meta_rules() );
+		$view = Renderer::for_post( $post );
+		if ( ! $view->defers_to_seo_plugins() ) {
+			remove_action( 'wp_head', 'rel_canonical' );
+		}
+
+		echo wp_kses( $view->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 	}
 
 	/**

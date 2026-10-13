@@ -257,7 +257,7 @@ test.describe( 'on the published page', () => {
 		);
 	} );
 
-	test( 'a module without a collection renders nothing; a missing one renders the shortcode\'s error', { tag: [ '@layout' ] }, async ( {
+	test( 'a module without a collection renders nothing; a missing one renders the shortcode\'s error block, hidden from visitors', { tag: [ '@layout' ] }, async ( {
 		page,
 	} ) => {
 		const { url } = builderPage( [
@@ -273,7 +273,9 @@ test.describe( 'on the published page', () => {
 		await expect( modules ).toHaveCount( 4 );
 		await expect( modules.nth( 0 ) ).toBeEmpty();
 		await expect( modules.nth( 1 ) ).toBeEmpty();
-		await expect( modules.nth( 2 ).locator( '.fotogrids-error' ) ).toContainText( '999999' );
+		await expect( modules.nth( 2 ).locator( '.fotogrids-error' ) ).toHaveCount( 1 );
+		await expect( modules.nth( 2 ).locator( '.fotogrids-error' ) ).toBeHidden();
+		await expect( modules.nth( 2 ) ).not.toContainText( '999999' );
 		await expect( modules.nth( 3 ) ).toBeEmpty();
 	} );
 
