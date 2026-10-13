@@ -121,9 +121,8 @@ class Gallery_Data {
 		}
 
 		$meta = array(
-			'layout'   => get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid',
-			'columns'  => (int) get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3,
-			'album_id' => (int) get_post_meta( $gallery_id, 'fotogrids_album_id', true ) ?: null,
+			'layout'  => get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid',
+			'columns' => (int) get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3,
 		);
 
 		$items = self::get_gallery_items( $gallery_id );
