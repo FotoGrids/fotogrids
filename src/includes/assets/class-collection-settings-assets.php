@@ -134,6 +134,7 @@ final class Collection_Settings_Assets {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-collection-settings', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 	}
 
 	/**
@@ -309,12 +310,15 @@ final class Collection_Settings_Assets {
 			$dependencies[] = 'fotogrids-render-select';
 		}
 
+		$handle = 'fotogrids-' . strtolower( preg_replace( '/([a-z])([A-Z])/', '$1-$2', $function_name ) );
+
 		wp_enqueue_script(
-			'fotogrids-' . strtolower( preg_replace( '/([a-z])([A-Z])/', '$1-$2', $function_name ) ),
+			$handle,
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/' . $function_name . '.js',
 			$dependencies,
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( $handle, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 	}
 }
