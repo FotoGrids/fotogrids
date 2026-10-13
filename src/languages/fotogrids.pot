@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-12T18:45:13+00:00\n"
+"POT-Creation-Date: 2026-10-13T07:02:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -18,7 +18,7 @@ msgstr ""
 #. Author of the plugin
 #: fotogrids.php
 #: includes/catalog/catalog-strings.php:357
-#: includes/class-admin-init.php:100
+#: includes/class-admin-init.php:92
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
@@ -58,8 +58,8 @@ msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
 #: fotogrids.php:280
-#: includes/class-admin-init.php:166
-#: includes/class-admin-init.php:167
+#: includes/class-admin-init.php:157
+#: includes/class-admin-init.php:158
 #: includes/tools/import-export/assets/constants.js:42
 #: includes/tools/import-export/assets/constants.js:107
 msgid "Settings"
@@ -115,7 +115,7 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:93
 #: includes/admin/class-dashboard-widget.php:142
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:26
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:29
 #: assets/admin/src/components/library/LibraryTabBase.jsx:451
 #: assets/admin/src/components/pages/StatsPage.jsx:241
 #: includes/tools/import-export/assets/constants.js:21
@@ -127,7 +127,7 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:215
 #: includes/catalog/catalog-strings.php:439
 #: includes/metaboxes/class-metabox-strings.php:261
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:38
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:41
 #: assets/admin/src/components/pages/StatsPage.jsx:254
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:109
 msgid "Interactions"
@@ -155,11 +155,11 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:214
 #: includes/admin/class-dashboard-widget.php:126
-#: includes/class-admin-init.php:121
-#: includes/class-admin-init.php:122
+#: includes/class-admin-init.php:112
+#: includes/class-admin-init.php:113
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:14
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:17
 #: assets/admin/src/components/pages/StatsPage.jsx:229
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:347
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
@@ -224,10 +224,10 @@ msgid "New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:134
-#: includes/class-admin-init.php:130
-#: includes/class-admin-init.php:131
+#: includes/class-admin-init.php:121
+#: includes/class-admin-init.php:122
 #: includes/diagnostics/class-system-report.php:161
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:20
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:23
 #: assets/admin/src/components/pages/StatsPage.jsx:235
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:31
 #: includes/tools/import-export/assets/constants.js:15
@@ -240,8 +240,8 @@ msgid "Engagement"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:167
-#: includes/class-admin-init.php:112
-#: includes/class-admin-init.php:113
+#: includes/class-admin-init.php:103
+#: includes/class-admin-init.php:104
 msgid "Dashboard"
 msgstr ""
 
@@ -268,12 +268,12 @@ msgid "Gallery"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:209
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:143
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:153
 msgid "Recently Edited"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:231
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:123
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:126
 msgid "No recently edited galleries or albums."
 msgstr ""
 
@@ -3954,12 +3954,8 @@ msgstr ""
 msgid "{postType} Password"
 msgstr ""
 
-#: includes/class-admin-init.php:91
-msgid "Sorry, you are not allowed to access this page."
-msgstr ""
-
-#: includes/class-admin-init.php:139
-#: includes/class-admin-init.php:140
+#: includes/class-admin-init.php:130
+#: includes/class-admin-init.php:131
 #: includes/class-upgrade-modal.php:97
 #: includes/modules/Templates/Module.php:43
 #: includes/modules/Templates/Module.php:118
@@ -3968,34 +3964,34 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: includes/class-admin-init.php:148
-#: includes/class-admin-init.php:149
+#: includes/class-admin-init.php:139
+#: includes/class-admin-init.php:140
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:32
 msgid "Library"
 msgstr ""
 
-#: includes/class-admin-init.php:157
-#: includes/class-admin-init.php:158
+#: includes/class-admin-init.php:148
+#: includes/class-admin-init.php:149
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
 #: includes/tools/import-export/assets/constants.js:50
 msgid "Statistics"
 msgstr ""
 
-#: includes/class-admin-init.php:175
-#: includes/class-admin-init.php:176
+#: includes/class-admin-init.php:166
+#: includes/class-admin-init.php:167
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
 msgid "Tools"
 msgstr ""
 
-#: includes/class-admin-init.php:185
-#: includes/class-admin-init.php:186
+#: includes/class-admin-init.php:176
+#: includes/class-admin-init.php:177
 #: includes/metaboxes/class-metabox-strings.php:290
 #: includes/modules/Templates/Module.php:324
 #: assets/admin/plain/collection-settings.js:2546
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:610
+#: includes/class-admin-init.php:601
 #: includes/metaboxes/class-collection-save-pipeline.php:98
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
@@ -4005,37 +4001,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:636
+#: includes/class-admin-init.php:627
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:644
+#: includes/class-admin-init.php:635
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:653
-#: includes/class-admin-init.php:700
+#: includes/class-admin-init.php:644
+#: includes/class-admin-init.php:691
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:705
+#: includes/class-admin-init.php:696
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:957
+#: includes/class-admin-init.php:948
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:958
+#: includes/class-admin-init.php:949
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1086
+#: includes/class-admin-init.php:1077
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1092
+#: includes/class-admin-init.php:1083
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4043,8 +4039,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1105
-#: includes/class-admin-init.php:1119
+#: includes/class-admin-init.php:1096
+#: includes/class-admin-init.php:1110
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4052,7 +4048,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1138
+#: includes/class-admin-init.php:1129
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4060,32 +4056,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1150
-#: includes/class-admin-init.php:1164
+#: includes/class-admin-init.php:1141
+#: includes/class-admin-init.php:1155
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1182
-#: includes/class-admin-init.php:1361
+#: includes/class-admin-init.php:1173
+#: includes/class-admin-init.php:1352
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1185
+#: includes/class-admin-init.php:1176
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1188
+#: includes/class-admin-init.php:1179
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1225
+#: includes/class-admin-init.php:1216
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1228
+#: includes/class-admin-init.php:1219
 msgid "Choose an album..."
 msgstr ""
 
@@ -4221,8 +4217,8 @@ msgid "Add New Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:122
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:33
-#: assets/admin/src/components/dashboard/MainCTA.jsx:54
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:15
+#: assets/admin/src/components/dashboard/MainCTA.jsx:79
 msgid "New Gallery"
 msgstr ""
 
@@ -4335,7 +4331,7 @@ msgid "Add New Album"
 msgstr ""
 
 #: includes/class-post-types.php:191
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:43
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:21
 msgid "New Album"
 msgstr ""
 
@@ -5396,7 +5392,7 @@ msgid "Are you sure you want to remove all items?"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:63
-#: assets/admin/src/components/dashboard/FileUploader.jsx:27
+#: assets/admin/src/components/dashboard/FileUploader.jsx:30
 msgid "WordPress media library is not available. Please refresh the page."
 msgstr ""
 
@@ -6472,8 +6468,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:323
-#: includes/rest/gallery/gallery-data.php:592
+#: includes/rest/gallery/gallery-data.php:322
+#: includes/rest/gallery/gallery-data.php:591
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
@@ -6997,20 +6993,24 @@ msgstr ""
 msgid "Gallery is not part of this album."
 msgstr ""
 
-#: includes/rest/album/album-data.php:109
-msgid "Album not found"
-msgstr ""
-
-#: includes/rest/album/album-data.php:117
-msgid "Album is not published"
-msgstr ""
-
-#: includes/rest/album/album-permissions.php:61
+#: includes/rest/album/album-permissions.php:65
 msgid "Invalid album ID."
 msgstr ""
 
-#: includes/rest/album/album-permissions.php:68
+#: includes/rest/album/album-permissions.php:72
 msgid "You do not have permission to edit this album."
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:94
+msgid "Album not found"
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:102
+msgid "Album is not published"
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:111
+msgid "You do not have access to this album."
 msgstr ""
 
 #: includes/rest/gallery/gallery-data.php:60
@@ -7026,25 +7026,25 @@ msgid "The featured item could not be saved."
 msgstr ""
 
 #: includes/rest/gallery/gallery-data.php:113
-#: includes/rest/gallery/gallery-data.php:165
-#: includes/rest/gallery/gallery-data.php:200
+#: includes/rest/gallery/gallery-data.php:164
+#: includes/rest/gallery/gallery-data.php:199
 msgid "Gallery not found"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:210
+#: includes/rest/gallery/gallery-data.php:209
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:221
+#: includes/rest/gallery/gallery-data.php:220
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:314
+#: includes/rest/gallery/gallery-data.php:313
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:331
+#: includes/rest/gallery/gallery-data.php:330
 #: includes/rest/gallery/gallery-permissions.php:76
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
@@ -8725,71 +8725,91 @@ msgstr ""
 msgid "or drag and drop files here"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:36
+#: assets/admin/src/components/dashboard/access.js:10
+msgid "Your role can't create or edit galleries."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/access.js:14
+msgid "Your role can't create or edit albums."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/access.js:18
+msgid "Your role can't use templates."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/access.js:22
+msgid "Your role can't change settings."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/access.js:26
+msgid "Your role can't open Statistics."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/Checklist.jsx:51
 msgid "Plugin installed and activated"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:40
+#: assets/admin/src/components/dashboard/Checklist.jsx:55
 msgid "Dashboard page visited"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:44
+#: assets/admin/src/components/dashboard/Checklist.jsx:59
 #: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:160
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:103
 msgid "Create your first gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:49
+#: assets/admin/src/components/dashboard/Checklist.jsx:65
 msgid "Configure display settings"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:54
+#: assets/admin/src/components/dashboard/Checklist.jsx:71
 msgid "Publish gallery on your site"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:96
+#: assets/admin/src/components/dashboard/Checklist.jsx:114
 msgid "Complete Your Setup"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:16
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:27
+msgid "Browse Templates"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:33
+msgid "Finetune Settings"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:69
 #: assets/admin/src/components/library/LibraryTabBase.jsx:1285
 msgid "Create"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:18
+#: assets/admin/src/components/dashboard/CreateOptions.jsx:71
 msgid "Create a new gallery, browse pre-defined templates and adjust settings to your own likes and needs."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:53
-msgid "Browse Templates"
-msgstr ""
-
-#: assets/admin/src/components/dashboard/CreateOptions.jsx:63
-msgid "Finetune Settings"
-msgstr ""
-
-#: assets/admin/src/components/dashboard/FileUploader.jsx:37
+#: assets/admin/src/components/dashboard/FileUploader.jsx:40
 msgid "Select Images for Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:39
+#: assets/admin/src/components/dashboard/FileUploader.jsx:42
 msgid "Create Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:60
+#: assets/admin/src/components/dashboard/FileUploader.jsx:63
 #: assets/admin/src/components/pages/Dashboard.jsx:74
 msgid "Failed to create gallery."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:77
+#: assets/admin/src/components/dashboard/FileUploader.jsx:86
 msgid "Quick Upload"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:79
+#: assets/admin/src/components/dashboard/FileUploader.jsx:88
 msgid "Click or drag files here to create a gallery automatically."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:92
+#: assets/admin/src/components/dashboard/FileUploader.jsx:102
 msgid "or <link>choose existing files</link> from media library"
 msgstr ""
 
@@ -8810,39 +8830,39 @@ msgstr ""
 msgid "Productivity Hacks"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:14
+#: assets/admin/src/components/dashboard/MainCTA.jsx:38
 msgid "Create Your"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:15
+#: assets/admin/src/components/dashboard/MainCTA.jsx:39
 msgid "First Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:18
+#: assets/admin/src/components/dashboard/MainCTA.jsx:42
 msgid "Build the first beautiful photo gallery in minutes."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:27
+#: assets/admin/src/components/dashboard/MainCTA.jsx:51
 msgid "Get Started"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:37
+#: assets/admin/src/components/dashboard/MainCTA.jsx:62
 msgid "Grow Your Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:40
+#: assets/admin/src/components/dashboard/MainCTA.jsx:65
 msgid "Add photos to your galleries to bring them to life."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:44
+#: assets/admin/src/components/dashboard/MainCTA.jsx:69
 msgid "Create more galleries or explore advanced features to showcase your photos."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/MainCTA.jsx:61
+#: assets/admin/src/components/dashboard/MainCTA.jsx:86
 msgid "Add Photos"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:32
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:35
 #: assets/admin/src/components/pages/StatsPage.jsx:160
 #: assets/admin/src/components/pages/StatsPage.jsx:188
 #: assets/admin/src/components/pages/StatsPage.jsx:247
@@ -8850,7 +8870,7 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:46
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:51
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:227
 msgid "Overview"
 msgstr ""
@@ -8895,25 +8915,25 @@ msgstr ""
 msgid "Plus many more powerful features designed to save time, optimize performance, and help you grow."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:14
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:17
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:110
 msgid "Draft"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:15
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:18
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:112
 msgid "Private"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:113
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:116
 msgid "Loading recently edited galleries and albums"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:154
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:165
 msgid "View all galleries"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:164
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:176
 msgid "View all albums"
 msgstr ""
 
@@ -10979,14 +10999,6 @@ msgstr ""
 
 #: assets/admin/src/components/shared/SearchBar.jsx:170
 msgid "Clear search"
-msgstr ""
-
-#: assets/admin/src/components/shared/SettingsLock.jsx:54
-msgid "Locked - administrator only"
-msgstr ""
-
-#: assets/admin/src/components/shared/SettingsLock.jsx:58
-msgid "Your role can view these settings but cannot change them. Ask an administrator if you need to make changes here."
 msgstr ""
 
 #: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:125

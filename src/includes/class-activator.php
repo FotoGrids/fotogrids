@@ -301,8 +301,13 @@ class Activator {
 		// to skip re-firing their registration actions.
 		if ( version_compare( $current, '1.2', '<' ) ) {
 			self::add_capabilities( false );
-		} elseif ( version_compare( $current, '1.3', '<' ) ) {
-			self::grant_published_caps_to_publishers();
+		} else {
+			if ( version_compare( $current, '1.3', '<' ) ) {
+				self::grant_published_caps_to_publishers();
+			}
+			if ( version_compare( $current, '1.4', '<' ) ) {
+				self::grant_statistics_to_authors();
+			}
 		}
 		update_option( 'fotogrids_caps_version', self::CAPS_VERSION, false );
 	}
@@ -334,11 +339,24 @@ class Activator {
 	}
 
 	/**
+	 * Grant the Statistics screen to the author role.
+	 *
+	 * @since 1.3.0
+	 * @return void
+	 */
+	private static function grant_statistics_to_authors(): void {
+		$author = get_role( 'author' );
+		if ( $author ) {
+			$author->add_cap( 'view_fotogrids_stats' );
+		}
+	}
+
+	/**
 	 * Current capability-catalogue version. Each bump adds a step to
 	 * Activator::maybe_resync_capabilities so existing installs receive the
 	 * change once.
 	 */
-	private const CAPS_VERSION = '1.3';
+	private const CAPS_VERSION = '1.4';
 
 	/**
 	 * Add plugin capabilities to WordPress roles.

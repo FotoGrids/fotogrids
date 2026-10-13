@@ -6,6 +6,9 @@ import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import LoadingIcon from '../shared/LoadingIcon';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
 import { fetchRecentlyEdited } from '../../utils/api';
 
 const ROW_LIMIT = 5;
@@ -133,6 +136,13 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 		);
 	}
 
+	const canOpenGalleries = userCan(DASHBOARD_ACCESS.gallery.cap);
+	const canOpenAlbums = userCan(DASHBOARD_ACCESS.album.cap);
+	const lockedReasons = [
+		!canOpenGalleries && DASHBOARD_ACCESS.gallery.reason,
+		hasAlbums && !canOpenAlbums && DASHBOARD_ACCESS.album.reason,
+	].filter(Boolean);
+
 	return (
 		<div className="fotogrids-admin-block-card fg-abc-recently-edited">
 			<div className="fotogrids-admin-block-card-header">
@@ -146,6 +156,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 			<div className="fg-abc-recently-edited-actions">
 				<Button
 					href="edit.php?post_type=fotogrids_gallery"
+					disabled={!canOpenGalleries}
 					variant="primary"
 					style="outline"
 					size="sm"
@@ -156,6 +167,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 				{hasAlbums && (
 					<Button
 						href="edit.php?post_type=fotogrids_album"
+						disabled={!canOpenAlbums}
 						variant="primary"
 						style="outline"
 						size="sm"
@@ -165,6 +177,9 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 					</Button>
 				)}
 			</div>
+			{lockedReasons.map((reason) => (
+				<LockedReason key={reason}>{reason}</LockedReason>
+			))}
 		</div>
 	);
 };

@@ -14,9 +14,12 @@ import type { Role } from './support/roles';
 
 test.describe.configure( { mode: 'serial' } );
 
-/** The plugin's admin pages, by the capability each is registered under. */
+/**
+ * The plugin's admin pages, by the capability each is registered under. The
+ * Dashboard follows the menu: the first of these the user holds.
+ */
 const PAGES = {
-	'fotogrids-dashboard': 'manage_fotogrids',
+	'fotogrids-dashboard': 'manage_fotogrids | edit_fotogrids_galleries | edit_fotogrids_albums',
 	'fotogrids-templates': 'manage_fotogrids',
 	'fotogrids-library': 'manage_fotogrids_library',
 	'fotogrids-stats': 'view_fotogrids_stats',
@@ -75,25 +78,23 @@ test.describe( 'an editor', () => {
 		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 	} );
 
-	// Library and Statistics sit under caps an editor holds; their parent does not.
-	test( 'ROLE-02: reaches Library and Statistics without the parent menu', { tag: [ '@admin', '@permissions' ] }, async ( {
+	test( 'ROLE-02: sees the Dashboard and reaches it, Library and Statistics, not Templates, Settings or Tools', { tag: [ '@admin', '@permissions' ] }, async ( {
 		page,
 	} ) => {
 		await page.goto( '/wp-admin/' );
 
 		const labels = ( await menuItems( page ).allInnerTexts() ).join( '\n' );
 
-		expect( labels, 'the top-level FotoGrids menu is visible to an editor' ).not.toContain(
-			'Dashboard'
-		);
+		expect( labels, "the Dashboard is missing from the editor's menu" ).toContain( 'Dashboard' );
 
+		expect( await reach( page, 'fotogrids' ) ).toBe( 'served' );
+		expect( await reach( page, 'fotogrids-dashboard' ) ).toBe( 'served' );
 		expect( await reach( page, 'fotogrids-library' ) ).toBe( 'served' );
 		expect( await reach( page, 'fotogrids-stats' ) ).toBe( 'served' );
 		expect( await reachList( page, 'fotogrids_gallery' ) ).toBe( 'served' );
 		expect( await reachList( page, 'fotogrids_album' ) ).toBe( 'served' );
 
-		expect( await reach( page, 'fotogrids' ) ).toBe( 'refused' );
-
+		expect( await reach( page, 'fotogrids-templates' ) ).toBe( 'refused' );
 		expect( await reach( page, 'fotogrids-settings' ) ).toBe( 'refused' );
 		expect( await reach( page, 'fotogrids-tools' ) ).toBe( 'refused' );
 	} );
@@ -105,21 +106,24 @@ test.describe( 'an author', () => {
 		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 	} );
 
-	// The Dashboard needs a cap an author lacks, so WordPress promotes the
-	// first submenu they can reach, under the plugin's name.
-	test( 'ROLE-03: the promoted menu entry points at Galleries', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+	test( 'ROLE-03: the top-level menu entry points at the Dashboard', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		await page.goto( '/wp-admin/' );
 
 		await expect(
 			page.locator( '#adminmenu a[href*="fotogrids"]' ).first()
-		).toHaveAttribute( 'href', /post_type=fotogrids_gallery/ );
+		).toHaveAttribute( 'href', /page=fotogrids-dashboard/ );
 	} );
 
-	test( 'ROLE-03: reaches the gallery and album lists, not the Dashboard', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+	test( 'ROLE-03: reaches the Dashboard, Statistics and both lists, not Templates, Library, Settings or Tools', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		expect( await reachList( page, 'fotogrids_gallery' ) ).toBe( 'served' );
 		expect( await reachList( page, 'fotogrids_album' ) ).toBe( 'served' );
+		expect( await reach( page, 'fotogrids' ) ).toBe( 'served' );
+		expect( await reach( page, 'fotogrids-dashboard' ) ).toBe( 'served' );
+		expect( await reach( page, 'fotogrids-stats' ) ).toBe( 'served' );
 
-		expect( await reach( page, 'fotogrids' ) ).toBe( 'refused' );
+		for ( const slug of [ 'fotogrids-templates', 'fotogrids-library', 'fotogrids-settings', 'fotogrids-tools' ] ) {
+			expect( await reach( page, slug ), slug ).toBe( 'refused' );
+		}
 	} );
 
 	test( 'ROLE-04: cannot open a gallery someone else owns', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {

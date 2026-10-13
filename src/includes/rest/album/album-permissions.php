@@ -1,6 +1,10 @@
 <?php
 namespace FotoGrids\REST\Album;
 
+use FotoGrids\Albums\Album_Repository;
+use FotoGrids\Render\Internal\Context_Builder;
+use FotoGrids\Render\Internal\Render_Controller;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -69,6 +73,46 @@ class Album_Permissions {
 				array( 'status' => 403 )
 			);
 		}
+		return true;
+	}
+
+	/**
+	 * Decides whether the current visitor may see an album and its galleries.
+	 *
+	 * The album must be published, and every gate that would run on its
+	 * public render must pass.
+	 *
+	 * @since 1.3.0
+	 * @param int $album_id Album post ID.
+	 * @return true|\WP_Error
+	 */
+	public static function authorize_album_view( int $album_id ) {
+		$album = $album_id > 0 ? get_post( $album_id ) : null;
+		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+			return new \WP_Error(
+				'album_not_found',
+				__( 'Album not found', 'fotogrids' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( 'publish' !== $album->post_status ) {
+			return new \WP_Error(
+				'album_not_published',
+				__( 'Album is not published', 'fotogrids' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$context = Context_Builder::for_public()->build_for_album( $album_id, Album_Repository::get_settings( $album_id ) );
+		if ( ! Render_Controller::evaluate_gates( $context )->passed ) {
+			return new \WP_Error(
+				'fotogrids_album_locked',
+				__( 'You do not have access to this album.', 'fotogrids' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		return true;
 	}
 }

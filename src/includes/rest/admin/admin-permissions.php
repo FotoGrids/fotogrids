@@ -170,7 +170,7 @@ class Admin_Permissions {
 	 * @return bool
 	 */
 	public static function check_overview_read( $request ) {
-		return self::check_view_stats( $request ) || current_user_can( 'manage_fotogrids' );
+		return self::check_view_stats( $request ) || self::can_open_dashboard();
 	}
 
 	/**
@@ -184,7 +184,7 @@ class Admin_Permissions {
 	 * @return bool
 	 */
 	public static function check_recently_edited_read( $request ) {
-		return self::check_edit_posts( $request ) || current_user_can( 'manage_fotogrids' );
+		return self::check_edit_posts( $request ) || self::can_open_dashboard();
 	}
 
 	/**
@@ -199,10 +199,19 @@ class Admin_Permissions {
 	 * @return bool
 	 */
 	public static function check_news_read( $request ) {
-		if ( self::check_edit_posts( $request ) ) {
-			return true;
-		}
+		return self::check_edit_posts( $request ) || self::can_open_dashboard();
+	}
 
+	/**
+	 * Whether the current user can open the FotoGrids Dashboard.
+	 *
+	 * Matches the capability the FotoGrids menu and its Dashboard are
+	 * registered under.
+	 *
+	 * @since  1.3.0
+	 * @return bool
+	 */
+	private static function can_open_dashboard(): bool {
 		foreach ( array( 'manage_fotogrids', 'edit_fotogrids_galleries', 'edit_fotogrids_albums' ) as $capability ) {
 			if ( current_user_can( $capability ) ) {
 				return true;

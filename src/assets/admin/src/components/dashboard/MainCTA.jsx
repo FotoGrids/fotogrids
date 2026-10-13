@@ -4,6 +4,30 @@
  */
 import React from 'react';
 import { __ } from '@wordpress/i18n';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
+
+const CtaLink = ({ href, className, children }) => {
+	if (userCan(DASHBOARD_ACCESS.gallery.cap)) {
+		return (
+			<a href={href} className={className}>
+				{children}
+			</a>
+		);
+	}
+
+	return (
+		<span className={`${className} fg-abc-main-cta-disabled`}>
+			{children}
+		</span>
+	);
+};
+
+const CtaReason = () =>
+	userCan(DASHBOARD_ACCESS.gallery.cap) ? null : (
+		<LockedReason>{DASHBOARD_ACCESS.gallery.reason}</LockedReason>
+	);
 
 const MainCTA = ({ galleriesCount, itemsCount }) => {
 	if (galleriesCount === 0) {
@@ -20,12 +44,13 @@ const MainCTA = ({ galleriesCount, itemsCount }) => {
 							'fotogrids'
 						)}
 					</p>
-					<a
+					<CtaLink
 						href="post-new.php?post_type=fotogrids_gallery"
 						className="button button-primary"
 					>
 						{__('Get Started', 'fotogrids')}
-					</a>
+					</CtaLink>
+					<CtaReason />
 				</div>
 			</div>
 		);
@@ -47,21 +72,22 @@ const MainCTA = ({ galleriesCount, itemsCount }) => {
 							)}
 				</p>
 				<div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-					<a
+					<CtaLink
 						href="post-new.php?post_type=fotogrids_gallery"
 						className="button button-primary"
 					>
 						{__('New Gallery', 'fotogrids')}
-					</a>
+					</CtaLink>
 					{itemsCount === 0 && (
-						<a
+						<CtaLink
 							href="edit.php?post_type=fotogrids_gallery"
 							className="button button-secondary"
 						>
 							{__('Add Photos', 'fotogrids')}
-						</a>
+						</CtaLink>
 					)}
 				</div>
+				<CtaReason />
 			</div>
 		</div>
 	);
