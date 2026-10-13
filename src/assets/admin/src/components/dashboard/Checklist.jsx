@@ -4,9 +4,24 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
 
-const ChecklistItem = ({ completed, href, label }) => {
+const ChecklistItem = ({ completed, href, label, access }) => {
 	const marker = completed ? <Icon name="check" /> : <span />;
+
+	if (!completed && access && !userCan(access.cap)) {
+		return (
+			<li className="is-disabled">
+				{marker}
+				<div className="fg-abc-checklist-text">
+					{label}
+					<LockedReason>{access.reason}</LockedReason>
+				</div>
+			</li>
+		);
+	}
 
 	if (completed || !href) {
 		return (
@@ -44,16 +59,19 @@ const buildSteps = ({
 		label: __('Create your first gallery', 'fotogrids'),
 		completed: galleriesTotal > 0,
 		href: 'post-new.php?post_type=fotogrids_gallery',
+		access: DASHBOARD_ACCESS.gallery,
 	},
 	{
 		label: __('Configure display settings', 'fotogrids'),
 		completed: settingsConfigured,
 		href: 'admin.php?page=fotogrids-settings&tab=defaults',
+		access: DASHBOARD_ACCESS.settings,
 	},
 	{
 		label: __('Publish gallery on your site', 'fotogrids'),
 		completed: galleriesPublished > 0,
 		href: 'edit.php?post_type=fotogrids_gallery',
+		access: DASHBOARD_ACCESS.gallery,
 	},
 ];
 
@@ -102,6 +120,7 @@ const Checklist = ({
 						completed={step.completed}
 						href={step.href}
 						label={step.label}
+						access={step.access}
 					/>
 				))}
 			</ul>

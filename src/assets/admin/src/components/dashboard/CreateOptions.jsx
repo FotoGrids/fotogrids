@@ -4,6 +4,59 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
+import LockedReason from './LockedReason';
+import { DASHBOARD_ACCESS } from './access';
+import { userCan } from '../../utils/capabilities';
+
+const OPTIONS = [
+	{
+		href: 'post-new.php?post_type=fotogrids_gallery',
+		icon: 'layout_3x3',
+		label: __('New Gallery', 'fotogrids'),
+		access: DASHBOARD_ACCESS.gallery,
+	},
+	{
+		href: 'post-new.php?post_type=fotogrids_album',
+		icon: 'layout_2x2',
+		label: __('New Album', 'fotogrids'),
+		access: DASHBOARD_ACCESS.album,
+	},
+	{
+		href: 'admin.php?page=fotogrids-templates',
+		icon: 'templates',
+		label: __('Browse Templates', 'fotogrids'),
+		access: DASHBOARD_ACCESS.templates,
+	},
+	{
+		href: 'admin.php?page=fotogrids-settings',
+		icon: 'settings',
+		label: __('Finetune Settings', 'fotogrids'),
+		access: DASHBOARD_ACCESS.settings,
+	},
+];
+
+const CreateOption = ({ href, icon, label, access }) => {
+	const iconNode = (
+		<Icon name={icon} className="fotogrids-admin-block-card-icon" />
+	);
+
+	if (userCan(access.cap)) {
+		return (
+			<a href={href} className="create-option">
+				{iconNode}
+				<span>{label}</span>
+			</a>
+		);
+	}
+
+	return (
+		<div className="create-option is-disabled">
+			{iconNode}
+			<span>{label}</span>
+			<LockedReason>{access.reason}</LockedReason>
+		</div>
+	);
+};
 
 const CreateOptions = () => {
 	return (
@@ -22,46 +75,9 @@ const CreateOptions = () => {
 				</p>
 			</div>
 			<div className="create-grid">
-				<a
-					href="post-new.php?post_type=fotogrids_gallery"
-					className="create-option"
-				>
-					<Icon
-						name="layout_3x3"
-						className="fotogrids-admin-block-card-icon"
-					/>
-					<span>{__('New Gallery', 'fotogrids')}</span>
-				</a>
-				<a
-					href="post-new.php?post_type=fotogrids_album"
-					className="create-option"
-				>
-					<Icon
-						name="layout_2x2"
-						className="fotogrids-admin-block-card-icon"
-					/>
-					<span>{__('New Album', 'fotogrids')}</span>
-				</a>
-				<a
-					href="admin.php?page=fotogrids-templates"
-					className="create-option"
-				>
-					<Icon
-						name="templates"
-						className="fotogrids-admin-block-card-icon"
-					/>
-					<span>{__('Browse Templates', 'fotogrids')}</span>
-				</a>
-				<a
-					href="admin.php?page=fotogrids-settings"
-					className="create-option"
-				>
-					<Icon
-						name="settings"
-						className="fotogrids-admin-block-card-icon"
-					/>
-					<span>{__('Finetune Settings', 'fotogrids')}</span>
-				</a>
+				{OPTIONS.map((option) => (
+					<CreateOption key={option.href} {...option} />
+				))}
 			</div>
 		</div>
 	);
