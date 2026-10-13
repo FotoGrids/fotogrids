@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-12T19:28:00+00:00\n"
+"POT-Creation-Date: 2026-10-13T05:53:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -6501,7 +6501,7 @@ msgid "Page Builders"
 msgstr ""
 
 #: includes/modules/PageBuilders/Module.php:92
-msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi and Bricks."
+msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi, Bricks and Beaver Builder."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:47
@@ -7844,6 +7844,34 @@ msgstr ""
 
 #: includes/watermark/class-watermark-regenerate-data.php:112
 msgid "Attachment is not an image."
+msgstr ""
+
+#: public/class-public-render.php:428
+msgid "No gallery ID specified. Usage: [fotogrids_gallery id=\"1\"]"
+msgstr ""
+
+#. translators: %d: gallery ID.
+#: public/class-public-render.php:436
+#: public/class-public-render.php:707
+#, php-format
+msgid "Gallery with ID %d not found."
+msgstr ""
+
+#. translators: 1: gallery ID, 2: post status.
+#: public/class-public-render.php:448
+#, php-format
+msgid "Gallery with ID %1$d is not published (status: %2$s)."
+msgstr ""
+
+#. translators: %d: gallery ID.
+#: public/class-public-render.php:462
+#: public/class-public-render.php:720
+#, php-format
+msgid "Gallery with ID %d exists but has no items."
+msgstr ""
+
+#: public/class-public-render.php:699
+msgid "No gallery ID specified."
 msgstr ""
 
 #: public/render/decorators/hover/class-hover-effects-catalog.php:78
