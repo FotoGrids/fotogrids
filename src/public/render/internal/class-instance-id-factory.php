@@ -64,11 +64,7 @@ final class Instance_Id_Factory {
 	}
 
 	/**
-	 * Whether an instance ID has the shape this factory gives a collection.
-	 *
-	 * Matches `fg-{id}-{n}` and `fg-{id}-p{key}`. A request that renders into a
-	 * page it cannot see, such as a password unlock or an album swap, takes the
-	 * ID the page chose for it only when this returns true.
+	 * Whether an instance ID is `fg-{id}-{n}` or `fg-{id}-p{key}` for the collection.
 	 *
 	 * @since   1.3.0
 	 * @param   int    $collection_id Gallery or album identifier.

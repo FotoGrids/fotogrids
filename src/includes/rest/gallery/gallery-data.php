@@ -251,8 +251,7 @@ class Gallery_Data {
 		$_COOKIE[ $cookie_key ] = $cookie_value;
 
 		// Render the gallery HTML server-side so the frontend can swap it in
-		// without a full page reload. The gallery keeps the lock screen's
-		// instance ID, the one a reload of the page would give it.
+		// without a full page reload.
 		$html     = \FotoGrids\Public_Render::render_gallery_embed(
 			array( 'id' => $gallery_id ),
 			(string) $request->get_param( 'instance_id' )
@@ -349,8 +348,6 @@ class Gallery_Data {
 		if ( $via_album_id > 0 ) {
 			$shared_meta_overrides['via_album_id'] = $via_album_id;
 		}
-		// The page picks an ID none of its elements use. The request's own
-		// counter starts at 1 and cannot see the page.
 		if ( '' !== $instance_id ) {
 			$shared_meta_overrides['instance_id'] = $instance_id;
 		}

@@ -5,8 +5,7 @@
  * album item). On click:
  *
  *   1. POST to the render URL carried in data-fg-render-url with the
- *      gallery's ID, an instance ID no element on the page uses, and the
- *      nonce.
+ *      gallery's ID, a free instance ID and the nonce.
  *   2. Server returns { html, css: { handle: url } }.
  *   3. Inject any CSS handles that aren't already in <head> (mirrors the
  *      password-gate unlock pattern).
@@ -50,8 +49,7 @@
 	const boundTriggers = new WeakSet();
 
 	/**
-	 * Instance IDs claimed by swaps still waiting for the server. Two swaps
-	 * started together must not pick the same free ID.
+	 * Instance IDs claimed by swaps in flight.
 	 *
 	 * @type {Set<string>}
 	 */
@@ -199,11 +197,7 @@
 	}
 
 	/**
-	 * Pick an instance ID for a gallery about to be swapped in.
-	 *
-	 * The server renders the gallery in a request of its own, whose counter
-	 * starts again at 1, so the page chooses: the first `fg-{gallery}-{n}`
-	 * that no element uses and no swap in flight has claimed.
+	 * First `fg-{gallery}-{n}` no element uses and no swap in flight has claimed.
 	 *
 	 * @param {number} galleryId
 	 * @returns {string}

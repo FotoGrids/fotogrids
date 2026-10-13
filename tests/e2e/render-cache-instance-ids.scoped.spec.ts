@@ -4,20 +4,16 @@ import { galleryPage, multiGalleryPage, shortcodePage } from './support/collecti
 import { storageStateFor, wpEval } from './support/roles';
 
 /**
- * Instance IDs on pages served from the render cache.
+ * Instance IDs on pages served from the render cache, for a logged-out visitor.
  *
- * Every visit here is logged out, so the cache is in play: the first visit
- * fills it and the second is served from it. Each embed has to come back with
- * the ID an uncached render gives it, and with styles written for that ID.
- *
- * Scoped: every gallery and page here is created by the spec.
+ * Scoped: every gallery and post here is created by the spec.
  */
 
 const CACHED = { layout: 'grid', enable_cache: true, enable_statistics: false };
 
 type Instance = { id: string; gallery: string; cols: string; styled: boolean };
 
-/** A post the purge removes, holding the given content verbatim. */
+/** A post, so the purge removes it. */
 function postWith( content: string ): string {
 	const encoded = Buffer.from( content, 'utf8' ).toString( 'base64' );
 
@@ -26,7 +22,6 @@ function postWith( content: string ): string {
 	).trim();
 }
 
-/** Every collection wrapper on the page, in document order. */
 function instances( page: Page ): Promise< Instance[] > {
 	return page.locator( '.fotogrids-collection' ).evaluateAll( ( nodes ) => {
 		const styles = [ ...document.querySelectorAll( 'style' ) ].map( ( style ) => style.textContent ?? '' ).join( '\n' );
@@ -40,7 +35,6 @@ function instances( page: Page ): Promise< Instance[] > {
 	} );
 }
 
-/** The instances a fresh visitor sees, on a page load of its own. */
 async function visit( browser: Browser, url: string, storageState?: string ): Promise< Instance[] > {
 	const context = await browser.newContext( storageState ? { storageState } : {} );
 	const page = await context.newPage();
@@ -56,7 +50,6 @@ function ids( found: Instance[] ): string[] {
 	return found.map( ( instance ) => instance.id );
 }
 
-/** Render cache rows held for a gallery. */
 function cachedRows( galleryId: number ): number {
 	return Number(
 		wpEval(

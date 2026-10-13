@@ -516,7 +516,7 @@ class FotoGrids_Cache {
 	 * @param  array  $settings
 	 * @param  array  $item_ids
 	 * @param  array  $atts
-	 * @param  string $instance_id Instance ID written into the render's markup and inline CSS.
+	 * @param  string $instance_id
 	 * @return string
 	 */
 	public static function make_key( int $gallery_id, array $settings, array $item_ids, array $atts, string $instance_id = '' ): string {

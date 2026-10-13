@@ -495,8 +495,7 @@ test.describe('two embeds on one page', () => {
 
 	/**
 	 * LAY-23. The counter is per request, not per gallery, so a second embed of
-	 * the same gallery is a second instance. The cache is off here; the next
-	 * test covers it on.
+	 * the same gallery is a second instance. The cache is off here.
 	 */
 	test(
 		'LAY-23: the same gallery twice gets two instances',
@@ -527,11 +526,6 @@ test.describe('two embeds on one page', () => {
 		}
 	);
 
-	/**
-	 * LAY-23 with the render cache on, for a logged-out visitor: on the visit
-	 * that fills the cache and on the one it serves, each embed keeps its own
-	 * instance id and the style variables written for it.
-	 */
 	test(
 		'LAY-23: the same gallery twice keeps two instances from the render cache',
 		{ tag: ['@layout', '@cache'] },

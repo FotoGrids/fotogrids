@@ -249,9 +249,6 @@
 				'X-WP-Nonce': nonce,
 			},
 			credentials: 'same-origin',
-			// The unlocked gallery keeps the lock screen's instance ID. The
-			// server renders in a request of its own, whose counter would
-			// otherwise start again at an ID the page may already use.
 			body: JSON.stringify({
 				password,
 				instance_id: wrapper && wrapper.id ? wrapper.id : '',
@@ -371,10 +368,7 @@
 		bindAll();
 
 		// Lock forms inserted later are caught by a delegated submit listener rather
-		// than a MutationObserver, on every submit. Binding the form here as well
-		// would add a listener this same submit then reaches on the form, which
-		// unlocks twice and reloads the page when the second answer finds the
-		// lock screen already gone.
+		// than a MutationObserver. Binding the form here too would unlock it twice.
 		document.addEventListener(
 			'submit',
 			function (e) {

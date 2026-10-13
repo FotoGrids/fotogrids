@@ -1,10 +1,7 @@
 /**
- * Tests for lock forms that public/render/gates/password/password-gate.js
- * finds only after load, such as a locked gallery an album opens in place on a
- * page that already shows another lock screen.
+ * Lock forms password-gate.js finds after load.
  *
- * The module is loaded once for the whole file: every load adds a listener to
- * the document, and a second one would count every submit twice.
+ * Loaded once: each load adds another document listener.
  */
 
 const GATE_MODULE = '../../../public/render/gates/password/password-gate';
@@ -33,7 +30,6 @@ function submit(gate) {
 	);
 }
 
-/** Records every request body and leaves each response for the test to settle. */
 function stubFetch() {
 	const calls = [];
 	window.fetch = jest.fn((url, init) => {
@@ -62,7 +58,6 @@ function respond(call, payload, ok = true) {
 describe('lock forms inserted after load', () => {
 	beforeAll(() => {
 		document.body.innerHTML = '';
-		// A lock screen already on the page when the module boots.
 		addGate('fg-5-1', 5);
 		jest.isolateModules(() => {
 			require(GATE_MODULE);

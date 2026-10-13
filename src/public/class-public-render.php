@@ -393,10 +393,7 @@ class Public_Render {
 	 *
 	 * @since 1.3.0
 	 * @param array|string $atts        Shortcode attributes.
-	 * @param string       $instance_id Instance ID for a render that takes the place of
-	 *                                  one already on the page, such as an unlocked
-	 *                                  password gate. Empty takes the next ID from the
-	 *                                  request's counter.
+	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
 	 * @return string Rendered gallery HTML
 	 */
 	public static function render_gallery_embed( $atts, string $instance_id = '' ) {

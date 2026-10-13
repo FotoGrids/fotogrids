@@ -4,15 +4,9 @@ import { album, galleryPage, passwordGalleryPage } from './support/collections';
 import { wpEval } from './support/roles';
 
 /**
- * Instance IDs of galleries rendered into a page that is already open: a
- * password unlock and an album that opens a gallery in place.
+ * Instance IDs of galleries an unlock or an album renders into an open page.
  *
- * The server renders those galleries in a request of its own, which cannot see
- * the IDs the page already uses, so the page sends the ID to render with. Each
- * test puts a second copy of the gallery on the page, where a repeated ID
- * would show.
- *
- * Scoped: every gallery, album and page here is created by the spec.
+ * Scoped: every gallery, album and post here is created by the spec.
  */
 
 const PASSWORD = 'in-place-secret';
@@ -21,7 +15,7 @@ const LOCKED = { ...GRID, password_remember: false };
 
 type Instance = { id: string; kind: 'gate' | 'gallery' | 'album'; cols: string; styled: boolean };
 
-/** A post the purge removes, holding the given content verbatim. */
+/** A post, so the purge removes it. */
 function postWith( content: string ): string {
 	const encoded = Buffer.from( content, 'utf8' ).toString( 'base64' );
 
@@ -30,7 +24,6 @@ function postWith( content: string ): string {
 	).trim();
 }
 
-/** Every lock screen and collection on the page, in document order. */
 function instances( page: Page ): Promise< Instance[] > {
 	return page.locator( '.fotogrids-gate, .fotogrids-collection' ).evaluateAll( ( nodes ) => {
 		const styles = [ ...document.querySelectorAll( 'style' ) ].map( ( style ) => style.textContent ?? '' ).join( '\n' );
@@ -53,7 +46,6 @@ function instances( page: Page ): Promise< Instance[] > {
 	} );
 }
 
-/** Every instance ID on the page that more than one element carries. */
 function repeatedIds( page: Page ): Promise< string[] > {
 	return page.evaluate( () => {
 		const seen = new Map< string, number >();
@@ -150,7 +142,6 @@ test( 'a locked gallery opened in place from an album unlocks with the ID it ope
 	await expect( swappedGate ).toBeVisible( { timeout: 15000 } );
 	await expect( swappedGate ).toHaveAttribute( 'id', `fg-${ id }-2` );
 
-	// The page's own lock screen was bound at load; this one arrived later.
 	await unlock( page, `fg-${ id }-2` );
 	await page.waitForLoadState( 'networkidle' );
 

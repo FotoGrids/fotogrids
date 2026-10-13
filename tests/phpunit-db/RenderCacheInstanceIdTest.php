@@ -21,7 +21,6 @@ class RenderCacheInstanceIdTest extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 	}
 
-	/** A published gallery with one item and the render cache on. */
 	private function cached_gallery(): int {
 		$gallery = self::factory()->post->create(
 			array(
@@ -35,7 +34,6 @@ class RenderCacheInstanceIdTest extends WP_UnitTestCase {
 		return $gallery;
 	}
 
-	/** An uploaded JPEG attachment. */
 	private function image(): int {
 		$file  = wp_tempnam( 'fg-instance.jpg' );
 		$image = imagecreatetruecolor( 40, 30 );

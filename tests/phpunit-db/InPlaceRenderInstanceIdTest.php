@@ -1,7 +1,6 @@
 <?php
 /**
- * Instance IDs of galleries rendered over REST into a page: an album swap and
- * a password unlock.
+ * Instance IDs of galleries an album swap or a password unlock renders over REST.
  *
  * @package FotoGrids
  */
@@ -26,7 +25,6 @@ class InPlaceRenderInstanceIdTest extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 	}
 
-	/** A published gallery with one item. */
 	private function gallery(): int {
 		$gallery = self::factory()->post->create(
 			array(
@@ -39,7 +37,6 @@ class InPlaceRenderInstanceIdTest extends WP_UnitTestCase {
 		return $gallery;
 	}
 
-	/** An uploaded JPEG attachment. */
 	private function image(): int {
 		$file  = wp_tempnam( 'fg-in-place.jpg' );
 		$image = imagecreatetruecolor( 40, 30 );
@@ -72,7 +69,7 @@ class InPlaceRenderInstanceIdTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Sends one REST request, as a request of its own.
+	 * Sends a REST request with a fresh instance counter.
 	 *
 	 * @param array<string, mixed> $body JSON body.
 	 */

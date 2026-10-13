@@ -1,11 +1,5 @@
 /**
- * Tests for the two scripts that render a gallery into a page already open:
- *
- *   - public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js
- *   - public/render/gates/password/password-gate.js
- *
- * The server renders those galleries in a request of its own, so it cannot
- * know which instance IDs the page uses. The page tells it.
+ * Instance IDs sent by album-to-gallery-ajax.js and password-gate.js.
  */
 
 const ALBUM_MODULE =
@@ -14,7 +8,6 @@ const GATE_MODULE = '../../../public/render/gates/password/password-gate';
 
 const RENDER_URL = 'https://example.com/wp-json/fotogrids/v1/gallery/render';
 
-/** Stand-in for window.FotoGrids: an onAlbum queue run against every album. */
 function installRuntime() {
 	const albumCallbacks = [];
 	window.FotoGrids = {
@@ -60,7 +53,6 @@ function click(album) {
 	);
 }
 
-/** Records every request body and leaves each response for the test to settle. */
 function stubFetch() {
 	const calls = [];
 	window.fetch = jest.fn((url, init) => {
@@ -170,7 +162,7 @@ describe('album to gallery swap', () => {
 		const second = addAlbum('fg-3-3', 7);
 		const calls = stubFetch();
 		window.FotoGrids.boot();
-		// The failed swap falls back to navigating to the trigger's href.
+		// '#' stops the failed swap from navigating.
 		first
 			.querySelector('[data-fg-album-ajax-trigger]')
 			.setAttribute('href', '#');

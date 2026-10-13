@@ -22,9 +22,6 @@ class Statistics {
 	/**
 	 * Increment a statistic counter
 	 *
-	 * Uses INSERT … ON DUPLICATE KEY UPDATE, so two first writes for an object
-	 * arriving together both count.
-	 *
 	 * @param string $object_type Type of object (gallery, album, item)
 	 * @param int $object_id ID of the object
 	 * @param string $field Field to increment (views, shares)
