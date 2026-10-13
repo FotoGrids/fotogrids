@@ -59,19 +59,19 @@ test( 'ROLE-10: the lowest-role write moves the capability down the ladder and b
 	};
 
 	// The shipped default, which the rest of this test moves away from.
-	expect( roleHas( 'editor', STATS_CAP ) ).toBe( true );
-	expect( roleHas( 'author', STATS_CAP ) ).toBe( false );
+	expect( roleHas( 'author', STATS_CAP ) ).toBe( true );
+	expect( roleHas( 'contributor', STATS_CAP ) ).toBe( false );
+
+	await setLowest( 'editor' );
+	expect( roleHas( 'author', STATS_CAP ), 'the author kept the cap' ).toBe( false );
+	expect( roleHas( 'editor', STATS_CAP ), 'a role above the floor lost the cap' ).toBe(
+		true
+	);
 
 	await setLowest( 'author' );
 	expect( roleHas( 'author', STATS_CAP ), 'the author was not granted the cap' ).toBe(
 		true
 	);
-	expect( roleHas( 'editor', STATS_CAP ), 'a role above the floor lost the cap' ).toBe(
-		true
-	);
-
-	await setLowest( 'editor' );
-	expect( roleHas( 'author', STATS_CAP ), 'the author kept the cap' ).toBe( false );
 	expect( roleHas( 'editor', STATS_CAP ) ).toBe( true );
 
 	await context.dispose();

@@ -153,7 +153,8 @@
 					}
 				}
 
-				a {
+				a,
+				.fg-abc-main-cta-disabled {
 					font-size: 16px;
 					font-weight: 600;
 					text-decoration: none;
@@ -167,6 +168,16 @@
 					&:hover {
 						background: transparent;
 						color: white;
+					}
+				}
+
+				.fg-abc-main-cta-disabled {
+					opacity: 0.6;
+					cursor: not-allowed;
+
+					&:hover {
+						background: white;
+						color: #1e1e1e;
 					}
 				}
 			}
@@ -334,10 +345,13 @@
 				gap: 4px;
 				margin: 24px 6px 6px;
 			}
+
+			.fg-abc-locked-reason {
+				margin: 4px 6px 0;
+			}
 		}
 
 		&.fg-abc-checklist {
-
 			.fg-abc-checklist-items {
 				list-style: none;
 				margin: 0;
@@ -383,6 +397,20 @@
 							outline: 1px solid white;
 							outline-offset: 3px;
 							box-shadow: none;
+						}
+					}
+
+					&.is-disabled .fg-abc-checklist-text {
+						display: flex;
+						flex-direction: column;
+						align-items: flex-start;
+						gap: 2px;
+
+						.fg-abc-locked-reason-icon {
+							width: 12px;
+							height: 12px;
+							border: 0;
+							border-radius: 0;
 						}
 					}
 
@@ -473,6 +501,21 @@
 					span {
 						font-size: 13px;
 						font-weight: 500;
+					}
+
+					&.is-disabled {
+						cursor: not-allowed;
+						color: var(--fg-text-secondary);
+
+						&:hover {
+							background: #f6f7f7;
+							color: var(--fg-text-secondary);
+						}
+
+						.fotogrids-admin-block-card-icon {
+							color: var(--fg-text-secondary);
+							opacity: 0.6;
+						}
 					}
 				}
 			}
@@ -675,6 +718,24 @@
 				}
 			}
 		}
+	}
+}
+
+// Why a Dashboard action is disabled for the current user.
+.fg-abc-locked-reason {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.4;
+
+	.fg-abc-locked-reason-icon {
+		display: inline-flex;
+		flex-shrink: 0;
+		width: 12px;
+		height: 12px;
+		font-size: 12px;
 	}
 }
 

@@ -272,7 +272,7 @@ function CollectionSettings() {
 	const isDefaultsMode = window.fotogridsSettings?.isDefaultsMode || false;
 	// Autosave drives ajax-save.js, which is only enqueued on the gallery and
 	// album edit screens, and its AJAX writer requires the settings cap. An
-	// absent capabilities bag is not a denial - see <SettingsLock>.
+	// absent capabilities bag is not a denial.
 	const showAutosaveToggle =
 		!isDefaultsMode &&
 		window.fotogridsAdmin?.capabilities?.manage_fotogrids_settings !==
@@ -2986,8 +2986,6 @@ function ReadonlyNotice() {
 
 function ReadonlyWrapper(props) {
 	// Render the existing tree inside a disabled fieldset and a notice.
-	// This is the metabox-level gate; granular per-control locking is the
-	// job of <SettingsLock> in newer code.
 	return h(
 		'div',
 		{ className: 'fotogrids-collection-settings--readonly' },
