@@ -241,6 +241,7 @@ class Module extends Abstract_Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-module-templates-metabox', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_enqueue_style(
 			'fotogrids-module-templates-metabox',
@@ -282,6 +283,7 @@ class Module extends Abstract_Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-module-templates-page', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		// The page reads the licence state while it mounts; the flag travels with
 		// the page bundle because this script does not depend on the admin bundle

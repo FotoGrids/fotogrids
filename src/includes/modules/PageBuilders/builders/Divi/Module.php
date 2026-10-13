@@ -222,6 +222,7 @@ final class Module {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( self::VB_SCRIPT_HANDLE, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_enqueue_style(
 			self::VB_STYLE_HANDLE . '-direct',

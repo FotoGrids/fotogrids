@@ -270,17 +270,12 @@ final class Preview_Renderer {
 			$button_lbl  = esc_html__( 'Add items', 'fotogrids' );
 		}
 
-		// The CTA is a <button> rather than an <a> because the
-		// page-builder preview iframe blocks `target="_blank"` and
-		// `window.open()` calls. The click handler postMessages the URL
-		// up to the parent editor window, which opens it (see the
-		// `fg-pb-empty-state:open` listener registered by editor.jsx).
-		// The inline `onclick` keeps the empty-state self-contained so
-		// it still works on hosts that haven't wired the parent listener.
+		// Each builder's editor script opens `data-fg-edit-url`; the preview
+		// iframe cannot open a new tab itself.
 		$cta = '';
 		if ( '' !== $edit_url ) {
 			$cta = sprintf(
-				'<button type="button" class="fg-pb-empty-state__cta" data-fg-edit-url="%1$s" onclick="(function(b){try{(window.top||window.parent||window).postMessage({type:\'fg-pb-empty-state:open\',url:b.dataset.fgEditUrl},\'*\');}catch(e){window.open(b.dataset.fgEditUrl,\'_blank\',\'noopener\');}})(this)">%2$s</button>',
+				'<button type="button" class="fg-pb-empty-state__cta" data-fg-edit-url="%1$s">%2$s</button>',
 				esc_url( $edit_url ),
 				$button_lbl
 			);

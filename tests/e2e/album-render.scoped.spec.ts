@@ -3,11 +3,13 @@ import {
 	album,
 	galleryPage,
 	multiGalleryPage,
+	pageFor,
 	shortcodePage,
 } from './support/collections';
 import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { wpEval } from './support/roles';
+import type { Page } from '@playwright/test';
 
 /**
  * What an album renders, and how a gallery finds its way back to one.
@@ -36,6 +38,15 @@ function viewOf(id: number): string {
 }
 
 const BREADCRUMB = '.fg-breadcrumbs';
+
+/** Every BreadcrumbList document on the page. */
+function breadcrumbLists(page: Page): Promise<Record<string, unknown>[]> {
+	return page.evaluate(() =>
+		[...document.querySelectorAll('script[type="application/ld+json"]')]
+			.map((script) => JSON.parse(script.textContent ?? '{}'))
+			.filter((doc) => 'BreadcrumbList' === doc['@type'])
+	);
+}
 
 test.describe('an album', () => {
 	test(
@@ -292,6 +303,97 @@ test.describe('the breadcrumb', () => {
 				crumbsOf(two).locator(`a[href="${secondAlbum.view}"]`),
 				"the second gallery shows the first gallery's album"
 			).toHaveCount(1);
+		}
+	);
+	/**
+	 * ALB-12. The album decides where its galleries show the trail: on their
+	 * own view pages, embedded in other content, or both.
+	 */
+	for (const [placement, shownOn] of [
+		['view_pages', 'the view page'],
+		['embedded', 'an embedding page'],
+	] as const) {
+		test(
+			`ALB-12: placed on ${placement} only, it shows on ${shownOn} only`,
+			{
+				tag: '@layout',
+			},
+			async ({ page }) => {
+				const child = gallery();
+				album([child], {
+					...CRUMBS,
+					navigation_breadcrumbs_placements: [placement],
+				});
+
+				const pages = {
+					view_pages: viewOf(child),
+					embedded: pageFor(child).url,
+				};
+
+				for (const [where, url] of Object.entries(pages)) {
+					await page.goto(url);
+					await expect(
+						page.locator(BREADCRUMB),
+						`on ${where}`
+					).toHaveCount(where === placement ? 1 : 0);
+				}
+			}
+		);
+	}
+
+	test(
+		'ALB-13: the trail is described as a BreadcrumbList for search engines',
+		{
+			tag: '@layout',
+		},
+		async ({ page }) => {
+			const child = gallery();
+			wpEval(
+				`wp_update_post( array( 'ID' => ${child}, 'post_title' => 'Harbour at dusk' ) );`
+			);
+			const parent = album([child], CRUMBS, 'Coastlines');
+
+			await page.goto(viewOf(child));
+
+			const lists = await breadcrumbLists(page);
+			expect(lists, 'one BreadcrumbList on the page').toHaveLength(1);
+			expect(lists[0]).toEqual({
+				'@context': 'https://schema.org',
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{
+						'@type': 'ListItem',
+						position: 1,
+						name: 'Coastlines',
+						item: parent.view,
+					},
+					{
+						'@type': 'ListItem',
+						position: 2,
+						name: 'Harbour at dusk',
+						item: viewOf(child),
+					},
+				],
+			});
+		}
+	);
+
+	test(
+		'ALB-13: the album can keep the trail and drop the BreadcrumbList',
+		{
+			tag: '@layout',
+		},
+		async ({ page }) => {
+			const child = gallery();
+			album([child], {
+				...CRUMBS,
+				navigation_emit_breadcrumb_schema: false,
+			});
+
+			await page.goto(viewOf(child));
+
+			await expect(page.locator(BREADCRUMB)).toBeVisible();
+			expect(await breadcrumbLists(page)).toEqual([]);
 		}
 	);
 });
