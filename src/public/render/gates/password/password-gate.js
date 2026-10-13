@@ -365,7 +365,10 @@
 		bindAll();
 
 		// Lock forms inserted later are caught by a delegated submit listener rather
-		// than a MutationObserver.
+		// than a MutationObserver, on every submit. Binding the form here as well
+		// would add a listener this same submit then reaches on the form, which
+		// unlocks twice and reloads the page when the second answer finds the
+		// lock screen already gone.
 		document.addEventListener(
 			'submit',
 			function (e) {
@@ -378,8 +381,6 @@
 				) {
 					return;
 				}
-				// Bind, then re-dispatch the submit so the new handler receives it.
-				bindLockForm(form);
 				e.preventDefault();
 				unlockGallery(form);
 			},
