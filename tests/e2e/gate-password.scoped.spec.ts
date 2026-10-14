@@ -381,3 +381,91 @@ test.describe('a registered-users gallery', () => {
 		}
 	);
 });
+
+/**
+ * GATE-04. The lock form is a real `method="post"` form, but only its script
+ * talks to the unlock route. Without JS the browser posts the password back
+ * to the page, nothing on the page reads it, and the gallery stays locked.
+ */
+test(
+	'GATE-04: with JS off, submitting the right password leaves the gallery locked',
+	{ tag: '@gate' },
+	async ({ browser }) => {
+		const { id, url } = passwordGalleryPage(PASSWORD);
+		const context = await browser.newContext({ javaScriptEnabled: false });
+		const noJs = await context.newPage();
+
+		try {
+			await noJs.goto(url);
+			await noJs.locator(`${FORM} input[name="password"]`).fill(PASSWORD);
+
+			const [posted] = await Promise.all([
+				noJs.waitForResponse(
+					(response) =>
+						response.request().method() === 'POST' &&
+						new URL(response.url()).pathname ===
+							new URL(url).pathname
+				),
+				noJs.locator(`${FORM} button[type="submit"]`).click(),
+			]);
+			expect(posted.status()).toBe(200);
+			await noJs.waitForLoadState();
+
+			await expect(noJs.locator(GATE)).toBeAttached();
+			await expect(noJs.locator('.fg-item')).toHaveCount(0);
+			expect(
+				(await context.cookies()).map((cookie) => cookie.name),
+				'an unlock was recorded'
+			).not.toContain(`fotogrids_unlocked_${id}`);
+		} finally {
+			await context.close();
+		}
+	}
+);
+
+/**
+ * GATE-13. Admin previews render past the password gate, so an editor sees the
+ * gallery they are styling. The `_simulate_state` setting is the one way to
+ * put the lock screen into a preview. The public render of the same gallery is
+ * the control.
+ */
+test(
+	'GATE-13: a preview is never locked unless it asks to show the lock screen',
+	{ tag: '@gate' },
+	async () => {
+		const { id } = passwordGalleryPage(PASSWORD);
+
+		const passed = (build: string) =>
+			wpEval(
+				`$settings = FotoGrids\\Galleries\\Gallery_Repository::get_settings( ${id} );
+				$items = FotoGrids\\Galleries\\Gallery_Repository::get_item_ids( ${id} );
+				$context = ${build};
+				echo FotoGrids\\Render\\Internal\\Render_Controller::evaluate_gates( $context )->passed ? 'open' : 'locked';`
+			).trim();
+
+		expect(
+			passed(
+				'FotoGrids\\Render\\Internal\\Context_Builder::for_public()->build_for_public( ' +
+					id +
+					', $settings, $items )'
+			),
+			'the public render is the control'
+		).toBe('locked');
+
+		expect(
+			passed(
+				'FotoGrids\\Render\\Internal\\Context_Builder::for_preview()->build_for_preview( ' +
+					id +
+					', $settings, array(), $items )'
+			)
+		).toBe('open');
+
+		expect(
+			passed(
+				'FotoGrids\\Render\\Internal\\Context_Builder::for_preview()->build_for_preview( ' +
+					id +
+					", $settings, array( '_simulate_state' => 'password_required' ), $items )"
+			)
+		).toBe('locked');
+	}
+);
