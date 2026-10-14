@@ -1,6 +1,7 @@
 import type { Browser, BrowserContext } from '@playwright/test';
 import { test, expect } from './support/test';
 import { galleryPage } from './support/collections';
+import { fixture } from './support/fixtures';
 import { storageStateFor, wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
 
@@ -204,10 +205,13 @@ test.describe( 'page caches in front of the site', () => {
 test.describe( 'caches in front of the REST API', () => {
 	/** The public GET endpoints that answer from a gallery's gate outcome. */
 	function gatedReads( galleryId: number ): string[] {
+		const firstItem = fixture< number[] >( 'F-small', 'items' )[ 0 ];
+
 		return [
 			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/galleries/${ galleryId }/items` ) }`,
 			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/gallery/${ galleryId }` ) }`,
 			`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/items' ) }&gallery=${ galleryId }`,
+			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/lightbox/item/${ firstItem }` ) }&gallery_id=${ galleryId }`,
 		];
 	}
 
