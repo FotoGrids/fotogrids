@@ -64,7 +64,26 @@ final class Instance_Id_Factory {
 	}
 
 	/**
-	 * Whether an instance ID is `fg-{id}-{n}` or `fg-{id}-p{key}` for the collection.
+	 * Generates the instance identifier of a gallery opened in place inside an album.
+	 *
+	 * Returns `fg-{gallery}-a{suffix}`, where the suffix is the album instance's own.
+	 *
+	 * @since   1.3.0
+	 * @param   int    $gallery_id        Gallery identifier.
+	 * @param   int    $album_id          Album identifier.
+	 * @param   string $album_instance_id Instance identifier of the album.
+	 * @return  string|null Null when the album instance identifier is not the album's.
+	 */
+	public static function for_gallery_in_album( int $gallery_id, int $album_id, string $album_instance_id ): ?string {
+		if ( ! self::matches( $album_id, $album_instance_id ) ) {
+			return null;
+		}
+
+		return sprintf( 'fg-%d-a%s', $gallery_id, substr( $album_instance_id, strlen( 'fg-' . $album_id . '-' ) ) );
+	}
+
+	/**
+	 * Whether an instance ID is one this factory gives the collection.
 	 *
 	 * @since   1.3.0
 	 * @param   int    $collection_id Gallery or album identifier.
@@ -73,7 +92,7 @@ final class Instance_Id_Factory {
 	 */
 	public static function matches( int $collection_id, string $instance_id ): bool {
 		return $collection_id > 0
-			&& 1 === preg_match( '/^fg-' . $collection_id . '-[0-9a-z]{1,33}$/D', $instance_id );
+			&& 1 === preg_match( '/^fg-' . $collection_id . '-[0-9a-z]{1,34}$/D', $instance_id );
 	}
 
 	/**

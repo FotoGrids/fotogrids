@@ -95,26 +95,41 @@ test( 'unlocking the second of two lock screens keeps that lock screen ID', { ta
 	expect( await repeatedIds( page ) ).toEqual( [] );
 } );
 
-test( 'a gallery opened in place from an album takes an ID the page does not use', { tag: [ '@layout' ] }, async ( {
+function inAlbum( galleryId: number, albumInstanceId: string ): string {
+	return `fg-${ galleryId }-a${ albumInstanceId.split( '-' ).pop() }`;
+}
+
+test( 'a gallery opened in place from an album takes the ID its album gives it, whatever was opened first', { tag: [ '@layout' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage( GRID );
-	const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
-	await page.goto( postWith( `[fotogrids_gallery id="${ id }"]\n\n[fotogrids_album id="${ albumId }"]` ) );
+	const { id: albumId } = album( [ id ], { use_ajax_from_album: true, navigation_show_back_button: true } );
+	await page.goto(
+		postWith( `[fotogrids_gallery id="${ id }"]\n\n[fotogrids_album id="${ albumId }"]\n\n[fotogrids_album id="${ albumId }"]` )
+	);
 
-	const before = await instances( page );
-	expect( before.map( ( instance ) => instance.kind ) ).toEqual( [ 'gallery', 'album' ] );
+	const albums = page.locator( `.fotogrids-album[data-fg-album-id="${ albumId }"]` );
+	const expected = ( await albums.evaluateAll( ( nodes ) => nodes.map( ( node ) => node.id ) ) ).map( ( albumInstance ) =>
+		inAlbum( id, albumInstance )
+	);
+	const open = async ( n: number ): Promise< string | null > => {
+		await albums.nth( n ).locator( `[data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
+		const swapped = albums.nth( n ).locator( `.fotogrids-gallery[data-fg-gallery-id="${ id }"]` );
+		await expect( swapped.locator( '.fg-item' ).first() ).toBeVisible( { timeout: 15000 } );
+		return swapped.getAttribute( 'id' );
+	};
 
-	await page.locator( `.fotogrids-album [data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
-	const swapped = page.locator( `.fotogrids-album .fotogrids-gallery[data-fg-gallery-id="${ id }"]` );
-	await expect( swapped.locator( '.fg-item' ).first() ).toBeVisible( { timeout: 15000 } );
+	expect( await open( 1 ) ).toBe( expected[ 1 ] );
+	expect( await open( 0 ) ).toBe( expected[ 0 ] );
 
-	const after = await instances( page );
-	const galleries = after.filter( ( instance ) => 'gallery' === instance.kind );
-	expect( galleries.map( ( instance ) => instance.id ) ).toEqual( [ before[ 0 ].id, `fg-${ id }-2` ] );
-	expect( galleries.map( ( instance ) => instance.cols ) ).toEqual( [ '3', '3' ] );
+	const galleries = ( await instances( page ) ).filter( ( instance ) => 'gallery' === instance.kind );
+	expect( galleries.map( ( instance ) => instance.id ) ).toEqual( [ `fg-${ id }-1`, ...expected ] );
+	expect( galleries.map( ( instance ) => instance.cols ) ).toEqual( [ '3', '3', '3' ] );
 	expect( galleries.every( ( instance ) => instance.styled ), 'an instance without styles' ).toBe( true );
 	expect( await repeatedIds( page ) ).toEqual( [] );
+
+	await albums.nth( 0 ).locator( '.fg-back-button' ).click();
+	expect( await open( 0 ) ).toBe( expected[ 0 ] );
 } );
 
 test( 'a locked gallery opened in place from an album unlocks with the ID it opened with', { tag: [ '@gate' ] }, async ( {
@@ -137,12 +152,14 @@ test( 'a locked gallery opened in place from an album unlocks with the ID it ope
 		}
 	} );
 
-	await page.locator( `.fotogrids-album [data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
-	const swappedGate = page.locator( `.fotogrids-album .fotogrids-gate[data-fg-gallery-id="${ id }"]` );
+	const albumEl = page.locator( '.fotogrids-album' );
+	const opened = inAlbum( id, ( await albumEl.getAttribute( 'id' ) ) ?? '' );
+	await albumEl.locator( `[data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
+	const swappedGate = albumEl.locator( `.fotogrids-gate[data-fg-gallery-id="${ id }"]` );
 	await expect( swappedGate ).toBeVisible( { timeout: 15000 } );
-	await expect( swappedGate ).toHaveAttribute( 'id', `fg-${ id }-2` );
+	await expect( swappedGate ).toHaveAttribute( 'id', opened );
 
-	await unlock( page, `fg-${ id }-2` );
+	await unlock( page, opened );
 	await page.waitForLoadState( 'networkidle' );
 
 	expect( unlockRequests, 'unlock requests' ).toBe( 1 );
@@ -150,6 +167,6 @@ test( 'a locked gallery opened in place from an album unlocks with the ID it ope
 
 	expect(
 		( await instances( page ) ).filter( ( instance ) => 'album' !== instance.kind ).map( ( { id: found, kind } ) => `${ kind } ${ found }` )
-	).toEqual( [ `gate fg-${ id }-1`, `gallery fg-${ id }-2` ] );
+	).toEqual( [ `gate fg-${ id }-1`, `gallery ${ opened }` ] );
 	expect( await repeatedIds( page ) ).toEqual( [] );
 } );

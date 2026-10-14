@@ -6,6 +6,7 @@
  */
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Render\Internal\Instance_Id_Factory;
@@ -104,6 +105,33 @@ class InPlaceRenderInstanceIdTest extends WP_UnitTestCase {
 		$this->assertSame( "fg-{$this->gallery}-2", $this->gallery_id_in( $data['html'] ) );
 		$this->assertStringContainsString( "#fg-{$this->gallery}-2", $data['inlineCss'] );
 		$this->assertStringNotContainsString( "#fg-{$this->gallery}-1", $data['inlineCss'] );
+	}
+
+	public function test_an_album_tile_carries_the_id_its_gallery_opens_with(): void {
+		$album = self::factory()->post->create(
+			array(
+				'post_type'   => 'fotogrids_album',
+				'post_status' => 'publish',
+			)
+		);
+		Gallery_Album_Relations::add_gallery_to_album( $this->gallery, $album );
+
+		$page = do_shortcode( '[fotogrids_gallery id="' . $this->gallery . '"][fotogrids_album id="' . $album . '"]' );
+		preg_match( '/<div id="fg-' . $album . '-([0-9a-z]+)" class="[^"]*\bfotogrids-album\b/', $page, $wrapper );
+		preg_match( '/data-fg-instance-id="([^"]+)"/', $page, $tile );
+
+		$this->assertNotEmpty( $wrapper );
+		$this->assertSame( "fg-{$this->gallery}-a{$wrapper[1]}", $tile[1] ?? '' );
+
+		$response = $this->post(
+			'/fotogrids/v1/gallery/render',
+			array(
+				'gallery_id'  => $this->gallery,
+				'instance_id' => $tile[1],
+			)
+		);
+
+		$this->assertSame( $tile[1], $this->gallery_id_in( $response->get_data()['html'] ) );
 	}
 
 	public function test_an_album_swap_without_an_id_still_renders_the_gallery(): void {

@@ -23,21 +23,14 @@ function installRuntime() {
 	};
 }
 
-function addGallery(id) {
-	const el = document.createElement('div');
-	el.id = id;
-	el.className = 'fotogrids-collection fotogrids-gallery';
-	document.body.appendChild(el);
-	return el;
-}
-
-function addAlbum(id, galleryId) {
+function addAlbum(id, galleryId, instanceId) {
 	const album = document.createElement('div');
 	album.id = id;
 	album.className = 'fotogrids-collection fotogrids-album';
 	album.innerHTML =
 		`<a href="/gallery/${galleryId}" data-fg-album-ajax-trigger` +
 		` data-fg-gallery-id="${galleryId}" data-fg-render-url="${RENDER_URL}"` +
+		(instanceId ? ` data-fg-instance-id="${instanceId}"` : '') +
 		' data-fg-render-nonce="n">Open</a>';
 	document.body.appendChild(album);
 	return album;
@@ -96,9 +89,8 @@ describe('album to gallery swap', () => {
 		delete window.fetch;
 	});
 
-	it('asks for the first instance ID of the gallery the page does not use', () => {
-		addGallery('fg-7-1');
-		const album = addAlbum('fg-3-2', 7);
+	it('asks for the instance ID the album gave the tile', () => {
+		const album = addAlbum('fg-3-2', 7, 'fg-7-a2');
 		const calls = stubFetch();
 		window.FotoGrids.boot();
 
@@ -107,72 +99,33 @@ describe('album to gallery swap', () => {
 		expect(calls).toHaveLength(1);
 		expect(calls[0].body).toMatchObject({
 			gallery_id: 7,
-			instance_id: 'fg-7-2',
+			instance_id: 'fg-7-a2',
 		});
 	});
 
-	it('asks for fg-{gallery}-1 when the gallery is not on the page', () => {
-		addGallery('fg-8-1');
+	it('asks for the same ID whichever album is opened first', () => {
+		const first = addAlbum('fg-3-2', 7, 'fg-7-a2');
+		const second = addAlbum('fg-3-3', 7, 'fg-7-a3');
+		const calls = stubFetch();
+		window.FotoGrids.boot();
+
+		click(second);
+		click(first);
+
+		expect(calls.map((c) => c.body.instance_id)).toEqual([
+			'fg-7-a3',
+			'fg-7-a2',
+		]);
+	});
+
+	it('leaves the ID to the server when the tile carries none', () => {
 		const album = addAlbum('fg-3-2', 7);
 		const calls = stubFetch();
 		window.FotoGrids.boot();
 
 		click(album);
 
-		expect(calls[0].body.instance_id).toBe('fg-7-1');
-	});
-
-	it('gives two swaps started together different IDs', () => {
-		addGallery('fg-7-1');
-		const first = addAlbum('fg-3-2', 7);
-		const second = addAlbum('fg-3-3', 7);
-		const calls = stubFetch();
-		window.FotoGrids.boot();
-
-		click(first);
-		click(second);
-
-		expect(calls.map((c) => c.body.instance_id)).toEqual([
-			'fg-7-2',
-			'fg-7-3',
-		]);
-	});
-
-	it('skips the ID a finished swap put on the page', async () => {
-		addGallery('fg-7-1');
-		const first = addAlbum('fg-3-2', 7);
-		const second = addAlbum('fg-3-3', 7);
-		const calls = stubFetch();
-		window.FotoGrids.boot();
-
-		click(first);
-		await respond(calls[0], {
-			html: '<div id="fg-7-2" class="fotogrids-collection fotogrids-gallery"></div>',
-		});
-		expect(first.querySelector('#fg-7-2')).not.toBeNull();
-
-		click(second);
-
-		expect(calls[1].body.instance_id).toBe('fg-7-3');
-	});
-
-	it('releases the ID of a swap that failed', async () => {
-		addGallery('fg-7-1');
-		const first = addAlbum('fg-3-2', 7);
-		const second = addAlbum('fg-3-3', 7);
-		const calls = stubFetch();
-		window.FotoGrids.boot();
-		// '#' stops the failed swap from navigating.
-		first
-			.querySelector('[data-fg-album-ajax-trigger]')
-			.setAttribute('href', '#');
-
-		click(first);
-		await respond(calls[0], {}, false);
-
-		click(second);
-
-		expect(calls[1].body.instance_id).toBe('fg-7-2');
+		expect(calls[0].body).not.toHaveProperty('instance_id');
 	});
 });
 
