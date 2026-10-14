@@ -57,6 +57,12 @@ body.fl-builder-edit .fg-modal {
     margin: 0;
 }
 
+.fg-pb-bb-picker__note {
+    margin: 0;
+    color: var(--fg-text-secondary);
+    font-size: 12px;
+}
+
 .fg-pb-bb-picker__actions {
     display: flex;
     gap: 4px;
