@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder;
 
+use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Album_Module;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Gallery_Module;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
@@ -57,6 +58,20 @@ final class Module {
 	public const EDITOR_HANDLE = 'fotogrids-pb-beaver-builder-editor';
 
 	/**
+	 * Shortcode Beaver Builder uses to insert a saved layout.
+	 *
+	 * @var string
+	 */
+	public const INSERT_LAYOUT_SHORTCODE = 'fl_builder_insert_layout';
+
+	/**
+	 * Maximum depth of inserted layouts.
+	 *
+	 * @var int
+	 */
+	private const MAX_INSERT_DEPTH = 3;
+
+	/**
 	 * Whether Beaver Builder is loaded.
 	 *
 	 * @since 1.3.0
@@ -86,6 +101,7 @@ final class Module {
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_builder_assets' ) );
 		add_action( 'fl_builder_ui_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
 		add_filter( 'fl_builder_ajax_layout_response', array( self::class, 'add_ajax_inline_css' ) );
+		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_beaver_builder' ), 10, 2 );
 	}
 
 	/**
@@ -163,7 +179,8 @@ final class Module {
 			self::EDITOR_HANDLE,
 			'fotogridsPbBeaverBuilder',
 			array(
-				'canPick'          => current_user_can( 'manage_fotogrids' ),
+				'canCreateGallery' => self::can_create( 'fotogrids_gallery' ),
+				'canCreateAlbum'   => self::can_create( 'fotogrids_album' ),
 				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
 				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
@@ -172,6 +189,189 @@ final class Module {
 				'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
 			)
 		);
+	}
+
+	/**
+	 * Detect FotoGrids content in the post's Beaver Builder layout and the layouts it inserts.
+	 *
+	 * @since 1.3.0
+	 * @param bool          $detected Previous detection result.
+	 * @param \WP_Post|null $post     Current post.
+	 * @return bool
+	 */
+	public static function detect_in_beaver_builder( bool $detected, $post ): bool {
+		if ( $detected ) {
+			return true;
+		}
+
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		if ( ! get_post_meta( $post->ID, '_fl_builder_enabled', true ) ) {
+			return self::inserted_layouts_have_fotogrids_content( (string) $post->post_content, 0 );
+		}
+
+		if ( ! class_exists( 'FLBuilderModel' ) ) {
+			return false;
+		}
+
+		$status = \FLBuilderModel::is_builder_active() ? 'draft' : 'published';
+
+		return self::layout_has_fotogrids_content( \FLBuilderModel::get_layout_data( $status, $post->ID ) );
+	}
+
+	/**
+	 * Whether layout data holds a FotoGrids module or shortcode.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $layout_data Layout nodes keyed by node ID.
+	 * @param int   $depth       Levels of inserted layouts above this one.
+	 * @return bool
+	 */
+	public static function layout_has_fotogrids_content( $layout_data, int $depth = 0 ): bool {
+		if ( empty( $layout_data ) ) {
+			return false;
+		}
+
+		$json = (string) wp_json_encode( $layout_data );
+
+		if ( false !== strpos( $json, '"type":"' . self::GALLERY_MODULE . '"' )
+			|| false !== strpos( $json, '"type":"' . self::ALBUM_MODULE . '"' )
+			|| false !== strpos( $json, '[fotogrids_' )
+		) {
+			return true;
+		}
+
+		$needle = '[' . self::INSERT_LAYOUT_SHORTCODE;
+		if ( false === strpos( $json, $needle ) ) {
+			return false;
+		}
+
+		$settings = json_decode( $json, true );
+		$contents = array();
+		if ( is_array( $settings ) ) {
+			array_walk_recursive(
+				$settings,
+				static function ( $value ) use ( $needle, &$contents ) {
+					if ( is_string( $value ) && false !== strpos( $value, $needle ) ) {
+						$contents[] = $value;
+					}
+				}
+			);
+		}
+
+		foreach ( $contents as $content ) {
+			if ( self::inserted_layouts_have_fotogrids_content( $content, $depth ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Post IDs inserted by `[fl_builder_insert_layout]` shortcodes in the content.
+	 *
+	 * @since 1.3.0
+	 * @param string $content Content that may hold the shortcode.
+	 * @return int[]
+	 */
+	public static function inserted_layout_ids( string $content ): array {
+		if ( false === strpos( $content, '[' . self::INSERT_LAYOUT_SHORTCODE ) ) {
+			return array();
+		}
+
+		$pattern = '/' . get_shortcode_regex( array( self::INSERT_LAYOUT_SHORTCODE ) ) . '/';
+		if ( ! preg_match_all( $pattern, $content, $matches, PREG_SET_ORDER ) ) {
+			return array();
+		}
+
+		$ids = array();
+		foreach ( $matches as $match ) {
+			if ( '[' === $match[1] && ']' === $match[6] ) {
+				continue;
+			}
+
+			$atts = shortcode_parse_atts( $match[3] );
+			if ( ! is_array( $atts ) ) {
+				continue;
+			}
+
+			if ( isset( $atts['id'] ) ) {
+				$ids = array_merge( $ids, wp_parse_id_list( $atts['id'] ) );
+			} elseif ( ! empty( $atts['slug'] ) ) {
+				$ids = array_merge(
+					$ids,
+					get_posts(
+						array(
+							'name'           => (string) $atts['slug'],
+							'post_type'      => isset( $atts['type'] ) ? (string) $atts['type'] : get_post_types(),
+							'posts_per_page' => 10,
+							'fields'         => 'ids',
+							'no_found_rows'  => true,
+						)
+					)
+				);
+			}
+		}
+
+		return array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
+	}
+
+	/**
+	 * Whether a layout inserted by the content holds FotoGrids content.
+	 *
+	 * @param string $content Content that may hold `[fl_builder_insert_layout]`.
+	 * @param int    $depth   Levels of inserted layouts above the content.
+	 * @return bool
+	 */
+	private static function inserted_layouts_have_fotogrids_content( string $content, int $depth ): bool {
+		if ( $depth >= self::MAX_INSERT_DEPTH ) {
+			return false;
+		}
+
+		foreach ( self::inserted_layout_ids( $content ) as $layout_id ) {
+			if ( ! get_post_meta( $layout_id, '_fl_builder_enabled', true ) ) {
+				if ( self::post_content_has_fotogrids_content( (string) get_post_field( 'post_content', $layout_id ), $depth + 1 ) ) {
+					return true;
+				}
+				continue;
+			}
+
+			if ( class_exists( 'FLBuilderModel' ) && self::layout_has_fotogrids_content( \FLBuilderModel::get_layout_data( 'published', $layout_id ), $depth + 1 ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether the content of an inserted post that does not use the builder holds FotoGrids content.
+	 *
+	 * @param string $content Post content.
+	 * @param int    $depth   Levels of inserted layouts above the content.
+	 * @return bool
+	 */
+	private static function post_content_has_fotogrids_content( string $content, int $depth ): bool {
+		return has_shortcode( $content, 'fotogrids_gallery' )
+			|| has_shortcode( $content, 'fotogrids_album' )
+			|| has_block( 'fotogrids/gallery', $content )
+			|| has_block( 'fotogrids/album', $content )
+			|| self::inserted_layouts_have_fotogrids_content( $content, $depth );
+	}
+
+	/**
+	 * Whether the current user can create posts of a type.
+	 *
+	 * @param string $post_type Post type.
+	 * @return bool
+	 */
+	private static function can_create( string $post_type ): bool {
+		$object = get_post_type_object( $post_type );
+
+		return $object instanceof \WP_Post_Type && current_user_can( $object->cap->create_posts );
 	}
 
 	/**

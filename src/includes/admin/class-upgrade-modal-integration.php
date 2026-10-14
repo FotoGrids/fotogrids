@@ -44,6 +44,7 @@ class Upgrade_Modal_Integration {
 			FOTOGRIDS_VERSION,
 			true
 		);
+		wp_set_script_translations( 'fotogrids-global-modal', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		wp_localize_script(
 			'fotogrids-global-modal',

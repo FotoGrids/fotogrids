@@ -28,6 +28,8 @@ const OPEN_LIGHTBOX_SELECTOR =
 	'dialog.fg-lightbox[open], .fg-lb-mini, .fg-lb-grid, .fg-lb-mv';
 
 const roots = new Map();
+const canCreate = (kind) =>
+	Boolean(kind === 'album' ? config.canCreateAlbum : config.canCreateGallery);
 const cache = { gallery: null, album: null };
 
 const fieldInput = (node) => {
@@ -130,9 +132,11 @@ const openPicker = (kind, currentId, onSelect) => {
 			restNonce={config.restNonce}
 			selectedId={currentId}
 			createNewUrl={
-				kind === 'album'
-					? config.albumCreateUrl
-					: config.galleryCreateUrl
+				canCreate(kind)
+					? kind === 'album'
+						? config.albumCreateUrl
+						: config.galleryCreateUrl
+					: undefined
 			}
 			onClose={close}
 			onSelect={(item) => {
@@ -159,24 +163,62 @@ const countLabel = (kind, count) =>
 				count
 			);
 
-const CreateButton = ({ kind }) => {
+/**
+ * Why the card's Edit or Create button is disabled for this user.
+ *
+ * @param {string}  kind       'gallery' or 'album'.
+ * @param {boolean} noEdit     Edit is disabled.
+ * @param {boolean} noCreate   Create is disabled.
+ * @return {string} Note text, or an empty string.
+ */
+const restrictionNote = (kind, noEdit, noCreate) => {
+	const isAlbum = kind === 'album';
+	if (noEdit && noCreate) {
+		return isAlbum
+			? __('Your role cannot edit or create albums.', 'fotogrids')
+			: __('Your role cannot edit or create galleries.', 'fotogrids');
+	}
+	if (noEdit) {
+		return isAlbum
+			? __('Your role cannot edit this album.', 'fotogrids')
+			: __('Your role cannot edit this gallery.', 'fotogrids');
+	}
+	if (noCreate) {
+		return isAlbum
+			? __('Your role cannot create albums.', 'fotogrids')
+			: __('Your role cannot create galleries.', 'fotogrids');
+	}
+	return '';
+};
+
+const CreateButton = ({ kind, withNote = false }) => {
 	const isAlbum = kind === 'album';
 	const url = isAlbum ? config.albumCreateUrl : config.galleryCreateUrl;
 	if (!url) {
 		return null;
 	}
-	return (
+	const note = withNote ? restrictionNote(kind, false, !canCreate(kind)) : '';
+	const button = (
 		<Button
 			variant="secondary"
 			size="sm"
 			icon="plus"
 			fullWidth
+			disabled={!canCreate(kind)}
 			onClick={() => openTab(url)}
 		>
 			{isAlbum
 				? __('Create new album', 'fotogrids')
 				: __('Create new gallery', 'fotogrids')}
 		</Button>
+	);
+	return note ? (
+		<>
+			{button}
+			<p className="fg-pb-bb-picker__note">{note}</p>
+		</>
+	) : (
+		button
 	);
 };
 
@@ -222,6 +264,8 @@ const CollectionPicker = ({ kind, input }) => {
 		[kind, id, input]
 	);
 	const editBase = isAlbum ? config.albumEditBase : config.galleryEditBase;
+	const canEdit = !item || item.can_edit !== false;
+	const note = restrictionNote(kind, id > 0 && !canEdit, !canCreate(kind));
 
 	return (
 		<div className="fg-pb-bb-picker__card">
@@ -266,6 +310,7 @@ const CollectionPicker = ({ kind, input }) => {
 					<Button
 						variant="secondary"
 						size="sm"
+						disabled={!canEdit}
 						onClick={() => openTab(`${editBase}${id}`)}
 					>
 						{isAlbum
@@ -275,6 +320,7 @@ const CollectionPicker = ({ kind, input }) => {
 				)}
 			</div>
 			<CreateButton kind={kind} />
+			{note && <p className="fg-pb-bb-picker__note">{note}</p>}
 		</div>
 	);
 };
@@ -404,7 +450,7 @@ const reconcile = () => {
 		const kind = node.dataset.fgPickerKind;
 		if (node.dataset.fgPickerMode === 'create') {
 			const root = createRoot(node);
-			root.render(<CreateButton kind={kind} />);
+			root.render(<CreateButton kind={kind} withNote />);
 			roots.set(node, root);
 			return;
 		}
@@ -420,9 +466,7 @@ const reconcile = () => {
 };
 
 const update = () => {
-	if (config.canPick) {
-		reconcile();
-	}
+	reconcile();
 	bindLayouts();
 };
 

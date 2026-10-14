@@ -92,8 +92,8 @@ class Album_Data {
 	/**
 	 * Get album data with galleries
 	 *
-	 * Retrieves a single album with all its associated galleries and metadata.
-	 * Only returns published albums. Automatically increments view count.
+	 * Retrieves a single published album with the galleries the current user
+	 * can view, in album order. Automatically increments view count.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request The REST API request object containing album ID
@@ -102,53 +102,33 @@ class Album_Data {
 	public static function get_album( $request ) {
 		$album_id = (int) $request['id'];
 
-		$album = get_post( $album_id );
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
-			return new \WP_Error(
-				'album_not_found',
-				__( 'Album not found', 'fotogrids' ),
-				array( 'status' => 404 )
-			);
+		$access = Album_Permissions::authorize_album_view( $album_id );
+		if ( true !== $access ) {
+			return $access;
 		}
 
-		if ( 'publish' !== $album->post_status ) {
-			return new \WP_Error(
-				'album_not_published',
-				__( 'Album is not published', 'fotogrids' ),
-				array( 'status' => 403 )
-			);
-		}
+		$album = get_post( $album_id );
 
 		$meta = array(
 			'layout'           => get_post_meta( $album_id, 'fotogrids_layout', true ) ?: 'grid',
 			'featured_gallery' => (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true ) ?: null,
 		);
 
-		$galleries = get_posts(
-			array(
-				'post_type'   => 'fotogrids_gallery',
-				'post_status' => 'publish',
-				'numberposts' => -1,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Admin-side relation lookup on a bounded set; meta_query is the correct tool here.
-				'meta_query'  => array(
-					array(
-						'key'     => 'fotogrids_album_id',
-						'value'   => $album_id,
-						'compare' => '=',
-					),
-				),
-			)
+		$galleries = \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album(
+			$album_id,
+			array( 'include_meta' => false )
 		);
 
 		$gallery_data = array();
 		foreach ( $galleries as $gallery ) {
-			$thumb          = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $gallery->ID, 'medium' );
+			$gallery_id     = (int) $gallery->ID;
+			$thumb          = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $gallery_id, 'medium' );
 			$gallery_data[] = array(
-				'id'          => $gallery->ID,
+				'id'          => $gallery_id,
 				'title'       => $gallery->post_title,
 				'description' => $gallery->post_content,
 				'thumbnail'   => '' !== $thumb ? $thumb : null,
-				'item_count'  => self::get_gallery_item_count( $gallery->ID ),
+				'item_count'  => self::get_gallery_item_count( $gallery_id ),
 			);
 		}
 

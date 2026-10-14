@@ -75,10 +75,22 @@ class AdminReadRoutePermissionsTest extends WP_UnitTestCase {
 		$this->expect_open( array( 'stats/overview', 'stats/views', 'stats/popular-galleries', 'stats/recent-activity', 'stats/top-content' ) );
 	}
 
-	public function test_gallery_capabilities_alone_open_the_news(): void {
+	public function test_gallery_capabilities_alone_open_what_the_dashboard_reads(): void {
 		wp_set_current_user( $this->user_with( array( 'edit_fotogrids_galleries' ) ) );
 
-		$this->expect_open( array( 'news' ) );
+		$this->expect_open( array( 'stats/overview', 'recently-edited', 'news' ) );
+	}
+
+	public function test_album_capabilities_alone_open_what_the_dashboard_reads(): void {
+		wp_set_current_user( $this->user_with( array( 'edit_fotogrids_albums' ) ) );
+
+		$this->expect_open( array( 'stats/overview', 'recently-edited', 'news' ) );
+	}
+
+	public function test_an_author_opens_the_dashboard_and_statistics_routes(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+
+		$this->expect_open( self::ROUTES );
 	}
 
 	public function test_a_contributor_keeps_the_routes_edit_posts_opened(): void {
