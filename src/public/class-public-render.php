@@ -9,6 +9,7 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Render\Internal\Render_Controller;
 use FotoGrids\Render\Internal\Render_Result;
 use FotoGrids\Render\Sorters\Random\Random_Sorter;
@@ -384,6 +385,18 @@ class Public_Render {
 	 * @return string Rendered gallery HTML
 	 */
 	public static function gallery_shortcode( $atts ) {
+		return self::render_gallery_embed( $atts );
+	}
+
+	/**
+	 * Renders one gallery embed from shortcode attributes.
+	 *
+	 * @since 1.3.0
+	 * @param array|string $atts        Shortcode attributes.
+	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @return string Rendered gallery HTML
+	 */
+	public static function render_gallery_embed( $atts, string $instance_id = '' ) {
 		$atts = shortcode_atts(
 			array(
 				'id'                => 0,
@@ -490,9 +503,13 @@ class Public_Render {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 
+		if ( ! Instance_Id_Factory::matches( $gallery_id, $instance_id ) ) {
+			$instance_id = Instance_Id_Factory::instance()->generate( $gallery_id );
+		}
+
 		$cache_key = null;
 		if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {
-			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts );
+			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts, $instance_id );
 			$cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
 			if ( false !== $cached ) {
 				// Order matters: replay_cached_assets() registers
@@ -506,7 +523,7 @@ class Public_Render {
 		}
 
 		Font_Resolver::instance()->begin_capture();
-		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
 		$fonts = Font_Resolver::instance()->end_capture();
 
 		if ( null !== $cache_key ) {

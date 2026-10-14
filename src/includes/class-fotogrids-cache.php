@@ -512,13 +512,14 @@ class FotoGrids_Cache {
 	 * they are excluded through the fotogrids/cache/should_cache filter.
 	 *
 	 * @since  1.0.0
-	 * @param  int   $gallery_id
-	 * @param  array $settings
-	 * @param  array $item_ids
-	 * @param  array $atts
+	 * @param  int    $gallery_id
+	 * @param  array  $settings
+	 * @param  array  $item_ids
+	 * @param  array  $atts
+	 * @param  string $instance_id
 	 * @return string
 	 */
-	public static function make_key( int $gallery_id, array $settings, array $item_ids, array $atts ): string {
+	public static function make_key( int $gallery_id, array $settings, array $item_ids, array $atts, string $instance_id = '' ): string {
 		$cache_settings = $settings;
 		unset( $cache_settings['enable_cache'], $cache_settings['cache_duration'] );
 
@@ -533,6 +534,7 @@ class FotoGrids_Cache {
 				md5( serialize( $cache_settings ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Internal cache payload (own data); not unserializing untrusted input.
 				implode( ',', $item_ids ),
 				md5( serialize( $atts ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Internal cache payload (own data); not unserializing untrusted input.
+				$instance_id,
 			)
 		);
 

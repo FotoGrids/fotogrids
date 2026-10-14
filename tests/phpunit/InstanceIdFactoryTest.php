@@ -67,4 +67,60 @@ final class InstanceIdFactoryTest extends TestCase {
 		$this->assertNull( $factory->generate_for_placement( 7, '' ) );
 		$this->assertSame( 'fg-7-1', $factory->generate( 7 ) );
 	}
+
+	public function test_ids_the_factory_gives_a_collection_match_it(): void {
+		$factory = Instance_Id_Factory::instance();
+
+		$this->assertTrue( Instance_Id_Factory::matches( 472, $factory->generate( 472 ) ) );
+		$this->assertTrue( Instance_Id_Factory::matches( 472, (string) $factory->generate_for_placement( 472, str_repeat( 'a', 40 ) ) ) );
+	}
+
+	public function test_an_id_of_another_collection_does_not_match(): void {
+		$this->assertFalse( Instance_Id_Factory::matches( 47, 'fg-472-1' ) );
+		$this->assertFalse( Instance_Id_Factory::matches( 472, 'fg-47-21' ) );
+	}
+
+	/**
+	 * @dataProvider provide_ids_of_the_wrong_shape
+	 */
+	public function test_ids_of_the_wrong_shape_do_not_match( string $instance_id ): void {
+		$this->assertFalse( Instance_Id_Factory::matches( 472, $instance_id ) );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public static function provide_ids_of_the_wrong_shape(): array {
+		return array(
+			'empty'               => array( '' ),
+			'no suffix'           => array( 'fg-472-' ),
+			'no prefix'           => array( '472-1' ),
+			'uppercase'           => array( 'fg-472-P1' ),
+			'markup'              => array( 'fg-472-1"><script>' ),
+			'selector'            => array( 'fg-472-1,body' ),
+			'trailing newline'    => array( "fg-472-1\n" ),
+			'suffix over 34 long' => array( 'fg-472-ap' . str_repeat( 'a', 33 ) ),
+		);
+	}
+
+	public function test_no_id_matches_a_collection_id_below_one(): void {
+		$this->assertFalse( Instance_Id_Factory::matches( 0, 'fg-0-1' ) );
+		$this->assertFalse( Instance_Id_Factory::matches( -1, 'fg--1-1' ) );
+	}
+
+	public function test_a_gallery_in_an_album_takes_the_album_instance_suffix(): void {
+		$this->assertSame( 'fg-48-a3', Instance_Id_Factory::for_gallery_in_album( 48, 12, 'fg-12-3' ) );
+		$this->assertSame( 'fg-48-apabc123', Instance_Id_Factory::for_gallery_in_album( 48, 12, 'fg-12-pabc123' ) );
+	}
+
+	public function test_a_gallery_in_an_album_matches_the_gallery(): void {
+		$album = (string) Instance_Id_Factory::instance()->generate_for_placement( 12, str_repeat( 'a', 40 ) );
+
+		$this->assertTrue( Instance_Id_Factory::matches( 48, (string) Instance_Id_Factory::for_gallery_in_album( 48, 12, $album ) ) );
+	}
+
+	public function test_a_gallery_in_an_album_needs_the_album_instance_id(): void {
+		$this->assertNull( Instance_Id_Factory::for_gallery_in_album( 48, 12, 'fg-13-3' ) );
+		$this->assertNull( Instance_Id_Factory::for_gallery_in_album( 48, 12, '' ) );
+	}
 }

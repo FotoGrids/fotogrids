@@ -6,6 +6,7 @@ import {
 } from './support/collections';
 import { fixture, twelveItems } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
+import { wpEval } from './support/roles';
 
 /**
  * The four layouts that do something of their own with the item list: Single
@@ -494,9 +495,7 @@ test.describe('two embeds on one page', () => {
 
 	/**
 	 * LAY-23. The counter is per request, not per gallery, so a second embed of
-	 * the same gallery is a second instance. The cache is left off here: it is
-	 * keyed on the gallery and its settings, so with it on the second embed
-	 * replays the first's HTML, instance id included.
+	 * the same gallery is a second instance. The cache is off here.
 	 */
 	test(
 		'LAY-23: the same gallery twice gets two instances',
@@ -524,6 +523,58 @@ test.describe('two embeds on one page', () => {
 			expect(await wrappers.nth(0).locator('.fg-item').count()).toBe(
 				await wrappers.nth(1).locator('.fg-item').count()
 			);
+		}
+	);
+
+	test(
+		'LAY-23: the same gallery twice keeps two instances from the render cache',
+		{ tag: ['@layout', '@cache'] },
+		async ({ page }) => {
+			const { id } = galleryPage({
+				layout: 'grid',
+				columns: { desktop: 3, tablet: 3, mobile: 1 },
+				enable_cache: true,
+				enable_statistics: false,
+			});
+			const { url } = multiGalleryPage([id, id]);
+
+			for (const visit of [
+				'filling the cache',
+				'served from the cache',
+			]) {
+				await page.setViewportSize({ width: 1280, height: 900 });
+				await page.goto(url);
+
+				const wrappers = page.locator(`[data-fg-gallery-id="${id}"]`);
+				await expect(wrappers).toHaveCount(2);
+
+				const ids = await wrappers.evaluateAll((nodes) =>
+					nodes.map((node) => node.id)
+				);
+				expect(new Set(ids).size, `${visit}: one id twice`).toBe(2);
+				const styles = await page.locator('style').allTextContents();
+				for (const instance of ids) {
+					expect(instance).toMatch(new RegExp(`^fg-${id}-\\d+$`));
+					expect(
+						styles.some((css) => css.includes(`#${instance}`)),
+						`${visit}: no styles for ${instance}`
+					).toBe(true);
+				}
+
+				const columns = await wrappers.evaluateAll((nodes) =>
+					nodes.map((node) =>
+						getComputedStyle(node)
+							.getPropertyValue('--fg-cols')
+							.trim()
+					)
+				);
+				expect(columns, `${visit}: columns`).toEqual(['3', '3']);
+			}
+
+			const rows = wpEval(
+				`global $wpdb; echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}fotogrids_render_cache WHERE object_type = 'gallery' AND object_id = %d", ${id} ) );`
+			).trim();
+			expect(Number(rows), 'one cache entry per embed').toBe(2);
 		}
 	);
 });
