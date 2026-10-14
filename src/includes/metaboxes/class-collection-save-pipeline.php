@@ -47,8 +47,8 @@ final class Collection_Save_Pipeline {
 	}
 
 	/**
-	 * `save_post` handler - only fires for FotoGrids galleries with the
-	 * metabox nonce present.
+	 * `save_post` handler - only fires for FotoGrids galleries and albums with
+	 * the metabox nonce present.
 	 *
 	 * @since 1.0.0
 	 * @param int $post_id Post being saved.
@@ -68,17 +68,20 @@ final class Collection_Save_Pipeline {
 			return;
 		}
 
-		if ( get_post_type( $post_id ) !== 'fotogrids_gallery' ) {
+		$post_type = get_post_type( $post_id );
+		if ( ! in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
 			return;
 		}
 
-		self::persist_item_order( (int) $post_id, $_POST );
+		if ( 'fotogrids_gallery' === $post_type ) {
+			self::persist_item_order( (int) $post_id, $_POST );
+		}
 
 		// $_POST is sanitised per key/type inside (allowlist + Setting_Value_Codec).
 		self::persist_settings_with_gate( (int) $post_id, $_POST );
 
 		// The AJAX save runs this handler through wp_update_post() and fires the action itself.
-		if ( ! wp_doing_ajax() ) {
+		if ( 'fotogrids_gallery' === $post_type && ! wp_doing_ajax() ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, (int) $post_id );
 		}
 	}
