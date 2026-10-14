@@ -50,6 +50,10 @@ final class Album_Repository {
 	 * (`fotogrids_<setting_key>`). Strings that decode as JSON arrays are
 	 * merged into the default; everything else replaces the default.
 	 *
+	 * Adds a synthetic `_password_encrypted` key with the ciphertext from
+	 * `fotogrids_password` post meta, which the Password gate verifies
+	 * against. The public `password` key is always `''`.
+	 *
 	 * @since 1.0.0
 	 * @param int $album_id Album post ID.
 	 * @return array<string, mixed> Album settings.
@@ -78,6 +82,9 @@ final class Album_Repository {
 				$settings[ $key ] = $saved_value;
 			}
 		}
+
+		$settings['_password_encrypted'] = (string) get_post_meta( $album_id, 'fotogrids_password', true );
+		$settings['password']            = '';
 
 		return $settings;
 	}

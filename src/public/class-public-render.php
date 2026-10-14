@@ -130,6 +130,16 @@ class Public_Render {
 			return;
 		}
 
+		self::send_no_cache_headers();
+	}
+
+	/**
+	 * Opts the current page out of host, page-builder and CDN caching.
+	 *
+	 * @since  1.3.0
+	 * @return void
+	 */
+	private static function send_no_cache_headers(): void {
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- De-facto constant read by host and plugin page caches; the name is fixed, not plugin-owned.
 		}
@@ -565,6 +575,18 @@ class Public_Render {
 	 * @return string Rendered album HTML.
 	 */
 	public static function album_shortcode( $atts ) {
+		return self::render_album_embed( $atts );
+	}
+
+	/**
+	 * Renders one album embed from shortcode attributes.
+	 *
+	 * @since 1.3.0
+	 * @param array|string $atts        Shortcode attributes.
+	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @return string Rendered album HTML.
+	 */
+	public static function render_album_embed( $atts, string $instance_id = '' ) {
 		$atts = shortcode_atts(
 			array(
 				'id'       => 0,
@@ -626,11 +648,21 @@ class Public_Render {
 			$album_settings['layout'] = $atts['template'];
 		}
 
+		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {
+			$instance_id = '';
+		}
+
 		$context = Context_Builder::for_public()->build_for_album(
 			$album_id,
 			$album_settings,
 			$child_gallery_ids,
+			Request_Source::SHORTCODE,
+			$instance_id
 		);
+
+		if ( Render_Controller::has_active_gates( $context ) ) {
+			self::send_no_cache_headers();
+		}
 
 		$result                   = Render_Controller::factory()->render( $context );
 		self::$last_render_result = $result;

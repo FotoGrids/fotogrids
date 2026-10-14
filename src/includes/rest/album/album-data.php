@@ -147,6 +147,98 @@ class Album_Data {
 	}
 
 	/**
+	 * Unlocks a password-protected album and returns its rendered HTML.
+	 *
+	 * Verifies the submitted password, sets the remember cookie when the album
+	 * remembers visitors (or returns a short-lived unlock token when it does
+	 * not), and renders the album so the lock form can be swapped in place.
+	 * The response shape matches the gallery unlock route.
+	 *
+	 * @since 1.3.0
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function unlock_album( $request ) {
+		$album_id  = (int) $request['id'];
+		$submitted = (string) ( $request->get_param( 'password' ) ?? '' );
+
+		$album = get_post( $album_id );
+		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+			return new \WP_Error(
+				'album_not_found',
+				__( 'Album not found', 'fotogrids' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$readable = 'publish' === $album->post_status
+			|| ( 'private' === $album->post_status && current_user_can( 'read_post', $album_id ) );
+		if ( ! $readable ) {
+			return new \WP_Error(
+				'album_not_published',
+				__( 'Album is not published', 'fotogrids' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+		$stored   = (string) $settings['_password_encrypted'];
+
+		if ( empty( $settings['password_protect'] ) || ! \FotoGrids\Password_Crypto::verify( $submitted, $stored ) ) {
+			return new \WP_Error(
+				'fotogrids_invalid_password',
+				__( 'Incorrect password.', 'fotogrids' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		$cookie_key    = 'fotogrids_unlocked_' . $album_id;
+		$cookie_value  = \FotoGrids\REST\Gallery\Gallery_Data::make_unlock_cookie_value( $album_id, $stored );
+		$remember      = ! empty( $settings['password_remember'] );
+		$remember_days = max( 1, min( 365, (int) ( $settings['password_remember_days'] ?? 7 ) ) );
+
+		if ( $remember ) {
+			setcookie(
+				$cookie_key,
+				$cookie_value,
+				array(
+					'expires'  => time() + ( $remember_days * DAY_IN_SECONDS ),
+					'path'     => COOKIEPATH,
+					'domain'   => COOKIE_DOMAIN,
+					'secure'   => is_ssl(),
+					'httponly' => true,
+					'samesite' => 'Lax',
+				)
+			);
+		}
+
+		// The render below reads the unlock state from $_COOKIE.
+		$_COOKIE[ $cookie_key ] = $cookie_value;
+
+		$html     = \FotoGrids\Public_Render::render_album_embed(
+			array( 'id' => $album_id ),
+			(string) $request->get_param( 'instance_id' )
+		);
+		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+		$inline   = \FotoGrids\Public_Render::last_render_result();
+
+		return rest_ensure_response(
+			array(
+				'success'     => true,
+				'html'        => $html,
+				'css'         => $resolver->get_css_asset_urls(),
+				'js'          => $resolver->get_js_asset_data(),
+				'fonts'       => \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url(),
+				'remember'    => $remember,
+				'unlockToken' => $remember ? '' : \FotoGrids\REST\Gallery\Gallery_Data::make_unlock_token( $album_id, $stored ),
+				'inlineCss'   => null !== $inline ? $inline->inline_css : '',
+				'inlineJs'    => null !== $inline ? $inline->inline_js : '',
+				'jsonLd'      => null !== $inline ? $inline->json_ld : '',
+			)
+		);
+	}
+
+	/**
 	 * Get albums list for admin use
 	 *
 	 * @param \WP_REST_Request $request The REST API request object

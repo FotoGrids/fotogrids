@@ -33,6 +33,19 @@ class Album_Permissions {
 	}
 
 	/**
+	 * Permission check for unlocking a password-protected album.
+	 *
+	 * Any visitor may submit a password; the handler verifies it.
+	 *
+	 * @since 1.3.0
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return bool Always true.
+	 */
+	public static function check_album_unlock( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return true;
+	}
+
+	/**
 	 * Permission check for the album list endpoint.
 	 *
 	 * The list includes draft and private albums of every author, so it is

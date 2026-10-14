@@ -223,12 +223,13 @@
 		const wrapper = form.closest('.fotogrids-gate');
 
 		const galleryId = parseInt(form.dataset.galleryId || '0', 10);
+		const albumId = parseInt(form.dataset.albumId || '0', 10);
 		const unlockUrl = form.dataset.unlockUrl || '';
 		// The lock form carries its own nonce in data-nonce.
 		const nonce = form.dataset.nonce || '';
 		const password = input ? input.value : '';
 
-		if (!galleryId || !unlockUrl) {
+		if ((!galleryId && !albumId) || !unlockUrl) {
 			return;
 		}
 
@@ -295,11 +296,13 @@
 				tempDiv.innerHTML = html;
 
 				// Without a remember cookie, the token is what authorises
-				// this gallery's later requests until the page is left.
+				// this collection's later requests until the page is left.
 				if (data.unlockToken) {
 					tempDiv
 						.querySelectorAll(
-							'[data-fg-gallery-id="' + galleryId + '"]'
+							albumId
+								? '[data-fg-album-id="' + albumId + '"]'
+								: '[data-fg-gallery-id="' + galleryId + '"]'
 						)
 						.forEach(function (el) {
 							el.dataset.fgUnlockToken = data.unlockToken;
@@ -331,7 +334,7 @@
 				document.dispatchEvent(
 					new CustomEvent('fotogrids:gallery_unlocked', {
 						bubbles: true,
-						detail: { galleryId },
+						detail: { galleryId, albumId },
 					})
 				);
 			})

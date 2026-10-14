@@ -398,13 +398,15 @@ final class Context_Builder {
 	 * @param   array<string, mixed> $render_settings     Resolved album settings.
 	 * @param   array<int, mixed>    $child_gallery_ids   Child gallery post IDs in album-stored order.
 	 * @param   value-of<Request_Source::ALL> $source     Request source.
+	 * @param   string               $instance_id         Instance ID to render with. Empty takes the next one.
 	 * @return  Render_Context
 	 */
 	public function build_for_album(
 		int $album_id,
 		array $render_settings = array(),
 		array $child_gallery_ids = array(),
-		string $source = Request_Source::SHORTCODE
+		string $source = Request_Source::SHORTCODE,
+		string $instance_id = ''
 	): Render_Context {
 		$render_settings = self::coerce_layout_settings( $render_settings );
 
@@ -413,7 +415,7 @@ final class Context_Builder {
 			// instance_id_factory so instance IDs are stable per album.
 			0,
 			$album_id,
-			$this->instance_id_factory->generate( $album_id ),
+			'' !== $instance_id ? $instance_id : $this->instance_id_factory->generate( $album_id ),
 			$source,
 			false,
 			Render_Mode::INITIAL,
