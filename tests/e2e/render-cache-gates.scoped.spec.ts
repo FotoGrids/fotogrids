@@ -200,3 +200,49 @@ test.describe( 'page caches in front of the site', () => {
 		await guest.close();
 	} );
 } );
+
+test.describe( 'caches in front of the REST API', () => {
+	/** The public GET endpoints that answer from a gallery's gate outcome. */
+	function gatedReads( galleryId: number ): string[] {
+		return [
+			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/galleries/${ galleryId }/items` ) }`,
+			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/gallery/${ galleryId }` ) }`,
+			`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/items' ) }&gallery=${ galleryId }`,
+		];
+	}
+
+	/** Request a REST URL in a context and return its Cache-Control header. */
+	async function restCacheControl( context: BrowserContext, url: string ): Promise< string > {
+		const response = await context.request.get( url );
+		return response.headers()[ 'cache-control' ] ?? '';
+	}
+
+	test( 'password gallery reads ask caches not to store them, locked or unlocked', { tag: [ '@critical', '@cache', '@gate', '@api' ] }, async ( {
+		browser,
+	} ) => {
+		const { id } = passwordGallery();
+		const visitor = await anonymous( browser );
+
+		for ( const url of gatedReads( id ) ) {
+			expect( await restCacheControl( visitor, url ), `locked visitor: ${ url }` ).toContain( 'no-store' );
+		}
+
+		await unlock( visitor, id );
+		for ( const url of gatedReads( id ) ) {
+			expect( await restCacheControl( visitor, url ), `unlocked visitor: ${ url }` ).toContain( 'no-store' );
+		}
+
+		await visitor.close();
+	} );
+
+	test( 'ungated gallery reads stay cacheable', { tag: [ '@critical', '@cache', '@gate', '@api' ] }, async ( { browser } ) => {
+		const { id } = galleryPage( { enable_cache: true } );
+		const guest = await anonymous( browser );
+
+		for ( const url of gatedReads( id ) ) {
+			expect( await restCacheControl( guest, url ), url ).not.toContain( 'no-store' );
+		}
+
+		await guest.close();
+	} );
+} );
