@@ -166,7 +166,7 @@ final class Collection_Save_Pipeline {
 
 		if ( 'fotogrids_gallery' === $post->post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, $post_id );
-		} else {
+		} elseif ( 'fotogrids_album' === $post->post_type ) {
 			do_action( Actions_Album::SETTINGS_SAVED, $post_id );
 		}
 
