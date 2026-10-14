@@ -81,8 +81,14 @@ final class Collection_Save_Pipeline {
 		self::persist_settings_with_gate( (int) $post_id, $_POST );
 
 		// The AJAX save runs this handler through wp_update_post() and fires the action itself.
-		if ( 'fotogrids_gallery' === $post_type && ! wp_doing_ajax() ) {
+		if ( wp_doing_ajax() ) {
+			return;
+		}
+
+		if ( 'fotogrids_gallery' === $post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, (int) $post_id );
+		} else {
+			do_action( Actions_Album::SETTINGS_SAVED, (int) $post_id );
 		}
 	}
 
