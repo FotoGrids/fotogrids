@@ -3,7 +3,8 @@ import { adopt, galleryPage } from './support/collections';
 import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
-import { wpEval } from './support/roles';
+import { execFileSync } from 'child_process';
+import { wpCli, wpEval } from './support/roles';
 
 /**
  * A gallery that is not in the post's content: in a block theme's footer
@@ -14,6 +15,20 @@ import { wpEval } from './support/roles';
  */
 
 test.describe.configure({ mode: 'serial' });
+
+const CLASSIC_THEME = 'twentytwentyone';
+
+/** Install the classic theme when the site does not ship it. */
+function ensureClassicTheme(): void {
+	const installed = execFileSync(wpCli(), ['theme', 'list', '--field=name'], {
+		encoding: 'utf8',
+	}).split('\n');
+	if (!installed.includes(CLASSIC_THEME)) {
+		execFileSync(wpCli(), ['theme', 'install', CLASSIC_THEME], {
+			encoding: 'utf8',
+		});
+	}
+}
 
 const SHORTCODE_BLOCK = (id: number) =>
 	`<!-- wp:shortcode -->[fotogrids_gallery id="${id}"]<!-- /wp:shortcode -->`;
@@ -103,8 +118,9 @@ test(
 		).trim();
 		const savedB64 = Buffer.from(saved).toString('base64');
 
+		ensureClassicTheme();
 		wpEval(
-			`switch_theme( 'twentytwentyone' );
+			`switch_theme( '${CLASSIC_THEME}' );
 			update_option( 'widget_block', array( 2 => array( 'content' => base64_decode( '${content}' ) ), '_multiwidget' => 1 ) );
 			$sidebars = get_option( 'sidebars_widgets', array() );
 			$sidebars['sidebar-1'] = array( 'block-2' );
@@ -112,6 +128,10 @@ test(
 		);
 
 		try {
+			expect(wpEval('echo get_stylesheet();').trim()).toBe(CLASSIC_THEME);
+			expect(
+				wpEval('echo wp_get_theme()->exists() ? 1 : 0;').trim()
+			).toBe('1');
 			expect(wpEval('echo wp_is_block_theme() ? 1 : 0;').trim()).toBe(
 				'0'
 			);
