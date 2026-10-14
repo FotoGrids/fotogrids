@@ -87,7 +87,7 @@ final class Collection_Save_Pipeline {
 
 		if ( 'fotogrids_gallery' === $post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, (int) $post_id );
-		} else {
+		} elseif ( 'fotogrids_album' === $post_type ) {
 			do_action( Actions_Album::SETTINGS_SAVED, (int) $post_id );
 		}
 	}
