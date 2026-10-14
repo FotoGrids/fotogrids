@@ -24,9 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   POST /preview/album/{id}      safe-preview render of an album
  *   GET  /picker/items            paged + searched listing for the picker
  *
- * Every route is admin-gated; the preview pipeline intentionally bypasses
- * the password gate, which would be a privacy hole if exposed
- * unauthenticated.
+ * Previews keep the password gate for users who cannot edit the collection.
  *
  * @since 1.0.0
  */
@@ -61,7 +59,7 @@ final class Register_Preview_Routes {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( Preview_Data::class, 'import_core_gallery' ),
-					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_import' ),
 					'args'                => array(
 						'attachment_ids' => array(
 							'required'          => true,

@@ -14,6 +14,7 @@ use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Request_Source;
+use FotoGrids\Render\Gates\Password\Password_Gate;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Instance_Id_Factory;
@@ -54,6 +55,68 @@ final class Preview_Renderer {
 	private static string $ajax_inline_css = '';
 
 	/**
+	 * Whether the current user may preview a gallery or album.
+	 *
+	 * @since 1.3.0
+	 * @param int $id Gallery or album ID.
+	 * @return bool
+	 */
+	public static function can_preview( int $id ): bool {
+		$post = get_post( $id );
+
+		return $post instanceof \WP_Post
+			&& ( 'publish' === $post->post_status || current_user_can( 'read_post', $id ) );
+	}
+
+	/**
+	 * Child gallery IDs of an album that the current user may see, in album order.
+	 *
+	 * @since 1.3.0
+	 * @param int $album_id Album ID.
+	 * @return int[]
+	 */
+	public static function visible_child_gallery_ids( int $album_id ): array {
+		if ( ! class_exists( '\FotoGrids\Gallery_Album_Relations' ) ) {
+			return array();
+		}
+
+		$children = \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album(
+			$album_id,
+			array(
+				'orderby' => 'position',
+				'order'   => 'ASC',
+			)
+		);
+
+		return array_values(
+			array_filter(
+				array_map(
+					static fn ( $child ) => is_object( $child ) ? (int) ( $child->ID ?? 0 ) : 0,
+					$children
+				)
+			)
+		);
+	}
+
+	/**
+	 * Preview-only settings markers for a collection.
+	 *
+	 * Users who cannot edit the collection still meet its password.
+	 *
+	 * @since 1.3.0
+	 * @param int    $collection_id Gallery or album ID.
+	 * @param string $source        Request source.
+	 * @return array<string,mixed>
+	 */
+	public static function preview_settings( int $collection_id, string $source ): array {
+		return array(
+			'_preview_source'                 => $source,
+			'_show_render_errors'             => current_user_can( 'edit_posts' ),
+			Password_Gate::PREVIEW_KEEPS_GATE => ! current_user_can( 'edit_post', $collection_id ),
+		);
+	}
+
+	/**
 	 * Render a gallery preview to HTML.
 	 *
 	 * @since 1.0.0
@@ -63,7 +126,7 @@ final class Preview_Renderer {
 	 * @return string Rendered HTML, or empty string if the pipeline is unavailable.
 	 */
 	public static function render_gallery_html( int $gallery_id, array $preview_options, string $placement_key = '' ): string {
-		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
+		if ( ! self::can_preview( $gallery_id ) || ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
 
@@ -113,7 +176,7 @@ final class Preview_Renderer {
 	 * @return string Rendered HTML, or empty string if the pipeline is unavailable.
 	 */
 	public static function render_album_html( int $album_id, array $preview_options, string $placement_key = '' ): string {
-		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
+		if ( ! self::can_preview( $album_id ) || ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
 
@@ -123,22 +186,7 @@ final class Preview_Renderer {
 			? (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id )
 			: array();
 
-		$child_ids = array();
-		if ( class_exists( '\FotoGrids\Gallery_Album_Relations' ) ) {
-			$children = (array) \FotoGrids\Gallery_Album_Relations::get_galleries_for_album(
-				$album_id,
-				array(
-					'orderby' => 'position',
-					'order'   => 'ASC',
-				)
-			);
-			foreach ( $children as $child ) {
-				$id = is_object( $child ) ? (int) ( $child->ID ?? 0 ) : 0;
-				if ( $id > 0 ) {
-					$child_ids[] = $id;
-				}
-			}
-		}
+		$child_ids = self::visible_child_gallery_ids( $album_id );
 
 		if ( false === $preview_options['click_behavior'] ) {
 			$album_settings['item_click_behavior'] = 'nothing';
@@ -225,13 +273,7 @@ final class Preview_Renderer {
 
 		$preview_meta = $context->meta->with( $meta_changes );
 
-		$preview_settings = array_merge(
-			$context->settings,
-			array(
-				'_preview_source'     => $source,
-				'_show_render_errors' => current_user_can( 'edit_posts' ),
-			)
-		);
+		$preview_settings = array_merge( $context->settings, self::preview_settings( $collection_id, $source ) );
 
 		return new Render_Context(
 			$preview_meta,

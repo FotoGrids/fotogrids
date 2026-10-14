@@ -40,7 +40,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Preview bypass
  * --------------
- * The gate never blocks admin previews ($render_context->meta->is_preview).
+ * The gate never blocks admin previews ($render_context->meta->is_preview)
+ * unless the settings carry PREVIEW_KEEPS_GATE.
  * The simulate_state='password_required' query parameter causes the gate to
  * render the lock screen even in preview mode (for design/QA purposes).
  *
@@ -48,6 +49,13 @@ if ( ! defined( 'WPINC' ) ) {
  * @since   1.0.0
  */
 final class Password_Gate implements Gate {
+
+	/**
+	 * Settings key that keeps the gate on in a preview render.
+	 *
+	 * @since 1.3.0
+	 */
+	public const PREVIEW_KEEPS_GATE = '_preview_keeps_password_gate';
 
 	public function id(): string {
 		return 'fotogrids/password';
@@ -82,7 +90,7 @@ final class Password_Gate implements Gate {
 		}
 
 		// Never block admin previews unless explicitly simulated (above).
-		if ( $render_context->meta->is_preview ) {
+		if ( $render_context->meta->is_preview && empty( $settings[ self::PREVIEW_KEEPS_GATE ] ) ) {
 			return false;
 		}
 
