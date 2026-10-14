@@ -1,7 +1,7 @@
 import { execFileSync } from 'child_process';
 import { existsSync, readFileSync, statSync } from 'fs';
 import path from 'path';
-import type { Browser, Frame, Page } from '@playwright/test';
+import type { Browser, Frame, Locator, Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { album, galleryPage } from './support/collections';
 import { roles, storageStateFor, wpCli, wpEval } from './support/roles';
@@ -185,7 +185,7 @@ test.beforeAll( () => {
 	}
 
 	// Skip the first-launch tour.
-	for ( const user of [ process.env.WP_ADMIN_USER ?? 'admin', roles().roles.editor.user ] ) {
+	for ( const user of [ process.env.WP_ADMIN_USER ?? 'admin', roles().roles.editor.user, roles().roles.contributor.user ] ) {
 		wp( [ 'user', 'meta', 'update', user, '_fl_builder_launched', '1' ] );
 	}
 } );
@@ -433,35 +433,103 @@ test.describe( 'in the builder', () => {
 	} );
 } );
 
-test.describe( 'in the builder, for a user who cannot manage FotoGrids', () => {
+/** Drop a gallery module and pick a gallery through its card. */
+async function pickThroughCard( page: Page, frame: Frame, title: string, id: number ): Promise< Locator > {
+	await dropModule( page, frame, 'fotogrids-gallery' );
+
+	const card = page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' );
+	await expect( card ).toContainText( 'No gallery selected yet.', { timeout: 15000 } );
+	await card.getByRole( 'button', { name: 'Choose gallery' } ).click();
+	await page.locator( '.fg-modal .fg-pb-picker-card', { hasText: title } ).first().click();
+	await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+	await expect( card ).toContainText( title );
+
+	return card;
+}
+
+test.describe( 'in the builder, for an editor', () => {
 	test.use( {
 		storageState: storageStateFor( 'editor' ),
 		allowConsoleErrors: 'Beaver Builder\'s own UI logs errors, such as its welcome video failing to load',
 		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
 	} );
 
-	test( 'a dropped module keeps the plain ID field, and an entered ID previews', { tag: [ '@admin', '@layout' ] }, async ( { page } ) => {
-		const { id } = galleryPage();
-		const target = emptyPage();
+	test( 'the card picks a gallery, which the editor can also edit', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+		const title = `Beaver Builder editor pick ${ Date.now() }`;
+		const { id } = galleryPage( {}, undefined, title );
 		const logFrom = debugLogSize();
 		const pageErrors: string[] = [];
 		page.on( 'pageerror', ( error ) => pageErrors.push( error.message ) );
 
-		const frame = await openBuilder( page, target.url );
-		await dropModule( page, frame, 'fotogrids-gallery' );
+		const frame = await openBuilder( page, emptyPage().url );
+		const card = await pickThroughCard( page, frame, title, id );
 
-		const field = page.locator( 'form.fl-builder-settings input[name="gallery_id"]' );
-		await expect( field ).toBeVisible( { timeout: 15000 } );
-		await expect( page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' ) ).toHaveCount( 0 );
-		// Beaver Builder focuses the first field once the form is ready.
-		await expect( page.locator( 'form.fl-builder-settings select[name="gallery_source"]' ) ).toBeFocused();
-
-		await field.click();
-		await page.keyboard.type( String( id ), { delay: 50 } );
-		await page.keyboard.press( 'Tab' );
-		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+		await expect( card.getByRole( 'button', { name: 'Edit gallery' } ) ).toBeEnabled();
+		await expect( card.getByRole( 'button', { name: 'Create new gallery' } ) ).toBeEnabled();
+		await expect( card.locator( '.fg-pb-bb-picker__note' ) ).toHaveCount( 0 );
 
 		expect( pageErrors ).toEqual( [] );
 		expect( fotogridsNoticesSince( logFrom ) ).toEqual( [] );
+	} );
+} );
+
+test.describe( 'in the builder, for a contributor', () => {
+	test.use( {
+		storageState: storageStateFor( 'contributor' ),
+		allowConsoleErrors: 'Beaver Builder\'s own UI logs errors, such as its welcome video failing to load',
+		allowPhpNotices: 'Beaver Builder Lite logs its own notices while the builder is open; FotoGrids notices are asserted below',
+	} );
+
+	test( 'the card picks a gallery and shows Edit and Create as unavailable', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+		const title = `Beaver Builder contributor pick ${ Date.now() }`;
+		const { id } = galleryPage( {}, undefined, title );
+		// Beaver Builder opens for contributors, on posts, only when an administrator allows it.
+		test.info().annotations.push( {
+			type: 'restore',
+			description: wpEval( `echo base64_encode( serialize( array( get_option( '_fl_builder_post_types', null ), get_option( '_fl_builder_user_access', null ) ) ) );` ),
+		} );
+		wpEval( `update_option( '_fl_builder_post_types', array( 'page', 'post' ) ); update_option( '_fl_builder_user_access', array( 'builder_access' => array( 'contributor' => true ) ) );` );
+		// Without unrestricted editing, the contributor edits modules already in the layout.
+		const draft = JSON.parse(
+			wpEval( `
+				$user = get_user_by( 'login', '${ roles().roles.contributor.user }' );
+				$id   = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'draft', 'post_title' => 'Beaver Builder contributor draft', 'post_author' => $user->ID ) );
+				update_post_meta( $id, '_fl_builder_enabled', true );
+				FLBuilderModel::set_post_id( $id );
+				$row    = FLBuilderModel::add_row( '1-col' );
+				$groups = FLBuilderModel::get_nodes( 'column-group', $row->node );
+				$cols   = FLBuilderModel::get_nodes( 'column', reset( $groups )->node );
+				FLBuilderModel::add_module( 'fotogrids-gallery', clone FLBuilderModel::get_module_defaults( 'fotogrids-gallery' ), reset( $cols )->node );
+				FLBuilderModel::update_layout_data( FLBuilderModel::get_layout_data( 'published', $id ), 'draft', $id );
+				FLBuilderModel::reset_post_id();
+				echo wp_json_encode( array( 'id' => $id, 'url' => add_query_arg( 'p', $id, home_url( '/' ) ) ) );
+			` )
+		);
+		createdPages.push( draft.id );
+		const pageErrors: string[] = [];
+		page.on( 'pageerror', ( error ) => pageErrors.push( error.message ) );
+
+		const frame = await openBuilder( page, draft.url );
+		await frame.locator( '.fl-module-fotogrids-gallery .fg-pb-bb-placeholder' ).click();
+		const card = page.locator( 'form.fl-builder-settings .fg-pb-bb-picker__card' );
+		await card.getByRole( 'button', { name: 'Choose gallery' } ).click( { timeout: 15000 } );
+		await page.locator( '.fg-modal .fg-pb-picker-card', { hasText: title } ).first().click();
+		await expect( frame.locator( `.fl-module-fotogrids-gallery [data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+		await expect( card ).toContainText( title );
+
+		await expect( card.getByRole( 'button', { name: 'Edit gallery' } ) ).toBeDisabled();
+		await expect( card.getByRole( 'button', { name: 'Create new gallery' } ) ).toBeDisabled();
+		await expect( card.locator( '.fg-pb-bb-picker__note' ) ).toHaveText( 'Your role cannot edit or create galleries.' );
+
+		expect( pageErrors ).toEqual( [] );
+	} );
+
+	test.afterEach( ( {}, testInfo ) => {
+		const saved = testInfo.annotations.find( ( note ) => 'restore' === note.type );
+		if ( saved?.description ) {
+			wpEval(
+				`$saved = unserialize( base64_decode( '${ saved.description }' ) ); foreach ( array( '_fl_builder_post_types', '_fl_builder_user_access' ) as $i => $name ) { null === $saved[ $i ] ? delete_option( $name ) : update_option( $name, $saved[ $i ] ); }`
+			);
+		}
 	} );
 } );

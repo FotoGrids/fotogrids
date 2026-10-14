@@ -148,9 +148,31 @@ test.describe( 'the unlock route gives nothing away', () => {
 } );
 
 test.describe( 'capabilities on admin and preview routes', () => {
-	/** SEC-20. Preview skips every gate, so it must require the manage cap. */
-	test( 'SEC-20: preview refuses an editor', { tag: '@api' }, async ( { playwright } ) => {
-		const { context, nonce } = await apiAs( playwright, 'editor' );
+	/** SEC-20. Preview keeps the password for users who cannot edit the gallery. */
+	for ( const [ role, locked ] of [
+		[ 'author', true ],
+		[ 'administrator', false ],
+	] as const ) {
+		test( `SEC-20: preview ${ locked ? 'keeps' : 'skips' } the password for an ${ role }`, { tag: '@api' }, async ( { playwright } ) => {
+			const { context, nonce } = await apiAs( playwright, role );
+
+			const response = await context.post(
+				route(
+					`/fotogrids/v1/preview/gallery/${ fixture< number >( 'F-pw', 'gallery' ) }`
+				),
+				{ headers: { 'X-WP-Nonce': nonce } }
+			);
+			const html = ( await response.json() ).html as string;
+			await context.dispose();
+
+			expect( response.status() ).toBe( 200 );
+			expect( html.includes( 'fg-lock-form' ) ).toBe( locked );
+		} );
+	}
+
+	/** SEC-21. Preview needs edit_posts. */
+	test( 'SEC-21: preview refuses a subscriber', { tag: '@api' }, async ( { playwright } ) => {
+		const { context, nonce } = await apiAs( playwright, 'subscriber' );
 
 		const response = await context.post(
 			route(
