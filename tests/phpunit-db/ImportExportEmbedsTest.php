@@ -231,4 +231,27 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 		$this->assertSame( 0, $embed['poster_id'] );
 		$this->assertStringContainsString( 'harbour.jpg', $embed['poster_url'] );
 	}
+
+	public function test_a_new_embed_is_not_taken_by_another_gallery_listing_its_id(): void {
+		$this->gallery_with( $this->embed() );
+		$file = json_decode( $this->export(), true );
+
+		$this->forget_galleries();
+		$next = (int) self::factory()->post->create() + 1;
+
+		$file['galleries'][] = array(
+			'id'    => 999999,
+			'title' => 'Harbour foreign',
+			'slug'  => 'harbour-foreign',
+			'meta'  => array( 'fotogrids_gallery_items' => wp_json_encode( range( $next, $next + 50 ) ) ),
+		);
+		$this->import( wp_json_encode( $file ) );
+
+		$embed   = $this->embeds()[0];
+		$foreign = get_page_by_path( 'harbour-foreign', OBJECT, 'fotogrids_gallery' );
+		$this->assertContains( $embed, range( $next, $next + 50 ) );
+		$this->assertNotContains( $embed, Gallery_Repository::get_item_ids( $foreign->ID ) );
+		$this->assertCount( 50, Gallery_Repository::get_item_ids( $foreign->ID ) );
+		$this->assertSame( array( get_page_by_path( 'harbour', OBJECT, 'fotogrids_gallery' )->ID ), Gallery_Repository::find_galleries_for_item( $embed ) );
+	}
 }

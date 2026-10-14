@@ -1015,7 +1015,8 @@ class Import_Export_Data {
 	 *
 	 * An embed already on this site keeps its ID when it shows the same video
 	 * and no other gallery lists it. Every other exported embed in the list is
-	 * created as a new embed owned by that gallery.
+	 * created as a new embed owned by that gallery, and no other list keeps the
+	 * new embed's ID.
 	 *
 	 * @since 1.3.0
 	 * @param array<int, mixed> $embeds      Exported embed entries.
@@ -1031,31 +1032,47 @@ class Import_Export_Data {
 			}
 		}
 
-		$created = 0;
+		$created = array();
+		$lists   = array();
 
 		foreach ( array_unique( array_map( 'intval', $gallery_ids ) ) as $gallery_id ) {
 			$item_ids = Gallery_Repository::get_item_ids( $gallery_id );
-			$changed  = false;
+			$placed   = array();
 
 			foreach ( $item_ids as $index => $item_id ) {
-				if ( ! isset( $by_old_id[ $item_id ] ) || self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
+				if ( ! isset( $by_old_id[ $item_id ] ) ) {
+					continue;
+				}
+				if ( ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
 					continue;
 				}
 
 				$new_id = Embed_Store::create( $by_old_id[ $item_id ] );
 				if ( $new_id > 0 ) {
-					++$created;
+					$created[ $new_id ] = true;
 				}
 				$item_ids[ $index ] = $new_id;
-				$changed            = true;
+				$placed[ $index ]   = true;
 			}
 
-			if ( $changed ) {
-				Gallery_Repository::set_item_ids( $gallery_id, array_filter( $item_ids ) );
+			$lists[ $gallery_id ] = array( $item_ids, $placed );
+		}
+
+		// A list can still hold an ID from the exporting site that a new embed has just taken.
+		foreach ( $lists as $gallery_id => $list ) {
+			$kept = array();
+			foreach ( $list[0] as $index => $item_id ) {
+				if ( $item_id > 0 && ( isset( $list[1][ $index ] ) || ! isset( $created[ $item_id ] ) ) ) {
+					$kept[] = $item_id;
+				}
+			}
+
+			if ( Gallery_Repository::get_item_ids( $gallery_id ) !== $kept ) {
+				Gallery_Repository::set_item_ids( $gallery_id, $kept );
 			}
 		}
 
-		return $created;
+		return count( $created );
 	}
 
 	/**
