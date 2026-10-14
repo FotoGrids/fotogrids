@@ -16,10 +16,11 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 const KEY = 'border_enabled';
 
+/** The stored meta value, JSON-encoded so an absent key reads as `""`. */
 function storedSetting( id: number ): string {
 	return execFileSync(
 		wpCli(),
-		[ 'post', 'meta', 'get', String( id ), `fotogrids_${ KEY }` ],
+		[ 'eval', `echo wp_json_encode( get_post_meta( ${ id }, 'fotogrids_${ KEY }', true ) );` ],
 		{ encoding: 'utf8' }
 	).trim();
 }
@@ -37,7 +38,7 @@ for ( const { kind, make } of KINDS ) {
 		const panel = new CollectionSettings( page );
 		const open = async () => {
 			await page.goto( `/wp-admin/post.php?post=${ id }&action=edit` );
-			await panel.switchTab( 'styling' );
+			await panel.openTab( 'Styling' );
 		};
 
 		await open();
