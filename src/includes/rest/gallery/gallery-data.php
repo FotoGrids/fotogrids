@@ -252,7 +252,10 @@ class Gallery_Data {
 
 		// Render the gallery HTML server-side so the frontend can swap it in
 		// without a full page reload.
-		$html     = \FotoGrids\Public_Render::gallery_shortcode( array( 'id' => $gallery_id ) );
+		$html     = \FotoGrids\Public_Render::render_gallery_embed(
+			array( 'id' => $gallery_id ),
+			(string) $request->get_param( 'instance_id' )
+		);
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 		$css_urls = $resolver->get_css_asset_urls();
 		$js_data  = $resolver->get_js_asset_data();
@@ -306,6 +309,7 @@ class Gallery_Data {
 		$filters         = is_array( $filters_raw ) ? $filters_raw : array();
 		$random_seed     = (int) $request->get_param( 'random_seed' );
 		$via_album_id    = (int) $request->get_param( 'via_album_id' );
+		$instance_id     = (string) $request->get_param( 'instance_id' );
 
 		if ( $gallery_id <= 0 ) {
 			return new \WP_Error(
@@ -343,6 +347,9 @@ class Gallery_Data {
 		);
 		if ( $via_album_id > 0 ) {
 			$shared_meta_overrides['via_album_id'] = $via_album_id;
+		}
+		if ( '' !== $instance_id ) {
+			$shared_meta_overrides['instance_id'] = $instance_id;
 		}
 
 		if ( ! $is_paginated_request ) {

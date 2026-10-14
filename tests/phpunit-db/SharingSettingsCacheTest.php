@@ -7,6 +7,7 @@
 
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Cache;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Settings\Sharing_Settings_Store;
 
 class SharingSettingsCacheTest extends WP_UnitTestCase {
@@ -49,6 +50,8 @@ class SharingSettingsCacheTest extends WP_UnitTestCase {
 	 * @return array<string, mixed>
 	 */
 	private function rendered_sharing(): array {
+		Instance_Id_Factory::reset_for_tests();
+
 		$html = do_shortcode( '[fotogrids_gallery id="' . $this->gallery . '"]' );
 
 		$this->assertStringContainsString( 'fotogrids-gallery', $html );

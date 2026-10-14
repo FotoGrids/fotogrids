@@ -249,7 +249,10 @@
 				'X-WP-Nonce': nonce,
 			},
 			credentials: 'same-origin',
-			body: JSON.stringify({ password }),
+			body: JSON.stringify({
+				password,
+				instance_id: wrapper && wrapper.id ? wrapper.id : '',
+			}),
 		})
 			.then(function (response) {
 				return response.json().then(function (data) {
@@ -365,7 +368,7 @@
 		bindAll();
 
 		// Lock forms inserted later are caught by a delegated submit listener rather
-		// than a MutationObserver.
+		// than a MutationObserver. Binding the form here too would unlock it twice.
 		document.addEventListener(
 			'submit',
 			function (e) {
@@ -378,8 +381,6 @@
 				) {
 					return;
 				}
-				// Bind, then re-dispatch the submit so the new handler receives it.
-				bindLockForm(form);
 				e.preventDefault();
 				unlockGallery(form);
 			},

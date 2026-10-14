@@ -12,6 +12,7 @@ use FotoGrids\Render\Api\Item_Wrapper;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Hooks;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -111,6 +112,11 @@ final class Album_To_Gallery_Ajax implements Decorator {
 
 			if ( null !== $via_album_id && $via_album_id > 0 ) {
 				$trigger_attrs['data-fg-via-album'] = (string) $via_album_id;
+
+				$instance_id = Instance_Id_Factory::for_gallery_in_album( $gallery_id, $via_album_id, $render_context->meta->instance_id );
+				if ( null !== $instance_id ) {
+					$trigger_attrs['data-fg-instance-id'] = $instance_id;
+				}
 			}
 
 			$trigger_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $trigger_attrs, $render_context );
