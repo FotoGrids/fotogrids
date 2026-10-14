@@ -62,11 +62,13 @@ class Save_Item_Data {
 		$description = sanitize_textarea_field( $request->get_param( 'description' ) ?? '' );
 
 		$post_result = wp_update_post(
-			array(
-				'ID'           => $item_id,
-				'post_title'   => $title,
-				'post_excerpt' => $caption,
-				'post_content' => $description,
+			wp_slash(
+				array(
+					'ID'           => $item_id,
+					'post_title'   => $title,
+					'post_excerpt' => $caption,
+					'post_content' => $description,
+				)
 			),
 			true
 		);
@@ -79,7 +81,7 @@ class Save_Item_Data {
 			);
 		}
 
-		update_post_meta( $item_id, '_wp_attachment_image_alt', $alt );
+		update_post_meta( $item_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
 
 		// ── fotogrids_item_meta row ──────────────────────────────────────────
 		$credit       = sanitize_text_field( $request->get_param( 'credit' ) ?? '' );
