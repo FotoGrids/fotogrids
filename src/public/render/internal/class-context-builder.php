@@ -75,7 +75,8 @@ final class Context_Builder {
 	 * @param   value-of<Request_Source::ALL> $source Request source.
 	 * @param   int|null             $album_id Album identifier.
 	 * @param   array<string, mixed> $meta_overrides Optional Render_Meta field overrides.
-	 *                                               Accepted keys: requested_page,
+	 *                                               Accepted keys: instance_id,
+	 *                                               requested_page,
 	 *                                               requested_per_page, breakpoint,
 	 *                                               partial, view_page,
 	 *                                               via_album_id. Used by the REST
@@ -111,7 +112,9 @@ final class Context_Builder {
 		$render_meta = new Render_Meta(
 			$gallery_id,
 			$album_id,
-			$this->instance_id_factory->generate( $gallery_id ),
+			isset( $meta_overrides['instance_id'] ) && '' !== $meta_overrides['instance_id']
+				? (string) $meta_overrides['instance_id']
+				: $this->instance_id_factory->generate( $gallery_id ),
 			$source,
 			false,
 			Render_Mode::INITIAL,

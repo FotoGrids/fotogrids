@@ -9,6 +9,7 @@ use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Album;
 use FotoGrids\Hooks\Actions_Cache;
+use FotoGrids\Render\Internal\Instance_Id_Factory;
 use FotoGrids\Metaboxes\Collection_Save_Pipeline;
 use FotoGrids\Settings\View_Settings_Store;
 
@@ -78,6 +79,8 @@ class AlbumChangesCacheTest extends WP_UnitTestCase {
 
 	/** A logged-out render of the gallery; true when it came from the cache. */
 	private function render(): bool {
+		Instance_Id_Factory::reset_for_tests();
+
 		$hits = did_action( Actions_Cache::HIT );
 		$html = do_shortcode( '[fotogrids_gallery id="' . $this->gallery . '"]' );
 

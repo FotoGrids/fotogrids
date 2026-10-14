@@ -5,7 +5,7 @@
  * album item). On click:
  *
  *   1. POST to the render URL carried in data-fg-render-url with the
- *      gallery's ID and nonce.
+ *      gallery's ID, its instance ID and the nonce.
  *   2. Server returns { html, css: { handle: url } }.
  *   3. Inject any CSS handles that aren't already in <head> (mirrors the
  *      password-gate unlock pattern).
@@ -238,6 +238,9 @@
 		// can build a "back to this album" breadcrumb. Falls back to the
 		// ?fg_via= already baked into the href on JS-off / fetch failure.
 		const requestBody = { gallery_id: galleryId };
+		if (trigger.dataset.fgInstanceId) {
+			requestBody.instance_id = trigger.dataset.fgInstanceId;
+		}
 		if (viaAlbumId > 0) {
 			requestBody.via_album_id = viaAlbumId;
 		}
