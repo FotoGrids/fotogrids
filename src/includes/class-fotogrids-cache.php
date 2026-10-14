@@ -87,9 +87,9 @@ class FotoGrids_Cache {
 		add_action( Actions_Album::GALLERY_REMOVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Album::SETTINGS_SAVED, array( __CLASS__, 'on_album_mutation' ), 10, 1 );
 		add_action( 'save_post_fotogrids_album', array( __CLASS__, 'on_album_mutation' ), 10, 1 );
-		add_action( Actions_Library::UPDATED, array( __CLASS__, 'on_library_mutation' ), 10, 0 );
-		add_action( Actions_Library::DELETED, array( __CLASS__, 'on_library_mutation' ), 10, 0 );
-		add_action( Actions_Library::MERGED, array( __CLASS__, 'on_library_mutation' ), 10, 0 );
+		add_action( Actions_Library::UPDATED, array( __CLASS__, 'flush_all' ), 10, 0 );
+		add_action( Actions_Library::DELETED, array( __CLASS__, 'flush_all' ), 10, 0 );
+		add_action( Actions_Library::MERGED, array( __CLASS__, 'flush_all' ), 10, 0 );
 		add_action( Actions_Maintenance::OPTIONS_RESET, array( __CLASS__, 'flush_all' ), 10, 0 );
 
 		add_action( 'init', array( __CLASS__, 'init_purge_schedule' ) );
@@ -166,19 +166,6 @@ class FotoGrids_Cache {
 	public static function on_attachment_metadata_update( $data, $attachment_id ) {
 		self::flush_for_item( (int) $attachment_id );
 		return $data;
-	}
-
-	/**
-	 * Flush every cached render after a Library entry is renamed, deleted or merged.
-	 *
-	 * The entry's links may already be gone by the time the action fires, so the
-	 * affected galleries cannot be looked up.
-	 *
-	 * @since  1.3.0
-	 * @return void
-	 */
-	public static function on_library_mutation(): void {
-		self::flush_all();
 	}
 
 	// -------------------------------------------------------------------------
