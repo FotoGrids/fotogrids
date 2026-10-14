@@ -1,10 +1,12 @@
 <?php
 namespace FotoGrids\Tools\ImportExport;
 
+use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\REST\Items\Embed_Data;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -257,6 +259,8 @@ class Import_Export_Data {
 				) ?: array()
 			);
 
+			$data['embeds'] = self::export_embeds();
+
 			$meta_table            = $wpdb->prefix . 'fotogrids_item_metadata';
 			$data['item_metadata'] = $wpdb->get_results(
 				$wpdb->prepare( 'SELECT * FROM %i', $meta_table ),
@@ -345,6 +349,28 @@ class Import_Export_Data {
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Build the exported video embed entries: every embed in a gallery the export
+	 * includes. `poster_src` carries the URL of a Media Library poster.
+	 *
+	 * @since 1.3.0
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function export_embeds(): array {
+		$embeds = array();
+
+		foreach ( Gallery_Repository::all_item_ids( self::COLLECTION_STATUSES ) as $item_id ) {
+			$embed = Embed_Store::get( $item_id );
+			if ( null === $embed ) {
+				continue;
+			}
+			$embed['poster_src'] = $embed['poster_id'] > 0 ? (string) wp_get_attachment_url( $embed['poster_id'] ) : '';
+			$embeds[]            = $embed;
+		}
+
+		return $embeds;
 	}
 
 	/**
@@ -545,16 +571,18 @@ class Import_Export_Data {
 				}
 			}
 
-			$gallery_id_map = array(); // old_id => new_id
+			$gallery_id_map    = array(); // old_id => new_id
+			$written_galleries = array();
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
-				[ $imp, $skip, $map ]  = self::import_collections(
+				[ $imp, $skip, $map, $written ] = self::import_collections(
 					$data['galleries'],
 					'fotogrids_gallery',
 					$options['galleries']
 				);
-				$imported['galleries'] = $imp;
-				$skipped['galleries']  = $skip;
-				$gallery_id_map        = $map;
+				$imported['galleries']          = $imp;
+				$skipped['galleries']           = $skip;
+				$gallery_id_map                 = $map;
+				$written_galleries              = $written;
 			}
 
 			$album_id_map = array();
@@ -578,6 +606,10 @@ class Import_Export_Data {
 				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map, $known );
 				$imported['items'] = $imp;
 				$skipped['items']  = $skip;
+			}
+
+			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && $written_galleries ) {
+				$imported['items'] = ( $imported['items'] ?? 0 ) + self::import_embeds( $data['embeds'], $written_galleries );
 			}
 
 			// Item metadata is imported after both items and tags exist.
@@ -728,12 +760,14 @@ class Import_Export_Data {
 	 *
 	 * $conflict_mode: 'skip' | 'overwrite' | 'duplicate'
 	 *
-	 * Returns [imported_count, skipped_count, old_id_to_new_id_map].
+	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids],
+	 * where written_ids lists the posts the import created or overwrote.
 	 */
 	private static function import_collections( array $posts, string $post_type, string $conflict_mode ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$id_map   = array();
+		$written  = array();
 
 		foreach ( $posts as $post_data ) {
 			$old_id = (int) ( $post_data['id'] ?? 0 );
@@ -767,6 +801,7 @@ class Import_Export_Data {
 						update_post_meta( $existing->ID, $key, $value );
 					}
 					$id_map[ $old_id ] = $existing->ID;
+					$written[]         = $existing->ID;
 					++$imported;
 					continue;
 				}
@@ -801,10 +836,11 @@ class Import_Export_Data {
 			}
 
 			$id_map[ $old_id ] = $new_id;
+			$written[]         = $new_id;
 			++$imported;
 		}
 
-		return array( $imported, $skipped, $id_map );
+		return array( $imported, $skipped, $id_map, $written );
 	}
 
 	/** Import gallery-album relationship rows, remapping IDs. */
@@ -971,6 +1007,118 @@ class Import_Export_Data {
 		}
 
 		return array( $imported, $skipped );
+	}
+
+	/**
+	 * Recreate the exported video embeds in each gallery the import wrote, and
+	 * point the gallery's item list at them.
+	 *
+	 * An embed already on this site keeps its ID when it shows the same video
+	 * and no other gallery lists it. Every other exported embed in the list is
+	 * created as a new embed owned by that gallery.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, mixed> $embeds      Exported embed entries.
+	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
+	 * @return int Number of embeds created.
+	 */
+	private static function import_embeds( array $embeds, array $gallery_ids ): int {
+		$by_old_id = array();
+		foreach ( $embeds as $embed ) {
+			$embed = self::sanitize_embed( (array) $embed );
+			if ( null !== $embed ) {
+				$by_old_id[ $embed['id'] ] = $embed;
+			}
+		}
+
+		$created = 0;
+
+		foreach ( array_unique( array_map( 'intval', $gallery_ids ) ) as $gallery_id ) {
+			$item_ids = Gallery_Repository::get_item_ids( $gallery_id );
+			$changed  = false;
+
+			foreach ( $item_ids as $index => $item_id ) {
+				if ( ! isset( $by_old_id[ $item_id ] ) || self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
+					continue;
+				}
+
+				$new_id = Embed_Store::create( $by_old_id[ $item_id ] );
+				if ( $new_id > 0 ) {
+					++$created;
+				}
+				$item_ids[ $index ] = $new_id;
+				$changed            = true;
+			}
+
+			if ( $changed ) {
+				Gallery_Repository::set_item_ids( $gallery_id, array_filter( $item_ids ) );
+			}
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Clean an exported embed entry into Embed_Store data.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $embed Exported embed entry.
+	 * @return array<string, mixed>|null Embed data with its exported `id`, or null when unusable.
+	 */
+	private static function sanitize_embed( array $embed ): ?array {
+		$old_id    = (int) ( $embed['id'] ?? 0 );
+		$item_type = sanitize_key( (string) ( $embed['item_type'] ?? '' ) );
+		$url       = esc_url_raw( is_string( $embed['url'] ?? null ) ? $embed['url'] : '' );
+
+		if ( $old_id <= 0 || '' === $url || ! in_array( $item_type, array( 'video_youtube', 'video_vimeo' ), true ) ) {
+			return null;
+		}
+
+		$settings = is_array( $embed['settings'] ?? null ) ? $embed['settings'] : array();
+		foreach ( $settings as $key => $value ) {
+			if ( 'false' === $value ) {
+				$settings[ $key ] = false;
+			}
+		}
+
+		$poster_id  = (int) ( $embed['poster_id'] ?? 0 );
+		$poster_url = is_string( $embed['poster_url'] ?? null ) ? $embed['poster_url'] : '';
+		if ( $poster_id > 0 && 'attachment' !== get_post_type( $poster_id ) ) {
+			$poster_id = 0;
+			if ( '' === $poster_url && is_string( $embed['poster_src'] ?? null ) ) {
+				$poster_url = $embed['poster_src'];
+			}
+		}
+
+		return array(
+			'id'            => $old_id,
+			'item_type'     => $item_type,
+			'video_id'      => sanitize_text_field( is_scalar( $embed['video_id'] ?? null ) ? (string) $embed['video_id'] : '' ),
+			'url'           => $url,
+			'caption'       => sanitize_text_field( is_scalar( $embed['caption'] ?? null ) ? (string) $embed['caption'] : '' ),
+			'thumbnail_url' => esc_url_raw( is_string( $embed['thumbnail_url'] ?? null ) ? $embed['thumbnail_url'] : '' ),
+			'settings'      => Embed_Data::sanitize_embed_settings( $settings, $item_type ),
+			'poster_id'     => $poster_id,
+			'poster_url'    => esc_url_raw( $poster_url ),
+		);
+	}
+
+	/**
+	 * Whether an embed on this site is the exported embed, already owned by the gallery.
+	 *
+	 * @since 1.3.0
+	 * @param int                  $item_id    Item ID from the gallery's list.
+	 * @param int                  $gallery_id Gallery post ID.
+	 * @param array<string, mixed> $exported   Sanitized exported embed.
+	 * @return bool
+	 */
+	private static function is_same_embed( int $item_id, int $gallery_id, array $exported ): bool {
+		$existing = Embed_Store::get( $item_id );
+		if ( null === $existing || $existing['item_type'] !== $exported['item_type'] || $existing['video_id'] !== $exported['video_id'] ) {
+			return false;
+		}
+
+		return array() === array_diff( Gallery_Repository::find_galleries_for_item( $item_id ), array( $gallery_id ) );
 	}
 
 	/**
