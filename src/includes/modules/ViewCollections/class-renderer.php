@@ -20,11 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Renders the regions of a collection view page.
- *
- * The gallery and album markup comes from the existing Public_Render pipeline;
- * this class only produces the surrounding shell (head, header, footer, share)
- * and exposes a filter at each region so Pro and third parties can extend it.
+ * Renders the shell regions of a collection view page; each region is filterable.
  *
  * @since 1.0.0
  */
@@ -33,8 +29,7 @@ class Renderer {
 	use Setting_Helpers;
 
 	/**
-	 * The id stamped on the view page <body> so its CSS-variable style block
-	 * can be scoped to a single selector.
+	 * The view page <body> id; scopes the CSS-variable block.
 	 *
 	 * @var string
 	 */
@@ -55,6 +50,8 @@ class Renderer {
 	private $settings;
 
 	/**
+	 * Creates a renderer for a collection.
+	 *
 	 * @since 1.0.0
 	 * @param \WP_Post $post The collection being rendered.
 	 */
@@ -64,7 +61,7 @@ class Renderer {
 	}
 
 	/**
-	 * Build a renderer for a collection.
+	 * Builds a renderer for a collection.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_Post $post The collection being rendered.
@@ -85,9 +82,7 @@ class Renderer {
 	}
 
 	/**
-	 * Whether the collection is being previewed as a draft by an editor.
-	 *
-	 * Published and private collections render as normal view pages.
+	 * Whether the collection is neither published nor private (a draft preview).
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -97,7 +92,7 @@ class Renderer {
 	}
 
 	/**
-	 * Document title for the view page.
+	 * Returns the document title for the view page.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -147,12 +142,6 @@ class Renderer {
 	public function is_noindex(): bool {
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
-		// Noindex chain (lowest to highest precedence):
-		//   1. view settings `noindex` / `index`
-		//   2. the SEO tab's per-collection `fotogrids_noindex` toggle (true
-		//      forces noindex; false alone does NOT override a draft preview)
-		//   3. draft preview always wins - never index unsaved work
-		//   4. the `fotogrids/view/robots` filter for code-level overrides
 		$noindex = ! empty( $this->settings['noindex'] )
 			|| empty( $this->settings['index'] )
 			|| ! empty( $seo['noindex'] )
@@ -169,7 +158,7 @@ class Renderer {
 	}
 
 	/**
-	 * Add the view page's noindex to `wp_robots`. Nothing when deferring.
+	 * Adds the view page's noindex to `wp_robots`; no-op when deferring to an SEO plugin.
 	 *
 	 * @since 1.3.0
 	 * @param array<string,bool|string> $robots Robots directives.
@@ -191,7 +180,7 @@ class Renderer {
 	}
 
 	/**
-	 * Canonical and Open Graph meta for the document head.
+	 * Returns canonical and Open Graph meta for the document head.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -199,18 +188,13 @@ class Renderer {
 	public function head_meta(): string {
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
-		// Canonical: per-collection override wins; otherwise the permalink.
 		$canonical = '' !== $seo['canonical_override'] ? $seo['canonical_override'] : get_permalink( $this->post );
 
 		/**
 		 * Filter the canonical URL emitted on the view page.
 		 *
-		 * Use this to inject a custom canonical (for example, on sites that
-		 * present the same gallery under multiple URLs and want a single
-		 * canonical pointer).
-		 *
 		 * @since 1.0.0
-		 * @param string   $canonical Default: permalink of the view page.
+		 * @param string   $canonical Override or permalink of the view page.
 		 * @param \WP_Post $post
 		 */
 		$canonical = (string) apply_filters( Filters_View::CANONICAL, $canonical, $this->post );
@@ -224,11 +208,7 @@ class Renderer {
 		/**
 		 * Filter the complete head-meta markup the view page emits.
 		 *
-		 * This is the catch-all string filter that runs after every granular
-		 * filter (og/title, og/description, og/image, og/url, og/type,
-		 * og/enabled, view/canonical). Prefer the granular
-		 * filters for targeted changes - this one is for sites that need to
-		 * rewrite or completely replace the markup.
+		 * Runs after all granular canonical and OG filters.
 		 *
 		 * @since 1.0.0
 		 * @param string   $meta
@@ -238,17 +218,9 @@ class Renderer {
 	}
 
 	/**
-	 * Open Graph and Twitter card markup.
+	 * Returns Open Graph and Twitter card markup.
 	 *
-	 * Emits collection-level tags by default. When a valid deep-linked item is
-	 * present in the request (?fg-item) and belongs to a gallery, emits per-item
-	 * tags so a shared image renders a rich preview.
-	 *
-	 * Every field passes through a granular filter (fotogrids/view/og/title,
-	 * /og/description, /og/image, /og/url, /og/type, /og/enabled) so themes
-	 * and other plugins can adjust individual values without rewriting the
-	 * whole markup. The `fotogrids/view/og/enabled` filter is the conflict-
-	 * guard escape hatch for sites whose SEO plugin already emits OG tags.
+	 * Uses per-item tags when ?fg-item names an item of this gallery and no gate applies.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -258,20 +230,15 @@ class Renderer {
 			$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 		}
 
-		$item = $this->deep_linked_item();
+		$gated = $this->has_active_gates();
+		$item  = $gated ? null : $this->deep_linked_item();
 
-		// Master switch: site-wide "OG off" or per-collection "defer to other
-		// SEO plugins" both kill OG emission before any filter runs.
 		if ( empty( $seo['enable_open_graph'] ) || ! empty( $seo['defer_to_seo_plugins'] ) ) {
 			return (string) apply_filters( Filters_View::OG_ENABLED, '', $this->post, $item );
 		}
 
 		/**
 		 * Filter whether OG/Twitter tags are emitted on this view page.
-		 *
-		 * Default true. Return false to suppress every OG and Twitter tag
-		 * (e.g. when another SEO plugin owns the head and FotoGrids should
-		 * stay out of the way for this specific page).
 		 *
 		 * @since 1.0.0
 		 * @param bool       $enabled  Default true.
@@ -306,27 +273,21 @@ class Renderer {
 			);
 			$url         = add_query_arg( 'fg-item', $item['id'], $url );
 		} else {
-			// Per-collection title override wins; else post title (already set).
 			if ( '' !== $seo['og_title_override'] ) {
 				$title = $seo['og_title_override'];
 			}
 
-			// Per-collection description override wins; else the layered chain.
 			$description = '' !== $seo['og_description_override']
 				? $seo['og_description_override']
 				: $this->collection_description();
 
-			// Image: explicit per-collection custom image wins; otherwise the
-			// collection cover (image or video/embed poster), which itself
-			// resolves the Featured / Share Image first, then the in-gallery
-			// Featured Item / featured child gallery, then the first item;
-			// finally the plugin-wide fallback.
+			// Image order: custom image, collection cover, plugin-wide fallback.
 			$image_id = 0;
 			if ( 'custom' === $seo['og_image_source'] && $seo['og_image_custom_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_custom_id'];
 			}
 			$poster_url = '';
-			if ( $image_id <= 0 ) {
+			if ( $image_id <= 0 && ! $gated ) {
 				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
 					(int) $this->post->ID,
 					'large'
@@ -352,7 +313,6 @@ class Renderer {
 				);
 			}
 
-			// A video or embed cover has no image attachment; its poster URL is the image.
 			if ( '' !== $poster_url ) {
 				$image = array(
 					'id'     => 0,
@@ -397,11 +357,10 @@ class Renderer {
 		$url = (string) apply_filters( Filters_View::OG_URL, $url, $this->post, $item );
 
 		/**
-		 * Filter the og:image data structure emitted for a view page.
+		 * Filter the og:image data emitted for a view page.
 		 *
 		 * Shape: array{id:int,url:string,width:int,height:int,alt:string}.
-		 * Return an array with an empty `url` to suppress the image (and the
-		 * Twitter card, which depends on the image).
+		 * An empty `url` suppresses the image and the Twitter image tags.
 		 *
 		 * @since 1.0.0
 		 * @param array      $image
@@ -452,10 +411,6 @@ class Renderer {
 			}
 		}
 
-		// article:* tags pair with og:type=article (the default). Skip them
-		// when a filter has rewritten og:type to something else (e.g.
-		// 'website', 'profile') because article:published_time on a
-		// non-article would be malformed.
 		if ( 'article' === $type && ! $item ) {
 			$tags .= $this->article_meta();
 		}
@@ -464,12 +419,7 @@ class Renderer {
 	}
 
 	/**
-	 * Build the description used for og:description on a collection page.
-	 *
-	 * Layered fallback: post excerpt → trimmed post content → auto-built
-	 * count summary (e.g. "24 photos in 'Tuscany 2024'"). The site tagline
-	 * is intentionally NOT in the chain - it would put the same generic
-	 * string on every gallery and actively hurt link previews.
+	 * Builds the og:description for a collection: excerpt, else content, else a count summary.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -489,11 +439,7 @@ class Renderer {
 	}
 
 	/**
-	 * Build the count-based fallback description for a collection.
-	 *
-	 * Examples:
-	 *   "24 photos in 'Tuscany 2024'."
-	 *   "3 galleries in 'Weddings 2024'."
+	 * Builds the count-based fallback description, or '' when the collection is empty.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -527,10 +473,7 @@ class Renderer {
 	}
 
 	/**
-	 * Cap a description string at a safe length for OG/social previews.
-	 *
-	 * Most platforms truncate around 200 characters in card previews; the cap
-	 * of 300 leaves a buffer while keeping the tag small.
+	 * Caps a description at 300 characters, ending in '...' when cut.
 	 *
 	 * @since 1.0.0
 	 * @param string $text
@@ -550,7 +493,7 @@ class Renderer {
 	}
 
 	/**
-	 * Build the article:* meta tags that pair with og:type=article.
+	 * Builds the article:* meta tags that pair with og:type=article.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -577,11 +520,10 @@ class Renderer {
 	}
 
 	/**
-	 * Resolve the og:type for the current collection.
+	 * Resolves the og:type for the current collection.
 	 *
 	 * @since 1.0.0
-	 * @param array|null $seo Resolved SEO settings (avoids a second store
-	 *                        lookup when the caller has them).
+	 * @param array|null $seo Resolved SEO settings, or null to look them up.
 	 * @return string
 	 */
 	private function og_type( ?array $seo = null ): string {
@@ -596,15 +538,14 @@ class Renderer {
 		 * Filter the og:type emitted for a view page.
 		 *
 		 * @since 1.0.0
-		 * @param string   $type Default from `fotogrids/seo/settings`.
+		 * @param string   $type From the SEO settings, else 'article'.
 		 * @param \WP_Post $post
 		 */
 		return (string) apply_filters( Filters_View::OG_TYPE, $type, $this->post );
 	}
 
 	/**
-	 * Resolve the deep-linked item from the request, if it belongs to this
-	 * collection's gallery.
+	 * Resolves the ?fg-item item when it belongs to this gallery.
 	 *
 	 * @since 1.0.0
 	 * @return array{id:int,title:string,caption:string,image:string}|null
@@ -643,8 +584,7 @@ class Renderer {
 	}
 
 	/**
-	 * Space-separated class list for the view page <body>. The template escapes
-	 * it with esc_attr(); the fixed body id is Renderer::BODY_ID.
+	 * Returns the space-separated class list for the view page <body>.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -671,13 +611,7 @@ class Renderer {
 	}
 
 	/**
-	 * Scoped CSS-variable block for the view page body, as bare CSS (no <style>
-	 * tags). Enqueued by enqueue_assets() via wp_add_inline_style() on the
-	 * fotogrids-view-collection handle rather than embedded in the markup, so the
-	 * accent, max width, and background custom properties reach the page as an
-	 * enqueued stylesheet scoped to #fotogrids-view. The max width is a
-	 * responsive range, carried as a Responsive_Var so Style_Var_Builder emits
-	 * one @media block per configured breakpoint.
+	 * Returns the CSS-variable rules scoped to #fotogrids-view, as bare CSS (no <style> tags).
 	 *
 	 * @since  1.0.0
 	 * @return string The CSS rules, or '' when no variables apply.
@@ -723,11 +657,30 @@ class Renderer {
 	}
 
 	/**
-	 * Resolved per-collection collection settings for this view page.
+	 * Whether a gate (password, members only) applies to this collection.
 	 *
-	 * Reads the saved gallery or album settings (keyed by the collection
-	 * settings registry) so view-page-specific values such as max width and
-	 * background colour can be applied per collection.
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	private function has_active_gates(): bool {
+		$collection_id = (int) $this->post->ID;
+		$settings      = $this->collection_settings();
+
+		$context = $this->is_album()
+			? \FotoGrids\Render\Internal\Context_Builder::for_public()->build_for_album(
+				$collection_id,
+				$settings,
+				array(),
+				\FotoGrids\Render\Api\Request_Source::SHORTCODE,
+				'fg-' . $collection_id . '-head'
+			)
+			: \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( $collection_id, $settings );
+
+		return \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
+	}
+
+	/**
+	 * Returns the saved gallery or album settings for this collection.
 	 *
 	 * @since 1.0.0
 	 * @return array<string,mixed>
@@ -779,7 +732,7 @@ class Renderer {
 	}
 
 	/**
-	 * Header region markup.
+	 * Returns the header region markup.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -809,7 +762,7 @@ class Renderer {
 	}
 
 	/**
-	 * Gallery or album markup from the existing render pipeline.
+	 * Returns the gallery or album markup from the render pipeline.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -819,9 +772,7 @@ class Renderer {
 			require_once FOTOGRIDS_PLUGIN_DIR . 'public/class-public-render.php';
 		}
 
-		// Flag this request as a View Page render so Render_Meta::view_page
-		// turns true. Collection_Header reads that flag to decide whether
-		// the parent album's "View Pages" breadcrumb placement applies.
+		// Must be set before rendering; Render_Meta::view_page reads it.
 		\FotoGrids\Public_Render::set_view_page_context( true );
 
 		try {
@@ -847,17 +798,10 @@ class Renderer {
 	}
 
 	/**
-	 * Share controls for the view page footer.
+	 * Returns the share container for the view page footer.
 	 *
-	 * Both code paths emit a [data-fg-share-footer] container with a JSON
-	 * sharing config. The Sharing module's attachFooterBars() handler
-	 * (public/render/decorators/sharing/sharing.js) picks the container
-	 * up and renders the buttons from the config - no view-specific JS.
-	 *
-	 * When sharing is enabled for the collection and the view_page
-	 * placement applies, the full resolved network set is used. Otherwise
-	 * the config falls back to copy-link only, so every shareable page still
-	 * offers at least the copy button.
+	 * The [data-fg-share-footer] JSON config is rendered client-side by the Sharing
+	 * module; it falls back to copy-link only unless the view_page placement is on.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -877,9 +821,6 @@ class Renderer {
 				'button_size'  => $resolved['button_size'],
 			);
 		} else {
-			// Copy-link-only fallback. Same payload shape so the Sharing
-			// module renders this just like any other share bar - just
-			// with a single network active.
 			$config = array(
 				'enabled'      => true,
 				'networks'     => array( 'copy_link' => true ),
@@ -907,15 +848,14 @@ class Renderer {
 	}
 
 	/**
-	 * Footer credit markup.
+	 * Returns the footer credit markup.
 	 *
 	 * @since 1.0.0
 	 * @return string
 	 */
 	public function footer_credit_html(): string {
 		/**
-		 * Filter the footer credit markup. Empty by default; a seam for
-		 * optionally adding footer content.
+		 * Filter the footer credit markup. Empty by default.
 		 *
 		 * @since 1.0.0
 		 * @param string   $html
@@ -925,20 +865,15 @@ class Renderer {
 	}
 
 	/**
-	 * Enqueue the assets the view page needs.
+	 * Enqueues the view page assets and its scoped CSS variables.
 	 *
-	 * Runs the frontend gallery assets and the standalone shell stylesheet. The
-	 * gallery render pipeline also registers its own per-render assets, which
-	 * flush through wp_head / wp_footer in the shell template.
+	 * Must run before wp_head() so the inline variables print in <head>.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		// Pre-register fotogrids-runtime; Runtime_Bootstrap::localize() attaches
-		// the window.fotogrids payload to it. The runtime asset itself is enqueued by
-		// Asset_Resolver during the gallery/album render that happens inside
-		// this view page; this registration just makes the handle known.
+		// Registered only; Runtime_Bootstrap::localize() needs the handle and the render enqueues it.
 		wp_register_script(
 			'fotogrids-runtime',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/fotogrids-runtime.js',
@@ -947,8 +882,6 @@ class Renderer {
 			true
 		);
 
-		// Deep-linking is essential on the view page - the URL might
-		// carry ?fg-item={id}, which opens that item in the lightbox.
 		wp_enqueue_script(
 			'fotogrids-deep-linking',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
@@ -957,9 +890,7 @@ class Renderer {
 			true
 		);
 
-		// Sharing module - always needed, because the View Page footer shows at
-		// least a copy-link button via attachFooterBars() (see share_html()),
-		// whatever the gallery's own sharing setting.
+		// Always enqueued: the footer shows at least a copy-link button.
 		wp_enqueue_style(
 			'fotogrids-sharing',
 			FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/sharing/sharing.css',
@@ -988,10 +919,6 @@ class Renderer {
 			FOTOGRIDS_VERSION
 		);
 
-		// Per-page CSS variables (accent, max width, background) scoped to
-		// #fotogrids-view. Attached to the view-collection handle - enqueued
-		// here before wp_head(), so it prints in <head> rather than being
-		// embedded as a <style> in the body markup.
 		$body_vars_css = $this->body_vars_css();
 		if ( '' !== $body_vars_css ) {
 			wp_add_inline_style( 'fotogrids-view-collection', $body_vars_css );
@@ -1014,11 +941,7 @@ class Renderer {
 	}
 
 	/**
-	 * Announce a view page visit.
-	 *
-	 * The view itself is recorded by the Stats feature's view request, so
-	 * it follows the collection's Enable Statistics Tracking setting. Draft
-	 * previews are not announced.
+	 * Announces a view page visit; skipped for draft previews.
 	 *
 	 * @since 1.0.0
 	 * @return void
