@@ -14,6 +14,11 @@ if ( ! defined( 'WPINC' ) ) {
 class Admin_Init {
 
 	/**
+	 * Menu parent for screens that need a menu entry but are not shown in the menu.
+	 */
+	private const HIDDEN_MENU_PARENT = 'fotogrids-hidden';
+
+	/**
 	 * Initialize the admin interface
 	 */
 	public static function init() {
@@ -125,6 +130,8 @@ class Admin_Init {
 			''
 		);
 
+		self::add_new_collection_pages();
+
 		add_submenu_page(
 			'fotogrids',
 			__( 'Templates', 'fotogrids' ),
@@ -182,6 +189,31 @@ class Admin_Init {
 		}
 
 		remove_submenu_page( 'fotogrids', 'fotogrids' );
+	}
+
+	/**
+	 * Registers the Add New screen of each collection type under a hidden parent.
+	 *
+	 * Without a menu entry, WordPress resolves post-new.php against core's Posts
+	 * menu and refuses users who lack edit_posts.
+	 */
+	private static function add_new_collection_pages() {
+		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+			$post_type_object = get_post_type_object( $post_type );
+
+			if ( ! $post_type_object ) {
+				continue;
+			}
+
+			add_submenu_page(
+				self::HIDDEN_MENU_PARENT,
+				$post_type_object->labels->add_new_item,
+				$post_type_object->labels->add_new_item,
+				$post_type_object->cap->create_posts,
+				'post-new.php?post_type=' . $post_type,
+				''
+			);
+		}
 	}
 
 	/**
