@@ -21,10 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 final class Item_Renderer {
 
 	/**
-	 * Per-request counter for fallback loader SVG IDs.
-	 *
-	 * Used only for template-preview items where id = 0 (no attachment ID
-	 * available). Real gallery items use the attachment ID as their unique suffix.
+	 * Per-request counter for loader SVG IDs of items with id 0 (template previews).
 	 *
 	 * @since 1.0.0
 	 * @var int
@@ -43,11 +40,7 @@ final class Item_Renderer {
 		$item_classes    = array_unique( array_merge( array( 'fg-item' ), $item_view->classes ) );
 		$class_attribute = esc_attr( implode( ' ', $item_classes ) );
 
-		// data-fg-media-state drives the loader visibility and the reveal
-		// animation. JS flips it to "loaded" on img load/error; it starts as
-		// "loading" here so the loader is visible from the moment the HTML is
-		// parsed. Video items and placeholder tiles carry no loadable image, so
-		// they start "loaded" to avoid a stuck loader.
+		// JS sets "loaded" on img load/error; items with no image start loaded.
 		$is_video        = \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type );
 		$state_attr      = ( $is_video || $this->is_placeholder( $item_view ) )
 			? ' data-fg-media-state="loaded"'
@@ -60,18 +53,11 @@ final class Item_Renderer {
 		$image_with_overlays = $this->wrap_with_overlays( $image_html, $item_view->thumb_overlays, $item_view, $render_context );
 		$image_with_wrappers = $this->apply_wrappers( $image_with_overlays, $item_view->wrappers );
 
-		// An overlay caption is absolutely positioned over the media. For a
-		// video that plays inline, the player replaces the poster in place, so
-		// the overlay caption would sit on top of the playing video. Omit it
-		// from the thumbnail grid for inline-video items with overlay captions.
+		// An overlay caption would cover a video playing inline.
 		$caption_placement = $render_context->settings['caption_placement'] ?? 'overlay';
 		$playback_mode     = $render_context->settings['video_playback_mode'] ?? 'inline';
 
-		// Image Viewer renders the caption title in its control bar, not as a
-		// per-item caption. Suppress the figcaption here and expose the title
-		// on a data attribute the layout's bar JS reads. The Item Description
-		// and per-item placement settings are hidden for this layout, so only
-		// the title travels to the bar.
+		// Image Viewer shows the title in its control bar instead of a figcaption.
 		$is_image_viewer = 'image-viewer' === $render_context->layout->layout_id;
 
 		$suppress_caption = $is_image_viewer
@@ -102,8 +88,7 @@ final class Item_Renderer {
 				. '</figcaption>';
 		}
 
-		// figure_wrappers enclose both the media block and the caption, so the
-		// entire clickable surface includes the caption text.
+		// figure_wrappers enclose the caption too, so it is part of the link.
 		$figure_inner = $this->apply_wrappers( $image_with_wrappers . $caption_html, $item_view->figure_wrappers );
 
 		return sprintf(
@@ -117,9 +102,7 @@ final class Item_Renderer {
 	}
 
 	/**
-	 * Serializes inline CSS declarations to a `style="..."` attribute string.
-	 * Returns an empty string when the declarations array is empty so the
-	 * attribute is omitted altogether.
+	 * Serializes inline CSS declarations to a `style` attribute, or '' when empty.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, string> $declarations Property => value map.
@@ -171,8 +154,6 @@ final class Item_Renderer {
 		$srcset = '';
 		$sizes  = '';
 		if ( $item_view->id > 0 ) {
-			// Use the resolved size from Item_View so srcset candidates match
-			// the actual thumbnail size displayed in the gallery grid.
 			$srcset_size     = '' !== $item_view->thumb_size ? $item_view->thumb_size : 'large';
 			$resolved_srcset = wp_get_attachment_image_srcset( $item_view->id, $srcset_size );
 			$resolved_sizes  = wp_get_attachment_image_sizes( $item_view->id, $srcset_size );
@@ -188,10 +169,7 @@ final class Item_Renderer {
 
 		$lazy_load = (bool) ( $render_context->settings['lazy_load'] ?? true );
 
-		// When the collection being rendered is watermark-enabled, serve the
-		// watermarked sibling for the thumbnail and full image. The filter
-		// returns the clean URL unchanged when watermarking is off for this
-		// collection or the variant file does not exist.
+		// Watermarked variants, when the collection has watermarking on.
 		$thumb_url = \FotoGrids\Watermark\Watermark_Render_Filter::rewrite_url( $item_view->thumb_url );
 		$full_url  = \FotoGrids\Watermark\Watermark_Render_Filter::rewrite_url( $item_view->full_url );
 
@@ -257,13 +235,8 @@ final class Item_Renderer {
 	}
 
 	/**
-	 * Renders the poster markup for a video item.
-	 *
-	 * Emits the poster image (or a placeholder when no poster resolved) and the
-	 * data-fg-* attributes the inline-playback and lightbox frontend modules
-	 * read to know how to play the item. The actual player (<video> /
-	 * <iframe>) is injected client-side. The play badge is added only for
-	 * tiles that would otherwise offer no way to start playback.
+	 * Renders a video item's poster (or placeholder) and the data-fg-* playback
+	 * attributes; the player itself is injected client-side.
 	 *
 	 * @since   1.1.0
 	 * @param   Item_View      $item_view      Item data.
@@ -338,17 +311,7 @@ final class Item_Renderer {
 	}
 
 	/**
-	 * Wraps item media in overlay containers and injects the loading icon.
-	 *
-	 * The loading icon is a full inline SVG (not a <symbol>/<use> reference)
-	 * so CSS transitions can target individual SVG child elements directly.
-	 * Inlining one SVG per item costs ~900 bytes of markup per item - a
-	 * negligible tradeoff for a gallery page.
-	 *
-	 * __FG_ID__ in the SVG is replaced with a per-item unique suffix so any
-	 * gradient or clipPath IDs referenced by multiple items on the same page
-	 * don't collide. Animations are driven by WAAPI (loading-icon.js); there
-	 * are no SMIL tags in the inlined markup.
+	 * Wraps item media with its overlays and the loading icon.
 	 *
 	 * @since   1.0.0
 	 * @param   string                   $image_html Base image markup.
@@ -373,8 +336,7 @@ final class Item_Renderer {
 			);
 		}
 
-		// Video items and placeholder tiles have no loadable image to wait on,
-		// so the loading-icon loader is omitted for them.
+		// Nothing to wait on without an image.
 		$loader_html = ( \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type ) || $this->is_placeholder( $item_view ) )
 			? ''
 			: $this->render_loader( $item_view, $render_context );
@@ -383,12 +345,7 @@ final class Item_Renderer {
 	}
 
 	/**
-	 * Renders the loading icon element for one item.
-	 *
-	 * Uses the icon name from settings (falling back to '12-dots') and replaces
-	 * __FG_ID__ in the SVG with a per-item unique suffix so gradient and clipPath
-	 * IDs don't collide across multiple items on the same page. The inlined SVG
-	 * contains no SMIL tags - animations are started by WAAPI in loading-icon.js.
+	 * Renders the inline loading-icon SVG for one item, with IDs made unique per item.
 	 *
 	 * @since   1.0.0
 	 * @param   Item_View      $item_view Item data.
@@ -401,8 +358,6 @@ final class Item_Renderer {
 			$icon_name = '12-dots';
 		}
 
-		// Attachment ID is naturally unique per page; fall back to a per-request
-		// counter for template-preview items that carry id = 0.
 		if ( $item_view->id > 0 ) {
 			$instance_id = 'fgi' . $item_view->id;
 		} else {
