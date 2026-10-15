@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatFileSize } from '@/admin/src/utils/format-file-size';
 import { EXPORT_TYPES } from '../constants.js';
+import { itemsDetail } from '../utils.js';
 
 const FileSummary = ({ file, summary }) => {
 	const counts = summary?.contents ?? {};
@@ -21,6 +22,10 @@ const FileSummary = ({ file, summary }) => {
 					{chips.map(({ key, label }) => {
 						const n = counts[key];
 						const showCount = typeof n === 'number' && n > 0;
+						const detail =
+							'items' === key
+								? itemsDetail(counts.items_detail)
+								: '';
 						return (
 							<span key={key} className="fg-ie-summary__chip">
 								{showCount && (
@@ -29,6 +34,11 @@ const FileSummary = ({ file, summary }) => {
 									</>
 								)}
 								{label}
+								{detail && (
+									<span className="fg-ie-summary__chip-detail">
+										{detail}
+									</span>
+								)}
 							</span>
 						);
 					})}

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-13T07:32:07+00:00\n"
+"POT-Creation-Date: 2026-10-15T12:23:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -89,7 +89,7 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:91
 #: includes/admin/class-dashboard-widget.php:187
-#: includes/metaboxes/class-collection-save-pipeline.php:165
+#: includes/metaboxes/class-collection-save-pipeline.php:174
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:47
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:64
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:71
@@ -250,7 +250,7 @@ msgid "Create New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:184
-#: includes/metaboxes/class-collection-save-pipeline.php:166
+#: includes/metaboxes/class-collection-save-pipeline.php:175
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:69
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:86
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:107
@@ -3992,7 +3992,7 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #: includes/class-admin-init.php:601
-#: includes/metaboxes/class-collection-save-pipeline.php:98
+#: includes/metaboxes/class-collection-save-pipeline.php:107
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
 #: includes/rest/admin/admin-data.php:255
@@ -5136,29 +5136,29 @@ msgstr ""
 msgid "Use %s instead."
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:94
+#: includes/metaboxes/class-collection-save-pipeline.php:103
 msgid "Security check failed"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:103
+#: includes/metaboxes/class-collection-save-pipeline.php:112
 msgid "Invalid post ID"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:108
+#: includes/metaboxes/class-collection-save-pipeline.php:117
 msgid "Invalid collection"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:112
+#: includes/metaboxes/class-collection-save-pipeline.php:121
 #: includes/metaboxes/class-item-ajax-endpoints.php:481
 msgid "Cannot edit this gallery"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:144
+#: includes/metaboxes/class-collection-save-pipeline.php:153
 msgid "Failed to update gallery"
 msgstr ""
 
 #. translators: %s: collection type (Gallery or Album).
-#: includes/metaboxes/class-collection-save-pipeline.php:171
+#: includes/metaboxes/class-collection-save-pipeline.php:180
 #, php-format
 msgid "%s saved successfully"
 msgstr ""
@@ -6468,9 +6468,9 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:322
-#: includes/rest/gallery/gallery-data.php:591
-#: includes/rest/gallery/gallery-permissions.php:64
+#: includes/rest/gallery/gallery-data.php:326
+#: includes/rest/gallery/gallery-data.php:598
+#: includes/rest/gallery/gallery-permissions.php:66
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
 msgid "Gallery not found."
@@ -7043,34 +7043,34 @@ msgstr ""
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:313
+#: includes/rest/gallery/gallery-data.php:317
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:330
-#: includes/rest/gallery/gallery-permissions.php:76
+#: includes/rest/gallery/gallery-data.php:334
+#: includes/rest/gallery/gallery-permissions.php:78
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
 msgstr ""
 
-#: includes/rest/gallery/gallery-permissions.php:85
+#: includes/rest/gallery/gallery-permissions.php:91
 msgid "You do not have access to this gallery."
 msgstr ""
 
-#: includes/rest/gallery/gallery-permissions.php:144
+#: includes/rest/gallery/gallery-permissions.php:150
 #: includes/rest/items/items-permissions.php:81
 #: includes/rest/media/media-permissions.php:49
 msgid "Invalid gallery ID."
 msgstr ""
 
-#: includes/rest/gallery/gallery-permissions.php:151
+#: includes/rest/gallery/gallery-permissions.php:157
 #: includes/rest/items/items-permissions.php:148
 #: includes/rest/media/media-permissions.php:57
 msgid "You do not have permission to edit this gallery."
 msgstr ""
 
-#: includes/rest/gallery/gallery-permissions.php:195
+#: includes/rest/gallery/gallery-permissions.php:201
 msgid "You do not have permission to view saved gallery passwords."
 msgstr ""
 
@@ -7183,42 +7183,42 @@ msgid "Item not found."
 msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:144
+#: includes/rest/items/save-item-data.php:146
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: tag name, 2: item ID.
-#: includes/rest/items/save-item-data.php:169
+#: includes/rest/items/save-item-data.php:171
 #, php-format
 msgid "Failed to add tag: %1$s to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:193
+#: includes/rest/items/save-item-data.php:195
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
-#: includes/rest/items/save-item-data.php:212
+#: includes/rest/items/save-item-data.php:214
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:234
+#: includes/rest/items/save-item-data.php:236
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
-#: includes/rest/items/save-item-data.php:253
+#: includes/rest/items/save-item-data.php:255
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:276
+#: includes/rest/items/save-item-data.php:278
 msgid "Item saved successfully."
 msgstr ""
 
@@ -7611,27 +7611,27 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:118
+#: includes/tools/import-export/class-import-export-data.php:126
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:153
+#: includes/tools/import-export/class-import-export-data.php:161
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:426
+#: includes/tools/import-export/class-import-export-data.php:460
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:443
+#: includes/tools/import-export/class-import-export-data.php:477
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:480
+#: includes/tools/import-export/class-import-export-data.php:514
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:487
+#: includes/tools/import-export/class-import-export-data.php:521
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
@@ -7854,31 +7854,31 @@ msgstr ""
 msgid "Attachment is not an image."
 msgstr ""
 
-#: public/class-public-render.php:428
+#: public/class-public-render.php:441
 msgid "No gallery ID specified. Usage: [fotogrids_gallery id=\"1\"]"
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:436
-#: public/class-public-render.php:707
+#: public/class-public-render.php:449
+#: public/class-public-render.php:724
 #, php-format
 msgid "Gallery with ID %d not found."
 msgstr ""
 
 #. translators: 1: gallery ID, 2: post status.
-#: public/class-public-render.php:448
+#: public/class-public-render.php:461
 #, php-format
 msgid "Gallery with ID %1$d is not published (status: %2$s)."
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:462
-#: public/class-public-render.php:720
+#: public/class-public-render.php:475
+#: public/class-public-render.php:737
 #, php-format
 msgid "Gallery with ID %d exists but has no items."
 msgstr ""
 
-#: public/class-public-render.php:699
+#: public/class-public-render.php:716
 msgid "No gallery ID specified."
 msgstr ""
 
@@ -11347,6 +11347,7 @@ msgstr ""
 
 #. translators: %d: image count
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:68
+#: includes/tools/import-export/assets/utils.js:99
 #, js-format
 msgid "%d image"
 msgid_plural "%d images"
@@ -11684,6 +11685,28 @@ msgstr ""
 
 #: includes/tools/import-export/assets/utils.js:51
 msgid "skipped"
+msgstr ""
+
+#. translators: %d: video count
+#: includes/tools/import-export/assets/utils.js:104
+#, js-format
+msgid "%d video"
+msgid_plural "%d videos"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: number of images, e.g. "83 images". 2: number of videos, e.g. "4 videos".
+#: includes/tools/import-export/assets/utils.js:111
+#, js-format
+msgctxt "import item counts"
+msgid "(%1$s, %2$s)"
+msgstr ""
+
+#. translators: %s: number of images or of videos, e.g. "4 videos".
+#: includes/tools/import-export/assets/utils.js:119
+#, js-format
+msgctxt "import item counts"
+msgid "(%s)"
 msgstr ""
 
 #: includes/tools/migration/assets/MigrationTool.jsx:25

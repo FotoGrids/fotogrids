@@ -44,6 +44,8 @@ type ExportFile = Record< string, unknown > & {
 	embeds: Array< Embed & { poster_src: string } >;
 };
 type Choice = 'skip' | 'overwrite' | 'duplicate';
+type Counts = Record< string, number | Record< string, number > >;
+type Imported = { imported: Counts; skipped: Counts; summary: string; result: string };
 
 const CHOICES: Record< Choice, string > = {
 	skip: 'Skip existing',
@@ -176,14 +178,17 @@ async function exportFile(
 	return body;
 }
 
-/** Upload a file on the Import tab of the site at `base` and import it. */
+/**
+ * Upload a file on the Import tab of the site at `base` and import it. Returns the
+ * route's answer and the text of the file summary and of the Imported row.
+ */
 async function importThroughUi(
 	page: Page,
 	body: string,
 	choice: Choice = 'skip',
 	format: 'json' | 'xml' = 'json',
 	base = ''
-): Promise< Record< string, Record< string, number > > > {
+): Promise< Imported > {
 	await page.goto( `${ base }${ SCREEN }` );
 	await page.getByRole( 'tab', { name: 'Import' } ).click();
 
@@ -197,6 +202,7 @@ async function importThroughUi(
 		buffer: Buffer.from( body ),
 	} );
 	await analysed;
+	const summary = await page.locator( '.fg-ie-summary__chips' ).innerText();
 
 	await page
 		.getByRole( 'radiogroup', { name: 'Galleries conflict handling' } )
@@ -207,8 +213,11 @@ async function importThroughUi(
 	await page.getByRole( 'button', { name: 'Import', exact: true } ).click();
 	const response = await executed;
 	expect( response.status() ).toBe( 200 );
+	await expect( page.getByRole( 'heading', { name: 'Import result' } ) ).toBeVisible();
+	const imported = page.locator( '.fg-ie-done__result' ).filter( { hasText: 'Imported' } );
+	const result = ( await imported.count() ) ? await imported.innerText() : '';
 
-	return response.json();
+	return { ...( await response.json() ), summary, result };
 }
 
 let image: number;
@@ -261,7 +270,9 @@ test( 'importing on a site without the gallery recreates its embeds in place, an
 	forget();
 
 	const result = await importThroughUi( page, JSON.stringify( file ) );
-	expect( result.imported ).toMatchObject( { galleries: 1, items: 3 } );
+	expect( result.imported ).toMatchObject( { galleries: 1, items: 3, items_detail: { images: 1, videos: 2 } } );
+	expect( result.summary ).toMatch( /3\s*Items\s*\(1 image, 2 videos\)/ );
+	expect( result.result ).toMatch( /3\s*Items\s*\(1 image, 2 videos\)/ );
 
 	[ gallery ] = galleriesTitled( title );
 	adopt( gallery );
@@ -307,19 +318,25 @@ test( 'an XML file brings the embeds back with every setting, the switched-off o
 	expect( embedOf( vimeo )?.settings ).toMatchObject( { loop: true, controls: false } );
 } );
 
-test( 'Overwrite on the same site keeps the gallery\'s embeds and adds none', { tag: [ '@admin', '@api' ] }, async ( {
+test( 'Overwrite on the same site puts the file\'s caption, settings and poster back on the gallery\'s embeds, adding none', { tag: [ '@admin', '@api' ] }, async ( {
 	page,
 	playwright,
 } ) => {
 	const current = JSON.parse( await exportFile( playwright, 'json' ) ) as ExportFile;
 	const own = { ...current, galleries: current.galleries.filter( ( g ) => g.title === title ) };
 	const embeds = ownEmbeds();
+	const before = { youtube: embedOf( youtube ), vimeo: embedOf( vimeo ) };
+
+	wpEval( `\\FotoGrids\\Galleries\\Embed_Store::update( ${ youtube }, ${ phpValue( { caption: 'Edited on the site', settings: { loop: true } } ) } );` );
+	wpEval( `\\FotoGrids\\Galleries\\Embed_Store::update( ${ vimeo }, ${ phpValue( { poster_id: 0, poster_url: '' } ) } );` );
 
 	await importThroughUi( page, JSON.stringify( own ), 'overwrite' );
 
 	expect( galleriesTitled( title ) ).toEqual( [ gallery ] );
 	expect( itemsOf( gallery ) ).toEqual( [ image, youtube, vimeo ] );
 	expect( ownEmbeds() ).toEqual( embeds );
+	expect( embedOf( youtube ) ).toEqual( before.youtube );
+	expect( embedOf( vimeo ) ).toEqual( before.vimeo );
 } );
 
 test( 'Duplicate gives the copy embeds of its own, so removing one from the copy leaves the original\'s', { tag: [ '@admin', '@api' ] }, async ( {

@@ -69,7 +69,8 @@ class Import_Export_Data {
 		$type_counts = array();
 		foreach ( array( 'galleries', 'albums', 'items', 'tags', 'templates' ) as $key ) {
 			if ( isset( $data[ $key ] ) ) {
-				$type_counts[] = count( $data[ $key ] ) . ' ' . $key;
+				$count         = count( $data[ $key ] ) + ( 'items' === $key ? count( $data['embeds'] ?? array() ) : 0 );
+				$type_counts[] = $count . ' ' . $key;
 			}
 		}
 		if ( isset( $data['settings'] ) ) {
@@ -318,7 +319,8 @@ class Import_Export_Data {
 
 	/**
 	 * Build the exported item entries: every item row, plus every attachment in a
-	 * gallery the export includes that has no row, each carrying the attachment's own text.
+	 * gallery the export includes that has no row, each carrying the attachment's own
+	 * text and whether it is an image or a video.
 	 *
 	 * @since 1.2.0
 	 * @param array<int, array<string, mixed>> $rows Item meta rows.
@@ -346,6 +348,7 @@ class Import_Export_Data {
 			$rows[ $index ]['caption']     = $attachment->post_excerpt;
 			$rows[ $index ]['description'] = $attachment->post_content;
 			$rows[ $index ]['alt']         = (string) get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+			$rows[ $index ]['media_type']  = wp_attachment_is( 'video', $attachment ) ? 'video' : 'image';
 		}
 
 		return $rows;
@@ -527,9 +530,26 @@ class Import_Export_Data {
 	 */
 	private static function analyse( array $data ): \WP_REST_Response {
 		$contents = array();
-		foreach ( array( 'galleries', 'albums', 'items', 'tags', 'item_metadata', 'templates', 'statistics' ) as $key ) {
+		foreach ( array( 'galleries', 'albums', 'tags', 'item_metadata', 'templates', 'statistics' ) as $key ) {
 			if ( isset( $data[ $key ] ) && is_array( $data[ $key ] ) ) {
 				$contents[ $key ] = count( $data[ $key ] );
+			}
+		}
+
+		$items  = is_array( $data['items'] ?? null ) ? $data['items'] : array();
+		$embeds = is_array( $data['embeds'] ?? null ) ? $data['embeds'] : array();
+		if ( isset( $data['items'] ) || $embeds ) {
+			$contents['items'] = count( $items ) + count( $embeds );
+
+			if ( self::has_media_types( $items ) ) {
+				$detail = array(
+					'images' => 0,
+					'videos' => count( $embeds ),
+				);
+				foreach ( $items as $item ) {
+					++$detail[ self::media_kind( (array) $item ) ];
+				}
+				$contents['items_detail'] = $detail;
 			}
 		}
 		if ( isset( $data['settings'] ) ) {
@@ -602,14 +622,36 @@ class Import_Export_Data {
 			}
 
 			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
+
+			$kinds = array(
+				'imported' => array(
+					'images' => 0,
+					'videos' => 0,
+				),
+				'skipped'  => array(
+					'images' => 0,
+					'videos' => 0,
+				),
+			);
+
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
-				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map, $known );
-				$imported['items'] = $imp;
-				$skipped['items']  = $skip;
+				[ $imp, $skip, $kinds ] = self::import_items( $data['items'], $gallery_id_map, $known );
+				$imported['items']      = $imp;
+				$skipped['items']       = $skip;
 			}
 
-			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && $written_galleries ) {
-				$imported['items'] = ( $imported['items'] ?? 0 ) + self::import_embeds( $data['embeds'], $written_galleries );
+			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && is_array( $data['embeds'] ) ) {
+				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries );
+				$imported['items'] = ( $imported['items'] ?? 0 ) + $imp;
+				$skipped['items']  = ( $skipped['items'] ?? 0 ) + $skip;
+
+				$kinds['imported']['videos'] += $imp;
+				$kinds['skipped']['videos']  += $skip;
+			}
+
+			if ( isset( $imported['items'] ) && self::has_media_types( is_array( $data['items'] ?? null ) ? $data['items'] : array() ) ) {
+				$imported['items_detail'] = $kinds['imported'];
+				$skipped['items_detail']  = $kinds['skipped'];
 			}
 
 			// Item metadata is imported after both items and tags exist.
@@ -939,12 +981,23 @@ class Import_Export_Data {
 	 * @param array<int, array<string, mixed>> $items          Exported item entries.
 	 * @param array<int, int>                  $gallery_id_map Old gallery ID => new gallery ID.
 	 * @param array<int, true>                 $known          Attachment IDs already used as items.
-	 * @return array{0: int, 1: int} Imported and skipped counts.
+	 * @return array{0: int, 1: int, 2: array<string, array<string, int>>} Imported and skipped
+	 *         counts, and both again split into images and videos.
 	 */
 	private static function import_items( array $items, array $gallery_id_map, array $known ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$lists    = array();
+		$kinds    = array(
+			'imported' => array(
+				'images' => 0,
+				'videos' => 0,
+			),
+			'skipped'  => array(
+				'images' => 0,
+				'videos' => 0,
+			),
+		);
 
 		foreach ( $items as $item ) {
 			// An empty or null element in an XML file parses to an array.
@@ -955,9 +1008,11 @@ class Import_Export_Data {
 				(array) $item
 			);
 			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
+			$kind          = self::media_kind( $item, $attachment_id );
 
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 				continue;
 			}
 
@@ -968,6 +1023,7 @@ class Import_Export_Data {
 
 			if ( null !== Item_Meta::get( $attachment_id ) ) {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 				continue;
 			}
 
@@ -991,8 +1047,10 @@ class Import_Export_Data {
 					self::import_item_text( $attachment_id, $item );
 				}
 				++$imported;
+				++$kinds['imported'][ $kind ];
 			} else {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 			}
 		}
 
@@ -1006,24 +1064,68 @@ class Import_Export_Data {
 			Item_Meta_Consolidation::restore_list( $gallery_id, array_column( $entries, 1 ) );
 		}
 
-		return array( $imported, $skipped );
+		return array( $imported, $skipped, $kinds );
+	}
+
+	/**
+	 * Whether an exported item entry is an image or a video.
+	 *
+	 * Reads the entry's `media_type`, then the attachment on this site, then the
+	 * entry's item type.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $item          Exported item entry.
+	 * @param int                  $attachment_id Attachment ID on this site, or 0.
+	 * @return string `images` or `videos`.
+	 */
+	private static function media_kind( array $item, int $attachment_id = 0 ): string {
+		$type = $item['media_type'] ?? '';
+		if ( 'image' === $type || 'video' === $type ) {
+			return $type . 's';
+		}
+		if ( $attachment_id > 0 && 'attachment' === get_post_type( $attachment_id ) ) {
+			return wp_attachment_is( 'video', $attachment_id ) ? 'videos' : 'images';
+		}
+
+		return false !== strpos( (string) ( $item['item_type'] ?? '' ), 'video' ) ? 'videos' : 'images';
+	}
+
+	/**
+	 * Whether a file's item entries say which are images and which are videos.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, mixed> $items Exported item entries.
+	 * @return bool
+	 */
+	private static function has_media_types( array $items ): bool {
+		if ( empty( $items ) ) {
+			return true;
+		}
+		foreach ( $items as $item ) {
+			if ( isset( ( (array) $item )['media_type'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * Recreate the exported video embeds in each gallery the import wrote, and
 	 * point the gallery's item list at them.
 	 *
-	 * An embed already on this site keeps its ID when it shows the same video
-	 * and no other gallery lists it. Every other exported embed in the list is
-	 * created as a new embed owned by that gallery, and no other list keeps the
-	 * new embed's ID.
+	 * An embed already on this site that shows the same video and belongs to no
+	 * other gallery keeps its ID and takes the file's data. Every other exported
+	 * embed in the list is created as a new embed owned by that gallery, and no
+	 * other list keeps the new embed's ID.
 	 *
 	 * @since 1.3.0
 	 * @param array<int, mixed> $embeds      Exported embed entries.
 	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
-	 * @return int Number of embeds created.
+	 * @return array{0: int, 1: int} Embeds created or updated, and exported embeds no
+	 *                               written gallery lists.
 	 */
-	private static function import_embeds( array $embeds, array $gallery_ids ): int {
+	private static function import_embeds( array $embeds, array $gallery_ids ): array {
 		$by_old_id = array();
 		foreach ( $embeds as $embed ) {
 			$embed = self::sanitize_embed( (array) $embed );
@@ -1033,6 +1135,8 @@ class Import_Export_Data {
 		}
 
 		$created = array();
+		$updated = 0;
+		$used    = array();
 		$lists   = array();
 
 		foreach ( array_unique( array_map( 'intval', $gallery_ids ) ) as $gallery_id ) {
@@ -1043,7 +1147,10 @@ class Import_Export_Data {
 				if ( ! isset( $by_old_id[ $item_id ] ) ) {
 					continue;
 				}
+				$used[ $item_id ] = true;
 				if ( ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
+					Embed_Store::update( $item_id, $by_old_id[ $item_id ] );
+					++$updated;
 					continue;
 				}
 
@@ -1072,7 +1179,7 @@ class Import_Export_Data {
 			}
 		}
 
-		return count( $created );
+		return array( count( $created ) + $updated, count( $by_old_id ) - count( $used ) );
 	}
 
 	/**

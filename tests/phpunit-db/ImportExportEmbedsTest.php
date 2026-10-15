@@ -192,6 +192,40 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 		$this->assertSame( array( $embed ), $this->embeds() );
 	}
 
+	public function test_overwrite_writes_the_files_data_onto_the_embed(): void {
+		$embed   = $this->embed();
+		$gallery = $this->gallery_with( $embed );
+		$before  = Embed_Store::get( $embed );
+		$file    = $this->export();
+
+		Embed_Store::update(
+			$embed,
+			array(
+				'caption'    => 'Edited on the site',
+				'settings'   => array( 'loop' => true ),
+				'poster_url' => 'https://example.com/poster.jpg',
+			)
+		);
+		$this->import( $file, 'overwrite' );
+
+		$this->assertSame( array( $embed ), Gallery_Repository::get_item_ids( $gallery ) );
+		$this->assertSame( $before, Embed_Store::get( $embed ) );
+	}
+
+	public function test_a_restored_gallery_takes_the_files_data_onto_its_leftover_embed(): void {
+		$embed   = $this->embed();
+		$gallery = $this->gallery_with( $embed );
+		$before  = Embed_Store::get( $embed );
+		$file    = $this->export();
+
+		wp_delete_post( $gallery, true );
+		Embed_Store::update( $embed, array( 'caption' => 'Edited on the site' ) );
+		$this->import( $file );
+
+		$this->assertSame( array( $embed ), $this->embeds() );
+		$this->assertSame( $before, Embed_Store::get( $embed ) );
+	}
+
 	public function test_skip_on_the_same_site_creates_no_embed(): void {
 		$embed   = $this->embed();
 		$gallery = $this->gallery_with( $embed );
@@ -253,5 +287,72 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 		$this->assertNotContains( $embed, Gallery_Repository::get_item_ids( $foreign->ID ) );
 		$this->assertCount( 50, Gallery_Repository::get_item_ids( $foreign->ID ) );
 		$this->assertSame( array( get_page_by_path( 'harbour', OBJECT, 'fotogrids_gallery' )->ID ), Gallery_Repository::find_galleries_for_item( $embed ) );
+	}
+
+	private function video_attachment(): int {
+		return self::factory()->attachment->create_object( 'clip.mp4', 0, array( 'post_mime_type' => 'video/mp4' ) );
+	}
+
+	private function analyse( string $file ): array {
+		$request = new WP_REST_Request( 'POST', '/fotogrids/v1/admin/tools/import-export/import' );
+		$request->set_param( 'phase', 'analyse' );
+		$request->set_param( 'file', $file );
+
+		return Import_Export_Data::import( $request )->get_data()['contents'];
+	}
+
+	public function test_the_analysis_counts_images_and_videos(): void {
+		$this->gallery_with( $this->attachment(), $this->video_attachment(), $this->embed() );
+
+		$contents = $this->analyse( $this->export() );
+
+		$this->assertSame( 3, $contents['items'] );
+		$this->assertSame(
+			array(
+				'images' => 1,
+				'videos' => 2,
+			),
+			$contents['items_detail']
+		);
+	}
+
+	public function test_a_file_that_does_not_type_its_items_is_not_split(): void {
+		$file = wp_json_encode(
+			array(
+				'meta'  => array( 'version' => '1.2.0' ),
+				'items' => array( array( 'attachment_id' => $this->attachment() ) ),
+			)
+		);
+
+		$contents = $this->analyse( $file );
+
+		$this->assertSame( 1, $contents['items'] );
+		$this->assertArrayNotHasKey( 'items_detail', $contents );
+	}
+
+	public function test_the_result_counts_images_and_videos(): void {
+		$this->gallery_with( $this->attachment(), $this->video_attachment(), $this->embed() );
+		$file = $this->export();
+
+		$this->forget_galleries();
+		$result = $this->import( $file );
+
+		$this->assertSame( 3, $result['imported']['items'] );
+		$this->assertSame(
+			array(
+				'images' => 1,
+				'videos' => 2,
+			),
+			$result['imported']['items_detail']
+		);
+	}
+
+	public function test_embeds_no_written_gallery_lists_count_as_skipped_videos(): void {
+		$this->gallery_with( $this->embed() );
+
+		$result = $this->import( $this->export(), 'skip' );
+
+		$this->assertSame( 1, $result['skipped']['items'] );
+		$this->assertSame( 1, $result['skipped']['items_detail']['videos'] );
 	}
 }
