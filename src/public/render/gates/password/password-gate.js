@@ -1,33 +1,13 @@
 /**
- * FotoGrids - Password Gate (client)
- *
- * Owns the lock-screen submit handler. Binds to every .fg-lock-form on
- * the page, intercepts submit, POSTs to the unlock REST endpoint, and:
- *
- *   • on success: injects any CSS handles the render pipeline collected
- *     for the now-unlocked gallery (so the gallery's per-render
- *     stylesheets are present before its HTML is inserted), then swaps
- *     the lock wrapper for the rendered gallery HTML. The runtime's
- *     MutationObserver picks the inserted gallery up and runs every
- *     onGallery() callback against it - no manual gallery init here.
- *   • on failure: shows the inline error and clears the input.
- *
- * Lock forms inserted later are handled by a delegated submit listener on
- * document.
- *
- * No imports - standalone vanilla JS compiled by webpack.
+ * Password Gate: submits .fg-lock-form to the unlock REST endpoint and swaps
+ * the lock screen for the returned gallery or album HTML.
  */
 
 (function () {
 	'use strict';
 
 	/**
-	 * Injects <link rel="stylesheet"> tags for any CSS handles that the
-	 * render pipeline collected during the unlock request but that are
-	 * not already present in the document.
-	 *
-	 * The server returns a { handle: url } map; each handle becomes its
-	 * <link> id, so duplicates are skipped cheaply.
+	 * Adds a stylesheet <link> for each handle not already in the document.
 	 *
 	 * @param {Record<string, string>} cssUrls  handle → absolute URL map
 	 */
@@ -56,9 +36,7 @@
 	}
 
 	/**
-	 * Inject any JS handles the render pipeline declared for the unlocked
-	 * gallery that aren't already in the document. Mirrors the
-	 * Album_To_Gallery_Ajax injectMissingScripts helper.
+	 * Adds a <script> for each handle not already in the document.
 	 *
 	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
 	 */
@@ -90,11 +68,7 @@
 	}
 
 	/**
-	 * Inject the combined Google Fonts stylesheet for the unlocked gallery.
-	 *
-	 * The unlock render runs in a separate REST request whose wp_footer never
-	 * reaches this page, so the combined fonts URL from the response is added
-	 * once, keyed by a fixed id so repeat unlocks do not duplicate it.
+	 * Adds the combined Google Fonts stylesheet once, keyed by a fixed id.
 	 *
 	 * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
 	 */
@@ -103,9 +77,7 @@
 			return;
 		}
 
-		// Both the wp_enqueue_style handle and the wp_footer fallback emit the
-		// <link> with this id, so one check covers a font sheet already present
-		// from the original page render, a prior unlock, or another gallery.
+		// Same id as the server-rendered font <link>.
 		const linkId = 'fotogrids-google-fonts-css';
 		if (document.getElementById(linkId)) {
 			return;
@@ -134,8 +106,7 @@
 	}
 
 	/**
-	 * Inject the render's per-render inline JS. A created + appended <script>
-	 * with textContent executes on insertion.
+	 * Adds the render's inline JS.
 	 *
 	 * @param {string} js  Bare JS (no <script> tags), or ''.
 	 */
@@ -164,17 +135,9 @@
 	}
 
 	/**
-	 * Ask the browser to save the just-used gallery password.
-	 *
-	 * The form submits via fetch() and swaps the DOM in place - it never
-	 * navigates - so browsers won't fire their native "save password?"
-	 * prompt on their own; the Credential Management API prompts explicitly
-	 * explicitly after a successful unlock. The credential is keyed on the
-	 * per-gallery username (the hidden .fg-lock-user field) so the browser
-	 * scopes the saved password to THIS gallery rather than the whole site.
-	 *
-	 * Best-effort only: unsupported browsers, insecure (non-HTTPS) origins,
-	 * and user refusals all fail silently - unlocking already succeeded.
+	 * Asks the browser to save the password, keyed on the per-collection
+	 * .fg-lock-user name. Browsers do not prompt on their own because the form
+	 * never navigates. Fails silently where unsupported.
 	 *
 	 * @param {HTMLFormElement} form
 	 */
@@ -186,14 +149,12 @@
 			const cred = new window.PasswordCredential(form);
 			navigator.credentials.store(cred).catch(function () {});
 		} catch (_e) {
-			// PasswordCredential( form ) throws if the form lacks the expected
-			// autocomplete fields, or on insecure origins. Non-fatal.
+			// Throws without the expected autocomplete fields or on insecure origins.
 		}
 	}
 
 	/**
-	 * Wire up a single lock form. Idempotent - repeat calls on the
-	 * same form are no-ops.
+	 * Binds submit on one lock form. Idempotent.
 	 *
 	 * @param {HTMLFormElement} form
 	 */
@@ -210,8 +171,7 @@
 	}
 
 	/**
-	 * Submit the password, swap in the rendered gallery HTML on success,
-	 * or show an inline error on failure. No page reload needed.
+	 * Submits the password; swaps in the rendered HTML or shows the error.
 	 *
 	 * @param {HTMLFormElement} form
 	 */
@@ -223,12 +183,12 @@
 		const wrapper = form.closest('.fotogrids-gate');
 
 		const galleryId = parseInt(form.dataset.galleryId || '0', 10);
+		const albumId = parseInt(form.dataset.albumId || '0', 10);
 		const unlockUrl = form.dataset.unlockUrl || '';
-		// The lock form carries its own nonce in data-nonce.
 		const nonce = form.dataset.nonce || '';
 		const password = input ? input.value : '';
 
-		if (!galleryId || !unlockUrl) {
+		if ((!galleryId && !albumId) || !unlockUrl) {
 			return;
 		}
 
@@ -273,9 +233,7 @@
 					return;
 				}
 
-				// Offer to save the password in the browser, scoped to this
-				// gallery. Must run while the form is still in the DOM, i.e.
-				// before the wrapper swap below.
+				// Must run before the wrapper swap, while the form is in the DOM.
 				storeCredential(form);
 
 				injectMissingStyles(data.css || {});
@@ -294,12 +252,13 @@
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = html;
 
-				// Without a remember cookie, the token is what authorises
-				// this gallery's later requests until the page is left.
+				// The token authorises this collection's later requests.
 				if (data.unlockToken) {
 					tempDiv
 						.querySelectorAll(
-							'[data-fg-gallery-id="' + galleryId + '"]'
+							albumId
+								? '[data-fg-album-id="' + albumId + '"]'
+								: '[data-fg-gallery-id="' + galleryId + '"]'
 						)
 						.forEach(function (el) {
 							el.dataset.fgUnlockToken = data.unlockToken;
@@ -323,15 +282,10 @@
 				});
 				parent.removeChild(wrapper);
 
-				// Notify other modules. The runtime's MutationObserver
-				// will already have fired fotogrids:gallery_inserted for
-				// any .fotogrids-collection in the inserted nodes; this
-				// event is a higher-level "the gate was passed" signal
-				// for anything that cares (e.g. analytics).
 				document.dispatchEvent(
 					new CustomEvent('fotogrids:gallery_unlocked', {
 						bubbles: true,
-						detail: { galleryId },
+						detail: { galleryId, albumId },
 					})
 				);
 			})
@@ -341,7 +295,6 @@
 				}
 			})
 			.then(function () {
-				// finally - restore form state
 				if (card) {
 					card.classList.remove('is-loading');
 				}
@@ -352,11 +305,7 @@
 	}
 
 	/**
-	 * Bind every lock form currently on the page. The runtime's
-	 * MutationObserver fires fotogrids:gallery_inserted for galleries,
-	 * but the gate replaces the gallery, so static lock-form discovery
-	 * runs once at boot, and a delegated submit listener handles forms
-	 * inserted later (e.g. an album-ajax load returning a locked gallery).
+	 * Binds every lock form currently on the page.
 	 */
 	function bindAll() {
 		document
@@ -367,8 +316,7 @@
 	function init() {
 		bindAll();
 
-		// Lock forms inserted later are caught by a delegated submit listener rather
-		// than a MutationObserver. Binding the form here too would unlock it twice.
+		// Catches lock forms inserted later. Skips bound forms to avoid a double unlock.
 		document.addEventListener(
 			'submit',
 			function (e) {

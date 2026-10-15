@@ -75,15 +75,6 @@ final class Context_Builder {
 	 * @param   value-of<Request_Source::ALL> $source Request source.
 	 * @param   int|null             $album_id Album identifier.
 	 * @param   array<string, mixed> $meta_overrides Optional Render_Meta field overrides.
-	 *                                               Accepted keys: instance_id,
-	 *                                               requested_page,
-	 *                                               requested_per_page, breakpoint,
-	 *                                               partial, view_page,
-	 *                                               via_album_id. Used by the REST
-	 *                                               /gallery/render endpoint to drive
-	 *                                               pagination + partial rendering,
-	 *                                               and by ViewCollections / album-ajax
-	 *                                               flows to thread visit context.
 	 * @return  Render_Context
 	 */
 	public function build_for_public(
@@ -95,16 +86,14 @@ final class Context_Builder {
 		array $meta_overrides = array()
 	): Render_Context {
 		$render_settings = self::coerce_layout_settings( $render_settings );
-		// Random sort seed: the caller's when supplied (paginated REST requests reuse
-		// the initial render's permutation), otherwise a fresh one. Capped at 2^31-1 so
-		// it survives a JSON round-trip through JavaScript's 53-bit numbers.
+		// Paginated REST requests pass the initial render's seed. Capped at 2^31-1
+		// to survive a JSON round-trip through JavaScript numbers.
 		$random_seed = isset( $meta_overrides['random_seed'] ) && null !== $meta_overrides['random_seed']
 			? (int) $meta_overrides['random_seed']
 			: random_int( 1, 2147483647 );
 
-		// is_ajax_swap is set explicitly by the /gallery/render REST handler. It is not
-		// inferred from Request_Source, because non-AJAX renders can also arrive with
-		// ALBUM_AJAX as their source (e.g. a shortcode carrying album_id).
+		// Set by the REST handler, not inferred from Request_Source: non-AJAX
+		// renders can also carry ALBUM_AJAX.
 		$is_ajax_swap = ! empty( $meta_overrides['is_ajax_swap'] );
 
 		$view_page = ! empty( $meta_overrides['view_page'] );
@@ -136,10 +125,8 @@ final class Context_Builder {
 									: null,
 		);
 
-		// Visit-context album. Honour an explicit meta override (REST /
-		// gallery/render path); otherwise read the `fg_via` query var
-		// for normal page loads. Validation (does this album really
-		// contain this gallery?) is deferred to Breadcrumb_Resolver.
+		// An explicit override wins over `fg_via`. Breadcrumb_Resolver validates
+		// that the album contains this gallery.
 		$via_album_id = null;
 		if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
 			$candidate    = (int) $meta_overrides['via_album_id'];
@@ -150,9 +137,7 @@ final class Context_Builder {
 
 		[ $thumb_size, $full_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
 
-		// Build a context shell (no items yet) so Module_Registry::active_modules()
-		// can call supports() on each registered sorter. The sorter receives this
-		// same context so it can read settings, gallery_id, is_preview, etc.
+		// Item-less shell for the sorters' supports() and sort().
 		$sort_context = new Render_Context(
 			$render_meta,
 			$this->build_layout( $render_settings ),
@@ -166,9 +151,7 @@ final class Context_Builder {
 		$raw_ids    = array_map( 'absint', $collection_item_ids );
 		$sorted_ids = $this->apply_sorter( $raw_ids, $sort_context );
 
-		// Single Item renders one item chosen by the active sorter. With Animate Images
-		// on, the full sorted set is kept for the layout's JS instead. The full count is
-		// recorded below for the lightbox-extended path.
+		// Single Item keeps one sorted item unless Animate Images is on.
 		$is_single_item         = ( $render_settings['layout'] ?? '' ) === 'single-item';
 		$single_item_animates   = $is_single_item && ! empty( $render_settings['single_item_auto_progress'] );
 		$single_item_full_count = $is_single_item ? count( $sorted_ids ) : null;
@@ -181,13 +164,8 @@ final class Context_Builder {
 		$loaded_items = $this->load_items( $sorted_ids, $thumb_size, $full_size );
 		$loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
-		// Server-side filtering runs before pagination so pages are computed against
-		// the filtered set. An item must pass every source with active values; each
-		// source applies OR within its own values. Only REST pagination requests carry
-		// active_filters.
+		// Filtering must run before pagination so pages count the filtered set.
 		if ( ! empty( $render_meta->active_filters ) && Collection_Kind::GALLERY === $render_meta->collection_kind ) {
-			// Rebuild context so filter sources see the sorted + loaded
-			// items (needed by their supports() checks).
 			$filter_context = new Render_Context(
 				$render_meta,
 				$sort_context->layout,
@@ -201,9 +179,7 @@ final class Context_Builder {
 			$loaded_items = $this->apply_server_filters( $loaded_items, $render_meta->active_filters, $filter_context );
 		}
 
-		// Total recorded after filtering and before slicing, so data-fg-page-total
-		// reflects the filtered set. Single Item without Animate Images was sliced to
-		// one item upstream, so its pre-slice count is used instead.
+		// Single Item uses its count from before the one-item slice.
 		$total_item_count = $single_item_full_count ?? count( $loaded_items );
 		$render_meta      = $render_meta->with( array( 'total_item_count' => $total_item_count ) );
 
@@ -227,15 +203,10 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Slices a loaded item list down to the requested page and stamps the
-	 * resolved page size + total page count onto the render meta.
+	 * Slices items to the requested page and records page size and total pages on the meta.
 	 *
-	 * Runs after sorter selection (canonical order already established) and
-	 * after caption resolution + filtering, so the slice contains
-	 * fully-prepared Item_Views from the filtered set. Layouts that opt out
-	 * via the `paginates` capability (slider, image-viewer) skip slicing
-	 * entirely - their own navigation walks the full item list. The item
-	 * list and meta are returned unchanged when pagination is not active.
+	 * Returns both unchanged when pagination is off or the layout lacks the
+	 * `paginates` capability.
 	 *
 	 * @since 1.0.0
 	 * @param array<int, mixed>    $loaded_items     Fully-prepared Item_Views.
@@ -381,39 +352,31 @@ final class Context_Builder {
 	/**
 	 * Creates a context for rendering an album as a collection.
 	 *
-	 * An album-as-collection renders one item per child gallery. Each
-	 * Item_View is a gallery summary (featured-image-or-first-attachment
-	 * thumbnail + gallery title as caption) supplied by Album_Item_Loader.
-	 * The same Grid / Justified / Masonry layouts apply. Click-behaviour
-	 * decorators specific to attachments (Lightbox, Direct_Link,
-	 * External_Link) opt out via supports(); the album-specific click
-	 * decorators (Album_To_View_Page, Album_To_Gallery_Ajax) opt in.
-	 *
-	 * No sorting: child galleries arrive in album-stored order. None of
-	 * the existing sorters operate on gallery summaries; running them
-	 * would be a no-op at best and misbehave at worst.
+	 * Items are child-gallery summaries from Album_Item_Loader, kept in
+	 * album-stored order; no sorter runs.
 	 *
 	 * @since   1.0.0
 	 * @param   int                  $album_id            Album post identifier.
 	 * @param   array<string, mixed> $render_settings     Resolved album settings.
 	 * @param   array<int, mixed>    $child_gallery_ids   Child gallery post IDs in album-stored order.
 	 * @param   value-of<Request_Source::ALL> $source     Request source.
+	 * @param   string               $instance_id         Instance ID to render with. Empty takes the next one.
 	 * @return  Render_Context
 	 */
 	public function build_for_album(
 		int $album_id,
 		array $render_settings = array(),
 		array $child_gallery_ids = array(),
-		string $source = Request_Source::SHORTCODE
+		string $source = Request_Source::SHORTCODE,
+		string $instance_id = ''
 	): Render_Context {
 		$render_settings = self::coerce_layout_settings( $render_settings );
 
 		$render_meta = new Render_Meta(
-			// gallery_id is 0 because the album is the render's identity; album_id seeds
-			// instance_id_factory so instance IDs are stable per album.
+			// gallery_id is 0; the album ID seeds the instance ID.
 			0,
 			$album_id,
-			$this->instance_id_factory->generate( $album_id ),
+			'' !== $instance_id ? $instance_id : $this->instance_id_factory->generate( $album_id ),
 			$source,
 			false,
 			Render_Mode::INITIAL,
@@ -424,11 +387,7 @@ final class Context_Builder {
 		[ $thumb_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
 		$thumb_size     = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
 
-		// Load gallery-summary items directly via Album_Item_Loader, bypassing
-		// the attachment-flavoured items_loader path entirely.
 		$loaded_items = Album_Item_Loader::load( $child_gallery_ids, $thumb_size );
-		// The gallery title is always passed as caption_title; resolve_captions still
-		// applies caption_hide_title and the caption source.
 		$loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
 		return new Render_Context(
@@ -470,10 +429,7 @@ final class Context_Builder {
 	/**
 	 * Applies server-side filters to the loaded items.
 	 *
-	 * For each filter source registered AND active for the context, if
-	 * the source's REST arg key is present in $active_filters with a
-	 * non-empty value list, every item is run through $source->matches().
-	 * AND across sources (item must pass every source with active values).
+	 * An item must match every active source that has values in $active_filters.
 	 *
 	 * @since 1.0.0
 	 * @param array<int, Item_View>           $items
@@ -491,7 +447,6 @@ final class Context_Builder {
 			return $items;
 		}
 
-		// Resolve sources that have active values supplied.
 		$source_predicates = array();
 		foreach ( $sources as $source ) {
 			$arg_key = $source->filter_arg_key();
@@ -531,14 +486,8 @@ final class Context_Builder {
 	/**
 	 * Finds the highest-precedence active sorter and sorts the item IDs.
 	 *
-	 * Asks Module_Registry for all active 'sorters' modules for the given
-	 * context (which already has settings and meta set). The registry returns
-	 * them in origin-precedence order (fotogrids < fotogrids-pro < third-party)
-	 * with replaces() already resolved, so the first one wins.
-	 *
-	 * Falls back to the original order when no sorter is active (should not
-	 * happen in practice because Manual_Sorter covers the default case, but
-	 * this guards against a mis-configured registry).
+	 * Module_Registry returns sorters in precedence order, so the first wins.
+	 * Returns the input order when no sorter is active.
 	 *
 	 * @since   1.0.0
 	 * @param   array<int, int>  $item_ids     Attachment IDs in manual order.
@@ -603,8 +552,7 @@ final class Context_Builder {
 	/**
 	 * Normalizes the object-fit setting into a CSS-ready string.
 	 *
-	 * Returns "cover" | "contain" or an empty string. Empty means "do not
-	 * emit the var" - the CSS fallback in the layout stylesheet takes over.
+	 * Returns "cover", "contain", or '' to leave the stylesheet fallback.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $render_settings Render settings.
@@ -621,9 +569,7 @@ final class Context_Builder {
 	/**
 	 * Normalizes the aspect-ratio setting into a CSS-ready string.
 	 *
-	 * Returns either a "W / H" string (e.g. "4 / 3") or an empty string.
-	 * Empty means "do not emit the var" - the CSS fallback in the layout
-	 * stylesheet takes over.
+	 * Returns "W / H" (e.g. "4 / 3"), or '' to leave the stylesheet fallback.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $render_settings Render settings.
@@ -636,9 +582,7 @@ final class Context_Builder {
 			return '';
 		}
 
-		// 'none' means "use the image's natural aspect ratio". Return the
-		// empty string so style_vars() skips emitting --fg-item-aspect-ratio
-		// and the .fg-item-media container has no enforced ratio.
+		// 'none' keeps the image's natural aspect ratio.
 		if ( 'none' === $raw ) {
 			return '';
 		}
@@ -652,7 +596,6 @@ final class Context_Builder {
 			return $w . ' / ' . $h;
 		}
 
-		// Preset values arrive as "W/H" (e.g. "4/3"). Normalize to "W / H".
 		if ( preg_match( '#^\s*(\d+)\s*/\s*(\d+)\s*$#', $raw, $m ) === 1 ) {
 			return ( (int) $m[1] ) . ' / ' . ( (int) $m[2] );
 		}
@@ -684,11 +627,8 @@ final class Context_Builder {
 	/**
 	 * Resolves the effective lightbox variant for a render.
 	 *
-	 * The admin offers a Full / Mini / Grid choice only on the layouts where it
-	 * applies; everywhere else the variant collapses to a single answer:
-	 *   - Featured Item always uses the grid overlay.
-	 *   - On the variant-eligible layouts, the saved `lightbox_variant` applies.
-	 *   - Any other layout (or a non-lightbox click behaviour) is 'full'.
+	 * Featured Item always uses 'grid'. The saved `lightbox_variant` applies only
+	 * to lightbox clicks on layouts offering the selector; otherwise 'full'.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $render_settings Render settings.
@@ -702,7 +642,6 @@ final class Context_Builder {
 			return 'grid';
 		}
 
-		// Layouts that offer the Full / Mini selector.
 		$selector_layouts = array( 'grid', 'masonry', 'justified', 'image-viewer', 'single-item', 'slider', 'instant-photos' );
 		if ( 'lightbox' !== $click_behavior || ! in_array( $layout, $selector_layouts, true ) ) {
 			return 'full';
@@ -713,8 +652,7 @@ final class Context_Builder {
 			return 'full';
 		}
 
-		// The grid overlay is only offered on grid-capable layouts; Instant
-		// Photos falls back to full if grid was somehow stored.
+		// Instant Photos has no grid overlay.
 		if ( 'grid' === $variant ) {
 			$grid_layouts = array( 'grid', 'masonry', 'justified', 'image-viewer', 'single-item', 'slider' );
 			if ( ! in_array( $layout, $grid_layouts, true ) ) {
@@ -726,13 +664,9 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Build an Item_View for a Media Library video attachment.
+	 * Builds an Item_View for a Media Library video attachment.
 	 *
-	 * Video attachments produce no image src, so the grid thumbnail comes from
-	 * the poster chain instead. The poster URL is used for both thumb_url and
-	 * full_url so layout sizing and the lightbox poster work unchanged; the
-	 * direct video file URL is carried in video_src for the player, and the
-	 * per-item playback settings in embed_settings.
+	 * The poster URL fills thumb_url and full_url; the file URL goes in video_src.
 	 *
 	 * @since   1.1.0
 	 * @param   int                    $attachment_id   The video attachment ID.
@@ -788,7 +722,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Build an Item_View for a single embed post.
+	 * Builds an Item_View for a single embed post.
 	 *
 	 * @since   1.1.0
 	 * @param   int    $embed_id   The fotogrids_embed post ID.
@@ -804,7 +738,6 @@ final class Context_Builder {
 		$item_type = (string) $embed['item_type'];
 		$caption   = (string) $embed['caption'];
 
-		// Re-assemble the custom_data shape the poster resolver expects.
 		$custom_data = array(
 			'thumbnail_url' => (string) $embed['thumbnail_url'],
 			'poster_id'     => (int) $embed['poster_id'],
@@ -847,7 +780,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Read and decode the custom_data JSON for an item.
+	 * Reads and decodes the custom_data JSON for an item.
 	 *
 	 * @since   1.1.0
 	 * @param   int $attachment_id Attachment ID.
@@ -866,14 +799,8 @@ final class Context_Builder {
 	/**
 	 * Loads item view data through the configured loader callback.
 	 *
-	 * When no custom loader is provided the method performs two queries:
-	 *  1. Standard WP attachment data (get_post + image URLs + alt).
-	 *  2. A single batch SELECT on fotogrids_item_meta to pull external_url and
-	 *     link_target for every item at once, keyed by attachment_id.
-	 *
-	 * Both external_url and link_target are stored in Item_View::meta so
-	 * decorators (Direct_Link, External_Link) can read them without coupling
-	 * to the DB themselves.
+	 * Without a custom loader, external_url and link_target are batch-loaded
+	 * into Item_View::meta.
 	 *
 	 * @since   1.0.0
 	 * @param   array<int, mixed> $collection_item_ids Item identifiers.
@@ -885,7 +812,6 @@ final class Context_Builder {
 		if ( ! is_callable( $this->items_loader ) ) {
 			$loaded_items = array();
 
-			// Normalise IDs first so they can be batch-queried.
 			$valid_ids = array();
 			foreach ( $collection_item_ids as $raw_id ) {
 				$id = (int) $raw_id;
@@ -894,7 +820,6 @@ final class Context_Builder {
 				}
 			}
 
-			// Batch-fetch external_url + link_target for every item at once.
 			$item_link_meta = $this->batch_load_link_meta( $valid_ids );
 
 			foreach ( $valid_ids as $attachment_id ) {
@@ -903,9 +828,6 @@ final class Context_Builder {
 					continue;
 				}
 
-				// Embed posts are first-class list members; build their view
-				// directly. Anything that is neither an attachment nor an embed
-				// is skipped.
 				if ( \FotoGrids\Galleries\Embed_Store::POST_TYPE === $item_post->post_type ) {
 					$embed_view = $this->build_embed_item_view( $attachment_id, $thumb_size );
 					if ( null !== $embed_view ) {
@@ -980,11 +902,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Public entry point to resolve captions on externally-supplied items.
-	 *
-	 * Used by the template-preview path, which builds its own Item_Views from a
-	 * bundled demo set rather than the media library, so they go through the same
-	 * caption resolution as real items.
+	 * Resolves captions on externally supplied items, such as template-preview demos.
 	 *
 	 * @since  1.1.0
 	 * @param  array<int, Item_View> $items           Item views.
@@ -998,22 +916,13 @@ final class Context_Builder {
 	/**
 	 * Resolves caption_title and caption_description on every loaded item.
 	 *
-	 * Runs each Item_View through Caption_Content_Builder using the gallery
-	 * settings, and returns a new array of Item_View instances with
-	 * caption_title and caption_description populated. Items from a custom
-	 * items_loader go through the same step.
-	 *
 	 * @since  1.0.0
 	 * @param  array<int, Item_View>  $items           Loaded items.
 	 * @param  array<string, mixed>   $render_settings Gallery render settings.
 	 * @return array<int, Item_View>
 	 */
 	private function resolve_captions( array $items, array $render_settings ): array {
-		// Image Viewer renders only the caption title, in its control bar, and
-		// hides Item Description and Limit Title Length in the admin. Neutralise
-		// those hidden settings here so they can never apply at the frontend:
-		// force the description off and the title-length limit to "no" before
-		// the content builder reads them.
+		// Image Viewer hides these settings in the admin; stored values must not apply.
 		$layout = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : '';
 		if ( 'image-viewer' === $layout ) {
 			$render_settings['caption_hide_description']   = true;
@@ -1037,24 +946,15 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Asks the active layout module for its preferred thumbnail size and
-	 * swaps in for it.
+	 * Applies the active layout's preferred thumbnail size.
 	 *
-	 * Layouts express their preference via Layout::preferred_thumbnail_size().
-	 * Returning null means "no preference" and the configured value is
-	 * returned unchanged. A soft preference only replaces the default
-	 * fotogrids_thumbnail, leaving an explicit user pick untouched. A
-	 * mandatory preference (Layout::requires_thumbnail_size() === true, used
-	 * by Justified and Masonry) overrides the user pick too, because those
-	 * layouts cannot render with an arbitrary cropped derivative. The
-	 * returned slug still flows through Image_Size_Manager's fallback chain
-	 * so a missing derivative degrades to fotogrids_thumbnail → thumbnail →
-	 * medium → full.
+	 * A soft preference replaces only the default fotogrids_thumbnail; a
+	 * mandatory one (requires_thumbnail_size()) also overrides a user pick.
 	 *
 	 * @since  1.0.0
 	 * @param  string               $thumb_size      Currently resolved size slug.
 	 * @param  array<string, mixed> $render_settings Render settings.
-	 * @param  Render_Context|null  $context         Optional pre-built context shell. When omitted a minimal one is constructed from $render_settings.
+	 * @param  Render_Context|null  $context         Context shell; built from $render_settings when null.
 	 * @return string
 	 */
 	private function apply_layout_thumb_size( string $thumb_size, array $render_settings, ?Render_Context $context = null ): string {
@@ -1073,8 +973,6 @@ final class Context_Builder {
 			return $thumb_size;
 		}
 
-		// A mandatory preference overrides an explicit pick; a soft preference applies
-		// only while thumbnail_size is on its default.
 		if ( $layout->requires_thumbnail_size( $context ) ) {
 			return $preferred;
 		}
@@ -1083,10 +981,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Builds a settings-only Render_Context shell for callers that need to
-	 * consult the module registry before they have item data. Used by the
-	 * preview and album code paths where the full pre-sort context shell
-	 * doesn't exist yet.
+	 * Builds a settings-only Render_Context shell for module-registry lookups.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $render_settings
@@ -1114,9 +1009,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Whether snap pagination is active for the given settings. Snap
-	 * applies to paginated justified galleries when the page-trailing-row
-	 * mode is set to 'fill'.
+	 * Returns whether the layout is justified with page trailing row set to 'fill'.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
@@ -1133,7 +1026,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Build aspect ratios + invoke the snap resolver.
+	 * Resolves the justified snap page from item aspect ratios.
 	 *
 	 * @since 1.0.0
 	 * @param array<int, \FotoGrids\Render\Api\Item_View> $items
@@ -1183,7 +1076,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Resolve the per-breakpoint --fg-gap value from item_spacing settings.
+	 * Resolves the per-breakpoint gap from item_spacing settings.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
@@ -1211,7 +1104,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Resolve the per-breakpoint justified row height in pixels.
+	 * Resolves the per-breakpoint justified row height in pixels.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
@@ -1264,7 +1157,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Merge preview overrides into item meta maps.
+	 * Merges preview overrides into item meta maps.
 	 *
 	 * @since   1.0.0
 	 * @param   array<int, Item_View>                        $collection_items Collection items.
@@ -1292,15 +1185,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Apply layout-driven coercions to the resolved settings array before
-	 * decorators and the layout consume it.
-	 *
-	 * Some layouts treat individual settings as fixed by design (e.g. Instant
-	 * Photos always renders captions below the image). The admin UI hides the
-	 * picker but stored values from a previous layout choice can persist on
-	 * a gallery that was switched over. Coercing here means every consumer
-	 * (Captions decorator, layout class, REST handlers) sees the layout's
-	 * intended value without each having to special-case it.
+	 * Forces settings a layout fixes, overriding values stored under a previous layout.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $render_settings Resolved settings.
@@ -1310,10 +1195,6 @@ final class Context_Builder {
 		$layout = $render_settings['layout'] ?? '';
 
 		if ( 'instant-photos' === $layout ) {
-			// The Instant Photos layout always renders the caption below the
-			// image; the placement picker is hidden in the admin for this
-			// layout. Force the value here so the Captions decorator stamps
-			// data-fg-caption="bottom" regardless of what's stored.
 			$render_settings['caption_placement'] = 'bottom';
 		}
 

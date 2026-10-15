@@ -6,21 +6,17 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Album Data Handler
- *
- * Handles album data retrieval for REST API endpoints.
+ * REST handlers for album data.
  *
  * @since 1.0.0
  */
 class Album_Data {
 
 	/**
-	 * Set or clear the album's featured gallery.
+	 * Sets or clears the album's featured gallery.
 	 *
-	 * Body: { gallery_id: int | null }. When null, the explicit choice is
-	 * cleared (the runtime cover resolver falls back to the first child
-	 * gallery with a resolvable cover). When set, the gallery must still
-	 * be a child of this album.
+	 * Body: { gallery_id: int|null }; an empty value clears it. A set gallery
+	 * must be a child of this album.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -90,14 +86,12 @@ class Album_Data {
 	}
 
 	/**
-	 * Get album data with galleries
-	 *
-	 * Retrieves a single published album with the galleries the current user
-	 * can view, in album order. Automatically increments view count.
+	 * Returns an album with the galleries the current user can view, in album
+	 * order, and increments its view count.
 	 *
 	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request object containing album ID
-	 * @return \WP_REST_Response|\WP_Error Album data or error response
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return \WP_REST_Response|\WP_Error Album data or error.
 	 */
 	public static function get_album( $request ) {
 		$album_id = (int) $request['id'];
@@ -147,10 +141,97 @@ class Album_Data {
 	}
 
 	/**
-	 * Get albums list for admin use
+	 * Unlocks a password-protected album and returns its rendered HTML.
 	 *
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Array of albums
+	 * @since 1.3.0
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function unlock_album( $request ) {
+		$album_id  = (int) $request['id'];
+		$submitted = (string) ( $request->get_param( 'password' ) ?? '' );
+
+		$album = get_post( $album_id );
+		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+			return new \WP_Error(
+				'album_not_found',
+				__( 'Album not found', 'fotogrids' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$readable = 'publish' === $album->post_status
+			|| ( 'private' === $album->post_status && current_user_can( 'read_post', $album_id ) );
+		if ( ! $readable ) {
+			return new \WP_Error(
+				'album_not_published',
+				__( 'Album is not published', 'fotogrids' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+		$stored   = (string) $settings['_password_encrypted'];
+
+		if ( empty( $settings['password_protect'] ) || ! \FotoGrids\Password_Crypto::verify( $submitted, $stored ) ) {
+			return new \WP_Error(
+				'fotogrids_invalid_password',
+				__( 'Incorrect password.', 'fotogrids' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		$cookie_key    = 'fotogrids_unlocked_' . $album_id;
+		$cookie_value  = \FotoGrids\REST\Gallery\Gallery_Data::make_unlock_cookie_value( $album_id, $stored );
+		$remember      = ! empty( $settings['password_remember'] );
+		$remember_days = max( 1, min( 365, (int) ( $settings['password_remember_days'] ?? 7 ) ) );
+
+		if ( $remember ) {
+			setcookie(
+				$cookie_key,
+				$cookie_value,
+				array(
+					'expires'  => time() + ( $remember_days * DAY_IN_SECONDS ),
+					'path'     => COOKIEPATH,
+					'domain'   => COOKIE_DOMAIN,
+					'secure'   => is_ssl(),
+					'httponly' => true,
+					'samesite' => 'Lax',
+				)
+			);
+		}
+
+		// Lets the render below see the unlock.
+		$_COOKIE[ $cookie_key ] = $cookie_value;
+
+		$html     = \FotoGrids\Public_Render::render_album_embed(
+			array( 'id' => $album_id ),
+			(string) $request->get_param( 'instance_id' )
+		);
+		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+		$inline   = \FotoGrids\Public_Render::last_render_result();
+
+		return rest_ensure_response(
+			array(
+				'success'     => true,
+				'html'        => $html,
+				'css'         => $resolver->get_css_asset_urls(),
+				'js'          => $resolver->get_js_asset_data(),
+				'fonts'       => \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url(),
+				'remember'    => $remember,
+				'unlockToken' => $remember ? '' : \FotoGrids\REST\Gallery\Gallery_Data::make_unlock_token( $album_id, $stored ),
+				'inlineCss'   => null !== $inline ? $inline->inline_css : '',
+				'inlineJs'    => null !== $inline ? $inline->inline_js : '',
+				'jsonLd'      => null !== $inline ? $inline->json_ld : '',
+			)
+		);
+	}
+
+	/**
+	 * Returns all published, draft and private albums for admin use.
+	 *
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return \WP_REST_Response Array of albums.
 	 */
 	public static function get_albums_list( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		$args = array(
@@ -176,14 +257,11 @@ class Album_Data {
 	}
 
 	/**
-	 * Get item count for a gallery
-	 *
-	 * Returns the total number of items associated with a specific gallery.
-	 * Used for display purposes and pagination calculations.
+	 * Returns a gallery's item count.
 	 *
 	 * @since 1.0.0
-	 * @param int $gallery_id The ID of the gallery to count items for
-	 * @return int The number of items in the gallery
+	 * @param int $gallery_id Gallery ID.
+	 * @return int Item count.
 	 */
 	private static function get_gallery_item_count( $gallery_id ) {
 		return \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $gallery_id );
