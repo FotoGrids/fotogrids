@@ -60,7 +60,8 @@
 [data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media picture,
 [data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media img,
 [data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-video,
-[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-video-poster {
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-video-poster,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-item-placeholder {
     width: 100%;
     height: 100%;
     object-fit: var( --fg-item-fit );
@@ -104,7 +105,8 @@
 [data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media picture,
 [data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media img,
 [data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-video,
-[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-video-poster {
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-video-poster,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-item-placeholder {
     width: 100%;
     height: 100%;
     object-fit: var( --fg-item-fit );

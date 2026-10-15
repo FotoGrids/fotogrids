@@ -495,7 +495,12 @@
 	.fg-carousel-track
 	.fg-item
 	.fg-item-media
-	.fg-video-poster {
+	.fg-video-poster,
+[data-fg-layout="slider"]
+	.fg-carousel-track
+	.fg-item
+	.fg-item-media
+	.fg-item-placeholder {
 	height: 100%;
 	object-fit: var(--fg-item-fit, cover);
 }

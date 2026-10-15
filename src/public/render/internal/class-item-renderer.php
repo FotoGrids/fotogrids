@@ -46,10 +46,10 @@ final class Item_Renderer {
 		// data-fg-media-state drives the loader visibility and the reveal
 		// animation. JS flips it to "loaded" on img load/error; it starts as
 		// "loading" here so the loader is visible from the moment the HTML is
-		// parsed. Video items carry no loadable image (poster aside), so they
-		// start "loaded" to avoid a stuck loader on posterless embeds.
+		// parsed. Video items and placeholder tiles carry no loadable image, so
+		// they start "loaded" to avoid a stuck loader.
 		$is_video        = \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type );
-		$state_attr      = $is_video
+		$state_attr      = ( $is_video || $this->is_placeholder( $item_view ) )
 			? ' data-fg-media-state="loaded"'
 			: ' data-fg-media-state="loading"';
 		$style_attribute = $this->serialize_style( $item_view->style );
@@ -137,6 +137,18 @@ final class Item_Renderer {
 	}
 
 	/**
+	 * Whether a non-video item has no image to show and renders a placeholder tile.
+	 *
+	 * @since   1.3.0
+	 * @param   Item_View $item_view Item data.
+	 * @return  bool
+	 */
+	private function is_placeholder( Item_View $item_view ): bool {
+		return '' === $item_view->thumb_url
+			&& ! \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type );
+	}
+
+	/**
 	 * Renders image markup for an item.
 	 *
 	 * @since   1.0.0
@@ -147,6 +159,13 @@ final class Item_Renderer {
 	private function render_img( Item_View $item_view, Render_Context $render_context ): string {
 		if ( \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type ) ) {
 			return $this->render_video_poster( $item_view, $render_context );
+		}
+
+		if ( $this->is_placeholder( $item_view ) ) {
+			$label = '' !== $item_view->alt ? $item_view->alt : $item_view->title;
+			return '' !== $label
+				? '<span class="fg-item-placeholder" role="img" aria-label="' . esc_attr( $label ) . '"></span>'
+				: '<span class="fg-item-placeholder" aria-hidden="true"></span>';
 		}
 
 		$srcset = '';
@@ -354,9 +373,9 @@ final class Item_Renderer {
 			);
 		}
 
-		// Video items show their own play badge and have no loadable image to
-		// wait on, so the loading-icon loader is omitted for them.
-		$loader_html = \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type )
+		// Video items and placeholder tiles have no loadable image to wait on,
+		// so the loading-icon loader is omitted for them.
+		$loader_html = ( \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type ) || $this->is_placeholder( $item_view ) )
 			? ''
 			: $this->render_loader( $item_view, $render_context );
 

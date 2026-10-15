@@ -81,8 +81,7 @@ test.describe('an album', () => {
 	/**
 	 * ALB-02. A gallery with no featured image and no items has nothing to show
 	 * for a cover, and is left out of the album rather than given an empty
-	 * tile. Pinned as it is; whether a placeholder would be better is a
-	 * product call, not this row's.
+	 * tile.
 	 */
 	test(
 		'ALB-02: a gallery with nothing to show for a cover is left out',
@@ -102,6 +101,81 @@ test.describe('an album', () => {
 				wrapper.locator(`[data-fg-gallery-id="${empty}"]`),
 				'the coverless gallery got a tile'
 			).toHaveCount(0);
+		}
+	);
+
+	/**
+	 * ALB-21. A gallery whose items yield no image - a video with no poster, an
+	 * embed with no thumbnail - still has items, so it gets a placeholder tile
+	 * that links to it like any other.
+	 */
+	test(
+		'ALB-21: a gallery with items but no cover gets a placeholder tile',
+		{
+			tag: '@layout',
+		},
+		async ({ page }) => {
+			const video = Number(
+				wpEval(`
+					echo wp_insert_attachment( array(
+						'post_mime_type' => 'video/mp4',
+						'post_title'     => 'Posterless video',
+						'post_status'    => 'inherit',
+					), wp_upload_dir()['path'] . '/fg-posterless.mp4' );
+				`).trim()
+			);
+			const embed = Number(
+				wpEval(`
+					echo \\FotoGrids\\Galleries\\Embed_Store::create( array(
+						'item_type'     => 'video_vimeo',
+						'video_id'      => '1084537',
+						'url'           => 'https://vimeo.com/1084537',
+						'caption'       => 'Thumbnail-less embed',
+						'thumbnail_url' => '',
+						'settings'      => array(),
+					) );
+				`).trim()
+			);
+
+			try {
+				const videoOnly = galleryPage({ layout: 'grid' }, [video]).id;
+				const embedOnly = galleryPage({ layout: 'grid' }, [embed]).id;
+				const empty = galleryPage({ layout: 'grid' }, []).id;
+				const children = [gallery(), videoOnly, embedOnly, empty];
+				const { id, url } = album(children, {
+					use_ajax_from_album: false,
+				});
+
+				await page.goto(url);
+
+				const wrapper = page.locator(`[data-fg-album-id="${id}"]`);
+				await expect(wrapper.locator('.fg-item')).toHaveCount(3);
+				await expect(
+					wrapper.locator(`[data-fg-gallery-id="${empty}"]`),
+					'the empty gallery got a tile'
+				).toHaveCount(0);
+
+				for (const child of [videoOnly, embedOnly]) {
+					const tile = wrapper.locator(
+						`a[data-fg-gallery-id="${child}"]`
+					);
+					await expect(tile).toBeAttached();
+
+					const item = wrapper.locator('.fg-item', { has: tile });
+					await expect(
+						item.locator('.fg-item-placeholder')
+					).toBeVisible();
+					await expect(item.locator('img')).toHaveCount(0);
+					await expect(item).toHaveAttribute(
+						'data-fg-media-state',
+						'loaded'
+					);
+				}
+			} finally {
+				wpEval(
+					`wp_delete_attachment( ${video}, true ); wp_delete_post( ${embed}, true );`
+				);
+			}
 		}
 	);
 
