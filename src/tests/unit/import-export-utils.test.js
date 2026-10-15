@@ -4,6 +4,7 @@
 import {
 	formatDate,
 	importResultChips,
+	itemsDetail,
 	parseSummary,
 } from '../../includes/tools/import-export/assets/utils.js';
 
@@ -81,5 +82,46 @@ describe( 'importResultChips', () => {
 		expect( importResultChips( {} ) ).toEqual( [] );
 		expect( importResultChips( [] ) ).toEqual( [] );
 		expect( importResultChips( undefined ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'itemsDetail', () => {
+	it( 'names both kinds when there are images and videos', () => {
+		expect( itemsDetail( { images: 83, videos: 4 } ) ).toBe( '(83 images, 4 videos)' );
+	} );
+
+	it( 'uses the singular for one', () => {
+		expect( itemsDetail( { images: 1, videos: 1 } ) ).toBe( '(1 image, 1 video)' );
+	} );
+
+	it( 'names only the kind there is', () => {
+		expect( itemsDetail( { images: 0, videos: 2 } ) ).toBe( '(2 videos)' );
+		expect( itemsDetail( { images: 5, videos: 0 } ) ).toBe( '(5 images)' );
+	} );
+
+	it( 'says nothing without counts', () => {
+		expect( itemsDetail( undefined ) ).toBe( '' );
+		expect( itemsDetail( { images: 0, videos: 0 } ) ).toBe( '' );
+	} );
+} );
+
+describe( 'importResultChips with an items split', () => {
+	it( 'adds the split to the items chip only', () => {
+		expect(
+			importResultChips( {
+				galleries: 1,
+				items: 3,
+				items_detail: { images: 1, videos: 2 },
+			} )
+		).toEqual( [
+			{ key: 'galleries', count: 1, label: 'Gallery' },
+			{ key: 'items', count: 3, label: 'Items', detail: '(1 image, 2 videos)' },
+		] );
+	} );
+
+	it( 'leaves the items chip plain without a split', () => {
+		expect( importResultChips( { items: 3 } ) ).toEqual( [
+			{ key: 'items', count: 3, label: 'Items' },
+		] );
 	} );
 } );

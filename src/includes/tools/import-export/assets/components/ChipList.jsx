@@ -4,7 +4,7 @@ import React from 'react';
  * A row of count chips.
  *
  * @param {Object} props
- * @param {Array}  props.chips     Chip descriptors: { key?, variant?, count?, label }.
+ * @param {Array}  props.chips     Chip descriptors: { key?, variant?, count?, label, detail? }.
  * @param {string} [props.variant] Variant for chips that do not carry their own.
  */
 const ChipList = ({ chips, variant }) => (
@@ -18,6 +18,9 @@ const ChipList = ({ chips, variant }) => (
 					<span className="fg-ie-chip__count">{chip.count}</span>
 				)}
 				<span className="fg-ie-chip__label">{chip.label}</span>
+				{chip.detail && (
+					<span className="fg-ie-chip__detail">{chip.detail}</span>
+				)}
 			</span>
 		))}
 	</span>

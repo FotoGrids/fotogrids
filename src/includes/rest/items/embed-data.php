@@ -520,7 +520,7 @@ class Embed_Data {
 	 * @param string $source Platform identifier.
 	 * @return array  Sanitized settings array.
 	 */
-	private static function sanitize_embed_settings( $raw, $source ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function sanitize_embed_settings( $raw, $source ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		$bool_keys = array(
 			'autoplay',
 			'mute',
