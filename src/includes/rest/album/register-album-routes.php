@@ -6,18 +6,14 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Album REST Routes Registration
- *
- * Handles registration of all album-related REST API endpoints.
+ * Registers the album REST API routes.
  *
  * @since 1.0.0
  */
 class Register_Album_Routes {
 
 	/**
-	 * Register all album-related REST API routes
-	 *
-	 * Registers endpoints for album data retrieval for both public and admin use.
+	 * Registers all album REST API routes.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -45,7 +41,7 @@ class Register_Album_Routes {
 			)
 		);
 
-		// Featured gallery endpoint - sets or clears the album's featured gallery.
+		// Featured gallery endpoint
 		register_rest_route(
 			'fotogrids/v1',
 			'/album/(?P<id>\d+)/featured-gallery',
