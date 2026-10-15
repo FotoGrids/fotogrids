@@ -156,12 +156,12 @@ test.describe('an album', () => {
 				).toHaveCount(0);
 
 				for (const child of [videoOnly, embedOnly]) {
-					const tile = wrapper.locator(
-						`a[data-fg-gallery-id="${child}"]`
-					);
-					await expect(tile).toBeAttached();
+					const link = `a[data-fg-gallery-id="${child}"]`;
+					await expect(wrapper.locator(link)).toBeAttached();
 
-					const item = wrapper.locator('.fg-item', { has: tile });
+					const item = wrapper.locator('.fg-item', {
+						has: page.locator(link),
+					});
 					await expect(
 						item.locator('.fg-item-placeholder')
 					).toBeVisible();
