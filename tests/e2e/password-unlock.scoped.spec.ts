@@ -395,3 +395,48 @@ test( 'an unlock token opens only its own gallery, and only unaltered', { tag: [
 	expect( await opens( first.id, signedFor( 60 ) ) ).toBe( true );
 	expect( await opens( first.id, signedFor( -60 ) ) ).toBe( false );
 } );
+
+test.describe( 'a Load More click as soon as the gallery appears', () => {
+	/** Hold the pagination script back so a click can only work if the swap waits for it. */
+	async function slowLoadMoreScript( page: Page ): Promise< void > {
+		await page.route( '**/load-more.js*', async ( route ) => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
+			await route.continue();
+		} );
+	}
+
+	/** Click Load More the moment the first item is on the page. */
+	async function loadMoreAtOnce( gallery: GalleryRender ): Promise< void > {
+		await expect( gallery.items().first() ).toBeVisible( { timeout: 15000 } );
+		await gallery.root.locator( '[data-fg-pagination-trigger="load-more"]' ).click();
+	}
+
+	test( 'pages a gallery opened in place from an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = galleryPage( PAGINATED, twelveItems() );
+		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
+		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const gallery = new GalleryRender( page, id );
+		await slowLoadMoreScript( page );
+
+		await page.goto( url );
+		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
+		await loadMoreAtOnce( gallery );
+		await expect( gallery.items() ).toHaveCount( 12 );
+	} );
+
+	test( 'pages a password gallery unlocked inside an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = passwordGallery();
+		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
+		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const gallery = new GalleryRender( page, id );
+		await slowLoadMoreScript( page );
+
+		await page.goto( url );
+		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
+		const form = page.locator( `.fg-lock-form[data-gallery-id="${ id }"]` );
+		await form.locator( '.fg-lock-input' ).fill( PASSWORD );
+		await form.locator( '.fg-lock-submit' ).click();
+		await loadMoreAtOnce( gallery );
+		await expect( gallery.items() ).toHaveCount( 12 );
+	} );
+} );
