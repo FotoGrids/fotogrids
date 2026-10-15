@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { EXPORT_TYPES, LOG_DETAIL_LABELS } from './constants.js';
 
 export function formatDate(iso) {
@@ -86,10 +86,49 @@ export function parseSummary(summary) {
 }
 
 /**
+ * Describe how many of a count of items are images and how many are videos.
+ *
+ * @param {Object} [detail] `{ images, videos }` counts.
+ * @return {string} E.g. "(83 images, 4 videos)", or an empty string.
+ */
+export function itemsDetail(detail) {
+	const images = detail?.images ?? 0;
+	const videos = detail?.videos ?? 0;
+	const imagesText = sprintf(
+		/* translators: %d: image count */
+		_n('%d image', '%d images', images, 'fotogrids'),
+		images
+	);
+	const videosText = sprintf(
+		/* translators: %d: video count */
+		_n('%d video', '%d videos', videos, 'fotogrids'),
+		videos
+	);
+
+	if (images > 0 && videos > 0) {
+		return sprintf(
+			/* translators: 1: number of images, e.g. "83 images". 2: number of videos, e.g. "4 videos". */
+			_x('(%1$s, %2$s)', 'import item counts', 'fotogrids'),
+			imagesText,
+			videosText
+		);
+	}
+	if (images > 0 || videos > 0) {
+		return sprintf(
+			/* translators: %s: number of images or of videos, e.g. "4 videos". */
+			_x('(%s)', 'import item counts', 'fotogrids'),
+			images > 0 ? imagesText : videosText
+		);
+	}
+
+	return '';
+}
+
+/**
  * Turn one side of an import response into chip descriptors.
  *
  * @param {Object} counts Data type to count, or `true` for a type imported whole.
- * @return {Array} Chip descriptors in EXPORT_TYPES order: { key, count, label }.
+ * @return {Array} Chip descriptors in EXPORT_TYPES order: { key, count, label, detail? }.
  */
 export function importResultChips(counts) {
 	return EXPORT_TYPES.filter(
@@ -102,6 +141,13 @@ export function importResultChips(counts) {
 			return { key, label };
 		}
 
-		return { key, count, label: labels[1 === count ? 0 : 1] };
+		const detail = 'items' === key ? itemsDetail(counts.items_detail) : '';
+
+		return {
+			key,
+			count,
+			label: labels[1 === count ? 0 : 1],
+			...(detail ? { detail } : {}),
+		};
 	});
 }
