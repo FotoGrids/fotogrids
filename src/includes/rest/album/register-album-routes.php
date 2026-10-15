@@ -77,6 +77,42 @@ class Register_Album_Routes {
 			)
 		);
 
+		register_rest_route(
+			'fotogrids/v1',
+			'/album/(?P<id>\d+)/unlock',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( '\FotoGrids\REST\Album\Album_Data', 'unlock_album' ),
+					'permission_callback' => array( '\FotoGrids\REST\Album\Album_Permissions', 'check_album_unlock' ),
+					'args'                => array(
+						'id'          => array(
+							'required'          => true,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => function ( $param ) {
+								return is_numeric( $param ) && $param > 0;
+							},
+						),
+						'password'    => array(
+							'required'          => true,
+							'sanitize_callback' => function ( $value ) {
+								return wp_strip_all_tags( (string) $value );
+							},
+						),
+						'instance_id' => array(
+							'type'              => 'string',
+							'default'           => '',
+							'validate_callback' => function ( $param, $request ) {
+								return '' === $param
+									|| ( is_string( $param )
+										&& \FotoGrids\Render\Internal\Instance_Id_Factory::matches( (int) $request['id'], $param ) );
+							},
+						),
+					),
+				),
+			)
+		);
+
 		// Albums list endpoint
 		register_rest_route(
 			'fotogrids/v1',
