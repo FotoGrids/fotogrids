@@ -18,11 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Shows a password form in place of a protected gallery or album until the
- * visitor unlocks it.
- *
- * An unlock sets the fotogrids_unlocked_{id} cookie or, when visitors are not
- * remembered, returns a token sent back in the X-FotoGrids-Unlock header.
+ * Shows a password form in place of a protected gallery or album.
  *
  * @package FotoGrids\Render\Gates\Password
  * @since   1.0.0
@@ -49,8 +45,8 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Returns true when the collection is protected. Previews pass unless
-	 * simulated or PREVIEW_KEEPS_GATE is set.
+	 * Whether the collection is protected. Previews pass unless simulated or
+	 * PREVIEW_KEEPS_GATE is set.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.

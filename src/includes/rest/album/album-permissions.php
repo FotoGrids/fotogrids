@@ -35,8 +35,6 @@ class Album_Permissions {
 	/**
 	 * Permission check for unlocking a password-protected album.
 	 *
-	 * Any visitor may submit a password; the handler verifies it.
-	 *
 	 * @since 1.3.0
 	 * @param \WP_REST_Request $request The REST API request object.
 	 * @return bool Always true.
@@ -93,9 +91,7 @@ class Album_Permissions {
 	 * Decides whether the current visitor may see an album and its galleries.
 	 *
 	 * The album must be published, and every gate that would run on its
-	 * public render must pass. For a gated album the response depends on the
-	 * visitor, so it is sent with Cache-Control: no-store whether the gates
-	 * pass or block.
+	 * public render must pass. Gated albums are sent with Cache-Control: no-store.
 	 *
 	 * @since 1.3.0
 	 * @param int $album_id Album post ID.

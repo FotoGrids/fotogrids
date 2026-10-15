@@ -726,8 +726,6 @@ class Renderer {
 	/**
 	 * Whether a gate (password, members only) applies to this collection.
 	 *
-	 * A gated collection keeps its cover and items out of the page head.
-	 *
 	 * @since 1.3.0
 	 * @return bool
 	 */

@@ -295,8 +295,7 @@
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = html;
 
-				// Without a remember cookie, the token is what authorises
-				// this collection's later requests until the page is left.
+				// The token authorises this collection's later requests.
 				if (data.unlockToken) {
 					tempDiv
 						.querySelectorAll(

@@ -4,10 +4,7 @@ import { album, galleryPage, type Settings } from './support/collections';
 import { wpEval } from './support/roles';
 
 /**
- * A password-protected album: what a logged-out visitor gets before the
- * password, what the password unlocks, and what the unlock is remembered by.
- *
- * Scoped: every collection here is the spec's own.
+ * Password-protected albums. Scoped: every collection here is the spec's own.
  */
 
 const PASSWORD = 'album-secret';

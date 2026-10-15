@@ -149,11 +149,6 @@ class Album_Data {
 	/**
 	 * Unlocks a password-protected album and returns its rendered HTML.
 	 *
-	 * Verifies the submitted password, sets the remember cookie when the album
-	 * remembers visitors (or returns a short-lived unlock token when it does
-	 * not), and renders the album so the lock form can be swapped in place.
-	 * The response shape matches the gallery unlock route.
-	 *
 	 * @since 1.3.0
 	 * @param \WP_REST_Request $request The REST API request object.
 	 * @return \WP_REST_Response|\WP_Error
@@ -212,7 +207,7 @@ class Album_Data {
 			);
 		}
 
-		// The render below reads the unlock state from $_COOKIE.
+		// Lets the render below see the unlock.
 		$_COOKIE[ $cookie_key ] = $cookie_value;
 
 		$html     = \FotoGrids\Public_Render::render_album_embed(
