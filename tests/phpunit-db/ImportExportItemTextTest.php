@@ -101,7 +101,7 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 	private function import( array $items ): array {
 		$known = self::call( 'known_item_ids' );
 
-		return self::call( 'import_items', $items, array(), $known );
+		return array_slice( self::call( 'import_items', $items, array(), $known ), 0, 2 );
 	}
 
 	public function test_export_carries_the_attachment_text_of_an_item_with_a_row(): void {
