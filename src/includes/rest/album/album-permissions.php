@@ -93,7 +93,9 @@ class Album_Permissions {
 	 * Decides whether the current visitor may see an album and its galleries.
 	 *
 	 * The album must be published, and every gate that would run on its
-	 * public render must pass.
+	 * public render must pass. For a gated album the response depends on the
+	 * visitor, so it is sent with Cache-Control: no-store whether the gates
+	 * pass or block.
 	 *
 	 * @since 1.3.0
 	 * @param int $album_id Album post ID.
@@ -118,6 +120,10 @@ class Album_Permissions {
 		}
 
 		$context = Context_Builder::for_public()->build_for_album( $album_id, Album_Repository::get_settings( $album_id ) );
+		if ( Render_Controller::has_active_gates( $context ) && ! headers_sent() ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+		}
+
 		if ( ! Render_Controller::evaluate_gates( $context )->passed ) {
 			return new \WP_Error(
 				'fotogrids_album_locked',

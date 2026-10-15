@@ -106,14 +106,27 @@ test.describe('a locked album', () => {
 	);
 
 	test(
-		'ALB-PW-03: the album REST read refuses it',
-		{ tag: '@gate' },
+		'ALB-PW-03: the album REST read refuses it, and asks caches not to store the refusal',
+		{ tag: ['@gate', '@cache', '@api'] },
 		async ({ page }) => {
+			const open = album([
+				galleryPage({}, undefined, 'Album password control').id,
+			]);
+			const control = await page.request.get(albumRoute(open.id));
+			expect(control.status()).toBe(200);
+			expect(
+				control.headers()['cache-control'] ?? '',
+				'control: an ungated album read stays cacheable'
+			).not.toContain('no-store');
+
 			const { id } = passwordAlbum();
 
 			const response = await page.request.get(albumRoute(id));
 
 			expect(response.status()).toBe(401);
+			expect(response.headers()['cache-control'] ?? '').toContain(
+				'no-store'
+			);
 			expect(await response.text()).not.toContain(CHILD_TITLE);
 		}
 	);
@@ -172,6 +185,10 @@ test.describe('the right password', () => {
 
 			const read = await page.request.get(albumRoute(id));
 			expect(read.status()).toBe(200);
+			expect(
+				read.headers()['cache-control'] ?? '',
+				'an unlocked read must not be stored for other visitors'
+			).toContain('no-store');
 		}
 	);
 
