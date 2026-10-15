@@ -10,23 +10,18 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Album Permissions Handler
- *
- * Handles permission checks for album-related REST API endpoints.
+ * Permission checks for the album REST API endpoints.
  *
  * @since 1.0.0
  */
 class Album_Permissions {
 
 	/**
-	 * Permission check for reading albums
-	 *
-	 * Determines if the current user has permission to read album data.
-	 * Currently allows public access for all published albums.
+	 * Permission check for reading an album; always allows.
 	 *
 	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return bool True if access is allowed, false otherwise
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return bool Always true.
 	 */
 	public static function check_album_read( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return true;
@@ -46,10 +41,8 @@ class Album_Permissions {
 	/**
 	 * Permission check for the album list endpoint.
 	 *
-	 * The list includes draft and private albums of every author, so it is
-	 * restricted to FotoGrids managers. Public surfaces render specific
-	 * published albums through the shortcode, which uses the publish-guarded
-	 * read path.
+	 * Requires manage_fotogrids: the list includes every author's draft and
+	 * private albums.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request The REST API request object.
@@ -60,9 +53,8 @@ class Album_Permissions {
 	}
 
 	/**
-	 * Permission check for writing an album's featured gallery.
-	 *
-	 * Mirrors WP's `edit_post` cap for the specific album ID.
+	 * Permission check for writing an album's featured gallery; requires
+	 * `edit_post` on the album.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -90,8 +82,8 @@ class Album_Permissions {
 	/**
 	 * Decides whether the current visitor may see an album and its galleries.
 	 *
-	 * The album must be published, and every gate that would run on its
-	 * public render must pass. Gated albums are sent with Cache-Control: no-store.
+	 * The album must be published and pass its public-render gates. Gated
+	 * albums are sent with Cache-Control: no-store.
 	 *
 	 * @since 1.3.0
 	 * @param int $album_id Album post ID.

@@ -6,21 +6,17 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Album Data Handler
- *
- * Handles album data retrieval for REST API endpoints.
+ * REST handlers for album data.
  *
  * @since 1.0.0
  */
 class Album_Data {
 
 	/**
-	 * Set or clear the album's featured gallery.
+	 * Sets or clears the album's featured gallery.
 	 *
-	 * Body: { gallery_id: int | null }. When null, the explicit choice is
-	 * cleared (the runtime cover resolver falls back to the first child
-	 * gallery with a resolvable cover). When set, the gallery must still
-	 * be a child of this album.
+	 * Body: { gallery_id: int|null }; an empty value clears it. A set gallery
+	 * must be a child of this album.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -90,14 +86,12 @@ class Album_Data {
 	}
 
 	/**
-	 * Get album data with galleries
-	 *
-	 * Retrieves a single published album with the galleries the current user
-	 * can view, in album order. Automatically increments view count.
+	 * Returns an album with the galleries the current user can view, in album
+	 * order, and increments its view count.
 	 *
 	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request object containing album ID
-	 * @return \WP_REST_Response|\WP_Error Album data or error response
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return \WP_REST_Response|\WP_Error Album data or error.
 	 */
 	public static function get_album( $request ) {
 		$album_id = (int) $request['id'];
@@ -234,10 +228,10 @@ class Album_Data {
 	}
 
 	/**
-	 * Get albums list for admin use
+	 * Returns all published, draft and private albums for admin use.
 	 *
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Array of albums
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return \WP_REST_Response Array of albums.
 	 */
 	public static function get_albums_list( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		$args = array(
@@ -263,14 +257,11 @@ class Album_Data {
 	}
 
 	/**
-	 * Get item count for a gallery
-	 *
-	 * Returns the total number of items associated with a specific gallery.
-	 * Used for display purposes and pagination calculations.
+	 * Returns a gallery's item count.
 	 *
 	 * @since 1.0.0
-	 * @param int $gallery_id The ID of the gallery to count items for
-	 * @return int The number of items in the gallery
+	 * @param int $gallery_id Gallery ID.
+	 * @return int Item count.
 	 */
 	private static function get_gallery_item_count( $gallery_id ) {
 		return \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $gallery_id );
