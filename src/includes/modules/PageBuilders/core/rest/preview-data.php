@@ -547,11 +547,18 @@ final class Preview_Data {
 			? (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id )
 			: array();
 
-		$status = $post ? $post->post_status : 'publish';
+		$status   = $post ? $post->post_status : 'publish';
+		$can_edit = current_user_can( 'edit_post', $album_id );
+
+		if ( ! $can_edit && ! empty( $settings['password_protect'] )
+			&& \FotoGrids\Password_Crypto::is_encrypted( (string) ( $settings['_password_encrypted'] ?? '' ) )
+		) {
+			$thumb = null;
+		}
 
 		return array(
 			'id'             => $album_id,
-			'can_edit'       => current_user_can( 'edit_post', $album_id ),
+			'can_edit'       => $can_edit,
 			'title'          => $post ? html_entity_decode( $post->post_title, ENT_QUOTES, 'UTF-8' ) : '',
 			'status'         => $status,
 			'status_label'   => self::status_label( $status ),

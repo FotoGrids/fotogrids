@@ -258,7 +258,8 @@ class Renderer {
 			$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 		}
 
-		$item = $this->deep_linked_item();
+		$gated = $this->has_active_gates();
+		$item  = $gated ? null : $this->deep_linked_item();
 
 		// Master switch: site-wide "OG off" or per-collection "defer to other
 		// SEO plugins" both kill OG emission before any filter runs.
@@ -326,7 +327,7 @@ class Renderer {
 				$image_id = (int) $seo['og_image_custom_id'];
 			}
 			$poster_url = '';
-			if ( $image_id <= 0 ) {
+			if ( $image_id <= 0 && ! $gated ) {
 				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
 					(int) $this->post->ID,
 					'large'
@@ -720,6 +721,29 @@ class Renderer {
 			self::BODY_ID,
 			Breakpoint_Config::from_settings()
 		);
+	}
+
+	/**
+	 * Whether a gate (password, members only) applies to this collection.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	private function has_active_gates(): bool {
+		$collection_id = (int) $this->post->ID;
+		$settings      = $this->collection_settings();
+
+		$context = $this->is_album()
+			? \FotoGrids\Render\Internal\Context_Builder::for_public()->build_for_album(
+				$collection_id,
+				$settings,
+				array(),
+				\FotoGrids\Render\Api\Request_Source::SHORTCODE,
+				'fg-' . $collection_id . '-head'
+			)
+			: \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( $collection_id, $settings );
+
+		return \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
 	}
 
 	/**

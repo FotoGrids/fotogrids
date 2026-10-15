@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-13T07:32:07+00:00\n"
+"POT-Creation-Date: 2026-10-14T14:56:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -6468,8 +6468,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:79
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:322
-#: includes/rest/gallery/gallery-data.php:591
+#: includes/rest/gallery/gallery-data.php:326
+#: includes/rest/gallery/gallery-data.php:598
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
@@ -6496,7 +6496,7 @@ msgstr ""
 msgid "Imported gallery (%s)"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:634
+#: includes/modules/PageBuilders/core/rest/preview-data.php:641
 msgid "Sorry, you are not allowed to preview this."
 msgstr ""
 
@@ -6633,7 +6633,7 @@ msgid "Draft preview - this collection is not published yet."
 msgstr ""
 
 #. translators: 1: gallery count, 2: album title
-#: includes/modules/ViewCollections/class-renderer.php:511
+#: includes/modules/ViewCollections/class-renderer.php:512
 #, php-format
 msgid "%1$d gallery in %2$s."
 msgid_plural "%1$d galleries in %2$s."
@@ -6641,7 +6641,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: item count, 2: gallery title
-#: includes/modules/ViewCollections/class-renderer.php:523
+#: includes/modules/ViewCollections/class-renderer.php:524
 #, php-format
 msgid "%1$d photo in %2$s."
 msgid_plural "%1$d photos in %2$s."
@@ -6651,7 +6651,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries in the album.
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
-#: includes/modules/ViewCollections/class-renderer.php:794
+#: includes/modules/ViewCollections/class-renderer.php:820
 #: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:157
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
@@ -6666,7 +6666,7 @@ msgstr[1] ""
 #. translators: %d: number of items in the gallery.
 #. translators: %d: number of items.
 #. translators: %d: item count
-#: includes/modules/ViewCollections/class-renderer.php:796
+#: includes/modules/ViewCollections/class-renderer.php:822
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
 #: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:162
@@ -6997,23 +6997,30 @@ msgstr ""
 msgid "Gallery is not part of this album."
 msgstr ""
 
-#: includes/rest/album/album-permissions.php:65
-msgid "Invalid album ID."
-msgstr ""
-
-#: includes/rest/album/album-permissions.php:72
-msgid "You do not have permission to edit this album."
-msgstr ""
-
-#: includes/rest/album/album-permissions.php:94
+#: includes/rest/album/album-data.php:169
+#: includes/rest/album/album-permissions.php:107
 msgid "Album not found"
 msgstr ""
 
-#: includes/rest/album/album-permissions.php:102
+#: includes/rest/album/album-data.php:179
+#: includes/rest/album/album-permissions.php:115
 msgid "Album is not published"
 msgstr ""
 
-#: includes/rest/album/album-permissions.php:111
+#: includes/rest/album/album-data.php:190
+#: includes/rest/gallery/gallery-data.php:220
+msgid "Incorrect password."
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:78
+msgid "Invalid album ID."
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:85
+msgid "You do not have permission to edit this album."
+msgstr ""
+
+#: includes/rest/album/album-permissions.php:124
 msgid "You do not have access to this album."
 msgstr ""
 
@@ -7039,16 +7046,12 @@ msgstr ""
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:220
-msgid "Incorrect password."
-msgstr ""
-
-#: includes/rest/gallery/gallery-data.php:313
+#: includes/rest/gallery/gallery-data.php:317
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:330
+#: includes/rest/gallery/gallery-data.php:334
 #: includes/rest/gallery/gallery-permissions.php:76
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
@@ -7611,27 +7614,27 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:118
+#: includes/tools/import-export/class-import-export-data.php:123
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:153
+#: includes/tools/import-export/class-import-export-data.php:158
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:426
+#: includes/tools/import-export/class-import-export-data.php:431
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:443
+#: includes/tools/import-export/class-import-export-data.php:448
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:480
+#: includes/tools/import-export/class-import-export-data.php:485
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:487
+#: includes/tools/import-export/class-import-export-data.php:492
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
@@ -7854,31 +7857,31 @@ msgstr ""
 msgid "Attachment is not an image."
 msgstr ""
 
-#: public/class-public-render.php:428
+#: public/class-public-render.php:451
 msgid "No gallery ID specified. Usage: [fotogrids_gallery id=\"1\"]"
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:436
-#: public/class-public-render.php:707
+#: public/class-public-render.php:459
+#: public/class-public-render.php:756
 #, php-format
 msgid "Gallery with ID %d not found."
 msgstr ""
 
 #. translators: 1: gallery ID, 2: post status.
-#: public/class-public-render.php:448
+#: public/class-public-render.php:471
 #, php-format
 msgid "Gallery with ID %1$d is not published (status: %2$s)."
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:462
-#: public/class-public-render.php:720
+#: public/class-public-render.php:485
+#: public/class-public-render.php:769
 #, php-format
 msgid "Gallery with ID %d exists but has no items."
 msgstr ""
 
-#: public/class-public-render.php:699
+#: public/class-public-render.php:748
 msgid "No gallery ID specified."
 msgstr ""
 
@@ -8116,28 +8119,38 @@ msgstr ""
 msgid "Log In"
 msgstr ""
 
+#. translators: heading shown on the album password lock screen
+#: public/render/gates/password/class-password-gate.php:194
+msgid "Album Protected"
+msgstr ""
+
+#. translators: instruction text shown below the album lock screen heading
+#: public/render/gates/password/class-password-gate.php:196
+msgid "Enter the password to view this album."
+msgstr ""
+
 #. translators: heading shown on the gallery password lock screen
-#: public/render/gates/password/class-password-gate.php:190
+#: public/render/gates/password/class-password-gate.php:199
 msgid "Gallery Protected"
 msgstr ""
 
 #. translators: instruction text shown below the lock screen heading
-#: public/render/gates/password/class-password-gate.php:192
+#: public/render/gates/password/class-password-gate.php:201
 msgid "Enter the password to view this gallery."
 msgstr ""
 
 #. translators: placeholder text inside the password input on the lock screen
-#: public/render/gates/password/class-password-gate.php:194
+#: public/render/gates/password/class-password-gate.php:204
 msgid "Password"
 msgstr ""
 
 #. translators: label/text for the submit button on the gallery lock screen
-#: public/render/gates/password/class-password-gate.php:196
+#: public/render/gates/password/class-password-gate.php:206
 msgid "Unlock"
 msgstr ""
 
 #. translators: error shown when the visitor enters an incorrect gallery password
-#: public/render/gates/password/class-password-gate.php:198
+#: public/render/gates/password/class-password-gate.php:208
 msgid "Incorrect password. Please try again."
 msgstr ""
 
