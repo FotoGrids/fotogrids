@@ -86,11 +86,11 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 		return self::call( $serialiser, self::call( 'collect_export_data', array( 'galleries', 'items' ) ) );
 	}
 
-	private function import( string $file, string $mode = 'skip' ): array {
+	private function import( string $file, string $mode = 'skip', array $include = array( 'galleries', 'items' ) ): array {
 		$request = new WP_REST_Request( 'POST', '/fotogrids/v1/admin/tools/import-export/import' );
 		$request->set_param( 'phase', 'execute' );
 		$request->set_param( 'file', $file );
-		$request->set_param( 'include', array( 'galleries', 'items' ) );
+		$request->set_param( 'include', $include );
 		$request->set_param( 'galleries', $mode );
 		$request->set_param( 'albums', $mode );
 
@@ -354,5 +354,75 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 
 		$this->assertSame( 1, $result['skipped']['items'] );
 		$this->assertSame( 1, $result['skipped']['items_detail']['videos'] );
+	}
+
+	public function test_galleries_imported_without_items_create_no_embed(): void {
+		$embed = $this->embed();
+		$this->gallery_with( $embed );
+		$file = $this->export();
+
+		$this->forget_galleries();
+		$this->import( $file, 'skip', array( 'galleries' ) );
+
+		$this->assertCount( 1, $this->galleries() );
+		$this->assertSame( array(), $this->embeds() );
+		$this->assertSame( array( $embed ), Gallery_Repository::get_item_ids( $this->galleries()[0] ) );
+	}
+
+	public function test_an_older_file_without_an_embeds_section_imports_as_before(): void {
+		$image = $this->attachment();
+		$embed = $this->embed();
+		$this->gallery_with( $image, $embed );
+		$file = json_decode( $this->export(), true );
+		unset( $file['embeds'] );
+		foreach ( $file['items'] as $index => $item ) {
+			unset( $file['items'][ $index ]['media_type'] );
+		}
+
+		$this->forget_galleries();
+		$result = $this->import( wp_json_encode( $file ) );
+
+		$this->assertSame( array(), $this->embeds() );
+		$this->assertSame( array( $image, $embed ), Gallery_Repository::get_item_ids( $this->galleries()[0] ) );
+		$this->assertSame( 1, $result['imported']['items'] );
+		$this->assertArrayNotHasKey( 'items_detail', $result['imported'] );
+	}
+
+	public function test_two_galleries_sharing_an_embed_in_the_file_each_get_their_own(): void {
+		$embed  = $this->embed();
+		$before = Embed_Store::get( $embed );
+		$this->gallery_with( $embed );
+		$this->gallery_with( $embed );
+		$file = $this->export();
+
+		$this->forget_galleries();
+		$this->import( $file );
+
+		$galleries = $this->galleries();
+		$this->assertCount( 2, $galleries );
+		$first  = Gallery_Repository::get_item_ids( $galleries[0] );
+		$second = Gallery_Repository::get_item_ids( $galleries[1] );
+		$this->assertCount( 1, $first );
+		$this->assertCount( 1, $second );
+		$this->assertNotSame( $first[0], $second[0] );
+		$this->assertSame( array( $galleries[0] ), Gallery_Repository::find_galleries_for_item( $first[0] ) );
+		$this->assertSame( array( $galleries[1] ), Gallery_Repository::find_galleries_for_item( $second[0] ) );
+		$this->assertSame( $this->without_id( $before ), $this->without_id( Embed_Store::get( $first[0] ) ) );
+		$this->assertSame( $this->without_id( $before ), $this->without_id( Embed_Store::get( $second[0] ) ) );
+	}
+
+	public function test_the_analysis_of_an_xml_file_counts_images_and_videos(): void {
+		$this->gallery_with( $this->attachment(), $this->video_attachment(), $this->embed() );
+
+		$contents = $this->analyse( $this->export( 'serialise_xml' ) );
+
+		$this->assertSame( 3, $contents['items'] );
+		$this->assertSame(
+			array(
+				'images' => 1,
+				'videos' => 2,
+			),
+			$contents['items_detail']
+		);
 	}
 }

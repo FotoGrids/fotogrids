@@ -330,6 +330,10 @@ test( 'Overwrite on the same site puts the file\'s caption, settings and poster 
 	wpEval( `\\FotoGrids\\Galleries\\Embed_Store::update( ${ youtube }, ${ phpValue( { caption: 'Edited on the site', settings: { loop: true } } ) } );` );
 	wpEval( `\\FotoGrids\\Galleries\\Embed_Store::update( ${ vimeo }, ${ phpValue( { poster_id: 0, poster_url: '' } ) } );` );
 
+	// The YouTube embed autoplays, which replaces its poster once scripts run, so the caption is read from the served HTML.
+	const { url } = pageFor( gallery );
+	expect( await ( await page.request.get( url ) ).text() ).toContain( 'alt="Edited on the site"' );
+
 	await importThroughUi( page, JSON.stringify( own ), 'overwrite' );
 
 	expect( galleriesTitled( title ) ).toEqual( [ gallery ] );
@@ -337,6 +341,16 @@ test( 'Overwrite on the same site puts the file\'s caption, settings and poster 
 	expect( ownEmbeds() ).toEqual( embeds );
 	expect( embedOf( youtube ) ).toEqual( before.youtube );
 	expect( embedOf( vimeo ) ).toEqual( before.vimeo );
+
+	const html = await ( await page.request.get( url ) ).text();
+	expect( html ).toContain( `alt="${ YOUTUBE.caption }"` );
+	expect( html ).not.toContain( 'Edited on the site' );
+
+	const render = new GalleryRender( page, gallery );
+	const video = render.root.locator( '.fg-video[data-fg-embed-provider="youtube"]' );
+	await page.goto( url );
+	await render.waitFor();
+	expect( JSON.parse( ( await video.getAttribute( 'data-fg-embed-settings' ) ) ?? '{}' ) ).toMatchObject( { loop: false, start_time: 30 } );
 } );
 
 test( 'Duplicate gives the copy embeds of its own, so removing one from the copy leaves the original\'s', { tag: [ '@admin', '@api' ] }, async ( {
