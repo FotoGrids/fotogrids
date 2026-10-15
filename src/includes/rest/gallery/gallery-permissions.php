@@ -51,6 +51,8 @@ class Gallery_Permissions {
 	 * A user who can edit the gallery always may. Anyone else needs the
 	 * gallery to be published and every gate that would run on a public
 	 * render (password, view permissions, and any add-on gates) to pass.
+	 * For a gated gallery the response depends on the visitor, so it is
+	 * sent with Cache-Control: no-store whether the gates pass or block.
 	 *
 	 * @since 1.1.2
 	 * @param int $gallery_id Gallery post ID.
@@ -79,6 +81,10 @@ class Gallery_Permissions {
 		}
 
 		$context = Gallery_Item_Sequence::stub_context( $gallery_id, Gallery_Repository::get_settings( $gallery_id ) );
+		if ( Render_Controller::has_active_gates( $context ) && ! headers_sent() ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+		}
+
 		if ( ! Render_Controller::evaluate_gates( $context )->passed ) {
 			return new \WP_Error(
 				'fotogrids_gallery_locked',
