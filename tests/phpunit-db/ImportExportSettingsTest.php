@@ -40,7 +40,12 @@ class ImportExportSettingsTest extends WP_UnitTestCase {
 	private function import( array $settings ): void {
 		$request = new WP_REST_Request( 'POST', '/fotogrids/v1/admin/tools/import-export/import' );
 		$request->set_param( 'phase', 'execute' );
-		$request->set_param( 'file', wp_json_encode( array( 'settings' => $settings ) ) );
+		$request->set_param( 'file', wp_json_encode(
+				array(
+					'meta'     => array( 'version' => FOTOGRIDS_VERSION ),
+					'settings' => $settings,
+				)
+			) );
 		$request->set_param( 'include', array( 'settings' ) );
 
 		$response = Import_Export_Data::import( $request );
