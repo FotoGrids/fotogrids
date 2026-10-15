@@ -17,8 +17,7 @@
 }
 
 [data-fg-layout="justified"] .fg-justified-track .fg-item .fg-item-media picture,
-[data-fg-layout="justified"] .fg-justified-track .fg-item .fg-item-media img,
-[data-fg-layout="justified"] .fg-justified-track .fg-item .fg-item-media .fg-item-placeholder {
+[data-fg-layout="justified"] .fg-justified-track .fg-item .fg-item-media img {
     height: 100%;
     width: 100%;
     object-fit: cover;

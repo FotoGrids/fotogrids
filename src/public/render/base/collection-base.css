@@ -84,8 +84,7 @@
     cursor: pointer;
 }
 
-.fotogrids-collection .fg-item-media .fg-video-poster,
-.fotogrids-collection .fg-item-media .fg-item-placeholder {
+.fotogrids-collection .fg-item-media .fg-video-poster {
     display: block;
     width: 100%;
     height: auto;
@@ -97,6 +96,13 @@
     aspect-ratio: var(--fg-item-aspect-ratio, 16 / 9);
     background-color: #1d2327;
     background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+/* Fills a media box that has a height; elsewhere the aspect ratio sizes it. */
+.fotogrids-collection .fg-item-media .fg-item-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .fotogrids-collection .fg-item-media .fg-video-badge {
@@ -173,13 +179,7 @@
     [data-fg-layout="single-item"],
     [data-fg-layout="image-viewer"],
     [data-fg-layout="featured-item"]
-) .fg-item-media .fg-video-poster,
-.fotogrids-collection:where(
-    [data-fg-layout="grid"],
-    [data-fg-layout="single-item"],
-    [data-fg-layout="image-viewer"],
-    [data-fg-layout="featured-item"]
-) .fg-item-media .fg-item-placeholder {
+) .fg-item-media .fg-video-poster {
     width: 100%;
     height: 100%;
     object-fit: var(--fg-item-fit, cover);

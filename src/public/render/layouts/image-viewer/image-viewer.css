@@ -83,8 +83,7 @@
 [data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media picture,
 [data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media img,
 [data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video,
-[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster,
-[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-item-placeholder {
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
     position: absolute;
     inset: 0;
     width: 100%;
