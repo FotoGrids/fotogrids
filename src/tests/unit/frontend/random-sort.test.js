@@ -34,11 +34,9 @@ function installRuntime() {
 			);
 		},
 		boot() {
-			document
-				.querySelectorAll('.fotogrids-collection')
-				.forEach((el) => {
-					queue.forEach((entry) => entry.cb(el));
-				});
+			document.querySelectorAll('.fotogrids-collection').forEach((el) => {
+				queue.forEach((entry) => entry.cb(el));
+			});
 		},
 	};
 }
@@ -235,7 +233,9 @@ describe('random-sort', () => {
 
 	describe('refetch mode', () => {
 		it('replaces the items with the fetched selection', async () => {
-			const { root } = makeCollection(['a', 'b', 'c'], { mode: 'refetch' });
+			const { root } = makeCollection(['a', 'b', 'c'], {
+				mode: 'refetch',
+			});
 			const server = stubFetch({ html: itemsMarkup(['x', 'y', 'z']) });
 
 			loadModule();
@@ -249,7 +249,9 @@ describe('random-sort', () => {
 		});
 
 		it('holds the items hidden until the response lands', async () => {
-			const { root } = makeCollection(['a', 'b', 'c'], { mode: 'refetch' });
+			const { root } = makeCollection(['a', 'b', 'c'], {
+				mode: 'refetch',
+			});
 			const server = stubFetch({ html: itemsMarkup(['x', 'y', 'z']) });
 
 			loadModule();
@@ -264,7 +266,9 @@ describe('random-sort', () => {
 
 		it('reveals the server items and drops a late response after the hold expires', async () => {
 			jest.useFakeTimers();
-			const { root } = makeCollection(['a', 'b', 'c'], { mode: 'refetch' });
+			const { root } = makeCollection(['a', 'b', 'c'], {
+				mode: 'refetch',
+			});
 			const server = stubFetch({ html: itemsMarkup(['x', 'y', 'z']) });
 
 			loadModule();
@@ -295,12 +299,12 @@ describe('random-sort', () => {
 			window.FotoGrids.boot();
 
 			expect(window.fetch).toHaveBeenCalledTimes(2);
-			expect(JSON.parse(window.fetch.mock.calls[0][1].body).instance_id).toBe(
-				'fg-9-2'
-			);
-			expect(JSON.parse(window.fetch.mock.calls[1][1].body).instance_id).toBe(
-				''
-			);
+			expect(
+				JSON.parse(window.fetch.mock.calls[0][1].body).instance_id
+			).toBe('fg-9-2');
+			expect(
+				JSON.parse(window.fetch.mock.calls[1][1].body).instance_id
+			).toBe('');
 		});
 
 		it('mints a fresh seed and sends it so later requests share the permutation', () => {

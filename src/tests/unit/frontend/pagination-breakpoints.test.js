@@ -32,7 +32,8 @@ function makeGallery({ sizes = '24 18 12', randomMode = null } = {}) {
 	el.dataset.fgPageCurrent = '1';
 	el.dataset.fgPageTotal = '3';
 	el.dataset.fgPageSize = '24';
-	el.dataset.fgRenderUrl = 'https://example.com/wp-json/fotogrids/v1/gallery/render';
+	el.dataset.fgRenderUrl =
+		'https://example.com/wp-json/fotogrids/v1/gallery/render';
 	el.dataset.fgRenderNonce = 'n';
 	if (sizes) {
 		el.dataset.fgPageSizes = sizes;
@@ -204,7 +205,11 @@ describe('pagination breakpoints', () => {
 		stubFetch(MOBILE_PAGE);
 
 		loadModule();
-		window.FotoGrids.modules.pagination.adopt(gallery, MOBILE_PAGE, 'mobile');
+		window.FotoGrids.modules.pagination.adopt(
+			gallery,
+			MOBILE_PAGE,
+			'mobile'
+		);
 
 		expect(gallery.dataset.fgViewBreakpoint).toBe('mobile');
 		expect(gallery.dataset.fgPageTotal).toBe('6');
