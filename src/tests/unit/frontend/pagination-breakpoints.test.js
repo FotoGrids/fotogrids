@@ -98,6 +98,23 @@ describe('pagination breakpoints', () => {
 		expect(gallery.dataset.fgPageTotal).toBe('6');
 	});
 
+	it('sends the wrapper ID as the instance ID, and nothing for one the route would reject', async () => {
+		installRuntime('mobile');
+		const gallery = makeGallery();
+		gallery.id = 'fg-5-2';
+		const foreign = makeGallery();
+		foreign.id = 'fg-6-1';
+		stubFetch(MOBILE_PAGE);
+
+		loadModule();
+		window.FotoGrids.boot();
+		await flush();
+
+		expect(window.fetch).toHaveBeenCalledTimes(2);
+		expect(requestBody(0).instance_id).toBe('fg-5-2');
+		expect(requestBody(1).instance_id).toBe('');
+	});
+
 	it('marks the re-request as a reflow so the page is not scrolled', async () => {
 		installRuntime('mobile');
 		const gallery = makeGallery();

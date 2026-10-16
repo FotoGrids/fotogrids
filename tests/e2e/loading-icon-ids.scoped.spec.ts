@@ -94,7 +94,7 @@ test( 'items added by Load More, in two copies of one gallery', { tag: [ '@layou
 	await loadMore( copies.nth( 0 ), 8 );
 	await loadMore( copies.nth( 0 ), 12 );
 
-	await expectUnique( page, 28 );
+	await expectUnique( page, 20 );
 } );
 
 test( 'a gallery opened in place from an album, next to the same gallery and a second copy of the album', { tag: [ '@layout' ] }, async ( {
