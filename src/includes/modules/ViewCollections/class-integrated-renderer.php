@@ -79,6 +79,8 @@ class Integrated_Renderer {
 		// Post_Types::register_cpts runs at 11.
 		add_action( 'init', array( __CLASS__, 'register_cpt_support' ), 20 );
 
+		add_filter( 'the_posts', array( __CLASS__, 'keep_first_singular_match' ), 10, 2 );
+
 		// Singular-request hooks. All gated on `should_run()`, which checks
 		// both layout_mode and is_singular(CPTs).
 		add_filter( 'the_content', array( __CLASS__, 'inject_gallery' ), 20 );
@@ -189,6 +191,30 @@ class Integrated_Renderer {
 		foreach ( self::POST_TYPES as $type ) {
 			add_post_type_support( $type, 'comments' );
 		}
+	}
+
+	/**
+	 * Keep only the first post when a view page's slug matches several.
+	 *
+	 * Collections created at the same moment can share a slug. The first match
+	 * is the queried object, so trimming to it keeps the theme's loop - and
+	 * with it inject_gallery() - on the collection the head meta describes.
+	 *
+	 * @since 1.3.0
+	 * @param \WP_Post[] $posts Posts the query found.
+	 * @param \WP_Query  $query The query.
+	 * @return \WP_Post[]
+	 */
+	public static function keep_first_singular_match( array $posts, \WP_Query $query ): array {
+		if ( count( $posts ) < 2 || ! $query->is_main_query() || ! $query->is_singular() ) {
+			return $posts;
+		}
+
+		if ( ! in_array( get_post_type( $posts[0] ), self::POST_TYPES, true ) ) {
+			return $posts;
+		}
+
+		return array( $posts[0] );
 	}
 
 	/**
