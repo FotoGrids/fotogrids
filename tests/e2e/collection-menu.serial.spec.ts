@@ -232,7 +232,7 @@ test.describe( 'a role holding only one collection type', () => {
 		wpEval( `
 foreach ( array( 'gallery' => 'galleries', 'album' => 'albums' ) as $one => $many ) {
 	$caps = array( 'read' => true );
-	foreach ( array( "edit_fotogrids_{$one}", "read_fotogrids_{$one}", "delete_fotogrids_{$one}", "edit_fotogrids_{$many}", "publish_fotogrids_{$many}", "delete_fotogrids_{$many}", "edit_published_fotogrids_{$many}", "delete_published_fotogrids_{$many}" ) as $cap ) {
+	foreach ( array( "edit_fotogrids_{$one}", "read_fotogrids_{$one}", "delete_fotogrids_{$one}", "edit_fotogrids_{$many}", "publish_fotogrids_{$many}", "delete_fotogrids_{$many}" ) as $cap ) {
 		$caps[ $cap ] = true;
 	}
 	add_role( "fg_menu_{$one}_only", "FG {$one} only", $caps );
