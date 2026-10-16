@@ -676,7 +676,7 @@ class Public_Render {
 		}
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return self::error_notice(
 				sprintf(
 					/* translators: %d: gallery ID. */

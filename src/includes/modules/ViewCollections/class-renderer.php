@@ -10,6 +10,7 @@ namespace FotoGrids\Modules\ViewCollections;
 
 use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Api\Setting_Helpers;
@@ -78,7 +79,7 @@ class Renderer {
 	 * @return bool
 	 */
 	public function is_album(): bool {
-		return 'fotogrids_album' === $this->post->post_type;
+		return Post_Types::ALBUM === $this->post->post_type;
 	}
 
 	/**

@@ -7,16 +7,17 @@ import Icon from '../shared/Icon';
 import LockedReason from './LockedReason';
 import { DASHBOARD_ACCESS } from './access';
 import { userCan } from '../../utils/capabilities';
+import { ALBUM_POST_TYPE, GALLERY_POST_TYPE } from '../../utils/post-types';
 
 const OPTIONS = [
 	{
-		href: 'post-new.php?post_type=fotogrids_gallery',
+		href: `post-new.php?post_type=${GALLERY_POST_TYPE}`,
 		icon: 'layout_3x3',
 		label: __('New Gallery', 'fotogrids'),
 		access: DASHBOARD_ACCESS.gallery,
 	},
 	{
-		href: 'post-new.php?post_type=fotogrids_album',
+		href: `post-new.php?post_type=${ALBUM_POST_TYPE}`,
 		icon: 'layout_2x2',
 		label: __('New Album', 'fotogrids'),
 		access: DASHBOARD_ACCESS.album,

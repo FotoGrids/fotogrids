@@ -323,6 +323,10 @@
 			10
 		);
 
+		const instanceIdPattern = new RegExp(
+			'^fg-' + galleryId + '-[0-9a-z]{1,34}$'
+		);
+
 		const headers = {
 			'Content-Type': 'application/json',
 			'X-WP-Nonce': nonce,
@@ -343,6 +347,9 @@
 				filters,
 				random_seed: randomSeed,
 				container_width: containerWidth > 0 ? containerWidth : 0,
+				instance_id: instanceIdPattern.test(galleryEl.id)
+					? galleryEl.id
+					: '',
 			}),
 		}).then(function (response) {
 			if (!response.ok) {

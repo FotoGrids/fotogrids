@@ -320,7 +320,7 @@
 }
 
 body[class*="fotogrids_page_"],
-body[class*="post-type-fotogrids_"] {
+body.fotogrids-collection-screen {
 	#wpcontent {
 		padding-inline-start: 0;
 		padding-inline-end: 0;

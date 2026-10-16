@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Permissions;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -95,9 +97,9 @@ final class Permission_Gate {
 	 */
 	public static function settings_cap_for( string $post_type ): ?string {
 		switch ( $post_type ) {
-			case 'fotogrids_gallery':
+			case Post_Types::GALLERY:
 				return self::CAP_GALLERY_SETTINGS;
-			case 'fotogrids_album':
+			case Post_Types::ALBUM:
 				return self::CAP_ALBUM_SETTINGS;
 			default:
 				return null;

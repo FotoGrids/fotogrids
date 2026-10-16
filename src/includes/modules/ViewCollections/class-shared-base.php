@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\View_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -42,7 +43,7 @@ class Shared_Base {
 	 *
 	 * @var string[]
 	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	private const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * Register the shared route.

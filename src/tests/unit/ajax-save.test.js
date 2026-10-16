@@ -7,7 +7,8 @@
  */
 
 function buildEditScreenDom() {
-	document.body.className = 'post-type-fotogrids_gallery';
+	document.body.className =
+		'fotogrids-collection-screen fotogrids-collection-screen--gallery';
 	document.body.innerHTML = `
 		<div id="wpadminbar"><ul id="wp-admin-bar-root-default"></ul></div>
 		<div class="wrap"><h1>Edit</h1></div>
@@ -301,14 +302,12 @@ describe('ajax-save', () => {
 			const onBeforeUnload = loadAndGetBeforeUnload();
 			typeTitle();
 
-			document
-				.getElementById('post')
-				.dispatchEvent(
-					new window.Event('submit', {
-						bubbles: true,
-						cancelable: true,
-					})
-				);
+			document.getElementById('post').dispatchEvent(
+				new window.Event('submit', {
+					bubbles: true,
+					cancelable: true,
+				})
+			);
 
 			expect(fireBeforeUnload(onBeforeUnload)).toBe(false);
 		});

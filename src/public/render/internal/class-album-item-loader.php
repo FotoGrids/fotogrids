@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Item_View;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -57,7 +58,7 @@ final class Album_Item_Loader {
 			}
 
 			$gallery_post = get_post( $gallery_id );
-			if ( ! $gallery_post || 'fotogrids_gallery' !== $gallery_post->post_type ) {
+			if ( ! $gallery_post || Post_Types::GALLERY !== $gallery_post->post_type ) {
 				continue;
 			}
 

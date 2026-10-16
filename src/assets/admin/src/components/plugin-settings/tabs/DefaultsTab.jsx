@@ -4,6 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { Panel, SaveBar } from '../../shared/settings';
 import ErrorBoundary from '../../shared/ErrorBoundary';
+import { toPostType } from '../../../utils/post-types';
 
 /**
  * Unified component for rendering Gallery or Album defaults
@@ -83,11 +84,15 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 
 		const container = containerRef.current;
 		const typeLabel = type === 'gallery' ? 'gallery' : 'album';
-		const postType =
-			type === 'gallery' ? 'fotogrids_gallery' : 'fotogrids_album';
 
 		if (window.fotogridsSettings) {
-			window.fotogridsSettings.postType = postType;
+			Object.assign(
+				window.fotogridsSettings,
+				window.fotogridsDefaultsByKind?.[typeLabel] || {
+					postType: toPostType(typeLabel),
+					collectionKind: typeLabel,
+				}
+			);
 		}
 
 		const initializeApp = () => {
