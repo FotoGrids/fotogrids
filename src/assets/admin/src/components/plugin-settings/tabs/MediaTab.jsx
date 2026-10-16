@@ -82,8 +82,10 @@ const MediaTab = () => {
 			setSaved(next);
 			setStatus('saved');
 			setTimeout(() => setStatus(null), 3000);
+			return true;
 		} catch (err) {
 			setStatus('error');
+			return false;
 		} finally {
 			setSaving(false);
 		}

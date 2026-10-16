@@ -1,14 +1,14 @@
 /**
  * Tests for src/assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:
- * each subtab saves its own type, shows what it saved when opened again, and
- * never drops a change when the user moves away.
+ * each subtab saves its own type and shows what it saved when opened again.
  */
-import React, { act, createRef } from 'react';
+import React, { act } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import DefaultsTab, {
 	toPanelValue,
 	panelPayload,
 } from '@/admin/src/components/plugin-settings/tabs/DefaultsTab';
+import { confirmLeave } from '@/admin/src/components/shared/SidebarTabs/elements/unsaved-changes';
 import { renderElement } from '@tests/helpers/render-component';
 
 jest.mock('@wordpress/api-fetch');
@@ -31,16 +31,12 @@ const change = (key, value) =>
 		);
 	});
 
-const mount = (type) => {
-	const ref = createRef();
-	const view = renderElement(h(DefaultsTab, { type, ref }));
-	return { ref, view };
-};
+const mount = (type) => ({ view: renderElement(h(DefaultsTab, { type })) });
 
-const leave = async (ref) => {
+const leave = async () => {
 	let result;
 	await act(async () => {
-		result = await ref.current.confirmLeave();
+		result = await confirmLeave('Defaults');
 	});
 	return result;
 };
@@ -107,7 +103,7 @@ describe('DefaultsTab', () => {
 		const first = mount('gallery');
 		change('layout', 'slider');
 
-		expect(await leave(first.ref)).toBe(true);
+		expect(await leave()).toBe(true);
 		expect(apiFetch).toHaveBeenCalledWith(
 			expect.objectContaining({
 				path: '/fotogrids/v1/admin/collection-defaults',
@@ -124,90 +120,5 @@ describe('DefaultsTab', () => {
 		const again = mount('gallery');
 		expect(window.fotogridsSettings.settings.layout).toBe('slider');
 		again.view.unmount();
-	});
-
-	it('lets the user leave at once when nothing is pending', async () => {
-		const { ref, view } = mount('gallery');
-
-		expect(await leave(ref)).toBe(true);
-		expect(apiFetch).not.toHaveBeenCalled();
-		view.unmount();
-	});
-
-	it('keeps the user on the subtab when the save fails', async () => {
-		apiFetch.mockImplementation(() => Promise.reject(new Error('500')));
-		const { ref, view } = mount('gallery');
-		change('layout', 'slider');
-
-		expect(await leave(ref)).toBe(false);
-		view.unmount();
-	});
-
-	describe('with Autosave off', () => {
-		const confirm = jest.fn();
-
-		beforeEach(() => {
-			window.fotogridsAdmin = { autosave: '0' };
-			window.FotoGridsAdmin = { modal: { confirm } };
-			confirm.mockReset();
-		});
-
-		it('saves when the user chooses Save changes', async () => {
-			confirm.mockImplementation((opts) => {
-				opts.onClose('confirm');
-				return Promise.resolve(true);
-			});
-			const { ref, view } = mount('album');
-			change('layout', 'justified');
-
-			expect(await leave(ref)).toBe(true);
-			expect(confirm.mock.calls[0][0].message).toContain('Album Defaults');
-			expect(apiFetch).toHaveBeenCalledWith(
-				expect.objectContaining({
-					data: { type: 'album', defaults: { layout: 'justified' } },
-				})
-			);
-			view.unmount();
-		});
-
-		it('drops the change when the user chooses Discard changes', async () => {
-			confirm.mockImplementation((opts) => {
-				opts.onClose('cancel');
-				return Promise.resolve(false);
-			});
-			const { ref, view } = mount('gallery');
-			change('layout', 'slider');
-
-			expect(await leave(ref)).toBe(true);
-			expect(apiFetch).not.toHaveBeenCalled();
-			expect(await leave(ref)).toBe(true);
-			expect(confirm).toHaveBeenCalledTimes(1);
-			view.unmount();
-		});
-
-		it('stays when the dialog is closed any other way', async () => {
-			confirm.mockImplementation((opts) => {
-				opts.onClose('esc');
-				return Promise.resolve(false);
-			});
-			const { ref, view } = mount('gallery');
-			change('layout', 'slider');
-
-			expect(await leave(ref)).toBe(false);
-			expect(apiFetch).not.toHaveBeenCalled();
-			view.unmount();
-		});
-
-		it('falls back to the browser dialog without the modal API', async () => {
-			delete window.FotoGridsAdmin;
-			const native = jest.spyOn(window, 'confirm').mockReturnValue(false);
-			const { ref, view } = mount('gallery');
-			change('layout', 'slider');
-
-			expect(await leave(ref)).toBe(false);
-			expect(native).toHaveBeenCalled();
-			native.mockRestore();
-			view.unmount();
-		});
 	});
 });

@@ -13,6 +13,7 @@ import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
 import TabBar from '../shared/TabBar.jsx';
+import { confirmLeave } from '../shared/SidebarTabs/elements/unsaved-changes';
 
 const TAB_IDS = [
 	'media',
@@ -175,14 +176,46 @@ const PluginSettingsPage = () => {
 		resolveDefaultsSubTab(resolveActiveTab())
 	);
 
+	// The view on screen and its URL, so back/forward can return to it when
+	// the user stays to keep unsaved changes.
+	const shown = useRef({ tab: activeTab, subTab: activeDefaultsSubTab });
+	const shownUrl = useRef(window.location.href);
+
 	useEffect(() => {
-		const handlePopState = () => {
+		shown.current = { tab: activeTab, subTab: activeDefaultsSubTab };
+		shownUrl.current = window.location.href;
+	}, [activeTab, activeDefaultsSubTab]);
+
+	const viewLabel = (tabId, subTabId) =>
+		'defaults' === tabId
+			? DEFAULTS_TABS.find((tab) => tab.id === subTabId)?.label
+			: tabs.find((tab) => tab.id === tabId)?.label;
+
+	const leaveView = () =>
+		confirmLeave(viewLabel(shown.current.tab, shown.current.subTab) || '');
+
+	useEffect(() => {
+		const handlePopState = async () => {
 			if (!uiState) {
 				return;
 			}
 			const tabId = resolveActiveTab();
+			const subTabId = resolveDefaultsSubTab(tabId);
+
+			if (
+				tabId === shown.current.tab &&
+				subTabId === shown.current.subTab
+			) {
+				return;
+			}
+
+			if (!(await leaveView())) {
+				window.history.pushState({}, '', shownUrl.current);
+				return;
+			}
+
 			setActiveTab(tabId);
-			setActiveDefaultsSubTab(resolveDefaultsSubTab(tabId));
+			setActiveDefaultsSubTab(subTabId);
 		};
 
 		window.addEventListener('popstate', handlePopState);
@@ -258,14 +291,6 @@ const PluginSettingsPage = () => {
 		setTimeout(attemptScroll, 300);
 	}, [activeTab]);
 
-	const defaultsTabRef = useRef(null);
-
-	// Resolves false when the user chooses to stay on the Defaults tab.
-	const leaveDefaults = () =>
-		defaultsTabRef.current
-			? defaultsTabRef.current.confirmLeave()
-			: Promise.resolve(true);
-
 	const handleTabChange = async (tabId) => {
 		// The Setup Wizard tab is a launcher, not a tab panel. Add the
 		// wizard query param to the current URL so the wizard opens *on
@@ -279,11 +304,7 @@ const PluginSettingsPage = () => {
 			return;
 		}
 
-		if (
-			'defaults' === activeTab &&
-			'defaults' !== tabId &&
-			!(await leaveDefaults())
-		) {
+		if (tabId !== activeTab && !(await leaveView())) {
 			return;
 		}
 
@@ -318,7 +339,7 @@ const PluginSettingsPage = () => {
 	};
 
 	const handleSubTabChange = async (subTabId) => {
-		if (subTabId === activeDefaultsSubTab || !(await leaveDefaults())) {
+		if (subTabId === activeDefaultsSubTab || !(await leaveView())) {
 			return;
 		}
 
@@ -370,7 +391,6 @@ const PluginSettingsPage = () => {
 						</Panel>
 						<DefaultsTab
 							key={activeDefaultsSubTab}
-							ref={defaultsTabRef}
 							type={activeDefaultsSubTab}
 						/>
 					</>

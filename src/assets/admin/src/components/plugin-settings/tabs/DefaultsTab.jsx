@@ -1,16 +1,8 @@
-import React, {
-	forwardRef,
-	useCallback,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Panel, SaveBar } from '../../shared/settings';
-import { useAutosaveEnabled } from '../../shared/SidebarTabs/elements/SaveBar';
 import ErrorBoundary from '../../shared/ErrorBoundary';
 
 const ENDPOINT = '/fotogrids/v1/admin/collection-defaults';
@@ -62,17 +54,12 @@ export const panelPayload = (payload, saved = {}) => {
 /**
  * Gallery or Album defaults, saved per collection type.
  *
- * The ref exposes `confirmLeave()`, which the settings page awaits before it
- * switches away: unsaved changes are saved straight away with Autosave on,
- * and otherwise the user chooses to save, discard or stay.
- *
  * @param {Object} props
  * @param {string} props.type - 'gallery' or 'album'
  */
-const DefaultsTab = forwardRef(({ type = 'gallery' }, ref) => {
+const DefaultsTab = ({ type = 'gallery' }) => {
 	const containerRef = useRef(null);
 	const rootRef = useRef(null);
-	const autosave = useAutosaveEnabled();
 
 	// The settings panel is a separate React tree rendered by the plain
 	// collection-settings script, so it reports changes by event rather than by
@@ -84,8 +71,6 @@ const DefaultsTab = forwardRef(({ type = 'gallery' }, ref) => {
 
 	const pendingRef = useRef(pending);
 	pendingRef.current = pending;
-	const autosaveRef = useRef(autosave);
-	autosaveRef.current = autosave;
 
 	useEffect(() => {
 		const handleSettingChanged = (e) => {
@@ -148,60 +133,6 @@ const DefaultsTab = forwardRef(({ type = 'gallery' }, ref) => {
 			setSaving(false);
 		}
 	}, [type]);
-
-	const confirmLeave = useCallback(async () => {
-		if (0 === Object.keys(pendingRef.current).length) {
-			return true;
-		}
-
-		if (autosaveRef.current) {
-			return handleSave();
-		}
-
-		const message = sprintf(
-			/* translators: %s: Settings subtab name, "Gallery Defaults" or "Album Defaults". */
-			__(
-				'You have unsaved changes on %s. Save them before you leave?',
-				'fotogrids'
-			),
-			'album' === type
-				? __('Album Defaults', 'fotogrids')
-				: __('Gallery Defaults', 'fotogrids')
-		);
-		const modal = window.FotoGridsAdmin?.modal;
-
-		if (!modal?.confirm) {
-			// eslint-disable-next-line no-alert -- fallback when the admin modal API has not loaded.
-			return window.confirm(message) ? handleSave() : false;
-		}
-
-		let closedBy = null;
-		const confirmed = await modal.confirm({
-			title: __('Unsaved changes', 'fotogrids'),
-			message,
-			confirmLabel: __('Save changes', 'fotogrids'),
-			cancelLabel: __('Discard changes', 'fotogrids'),
-			variant: 'warning',
-			onClose: (reason) => {
-				closedBy = reason;
-			},
-		});
-
-		if (confirmed) {
-			return handleSave();
-		}
-
-		// Esc, the close button and a click outside keep the user here.
-		if ('cancel' === closedBy) {
-			pendingRef.current = {};
-			setPending({});
-			return true;
-		}
-
-		return false;
-	}, [type, handleSave]);
-
-	useImperativeHandle(ref, () => ({ confirmLeave }), [confirmLeave]);
 
 	useEffect(() => {
 		if (!containerRef.current) {
@@ -295,8 +226,6 @@ const DefaultsTab = forwardRef(({ type = 'gallery' }, ref) => {
 			/>
 		</div>
 	);
-});
-
-DefaultsTab.displayName = 'DefaultsTab';
+};
 
 export default DefaultsTab;

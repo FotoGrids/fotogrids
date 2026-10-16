@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Button } from '../../Button';
+import { registerSaveBar } from './unsaved-changes';
 
 /**
  * SaveBar - a sticky bottom bar showing save state and actions.
  *
- * Presentational only: the parent owns dirty-tracking and the save call.
- * Drives a status dot + message and a primary save button, with an optional
- * discard action and extra action slot.
+ * The parent owns dirty-tracking and the save call. Drives a status dot +
+ * message and a primary save button, with an optional discard action and
+ * extra action slot. While mounted, the bar's unsaved changes are seen by
+ * confirmLeave() and the browser warns before the page is left with them.
  *
  * Moved from shared/settings/ to shared/ - this is a general-purpose UI
  * primitive that can be used in settings pages, tool UIs, or any context
@@ -17,7 +19,7 @@ import { Button } from '../../Button';
  * @param {boolean}         props.dirty             Whether there are unsaved changes.
  * @param {boolean}         [props.saving]          Save in progress (disables the button).
  * @param {string}          [props.status]          'saved' | 'error' | null - transient feedback.
- * @param {() => void}      props.onSave            Save handler.
+ * @param {() => unknown}   props.onSave            Save handler. Resolves false when the save failed.
  * @param {boolean}         [props.disabled]        Blocks saving while the form is invalid; Discard stays available.
  * @param {() => void}      [props.onDiscard]       Discard handler. Hidden if omitted.
  * @param {string}          [props.savedHint]       Sub-text shown when clean, e.g. "just now".
@@ -94,6 +96,61 @@ const SaveBar = ({
 	onSaveRef.current = onSave;
 
 	const watchToken = watch === undefined ? null : JSON.stringify(watch);
+
+	const state = useRef({});
+	state.current = { dirty, saving, disabled, autosave, onDiscard };
+	const idleWaiters = useRef([]);
+
+	useEffect(() => {
+		if (!saving) {
+			idleWaiters.current.splice(0).forEach((resolve) => resolve());
+		}
+	}, [saving]);
+
+	useEffect(
+		() =>
+			registerSaveBar({
+				isDirty: () => !!state.current.dirty,
+				isSaving: () => !!state.current.saving,
+				whenIdle: () =>
+					state.current.saving
+						? new Promise((resolve) =>
+								idleWaiters.current.push(resolve)
+							)
+						: Promise.resolve(),
+				canAutosave: () =>
+					state.current.autosave && !state.current.disabled,
+				save: async () =>
+					!state.current.disabled &&
+					false !== (await onSaveRef.current?.()),
+				discard: () => state.current.onDiscard?.(),
+			}),
+		[]
+	);
+
+	useEffect(() => {
+		if (!dirty && !saving) {
+			return undefined;
+		}
+
+		const handleBeforeUnload = (e) => {
+			const current = state.current;
+			if (
+				current.autosave &&
+				current.dirty &&
+				!current.saving &&
+				!current.disabled
+			) {
+				onSaveRef.current?.();
+			}
+			e.preventDefault();
+			e.returnValue = '';
+		};
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+		return () =>
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+	}, [dirty, saving]);
 
 	useEffect(() => {
 		// `status === 'error'` stops a failed save retrying on a loop. Editing
