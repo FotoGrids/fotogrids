@@ -5,6 +5,8 @@
  * loaded into the modal, so the SEO tab never issues its own request.
  */
 
+import { toPlainText } from '@packages/fg-formatted-text';
+
 export const CHECK_PASS = 'pass';
 export const CHECK_WARN = 'warn';
 export const CHECK_FAIL = 'fail';
@@ -145,6 +147,14 @@ const GENERIC_FILENAME_PATTERNS = [
 
 const text = (value) => String(value ?? '').trim();
 
+/**
+ * Visible text of a title, alt, caption or description, without markup.
+ *
+ * @param {string} value Stored or edited value.
+ * @return {string} Trimmed plain text.
+ */
+const plain = (value) => toPlainText(String(value ?? '')).trim();
+
 const wordCount = (value) => text(value).split(/\s+/).filter(Boolean).length;
 
 const filenameStem = (filename) => text(filename).replace(/\.[^.]+$/, '');
@@ -263,7 +273,7 @@ const check = (id, code, status, extra = {}) => ({
 });
 
 const altCheck = (formData) => {
-	const alt = text(formData.alt);
+	const alt = plain(formData.alt);
 	const target = { tab: 'details', fieldId: 'fotogrids-item-alt' };
 
 	if ('' === alt) {
@@ -277,7 +287,9 @@ const altCheck = (formData) => {
 		});
 	}
 
-	if (normalizeForCompare(alt) === normalizeForCompare(formData.title)) {
+	if (
+		normalizeForCompare(alt) === normalizeForCompare(plain(formData.title))
+	) {
 		return check('alt', 'alt_same_as_title', CHECK_WARN, target);
 	}
 
@@ -311,7 +323,7 @@ const filenameCheck = (formData, itemData) => {
 	}
 
 	const described = meaningfulTokens(
-		[formData.title, formData.alt, formData.caption].join(' ')
+		[formData.title, formData.alt, formData.caption].map(plain).join(' ')
 	);
 
 	if (
@@ -327,7 +339,7 @@ const filenameCheck = (formData, itemData) => {
 };
 
 const titleCheck = (formData, itemData) => {
-	const title = text(formData.title);
+	const title = plain(formData.title);
 	const target = { tab: 'details', fieldId: 'fotogrids-item-title' };
 
 	if ('' === title) {
@@ -351,7 +363,7 @@ const titleCheck = (formData, itemData) => {
 const captionCheck = (formData) => {
 	const target = { tab: 'details', fieldId: 'fotogrids-item-caption' };
 
-	return '' === text(formData.caption)
+	return '' === plain(formData.caption)
 		? check('caption', 'caption_missing', CHECK_WARN, target)
 		: check('caption', 'caption_ok', CHECK_PASS, target);
 };
@@ -359,7 +371,7 @@ const captionCheck = (formData) => {
 const descriptionCheck = (formData) => {
 	const target = { tab: 'details', fieldId: 'fotogrids-item-description' };
 
-	return '' === text(formData.description)
+	return '' === plain(formData.description)
 		? check('description', 'description_missing', CHECK_WARN, target)
 		: check('description', 'description_ok', CHECK_PASS, target);
 };
@@ -478,13 +490,13 @@ export const summarizeSeoChecks = (checks = []) => {
  * @return {{value: string, source: string}} Resolved value and its source.
  */
 export const resolveEmittedAlt = (formData = {}) => {
-	const alt = text(formData.alt);
+	const alt = plain(formData.alt);
 
 	if ('' !== alt) {
 		return { value: alt, source: 'alt' };
 	}
 
-	const title = text(formData.title);
+	const title = plain(formData.title);
 
 	if ('' !== title) {
 		return { value: title, source: 'title' };

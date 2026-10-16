@@ -254,6 +254,48 @@ function fullSrcForViewport(item, mobileMax) {
 }
 
 /**
+ * The shared caption formatter, when its script is on the page.
+ *
+ * @returns {Object|null}
+ */
+function formattedText() {
+	return window.FotoGrids?.modules?.formattedText || null;
+}
+
+/**
+ * Stored caption or description as plain text.
+ *
+ * @param {string} raw
+ * @returns {string}
+ */
+function plainText(raw) {
+	const formatter = formattedText();
+	return formatter ? formatter.toPlainText(raw) : String(raw ?? '');
+}
+
+/**
+ * Stored text as one trimmed line of plain text.
+ *
+ * @param {string} raw
+ * @returns {string}
+ */
+function singleLine(raw) {
+	return plainText(raw)
+		.replace(/\s*\n\s*/g, ' ')
+		.trim();
+}
+
+/**
+ * Whether stored text has anything to show once formatted.
+ *
+ * @param {string} raw
+ * @returns {boolean}
+ */
+function hasText(raw) {
+	return plainText(raw).trim() !== '';
+}
+
+/**
  * Build a slide dict from a single `[data-fg-lightbox-trigger]` element.
  *
  * @param {Element} triggerEl
@@ -2595,7 +2637,7 @@ class FotoGridsLightbox {
 		iframe.setAttribute('allowfullscreen', '');
 		iframe.setAttribute(
 			'title',
-			item.title || item.alt || this.settings.labels.video
+			singleLine(item.title) || item.alt || this.settings.labels.video
 		);
 		return iframe;
 	}
@@ -2681,6 +2723,28 @@ class FotoGridsLightbox {
 	}
 
 	/**
+	 * Formats a stored caption or description into an element.
+	 *
+	 * @param {HTMLElement} el
+	 * @param {string}      raw
+	 * @param {string}      field 'caption' | 'description'.
+	 * @param {Object}      [item]
+	 */
+	_renderFormatted(el, raw, field, item) {
+		const formatter = formattedText();
+		if (!formatter) {
+			el.textContent = plainText(raw);
+			return;
+		}
+		formatter.render(el, raw, {
+			surface: 'lightbox',
+			field,
+			itemId: item?.id || '',
+			galleryEl: this.galleryEl,
+		});
+	}
+
+	/**
 	 * Render the combined title / caption / description text block.
 	 *
 	 * Title (if selected and present) is always first; caption and description
@@ -2700,7 +2764,7 @@ class FotoGridsLightbox {
 		blockEl.dataset.fgLbBlock = 'text';
 
 		const wantsTitle = blocks.includes('title');
-		const titleText = (item.title || '').trim();
+		const titleText = singleLine(item.title);
 		if (wantsTitle && titleText !== '') {
 			const titleEl = document.createElement('p');
 			titleEl.className = 'fg-lb-info-title';
@@ -2715,11 +2779,15 @@ class FotoGridsLightbox {
 		);
 		ordered.forEach((b) => {
 			if (b === 'caption') {
-				const captionText = (item.caption || '').trim();
-				if (captionText !== '') {
+				if (hasText(item.caption)) {
 					const captionEl = document.createElement('p');
 					captionEl.className = 'fg-lb-info-caption';
-					captionEl.textContent = captionText;
+					this._renderFormatted(
+						captionEl,
+						item.caption,
+						'caption',
+						item
+					);
 					blockEl.appendChild(captionEl);
 				}
 			} else if (b === 'description') {
@@ -2810,7 +2878,7 @@ class FotoGridsLightbox {
 			{
 				id: item.id || '',
 				fullUrl: item.fullSrc || '',
-				caption: item.caption || item.alt || '',
+				caption: singleLine(item.caption) || item.alt || '',
 				galleryEl: this.galleryEl,
 				galleryId: this.galleryEl.dataset.fgGalleryId || '',
 			},
@@ -3052,7 +3120,8 @@ class FotoGridsLightbox {
 			// slot. The slot <p> is pre-rendered (hidden) by _renderTextBlock;
 			// fill and reveal it here, or rebuild the text block if absent.
 			if (blockId === 'description') {
-				const desc = (data.description || '').trim();
+				const desc = data.description || '';
+				const hasDescription = hasText(desc);
 				const textBlockEl = infoEl.querySelector(
 					'[data-fg-lb-block="text"]'
 				);
@@ -3061,14 +3130,19 @@ class FotoGridsLightbox {
 						'.fg-lb-info-description'
 					);
 					if (target) {
-						if (desc !== '') {
-							target.textContent = desc;
+						if (hasDescription) {
+							this._renderFormatted(
+								target,
+								desc,
+								'description',
+								this.items[this.index]
+							);
 							target.hidden = false;
 						} else {
 							target.remove();
 						}
 					}
-				} else if (desc !== '') {
+				} else if (hasDescription) {
 					// No text block in the DOM (title + caption were empty);
 					// rebuild it now that description has content.
 					const blockEl = document.createElement('div');
@@ -3076,7 +3150,12 @@ class FotoGridsLightbox {
 					blockEl.dataset.fgLbBlock = 'text';
 					const descEl = document.createElement('p');
 					descEl.className = 'fg-lb-info-description';
-					descEl.textContent = desc;
+					this._renderFormatted(
+						descEl,
+						desc,
+						'description',
+						this.items[this.index]
+					);
 					blockEl.appendChild(descEl);
 					// Insert at the text block's selected position: before the
 					// next non-text block already in the DOM.
