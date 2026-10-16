@@ -19,7 +19,6 @@ class Admin_Init {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_scripts' ) );
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_activation_redirect' ), 1 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
@@ -396,75 +395,6 @@ class Admin_Init {
 
 			wp_localize_script( 'fotogrids-collection-settings', 'fotogridsSettings', $localized_data );
 		}
-	}
-
-	/**
-	 * Admin initialization
-	 */
-	public static function admin_init() {
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_general_settings',
-			array(
-				'type'              => 'array',
-				'default'           => self::get_general_settings_defaults(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_general_settings' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_permission_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_integration_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_share_statistics',
-			array(
-				'type'              => 'boolean',
-				'default'           => false,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_share_statistics' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_autosave',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_allow_google_fonts',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => 'rest_sanitize_boolean',
-			)
-		);
-	}
-
-	/**
-	 * Return default values for general settings.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function get_general_settings_defaults() {
-		return \FotoGrids\Settings\Plugin_Settings_Store::general_defaults();
 	}
 
 	/**

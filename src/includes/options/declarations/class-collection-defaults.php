@@ -34,7 +34,6 @@ final class Collection_Defaults extends Abstract_Option_Declaration {
 	 */
 	public static function options(): array {
 		return array(
-			'fotogrids_album_defaults'   => self::RESET,
 			'fotogrids_gallery_defaults' => self::RESET,
 		);
 	}

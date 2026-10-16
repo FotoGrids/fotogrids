@@ -429,8 +429,8 @@ class Admin_Data {
 	/**
 	 * Save general (responsiveness) settings.
 	 *
-	 * Delegates to the same sanitizer the Settings API uses, so REST and
-	 * options.php persist identically (breakpoint clamping included).
+	 * Values pass through Plugin_Settings_Store::sanitize_general(), which
+	 * keeps the mobile breakpoint below the tablet one.
 	 *
 	 * POST /wp-json/fotogrids/v1/admin/general-settings
 	 *
@@ -1033,9 +1033,6 @@ class Admin_Data {
 		$option_keys = array(
 			'fotogrids_general_settings',
 			'fotogrids_gallery_defaults',
-			'fotogrids_album_defaults',
-			'fotogrids_permission_settings',
-			'fotogrids_integration_settings',
 			'fotogrids_sharing_settings',
 			'fotogrids_view_settings',
 			'fotogrids_watermark_settings',

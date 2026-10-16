@@ -62,8 +62,8 @@ assert_eq "$schema_version" "$( $WP option get fotogrids_db_version )" \
 # the registry is checked against them, so moving an option between them takes
 # an edit here as well.
 
-RESET="fotogrids_album_defaults fotogrids_autosave fotogrids_debug_channels
-	fotogrids_gallery_defaults fotogrids_general_settings
+RESET="fotogrids_autosave fotogrids_debug_channels fotogrids_gallery_defaults
+	fotogrids_general_settings
 	fotogrids_integration_settings fotogrids_media_settings
 	fotogrids_permission_settings fotogrids_preserve_data_on_uninstall
 	fotogrids_seo_settings fotogrids_sharing_settings
