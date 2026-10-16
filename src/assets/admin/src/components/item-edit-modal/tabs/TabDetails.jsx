@@ -1,6 +1,9 @@
 import React from 'react';
+import { __ } from '@wordpress/i18n';
+import { Editor } from '@packages/fg-text-editor';
 import FormField from '../../shared/FormField/FormField.jsx';
 import FormFields from '../../shared/FormField/FormFields.jsx';
+import useTextEditorConfig from '../useTextEditorConfig';
 
 const TabDetails = ({
 	formData,
@@ -8,6 +11,22 @@ const TabDetails = ({
 	strings,
 	disabled = false,
 }) => {
+	const textEditor = useTextEditorConfig();
+	const editorProps = {
+		profile: textEditor.profile,
+		disabledReason: textEditor.disabledReason,
+		reasonLink: textEditor.reasonLink,
+		stripsFormatting: textEditor.stripsFormatting,
+		linkDefaults: textEditor.linkDefaults,
+		disabled,
+	};
+	const formattingHint = textEditor.disabledReason
+		? undefined
+		: __(
+				'Bold, italic and links show in Lightboxes. Thumbnails and album tiles show links as plain text.',
+				'fotogrids'
+			);
+
 	return (
 		<div className="fotogrids-tab-panel fg-is-active">
 			<FormFields>
@@ -48,14 +67,16 @@ const TabDetails = ({
 					htmlFor="fotogrids-item-caption"
 					layout="column"
 				>
-					<textarea
+					<Editor
+						{...editorProps}
 						id="fotogrids-item-caption"
-						rows="3"
+						field="caption"
+						label={strings.caption || 'Caption'}
+						rows={3}
 						value={formData?.caption || ''}
-						onChange={(e) =>
-							handleInputChange('caption', e.target.value)
+						onChange={(value) =>
+							handleInputChange('caption', value)
 						}
-						disabled={disabled}
 					/>
 				</FormField>
 
@@ -63,15 +84,18 @@ const TabDetails = ({
 					label={strings.description || 'Description'}
 					htmlFor="fotogrids-item-description"
 					layout="column"
+					description={formattingHint}
 				>
-					<textarea
+					<Editor
+						{...editorProps}
 						id="fotogrids-item-description"
-						rows="4"
+						field="description"
+						label={strings.description || 'Description'}
+						rows={4}
 						value={formData?.description || ''}
-						onChange={(e) =>
-							handleInputChange('description', e.target.value)
+						onChange={(value) =>
+							handleInputChange('description', value)
 						}
-						disabled={disabled}
 					/>
 				</FormField>
 

@@ -35,6 +35,31 @@ const baseURL = process.env.WP_BASE_URL ?? 'http://127.0.0.1:8899';
 /** Shared by all three; only the write contract differs. */
 const chromium = { ...devices[ 'Desktop Chrome' ] };
 
+/**
+ * The text editor drives contenteditable, where browsers differ most, so its
+ * spec also runs in Firefox and WebKit. Only the editor browsers CI job sets
+ * FG_EDITOR_BROWSERS, so every other run needs Chromium alone.
+ */
+const EDITOR_SPEC = /text-editor\.serial\.spec\.ts/;
+const editorBrowsers = process.env.FG_EDITOR_BROWSERS
+	? [
+			{
+				name: 'editor-firefox',
+				testMatch: EDITOR_SPEC,
+				fullyParallel: false,
+				workers: 1,
+				use: { ...devices[ 'Desktop Firefox' ] },
+			},
+			{
+				name: 'editor-webkit',
+				testMatch: EDITOR_SPEC,
+				fullyParallel: false,
+				workers: 1,
+				use: { ...devices[ 'Desktop Safari' ] },
+			},
+	  ]
+	: [];
+
 export default defineConfig( {
 	testDir: './tests/e2e',
 	globalSetup: './tests/e2e/global-setup.ts',
@@ -90,5 +115,6 @@ export default defineConfig( {
 			workers: 1,
 			use: chromium,
 		},
+		...editorBrowsers,
 	],
 } );
