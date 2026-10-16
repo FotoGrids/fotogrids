@@ -273,6 +273,10 @@
 
 		const timer = window.setTimeout(release, HOLD_TIMEOUT_MS);
 
+		const instanceIdPattern = new RegExp(
+			'^fg-' + galleryId + '-[0-9a-z]{1,34}$'
+		);
+
 		const headers = {
 			'Content-Type': 'application/json',
 			'X-WP-Nonce': collectionEl.dataset.fgRenderNonce || '',
@@ -292,6 +296,9 @@
 					breakpoint,
 					partial: 'items_only',
 					random_seed: seed,
+					instance_id: instanceIdPattern.test(collectionEl.id)
+						? collectionEl.id
+						: '',
 				}),
 			})
 			.then(function (response) {
