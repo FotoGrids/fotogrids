@@ -6,13 +6,13 @@ import { renderElement, act } from '@tests/helpers/render-component';
 
 const strings = new Proxy({}, { get: (_t, p) => String(p) });
 
-const config = (assignedGalleries) => ({
+const config = (assignedGalleries, featuredGalleryId = null) => ({
 	postId: 7,
 	restUrl: '/r/',
 	nonce: 'n',
 	assignedGalleries,
 	allGalleries: [],
-	featuredGalleryId: null,
+	featuredGalleryId,
 	strings,
 });
 
@@ -46,5 +46,25 @@ describe('AlbumGalleries', () => {
 		expect(row).not.toBeNull();
 		expect(row.querySelector('.fg-action-button--remove')).toBeNull();
 		expect(row.querySelector('.fg-action-button--edit')).toBeNull();
+	});
+
+	it('marks the featured gallery when its localized id arrives as a string', async () => {
+		window.fotogridsAlbumGalleries = config(
+			[
+				{
+					ID: 158,
+					post_title: 'Featured',
+					item_count: 3,
+					editable: true,
+				},
+			],
+			'158'
+		);
+		const row = await render();
+		expect(
+			row
+				.querySelector('.fotogrids-featured-button')
+				.getAttribute('aria-pressed')
+		).toBe('true');
 	});
 });
