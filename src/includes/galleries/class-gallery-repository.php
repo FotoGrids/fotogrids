@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Galleries;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -38,7 +39,7 @@ final class Gallery_Repository {
 	public static function get( int $gallery_id ): ?\WP_Post {
 		$gallery = get_post( $gallery_id );
 
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return null;
 		}
 
@@ -322,10 +323,10 @@ final class Gallery_Repository {
 				"SELECT pm.meta_value FROM {$wpdb->postmeta} pm
              INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
              WHERE pm.meta_key = 'fotogrids_gallery_items'
-               AND p.post_type = 'fotogrids_gallery'
+               AND p.post_type = %s
                AND p.post_status IN ({$placeholders})
              ORDER BY p.post_date DESC, p.ID DESC",
-				$post_statuses
+				array_merge( array( Post_Types::GALLERY ), $post_statuses )
 			)
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare

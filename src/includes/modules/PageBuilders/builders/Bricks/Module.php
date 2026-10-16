@@ -13,6 +13,7 @@ namespace FotoGrids\Modules\PageBuilders\Builders\Bricks;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Builders\Bricks\Elements\Element_Album;
 use FotoGrids\Modules\PageBuilders\Builders\Bricks\Elements\Element_Gallery;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -167,8 +168,8 @@ final class Module {
 				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
 				'settingKey'       => Elements\Element_Base::SETTING_ID,
-				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
-				'albumCreateUrl'   => admin_url( 'post-new.php?post_type=fotogrids_album' ),
+				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=' . Post_Types::GALLERY ),
+				'albumCreateUrl'   => admin_url( 'post-new.php?post_type=' . Post_Types::ALBUM ),
 				'galleryEditBase'  => admin_url( 'post.php?action=edit&post=' ),
 				'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
 			)

@@ -3,6 +3,7 @@ namespace FotoGrids\Modules\Templates;
 
 use FotoGrids\Hooks\Filters_Templates;
 use FotoGrids\Modules\Abstract_Module;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -99,7 +100,7 @@ class Module extends Abstract_Module {
 	public function register_metabox(): void {
 		global $post;
 
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( Post_Types::COLLECTION_TYPES as $post_type ) {
 			// Templates are settings (applying overrides every setting). Same
 			// visibility rule as the Collection Settings metabox.
 			$settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $post_type );
@@ -132,7 +133,7 @@ class Module extends Abstract_Module {
 	 * @return void
 	 */
 	public function render_metabox( $post ): void {
-		$post_type = 'fotogrids_gallery' === $post->post_type ? 'gallery' : 'album';
+		$post_type = Post_Types::GALLERY === $post->post_type ? 'gallery' : 'album';
 
 		/**
 		 * Save-as-Template button component id. Pro returns its component id
@@ -230,7 +231,7 @@ class Module extends Abstract_Module {
 		}
 
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( ! $screen || ! in_array( $screen->post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! $screen || ! in_array( $screen->post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 

@@ -12,6 +12,7 @@ declare( strict_types=1 );
 use FotoGrids\Gallery_Album_Relations;
 use PHPUnit\Framework\TestCase;
 
+require_once dirname( __DIR__, 2 ) . '/src/includes/class-post-types.php';
 require_once dirname( __DIR__, 2 ) . '/src/includes/class-gallery-album-relations.php';
 
 /**

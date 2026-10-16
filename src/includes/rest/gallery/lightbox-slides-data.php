@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Gallery;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -44,7 +46,7 @@ class Lightbox_Slides_Data {
 		}
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),

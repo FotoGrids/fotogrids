@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import LockedReason from './LockedReason';
 import { DASHBOARD_ACCESS } from './access';
 import { userCan } from '../../utils/capabilities';
+import { GALLERY_POST_TYPE } from '../../utils/post-types';
 
 const CtaLink = ({ href, className, children }) => {
 	if (userCan(DASHBOARD_ACCESS.gallery.cap)) {
@@ -45,7 +46,7 @@ const MainCTA = ({ galleriesCount, itemsCount }) => {
 						)}
 					</p>
 					<CtaLink
-						href="post-new.php?post_type=fotogrids_gallery"
+						href={`post-new.php?post_type=${GALLERY_POST_TYPE}`}
 						className="button button-primary"
 					>
 						{__('Get Started', 'fotogrids')}
@@ -73,14 +74,14 @@ const MainCTA = ({ galleriesCount, itemsCount }) => {
 				</p>
 				<div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
 					<CtaLink
-						href="post-new.php?post_type=fotogrids_gallery"
+						href={`post-new.php?post_type=${GALLERY_POST_TYPE}`}
 						className="button button-primary"
 					>
 						{__('New Gallery', 'fotogrids')}
 					</CtaLink>
 					{itemsCount === 0 && (
 						<CtaLink
-							href="edit.php?post_type=fotogrids_gallery"
+							href={`edit.php?post_type=${GALLERY_POST_TYPE}`}
 							className="button button-secondary"
 						>
 							{__('Add Photos', 'fotogrids')}

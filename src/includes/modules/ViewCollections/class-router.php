@@ -9,6 +9,7 @@
 namespace FotoGrids\Modules\ViewCollections;
 
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -32,7 +33,7 @@ class Router {
 	 *
 	 * @var string[]
 	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	private const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * The collection resolved for the current view page request.
@@ -98,8 +99,8 @@ class Router {
 	 */
 	private static function rewrite_signature(): string {
 		return self::REWRITE_VERSION . ':' . md5(
-			self::base_slug( 'fotogrids_gallery' )
-			. '|' . self::base_slug( 'fotogrids_album' )
+			self::base_slug( Post_Types::GALLERY )
+			. '|' . self::base_slug( Post_Types::ALBUM )
 			. '|' . ( Shared_Base::is_active() ? 'shared' : 'split' )
 		);
 	}
@@ -159,7 +160,7 @@ class Router {
 
 		// The admin bar "New" dropdown uses name_admin_bar; brand it so it is
 		// distinguishable from other gallery plugins' entries.
-		$args['labels']['name_admin_bar'] = 'fotogrids_album' === $post_type
+		$args['labels']['name_admin_bar'] = Post_Types::ALBUM === $post_type
 			? __( 'FotoGrids Album', 'fotogrids' )
 			: __( 'FotoGrids Gallery', 'fotogrids' );
 
@@ -185,7 +186,7 @@ class Router {
 	public static function base_slug( string $post_type ): string {
 		$settings = \FotoGrids\Settings\View_Settings_Store::get();
 
-		$segment = 'fotogrids_album' === $post_type
+		$segment = Post_Types::ALBUM === $post_type
 			? $settings['base_album_segment']
 			: $settings['base_gallery_segment'];
 

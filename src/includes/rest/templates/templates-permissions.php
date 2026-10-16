@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Templates;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -45,8 +47,8 @@ class Templates_Permissions {
 		}
 
 		$expected_types     = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
+			'gallery' => Post_Types::GALLERY,
+			'album'   => Post_Types::ALBUM,
 		);
 		$expected_post_type = isset( $expected_types[ $post_type ] ) ? $expected_types[ $post_type ] : $post_type;
 
@@ -67,8 +69,8 @@ class Templates_Permissions {
 		$post_type = $request->get_param( 'post_type' );
 
 		$expected_types = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
+			'gallery' => Post_Types::GALLERY,
+			'album'   => Post_Types::ALBUM,
 		);
 
 		if ( ! isset( $expected_types[ $post_type ] ) ) {

@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -39,7 +41,7 @@ class Admin_Permissions {
 
 		$gallery = get_post( $gallery_id );
 
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return false;
 		}
 
@@ -65,7 +67,7 @@ class Admin_Permissions {
 			$album_ids[] = $request->get_param( 'album_id' );
 		}
 
-		return self::can_edit_all( $album_ids, 'fotogrids_album' );
+		return self::can_edit_all( $album_ids, Post_Types::ALBUM );
 	}
 
 	/**
@@ -87,7 +89,7 @@ class Admin_Permissions {
 			$gallery_ids[] = $request->get_param( 'gallery_id' );
 		}
 
-		return self::can_edit_all( $gallery_ids, 'fotogrids_gallery' );
+		return self::can_edit_all( $gallery_ids, Post_Types::GALLERY );
 	}
 
 	/**
@@ -128,7 +130,7 @@ class Admin_Permissions {
 
 		$album = get_post( $album_id );
 
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return false;
 		}
 

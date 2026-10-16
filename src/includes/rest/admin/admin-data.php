@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -894,9 +896,9 @@ class Admin_Data {
 	public static function get_overview_stats( $request ) {
 		global $wpdb;
 
-		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
+		$gallery_counts  = wp_count_posts( Post_Types::GALLERY );
 		$galleries_count = (int) $gallery_counts->publish;
-		$album_counts    = wp_count_posts( 'fotogrids_album' );
+		$album_counts    = wp_count_posts( Post_Types::ALBUM );
 		$albums_count    = $album_counts->publish;
 
 		$items_count = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish' ) );
@@ -1431,7 +1433,7 @@ class Admin_Data {
 			$args,
 			array(
 				'limit'       => 10,
-				'post_type'   => array( 'fotogrids_gallery', 'fotogrids_album' ),
+				'post_type'   => Post_Types::COLLECTION_TYPES,
 				'post_status' => array( 'publish', 'draft' ),
 			)
 		);
@@ -1477,7 +1479,7 @@ class Admin_Data {
 					continue;
 				}
 
-				$is_album = 'fotogrids_album' === $post->post_type;
+				$is_album = Post_Types::ALBUM === $post->post_type;
 
 				$items[] = array(
 					'id'                 => $post->ID,

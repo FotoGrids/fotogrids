@@ -3,6 +3,7 @@ namespace FotoGrids\Tools\Migration\Sources;
 
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -45,7 +46,7 @@ class Gallery_Writer {
 
 		$gallery_id = wp_insert_post(
 			array(
-				'post_type'   => 'fotogrids_gallery',
+				'post_type'   => Post_Types::GALLERY,
 				'post_title'  => $title,
 				'post_status' => 'publish',
 			),
@@ -79,7 +80,7 @@ class Gallery_Writer {
 	public static function find_by_origin( string $origin ): int {
 		$ids = get_posts(
 			array(
-				'post_type'      => 'fotogrids_gallery',
+				'post_type'      => Post_Types::GALLERY,
 				'post_status'    => 'any',
 				'fields'         => 'ids',
 				'posts_per_page' => 1,

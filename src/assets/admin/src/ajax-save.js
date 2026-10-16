@@ -4,6 +4,8 @@
  * Handles asynchronous saving of gallery data to prevent page reloads
  */
 
+import { ALBUM_POST_TYPE } from './utils/post-types';
+
 (function () {
 	'use strict';
 
@@ -29,10 +31,10 @@
 
 	function initAjaxSave() {
 		const isGallery = document.body.classList.contains(
-			'post-type-fotogrids_gallery'
+			'fotogrids-collection-screen--gallery'
 		);
 		const isAlbum = document.body.classList.contains(
-			'post-type-fotogrids_album'
+			'fotogrids-collection-screen--album'
 		);
 		if ((!isGallery && !isAlbum) || !document.getElementById('post')) {
 			return;
@@ -427,7 +429,7 @@
 				document.title.split(' ‹ ').slice(1).join(' ‹ ');
 			const titleElement = document.querySelector('.wrap h1');
 			if (titleElement) {
-				const isAlbum = data.post_type === 'fotogrids_album';
+				const isAlbum = data.post_type === ALBUM_POST_TYPE;
 				const editLabel = isAlbum
 					? strings.editAlbum
 					: strings.editGallery;
