@@ -27,7 +27,7 @@ class Collection_Title {
 	 *
 	 * @var string[]
 	 */
-	const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * Register the title filters.
@@ -67,7 +67,7 @@ class Collection_Title {
 			return '';
 		}
 
-		if ( 'fotogrids_album' === $post->post_type ) {
+		if ( Post_Types::ALBUM === $post->post_type ) {
 			/* translators: %d: album ID. */
 			return sprintf( __( 'Album #%d', 'fotogrids' ), (int) $post->ID );
 		}

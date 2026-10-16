@@ -189,11 +189,12 @@ class Gallery_Album_Relations {
              FROM {$wpdb->posts} p
              INNER JOIN %i ga ON p.ID = ga.gallery_id
              WHERE ga.album_id = %d
-             AND p.post_type = 'fotogrids_gallery'
+             AND p.post_type = %s
              AND p.post_status IN ('publish', 'private', 'draft')
              $order_clause",
 			$table_name,
-			$album_id
+			$album_id,
+			Post_Types::GALLERY
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -299,11 +300,12 @@ class Gallery_Album_Relations {
              FROM {$wpdb->posts} p
              INNER JOIN %i ga ON p.ID = ga.album_id
              WHERE ga.gallery_id = %d
-             AND p.post_type = 'fotogrids_album'
+             AND p.post_type = %s
              AND p.post_status IN ('publish', 'private', 'draft')
              $order_clause",
 			$table_name,
-			$gallery_id
+			$gallery_id,
+			Post_Types::ALBUM
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -378,7 +380,7 @@ class Gallery_Album_Relations {
 	 */
 	public static function get_all_albums( $args = array() ) {
 		$defaults = array(
-			'post_type'      => 'fotogrids_album',
+			'post_type'      => Post_Types::ALBUM,
 			'post_status'    => array( 'publish', 'draft', 'private' ),
 			'posts_per_page' => -1,
 			'orderby'        => 'title',
@@ -413,7 +415,7 @@ class Gallery_Album_Relations {
 	 */
 	public static function get_all_galleries( $args = array() ) {
 		$defaults = array(
-			'post_type'      => 'fotogrids_gallery',
+			'post_type'      => Post_Types::GALLERY,
 			'post_status'    => array( 'publish', 'draft', 'private' ),
 			'posts_per_page' => -1,
 			'orderby'        => 'title',
@@ -501,8 +503,8 @@ class Gallery_Album_Relations {
 		$album   = get_post( $album_id );
 
 		return $gallery && $album &&
-				'fotogrids_gallery' === $gallery->post_type &&
-				'fotogrids_album' === $album->post_type;
+				Post_Types::GALLERY === $gallery->post_type &&
+				Post_Types::ALBUM === $album->post_type;
 	}
 
 	/**
@@ -609,7 +611,7 @@ class Gallery_Album_Relations {
 		$post_id    = (int) $post->ID;
 		$table_name = self::get_table_name();
 
-		if ( 'fotogrids_gallery' === $post->post_type ) {
+		if ( Post_Types::GALLERY === $post->post_type ) {
 			$album_ids = array_map(
 				'intval',
 				$wpdb->get_col( $wpdb->prepare( 'SELECT album_id FROM %i WHERE gallery_id = %d', $table_name, $post_id ) )
@@ -619,7 +621,7 @@ class Gallery_Album_Relations {
 				do_action( Actions_Album::GALLERY_REMOVED, $post_id, $album_id );
 			}
 			do_action( Actions_Gallery::DELETED, $post_id );
-		} elseif ( 'fotogrids_album' === $post->post_type ) {
+		} elseif ( Post_Types::ALBUM === $post->post_type ) {
 			$gallery_ids = self::get_gallery_ids_for_album( $post_id );
 			$wpdb->delete( $table_name, array( 'album_id' => $post_id ), array( '%d' ) );
 			foreach ( $gallery_ids as $gallery_id ) {

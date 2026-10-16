@@ -6,6 +6,7 @@ use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Post_Types;
 use FotoGrids\REST\Items\Embed_Data;
 use FotoGrids\Settings\Plugin_Settings_Store;
 
@@ -195,7 +196,7 @@ class Import_Export_Data {
 		if ( in_array( 'galleries', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_gallery',
+					'post_type'      => Post_Types::GALLERY,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -221,7 +222,7 @@ class Import_Export_Data {
 		if ( in_array( 'albums', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_album',
+					'post_type'      => Post_Types::ALBUM,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -597,7 +598,7 @@ class Import_Export_Data {
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
 				[ $imp, $skip, $map, $written ] = self::import_collections(
 					$data['galleries'],
-					'fotogrids_gallery',
+					Post_Types::GALLERY,
 					$options['galleries']
 				);
 				$imported['galleries']          = $imp;
@@ -610,7 +611,7 @@ class Import_Export_Data {
 			if ( in_array( 'albums', $include, true ) && ! empty( $data['albums'] ) ) {
 				[ $imp, $skip, $map ] = self::import_collections(
 					$data['albums'],
-					'fotogrids_album',
+					Post_Types::ALBUM,
 					$options['albums']
 				);
 				$imported['albums']   = $imp;
@@ -874,7 +875,7 @@ class Import_Export_Data {
 				update_post_meta( $new_id, $key, $value );
 			}
 
-			if ( 'fotogrids_gallery' === $post_type ) {
+			if ( Post_Types::GALLERY === $post_type ) {
 				do_action( Actions_Gallery::IMPORTED, $new_id, $old_id );
 			}
 

@@ -3,6 +3,7 @@ namespace FotoGrids\REST\Stats;
 
 use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\Sharing_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -102,8 +103,8 @@ class Stats_Data {
 	 */
 	private static function object_exists( $object_type, $object_id ) {
 		$post_types = array(
-			'gallery' => array( 'fotogrids_gallery' ),
-			'album'   => array( 'fotogrids_album' ),
+			'gallery' => array( Post_Types::GALLERY ),
+			'album'   => array( Post_Types::ALBUM ),
 			'item'    => array( 'attachment', Embed_Store::POST_TYPE ),
 		);
 
