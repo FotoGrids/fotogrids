@@ -55,11 +55,16 @@ function unlockRoute( galleryId: number ): string {
 	return `/?rest_route=${ encodeURIComponent( `/fotogrids/v1/gallery/${ galleryId }/unlock` ) }`;
 }
 
-/** Fill and submit the lock form inside `scope`, then wait for the items. */
-async function unlockThroughForm( page: Page, gallery: GalleryRender, count = 6 ): Promise< void > {
+/** Fill and submit the gallery's lock form. */
+async function submitLockForm( page: Page, gallery: GalleryRender ): Promise< void > {
 	const form = page.locator( `.fg-lock-form[data-gallery-id="${ gallery.galleryId }"]` );
 	await form.locator( '.fg-lock-input' ).fill( PASSWORD );
 	await form.locator( '.fg-lock-submit' ).click();
+}
+
+/** Fill and submit the lock form, then wait for the items. */
+async function unlockThroughForm( page: Page, gallery: GalleryRender, count = 6 ): Promise< void > {
+	await submitLockForm( page, gallery );
 	await expect( gallery.items() ).toHaveCount( count, { timeout: 15000 } );
 }
 
@@ -160,9 +165,11 @@ test.describe( 'with remember off', () => {
 		const seen = watchRest( page );
 
 		await page.goto( url );
-		await unlockThroughForm( page, gallery );
+		await submitLockForm( page, gallery );
+		await expect( gallery.items().first() ).toBeVisible( { timeout: 15000 } );
 
-		await page.locator( '[data-fg-pagination-sentinel="true"]' ).scrollIntoViewIfNeeded();
+		// Endless scroll is bound when the gallery arrives, so a sentinel already in view loads page 2 at once.
+		await page.evaluate( () => window.scrollTo( 0, document.body.scrollHeight ) );
 		await expect( gallery.items() ).toHaveCount( 12 );
 		await expectAllAuthorised( seen );
 	} );
@@ -433,9 +440,7 @@ test.describe( 'a Load More click as soon as the gallery appears', () => {
 
 		await page.goto( url );
 		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
-		const form = page.locator( `.fg-lock-form[data-gallery-id="${ id }"]` );
-		await form.locator( '.fg-lock-input' ).fill( PASSWORD );
-		await form.locator( '.fg-lock-submit' ).click();
+		await submitLockForm( page, gallery );
 		await loadMoreAtOnce( gallery );
 		await expect( gallery.items() ).toHaveCount( 12 );
 	} );
