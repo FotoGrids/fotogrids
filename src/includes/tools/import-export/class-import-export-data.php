@@ -7,6 +7,7 @@ use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\REST\Items\Embed_Data;
+use FotoGrids\Settings\Plugin_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -1297,19 +1298,30 @@ class Import_Export_Data {
 		}
 	}
 
-	/** Import plugin settings. */
+	/**
+	 * Import plugin settings through the sanitizers their settings screens use.
+	 * The usage-data sharing choice is never imported.
+	 */
 	private static function import_settings( array $settings ): void {
-		$map = array(
-			'media'                      => 'fotogrids_media_settings',
-			'gallery_defaults'           => 'fotogrids_gallery_defaults',
+		if ( isset( $settings['media'] ) && is_array( $settings['media'] ) ) {
+			\FotoGrids\Image_Size_Manager::save_plugin_size_settings( $settings['media'] );
+		}
+
+		if ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
+			update_option(
+				'fotogrids_gallery_defaults',
+				Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'] )
+			);
+		}
+
+		$flags = array(
 			'autosave'                   => 'fotogrids_autosave',
-			'share_statistics'           => 'fotogrids_share_statistics',
 			'preserve_data_on_uninstall' => 'fotogrids_preserve_data_on_uninstall',
 		);
 
-		foreach ( $map as $export_key => $option_key ) {
+		foreach ( $flags as $export_key => $option_key ) {
 			if ( array_key_exists( $export_key, $settings ) ) {
-				update_option( $option_key, $settings[ $export_key ] );
+				Plugin_Settings_Store::save_bool( $option_key, Plugin_Settings_Store::truthy( $settings[ $export_key ] ) );
 			}
 		}
 	}
