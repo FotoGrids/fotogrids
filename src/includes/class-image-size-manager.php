@@ -92,7 +92,7 @@ final class Image_Size_Manager {
 	 * @return void
 	 */
 	public static function on_before_delete_post( int $post_id, \WP_Post $post ): void {
-		if ( 'fotogrids_gallery' !== $post->post_type && 'fotogrids_album' !== $post->post_type ) {
+		if ( Post_Types::GALLERY !== $post->post_type && Post_Types::ALBUM !== $post->post_type ) {
 			return;
 		}
 
@@ -443,13 +443,13 @@ final class Image_Size_Manager {
 	 */
 	public static function sync_collection_sizes( int $collection_id ): void {
 		$post_type = get_post_type( $collection_id );
-		if ( 'fotogrids_gallery' !== $post_type && 'fotogrids_album' !== $post_type ) {
+		if ( Post_Types::GALLERY !== $post_type && Post_Types::ALBUM !== $post_type ) {
 			return;
 		}
 
 		$sizes = self::custom_sizes_for(
 			Galleries\Gallery_Repository::get_settings( $collection_id ),
-			'fotogrids_gallery' === $post_type
+			Post_Types::GALLERY === $post_type
 		);
 
 		$original = get_option( self::OPT_CUSTOM_SIZES, array() );
@@ -687,7 +687,7 @@ final class Image_Size_Manager {
 		$settings = array(
 			'thumbnail_width'     => max( 1, (int) ( $raw['thumbnail_width'] ?? self::DEFAULT_THUMBNAIL_WIDTH ) ),
 			'thumbnail_height'    => max( 0, (int) ( $raw['thumbnail_height'] ?? self::DEFAULT_THUMBNAIL_HEIGHT ) ),
-			'thumbnail_crop'      => (bool) ( $raw['thumbnail_crop'] ?? self::DEFAULT_THUMBNAIL_CROP ),
+			'thumbnail_crop'      => rest_sanitize_boolean( $raw['thumbnail_crop'] ?? self::DEFAULT_THUMBNAIL_CROP ),
 			'thumbnail_alignment' => self::sanitize_alignment( (string) ( $raw['thumbnail_alignment'] ?? self::DEFAULT_THUMBNAIL_ALIGNMENT ) ),
 			'full_width'          => max( 1, (int) ( $raw['full_width'] ?? self::DEFAULT_FULL_WIDTH ) ),
 			'full_height'         => max( 0, (int) ( $raw['full_height'] ?? self::DEFAULT_FULL_HEIGHT ) ),

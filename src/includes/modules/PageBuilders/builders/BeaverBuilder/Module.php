@@ -13,6 +13,7 @@ namespace FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Album_Module;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Gallery_Module;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -179,12 +180,12 @@ final class Module {
 			self::EDITOR_HANDLE,
 			'fotogridsPbBeaverBuilder',
 			array(
-				'canCreateGallery' => self::can_create( 'fotogrids_gallery' ),
-				'canCreateAlbum'   => self::can_create( 'fotogrids_album' ),
+				'canCreateGallery' => self::can_create( Post_Types::GALLERY ),
+				'canCreateAlbum'   => self::can_create( Post_Types::ALBUM ),
 				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 				'restNonce'        => wp_create_nonce( 'wp_rest' ),
-				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
-				'albumCreateUrl'   => admin_url( 'post-new.php?post_type=fotogrids_album' ),
+				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=' . Post_Types::GALLERY ),
+				'albumCreateUrl'   => admin_url( 'post-new.php?post_type=' . Post_Types::ALBUM ),
 				'galleryEditBase'  => admin_url( 'post.php?action=edit&post=' ),
 				'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
 			)

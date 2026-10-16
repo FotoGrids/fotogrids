@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Item_View;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -57,14 +58,13 @@ final class Album_Item_Loader {
 			}
 
 			$gallery_post = get_post( $gallery_id );
-			if ( ! $gallery_post || 'fotogrids_gallery' !== $gallery_post->post_type ) {
+			if ( ! $gallery_post || Post_Types::GALLERY !== $gallery_post->post_type ) {
 				continue;
 			}
 
-			$thumb = self::resolve_thumbnail( $gallery_id, $thumb_size );
-			if ( '' === $thumb['url'] ) {
-				// A gallery with no featured image and no items at all gets
-				// skipped - there is literally nothing to show for it.
+			$thumb      = self::resolve_thumbnail( $gallery_id, $thumb_size );
+			$item_count = self::count_items( $gallery_id );
+			if ( '' === $thumb['url'] && 0 === $item_count ) {
 				continue;
 			}
 
@@ -81,7 +81,7 @@ final class Album_Item_Loader {
 				$thumb['width'],
 				$thumb['height'],
 				array(
-					'item_count' => self::count_items( $gallery_id ),
+					'item_count' => $item_count,
 				),
 				array(),
 				array(),

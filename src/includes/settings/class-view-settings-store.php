@@ -9,6 +9,7 @@
 namespace FotoGrids\Settings;
 
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -276,7 +277,7 @@ final class View_Settings_Store {
 		}
 
 		foreach ( get_post_types( array(), 'objects' ) as $post_type ) {
-			if ( in_array( $post_type->name, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+			if ( in_array( $post_type->name, Post_Types::COLLECTION_TYPES, true ) ) {
 				continue;
 			}
 

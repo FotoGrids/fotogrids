@@ -6,6 +6,7 @@ namespace FotoGrids\REST\Admin;
 use FotoGrids\Catalog\Catalog;
 use FotoGrids\Catalog\Catalog_Assembler;
 use FotoGrids\Catalog\Catalog_I18n;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Internal\Hover_Effect_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -37,11 +38,7 @@ final class Catalog_Entries_Endpoint {
 	 */
 	public static function get_entries( \WP_REST_Request $request ): \WP_REST_Response {
 		$post_type = sanitize_text_field( (string) ( $request->get_param( 'post_type' ) ?? 'gallery' ) );
-		if ( 'fotogrids_gallery' === $post_type ) {
-			$post_type = 'gallery';
-		} elseif ( 'fotogrids_album' === $post_type ) {
-			$post_type = 'album';
-		}
+		$post_type = Post_Types::kind_of( $post_type ) ?? $post_type;
 
 		$raw_files = Catalog::raw_files();
 

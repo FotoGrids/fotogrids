@@ -2,6 +2,7 @@
 namespace FotoGrids\REST\Album;
 
 use FotoGrids\Albums\Album_Repository;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Render_Controller;
 
@@ -91,7 +92,7 @@ class Album_Permissions {
 	 */
 	public static function authorize_album_view( int $album_id ) {
 		$album = $album_id > 0 ? get_post( $album_id ) : null;
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return new \WP_Error(
 				'album_not_found',
 				__( 'Album not found', 'fotogrids' ),

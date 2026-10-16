@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Module_Assets;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -82,6 +85,18 @@ final class Render_Result {
 			$inline_css,
 			$inline_js,
 			$json_ld,
+		);
+	}
+
+	/**
+	 * Returns the stylesheet declaration for visible error markup.
+	 *
+	 * @since 1.3.0
+	 * @return Module_Assets
+	 */
+	public static function error_assets(): Module_Assets {
+		return new Module_Assets(
+			array( 'fotogrids-errors' => new Asset_Decl( '../assets/fotogrids-errors.css' ) )
 		);
 	}
 

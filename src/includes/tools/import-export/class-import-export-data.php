@@ -6,7 +6,9 @@ use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Post_Types;
 use FotoGrids\REST\Items\Embed_Data;
+use FotoGrids\Settings\Plugin_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -194,7 +196,7 @@ class Import_Export_Data {
 		if ( in_array( 'galleries', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_gallery',
+					'post_type'      => Post_Types::GALLERY,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -220,7 +222,7 @@ class Import_Export_Data {
 		if ( in_array( 'albums', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_album',
+					'post_type'      => Post_Types::ALBUM,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -596,7 +598,7 @@ class Import_Export_Data {
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
 				[ $imp, $skip, $map, $written ] = self::import_collections(
 					$data['galleries'],
-					'fotogrids_gallery',
+					Post_Types::GALLERY,
 					$options['galleries']
 				);
 				$imported['galleries']          = $imp;
@@ -609,7 +611,7 @@ class Import_Export_Data {
 			if ( in_array( 'albums', $include, true ) && ! empty( $data['albums'] ) ) {
 				[ $imp, $skip, $map ] = self::import_collections(
 					$data['albums'],
-					'fotogrids_album',
+					Post_Types::ALBUM,
 					$options['albums']
 				);
 				$imported['albums']   = $imp;
@@ -873,7 +875,7 @@ class Import_Export_Data {
 				update_post_meta( $new_id, $key, $value );
 			}
 
-			if ( 'fotogrids_gallery' === $post_type ) {
+			if ( Post_Types::GALLERY === $post_type ) {
 				do_action( Actions_Gallery::IMPORTED, $new_id, $old_id );
 			}
 
@@ -1297,19 +1299,30 @@ class Import_Export_Data {
 		}
 	}
 
-	/** Import plugin settings. */
+	/**
+	 * Import plugin settings through the sanitizers their settings screens use.
+	 * The usage-data sharing choice is never imported.
+	 */
 	private static function import_settings( array $settings ): void {
-		$map = array(
-			'media'                      => 'fotogrids_media_settings',
-			'gallery_defaults'           => 'fotogrids_gallery_defaults',
+		if ( isset( $settings['media'] ) && is_array( $settings['media'] ) ) {
+			\FotoGrids\Image_Size_Manager::save_plugin_size_settings( $settings['media'] );
+		}
+
+		if ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
+			update_option(
+				'fotogrids_gallery_defaults',
+				Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'] )
+			);
+		}
+
+		$flags = array(
 			'autosave'                   => 'fotogrids_autosave',
-			'share_statistics'           => 'fotogrids_share_statistics',
 			'preserve_data_on_uninstall' => 'fotogrids_preserve_data_on_uninstall',
 		);
 
-		foreach ( $map as $export_key => $option_key ) {
+		foreach ( $flags as $export_key => $option_key ) {
 			if ( array_key_exists( $export_key, $settings ) ) {
-				update_option( $option_key, $settings[ $export_key ] );
+				Plugin_Settings_Store::save_bool( $option_key, Plugin_Settings_Store::truthy( $settings[ $export_key ] ) );
 			}
 		}
 	}

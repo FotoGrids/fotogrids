@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Templates;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -314,8 +316,8 @@ class Templates_Data {
 
 		// Request may send 'gallery'/'album'; WordPress uses 'fotogrids_gallery'/'fotogrids_album'
 		$post_type_map      = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
+			'gallery' => Post_Types::GALLERY,
+			'album'   => Post_Types::ALBUM,
 		);
 		$expected_post_type = isset( $post_type_map[ $post_type ] ) ? $post_type_map[ $post_type ] : $post_type;
 		if ( $post->post_type !== $expected_post_type ) {
@@ -368,8 +370,8 @@ class Templates_Data {
 		$post_type   = $request->get_param( 'post_type' );
 
 		$post_type_map = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
+			'gallery' => Post_Types::GALLERY,
+			'album'   => Post_Types::ALBUM,
 		);
 
 		if ( ! $template_id || ! isset( $post_type_map[ $post_type ] ) ) {
@@ -411,7 +413,7 @@ class Templates_Data {
 			$title = (string) $template['name'];
 		}
 		if ( '' === $title ) {
-			$title = 'fotogrids_album' === $target_post_type
+			$title = Post_Types::ALBUM === $target_post_type
 				? __( 'New album', 'fotogrids' )
 				: __( 'New gallery', 'fotogrids' );
 		}

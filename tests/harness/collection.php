@@ -90,6 +90,17 @@ function fg_col_settings( int $gallery_id, array $settings ): void {
 }
 
 /**
+ * A slug no other scoped collection has, so parallel workers creating the same
+ * title never share a view page URL.
+ *
+ * @param string $title Post title.
+ * @return string
+ */
+function fg_col_slug( string $title ): string {
+	return sanitize_title( $title ) . '-' . strtolower( wp_generate_password( 8, false ) );
+}
+
+/**
  * Resolve an author login to its user id; 0 leaves the post unowned.
  *
  * @param string $login User login, or '' for none.
@@ -156,6 +167,7 @@ if ( 'render' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_gallery',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped gallery' ),
+			'post_name'   => fg_col_slug( fg_col_arg( $args, 'title', 'Scoped gallery' ) ),
 			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
 			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
@@ -206,6 +218,7 @@ if ( 'album' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_album',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped album' ),
+			'post_name'   => fg_col_slug( fg_col_arg( $args, 'title', 'Scoped album' ) ),
 			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
 			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
@@ -297,7 +310,7 @@ if ( 'adopt' === $op ) {
 if ( 'purge' === $op ) {
 	$owned = get_posts(
 		array(
-			'post_type'        => array( 'post', 'fotogrids_gallery', 'fotogrids_album' ),
+			'post_type'        => array( 'post', 'page', 'fotogrids_gallery', 'fotogrids_album' ),
 			'post_status'      => 'any',
 			'posts_per_page'   => -1,
 			'fields'           => 'ids',

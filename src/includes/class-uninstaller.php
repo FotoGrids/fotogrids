@@ -249,8 +249,8 @@ class Uninstaller {
 			$wpdb->prepare(
 				"SELECT ID FROM {$wpdb->posts}
                  WHERE post_type IN ( %s, %s, %s )",
-				'fotogrids_gallery',
-				'fotogrids_album',
+				Post_Types::GALLERY,
+				Post_Types::ALBUM,
 				'fotogrids_embed'
 			)
 		);

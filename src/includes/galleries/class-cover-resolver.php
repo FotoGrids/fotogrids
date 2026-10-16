@@ -13,6 +13,7 @@ namespace FotoGrids\Galleries;
 use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Embed_Store;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -46,10 +47,10 @@ final class Cover_Resolver {
 		}
 
 		$post_type = get_post_type( $post_id );
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( Post_Types::GALLERY === $post_type ) {
 			return self::for_gallery( $post_id );
 		}
-		if ( 'fotogrids_album' === $post_type ) {
+		if ( Post_Types::ALBUM === $post_type ) {
 			return self::for_album( $post_id );
 		}
 
@@ -348,10 +349,10 @@ final class Cover_Resolver {
 		}
 
 		$post_type = get_post_type( $post_id );
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( Post_Types::GALLERY === $post_type ) {
 			return self::descriptor_for_gallery( $post_id, $size );
 		}
-		if ( 'fotogrids_album' === $post_type ) {
+		if ( Post_Types::ALBUM === $post_type ) {
 			return self::descriptor_for_album( $post_id, $size );
 		}
 

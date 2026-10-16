@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Album;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -26,7 +28,7 @@ class Album_Data {
 		$album_id = (int) $request['id'];
 
 		$album = get_post( $album_id );
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return new \WP_Error(
 				'fotogrids_album_not_found',
 				__( 'Album not found.', 'fotogrids' ),
@@ -50,7 +52,7 @@ class Album_Data {
 
 		$gallery_id = (int) $gallery_param;
 		$gallery    = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'fotogrids_invalid_gallery',
 				__( 'Featured gallery must be a gallery.', 'fotogrids' ),
@@ -152,7 +154,7 @@ class Album_Data {
 		$submitted = (string) ( $request->get_param( 'password' ) ?? '' );
 
 		$album = get_post( $album_id );
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return new \WP_Error(
 				'album_not_found',
 				__( 'Album not found', 'fotogrids' ),
@@ -235,7 +237,7 @@ class Album_Data {
 	 */
 	public static function get_albums_list( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		$args = array(
-			'post_type'      => 'fotogrids_album',
+			'post_type'      => Post_Types::ALBUM,
 			'post_status'    => array( 'publish', 'draft', 'private' ),
 			'posts_per_page' => -1,
 			'orderby'        => 'title',

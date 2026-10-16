@@ -280,8 +280,7 @@ add_filter(
 		$settings_link = '<a href="' . esc_url(
 			admin_url( 'admin.php?page=fotogrids-settings' )
 		) . '">' . __( 'Settings', 'fotogrids' ) . '</a>';
-		array_unshift( $links, $settings_link );
-		return $links;
+		return array( 'settings' => $settings_link ) + $links;
 	}
 );
 
@@ -300,10 +299,10 @@ add_filter(
 			. __( 'Get FotoGrids Pro', 'fotogrids' ) .
 			'</a>';
 		$new_links = array();
-		foreach ( $links as $link ) {
-			$new_links[] = $link;
-			if ( str_contains( $link, 'deactivate' ) ) {
-				$new_links[] = $pro_link;
+		foreach ( $links as $key => $link ) {
+			$new_links[ $key ] = $link;
+			if ( 'deactivate' === $key ) {
+				$new_links['get-pro'] = $pro_link;
 			}
 		}
 		return $new_links;

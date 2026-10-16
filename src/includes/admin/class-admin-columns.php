@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -21,13 +23,13 @@ class Admin_Columns {
 	 * @since 1.0.0
 	 */
 	public static function init() {
-		add_filter( 'manage_fotogrids_gallery_posts_columns', array( __CLASS__, 'gallery_columns' ) );
-		add_filter( 'manage_fotogrids_gallery_posts_columns', array( __CLASS__, 'gallery_columns_whitelist' ), 9999 );
-		add_action( 'manage_fotogrids_gallery_posts_custom_column', array( __CLASS__, 'gallery_column_content' ), 10, 2 );
+		add_filter( 'manage_' . Post_Types::GALLERY . '_posts_columns', array( __CLASS__, 'gallery_columns' ) );
+		add_filter( 'manage_' . Post_Types::GALLERY . '_posts_columns', array( __CLASS__, 'gallery_columns_whitelist' ), 9999 );
+		add_action( 'manage_' . Post_Types::GALLERY . '_posts_custom_column', array( __CLASS__, 'gallery_column_content' ), 10, 2 );
 
-		add_filter( 'manage_fotogrids_album_posts_columns', array( __CLASS__, 'album_columns' ) );
-		add_filter( 'manage_fotogrids_album_posts_columns', array( __CLASS__, 'album_columns_whitelist' ), 9999 );
-		add_action( 'manage_fotogrids_album_posts_custom_column', array( __CLASS__, 'album_column_content' ), 10, 2 );
+		add_filter( 'manage_' . Post_Types::ALBUM . '_posts_columns', array( __CLASS__, 'album_columns' ) );
+		add_filter( 'manage_' . Post_Types::ALBUM . '_posts_columns', array( __CLASS__, 'album_columns_whitelist' ), 9999 );
+		add_action( 'manage_' . Post_Types::ALBUM . '_posts_custom_column', array( __CLASS__, 'album_column_content' ), 10, 2 );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_shortcode_column_script' ) );
 	}
@@ -37,7 +39,7 @@ class Admin_Columns {
 	 */
 	public static function enqueue_shortcode_column_script( $hook ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( ! $screen || ! in_array( $screen->id, array( 'edit-fotogrids_gallery', 'edit-fotogrids_album' ), true ) ) {
+		if ( ! $screen || ! in_array( $screen->id, array( 'edit-' . Post_Types::GALLERY, 'edit-' . Post_Types::ALBUM ), true ) ) {
 			return;
 		}
 		wp_enqueue_script(

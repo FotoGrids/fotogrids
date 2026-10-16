@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Items;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -92,7 +94,7 @@ class Items_Data {
 	private static function editable_item_ids(): array {
 		$gallery_ids = get_posts(
 			array(
-				'post_type'      => 'fotogrids_gallery',
+				'post_type'      => Post_Types::GALLERY,
 				'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
 				'fields'         => 'ids',
 				'posts_per_page' => -1,

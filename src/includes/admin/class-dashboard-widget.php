@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -104,8 +106,8 @@ class Dashboard_Widget {
 	public static function render_widget() {
 		$logo_svg           = self::get_logo_svg();
 		$version            = FOTOGRIDS_VERSION;
-		$create_gallery_url = admin_url( 'post-new.php?post_type=fotogrids_gallery' );
-		$create_album_url   = admin_url( 'post-new.php?post_type=fotogrids_album' );
+		$create_gallery_url = admin_url( 'post-new.php?post_type=' . Post_Types::GALLERY );
+		$create_album_url   = admin_url( 'post-new.php?post_type=' . Post_Types::ALBUM );
 		$dashboard_url      = admin_url( 'admin.php?page=fotogrids-dashboard' );
 		$docs_url           = \FotoGrids\Links::go( 'docs', 'dashboard-widget', 'docs' );
 		$support_url        = 'https://wordpress.org/support/plugin/fotogrids/';
@@ -125,7 +127,7 @@ class Dashboard_Widget {
 				'icon'  => 'layout_3x3',
 				'label' => __( 'Galleries', 'fotogrids' ),
 				'value' => $stats['galleries'],
-				'url'   => admin_url( 'edit.php?post_type=fotogrids_gallery' ),
+				'url'   => admin_url( 'edit.php?post_type=' . Post_Types::GALLERY ),
 				'color' => 'blue',
 			),
 			array(
@@ -133,7 +135,7 @@ class Dashboard_Widget {
 				'icon'  => 'layout_2x2',
 				'label' => __( 'Albums', 'fotogrids' ),
 				'value' => $stats['albums'],
-				'url'   => admin_url( 'edit.php?post_type=fotogrids_album' ),
+				'url'   => admin_url( 'edit.php?post_type=' . Post_Types::ALBUM ),
 				'color' => 'red',
 			),
 			array(
@@ -275,8 +277,8 @@ class Dashboard_Widget {
 	private static function get_stats() {
 		global $wpdb;
 
-		$galleries_count = (int) wp_count_posts( 'fotogrids_gallery' )->publish;
-		$albums_count    = (int) wp_count_posts( 'fotogrids_album' )->publish;
+		$galleries_count = (int) wp_count_posts( Post_Types::GALLERY )->publish;
+		$albums_count    = (int) wp_count_posts( Post_Types::ALBUM )->publish;
 		$items_count     = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish' ) );
 
 		$engagement  = 0;

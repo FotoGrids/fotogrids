@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\View_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -120,11 +121,11 @@ class Base_Fallback_Redirect {
 		$default_prefix = View_Settings_Store::DEFAULT_BASE_PREFIX;
 
 		$bases = array(
-			$default_prefix . '/' . View_Settings_Store::DEFAULT_GALLERY_SEGMENT => array( 'fotogrids_gallery' ),
-			$default_prefix . '/' . View_Settings_Store::DEFAULT_ALBUM_SEGMENT   => array( 'fotogrids_album' ),
+			$default_prefix . '/' . View_Settings_Store::DEFAULT_GALLERY_SEGMENT => array( Post_Types::GALLERY ),
+			$default_prefix . '/' . View_Settings_Store::DEFAULT_ALBUM_SEGMENT   => array( Post_Types::ALBUM ),
 		);
 
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( Post_Types::COLLECTION_TYPES as $post_type ) {
 			$base = Router::base_slug( $post_type );
 
 			$bases[ $base ] = array_values(
