@@ -23,7 +23,10 @@
 			}
 
 			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) {
+			if (
+				document.getElementById(linkId) ||
+				document.getElementById(handle + '-css')
+			) {
 				return;
 			}
 
