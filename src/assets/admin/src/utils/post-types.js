@@ -1,8 +1,5 @@
 /**
  * Gallery and album post types.
- *
- * Mirrors the `Post_Types::GALLERY` and `Post_Types::ALBUM` constants in
- * `includes/class-post-types.php`; a unit test fails if the two drift.
  */
 
 export const GALLERY_POST_TYPE = 'fotogrids_gallery';
