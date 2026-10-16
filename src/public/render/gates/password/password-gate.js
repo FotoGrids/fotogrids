@@ -39,12 +39,14 @@
 	 * Adds a <script> for each handle not already in the document.
 	 *
 	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */
 	function injectMissingScripts(jsData) {
 		if (!jsData || typeof jsData !== 'object') {
-			return;
+			return Promise.resolve();
 		}
 
+		const pending = [];
 		Object.keys(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
 			const url = entry && entry.src ? entry.src : '';
@@ -63,8 +65,16 @@
 			script.id = scriptId;
 			script.src = url;
 			script.async = false;
+			pending.push(
+				new Promise(function (resolve) {
+					script.onload = resolve;
+					script.onerror = resolve;
+				})
+			);
 			document.head.appendChild(script);
 		});
+
+		return Promise.all(pending);
 	}
 
 	/**
@@ -237,7 +247,15 @@
 				storeCredential(form);
 
 				injectMissingStyles(data.css || {});
-				injectMissingScripts(data.js || {});
+				return injectMissingScripts(data.js || {}).then(function () {
+					return data;
+				});
+			})
+			.then(function (data) {
+				if (!data) {
+					return;
+				}
+
 				injectFontStylesheet(data.fonts || '');
 				injectInlineCss(data.inlineCss || '');
 				injectInlineJs(data.inlineJs || '');

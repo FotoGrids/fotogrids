@@ -82,17 +82,19 @@
 	 * Inject <script> tags for any JS handles the render pipeline declared
 	 * that aren't already in the document. The album page only enqueued the
 	 * modules its own render needed; a swapped-in gallery can need more.
-	 * Late-loaded modules scan the DOM on init, so they still wire it.
+	 * The swap waits for them, so a module is bound before its markup is live.
 	 *
 	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
 	 *     handle → {src, in_footer} map. in_footer is ignored; scripts are
 	 *     appended to <head> and execute in order.
+	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */
 	function injectMissingScripts(jsData) {
 		if (!jsData || typeof jsData !== 'object') {
-			return;
+			return Promise.resolve();
 		}
 
+		const pending = [];
 		Object.keys(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
 			const url = entry && entry.src ? entry.src : '';
@@ -114,8 +116,16 @@
 			script.id = scriptId;
 			script.src = url;
 			script.async = false; // preserve load order between siblings
+			pending.push(
+				new Promise(function (resolve) {
+					script.onload = resolve;
+					script.onerror = resolve;
+				})
+			);
 			document.head.appendChild(script);
 		});
+
+		return Promise.all(pending);
 	}
 
 	/**
@@ -268,7 +278,11 @@
 				}
 
 				injectMissingStyles(data.css || {});
-				injectMissingScripts(data.js || {});
+				return injectMissingScripts(data.js || {}).then(function () {
+					return data;
+				});
+			})
+			.then(function (data) {
 				injectFontStylesheet(data.fonts || '');
 				injectInlineCss(data.inlineCss || '');
 				injectInlineJs(data.inlineJs || '');
