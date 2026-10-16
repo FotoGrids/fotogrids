@@ -4,7 +4,7 @@ import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 import { execFileSync } from 'child_process';
-import { wpCli, wpEval } from './support/roles';
+import { storageStateFor, wpCli, wpEval } from './support/roles';
 
 /**
  * A gallery that is not in the post's content: in a block theme's footer
@@ -146,3 +146,47 @@ test(
 		}
 	}
 );
+
+/**
+ * INS-21. A broken gallery in a block theme footer shows an editor the same
+ * styled error box as one in the post content.
+ */
+test.describe('signed in as an administrator', () => {
+	test.use({ storageState: storageStateFor('administrator') });
+
+	test(
+		'INS-21: a missing gallery in a block theme footer shows a styled error box',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const content = Buffer.from(SHORTCODE_BLOCK(987654)).toString(
+				'base64'
+			);
+
+			const part = Number(
+				wpEval(
+					`$id = wp_insert_post( array( 'post_type' => 'wp_template_part', 'post_name' => 'footer', 'post_title' => 'Footer', 'post_status' => 'publish', 'post_content' => base64_decode( '${content}' ) ) );
+					wp_set_object_terms( $id, get_stylesheet(), 'wp_theme' );
+					wp_set_object_terms( $id, 'footer', 'wp_template_part_area' );
+					echo $id;`
+				).trim()
+			);
+
+			try {
+				expect(wpEval('echo wp_is_block_theme() ? 1 : 0;').trim()).toBe(
+					'1'
+				);
+				await page.goto(plainPost());
+
+				const error = page.locator('.fotogrids-error');
+				await expect(error).toHaveCount(1);
+				await expect(error).toContainText('987654');
+				await expect(error).toHaveCSS(
+					'background-color',
+					'rgb(255, 235, 232)'
+				);
+			} finally {
+				wpEval(`wp_delete_post( ${part}, true );`);
+			}
+		}
+	);
+});
