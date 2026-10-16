@@ -11,11 +11,6 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
  * Saving one settings tab must not disturb another, and a setting turned off
  * must read as off everywhere it is shown.
  *
- * The Defaults tab persists through a WordPress Settings API form posted to
- * options.php. options.php writes every option registered to the posted
- * option group, passing null for any the form does not carry, so a group with
- * more than one member silently resets its other options on every save.
- *
  * Serial: these share one WordPress site and one set of options.
  */
 
@@ -152,7 +147,7 @@ test.describe( 'settings persistence', () => {
 
 		// Read it back from the server rather than trusting the bar.
 		const stored = await page.evaluate( async () =>
-			window.wp.apiFetch( { path: '/fotogrids/v1/admin/gallery-defaults' } )
+			window.wp.apiFetch( { path: '/fotogrids/v1/admin/collection-defaults?type=gallery' } )
 		);
 		expect( stored.defaults.featured_show_all_radius ).toBe( value );
 	} );

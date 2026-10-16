@@ -19,8 +19,9 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Retired
  *
- * A reset still keeps the licence options and clears the settings options
- * that earlier versions registered without writing.
+ * A reset still keeps the licence options, and clears the settings options
+ * that earlier versions registered without writing and the defaults option
+ * earlier versions shared between galleries and albums.
  *
  * @package FotoGrids\Options\Declarations
  * @since   1.3.0
@@ -35,6 +36,7 @@ final class Retired extends Abstract_Option_Declaration {
 	 */
 	public static function options(): array {
 		return array(
+			'fotogrids_gallery_defaults'            => self::RESET,
 			'fotogrids_integration_settings'        => self::RESET,
 			'fotogrids_license_data'                => self::KEEP,
 			'fotogrids_license_key'                 => self::KEEP,

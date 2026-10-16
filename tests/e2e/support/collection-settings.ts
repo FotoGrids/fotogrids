@@ -110,6 +110,24 @@ export class CollectionSettings {
 		await this.subtab( label ).first().click();
 	}
 
+	/** The Layout picker's card for one layout, by the name it shows. */
+	layoutOption( name: string ): Locator {
+		return this.field( 'layout' )
+			.locator( '.fotogrids-layout-option' )
+			.filter( {
+				has: this.page.locator( '.fotogrids-layout-option__name', {
+					hasText: new RegExp( `^${ name }$` ),
+				} ),
+			} );
+	}
+
+	/** The name on the Layout picker's chosen card. */
+	activeLayout(): Locator {
+		return this.field( 'layout' ).locator(
+			'.fotogrids-layout-option.fg-is-active .fotogrids-layout-option__name'
+		);
+	}
+
 	/** The editor's own autosave switch, in the panel's docs strip. */
 	autosaveToggle(): Locator {
 		return this.page.locator(

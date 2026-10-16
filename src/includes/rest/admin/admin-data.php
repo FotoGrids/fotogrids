@@ -590,20 +590,21 @@ class Admin_Data {
 	}
 
 	/**
-	 * Get collection defaults.
+	 * Get one collection type's defaults.
 	 *
-	 * GET /wp-json/fotogrids/v1/admin/gallery-defaults
+	 * GET /wp-json/fotogrids/v1/admin/collection-defaults?type={gallery|album}
 	 *
-	 * @since  1.1.2
+	 * @since  1.3.0
 	 * @param  \WP_REST_Request $request
 	 * @return \WP_REST_Response
 	 */
-	public static function get_gallery_defaults( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function get_collection_defaults( $request ): \WP_REST_Response {
+		$type = (string) $request->get_param( 'type' );
+
 		return rest_ensure_response(
 			array(
-				'defaults' => self::redact_passwords(
-					(array) get_option( 'fotogrids_gallery_defaults', array() )
-				),
+				'type'     => $type,
+				'defaults' => self::redact_passwords( \FotoGrids\Settings\Collection_Defaults_Store::get( $type ) ),
 			)
 		);
 	}
@@ -629,41 +630,85 @@ class Admin_Data {
 	}
 
 	/**
-	 * Persist collection defaults.
+	 * Persist one collection type's defaults.
 	 *
 	 * Merges the incoming keys over what is stored rather than replacing the
-	 * option, so a caller that sends one setting does not drop the rest.
+	 * type's defaults, so a caller that sends one setting does not drop the rest.
+	 *
+	 * POST /wp-json/fotogrids/v1/admin/collection-defaults
+	 *
+	 * @since  1.3.0
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function save_collection_defaults( $request ) {
+		$type   = (string) $request->get_param( 'type' );
+		$merged = \FotoGrids\Settings\Collection_Defaults_Store::merge(
+			$type,
+			\FotoGrids\Settings\Plugin_Settings_Store::sanitize_collection_defaults(
+				(array) $request->get_param( 'defaults' ),
+				$type
+			)
+		);
+
+		if ( null === $merged ) {
+			return new \WP_Error(
+				'fotogrids_defaults_not_saved',
+				__( 'The defaults could not be saved.', 'fotogrids' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'type'     => $type,
+				'defaults' => self::redact_passwords( $merged ),
+			)
+		);
+	}
+
+	/**
+	 * Get the gallery defaults.
+	 *
+	 * GET /wp-json/fotogrids/v1/admin/gallery-defaults
+	 *
+	 * @since      1.1.2
+	 * @deprecated 1.3.0 Use GET /admin/collection-defaults with `type`, handled by Admin_Data::get_collection_defaults().
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function get_gallery_defaults( $request ): \WP_REST_Response {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\REST\\Admin\\Admin_Data::get_collection_defaults()' );
+
+		$request->set_param( 'type', 'gallery' );
+		$data = self::get_collection_defaults( $request )->get_data();
+
+		return rest_ensure_response( array( 'defaults' => $data['defaults'] ) );
+	}
+
+	/**
+	 * Persist gallery defaults.
 	 *
 	 * POST /wp-json/fotogrids/v1/admin/gallery-defaults
 	 *
-	 * @since  1.1.2
+	 * @since      1.1.2
+	 * @deprecated 1.3.0 Use POST /admin/collection-defaults with `type`, handled by Admin_Data::save_collection_defaults().
 	 * @param  \WP_REST_Request $request
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public static function save_gallery_defaults( $request ) {
-		$incoming = (array) $request->get_param( 'defaults' );
-		$stored   = (array) get_option( 'fotogrids_gallery_defaults', array() );
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\REST\\Admin\\Admin_Data::save_collection_defaults()' );
 
-		$merged = array_merge(
-			$stored,
-			\FotoGrids\Settings\Plugin_Settings_Store::sanitize_collection_defaults( $incoming )
-		);
+		$request->set_param( 'type', 'gallery' );
+		$response = self::save_collection_defaults( $request );
 
-		if ( ! update_option( 'fotogrids_gallery_defaults', $merged ) ) {
-			// update_option() also answers false when nothing changed, so the
-			// stored value is what decides whether this actually failed.
-			$current = (array) get_option( 'fotogrids_gallery_defaults', array() );
-
-			if ( wp_json_encode( $current ) !== wp_json_encode( $merged ) ) {
-				return new \WP_Error(
-					'fotogrids_defaults_not_saved',
-					__( 'The defaults could not be saved.', 'fotogrids' ),
-					array( 'status' => 500 )
-				);
-			}
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
 
-		return rest_ensure_response( array( 'defaults' => self::redact_passwords( $merged ) ) );
+		$data = $response->get_data();
+
+		return rest_ensure_response( array( 'defaults' => $data['defaults'] ) );
 	}
 
 	/**
@@ -1021,18 +1066,22 @@ class Admin_Data {
 	/**
 	 * Whether the user has saved any of the plugin's Setup settings pages.
 	 *
-	 * Each option below is written only when its Settings tab is saved, so the
-	 * presence of a non-empty value is the signal. The one exception is
-	 * fotogrids_media_settings, which Activator seeds on first activation and
-	 * therefore only counts once it diverges from the seeded defaults.
+	 * Saved gallery or album defaults count. Each option below is written only
+	 * when its Settings tab is saved, so the presence of a non-empty value is
+	 * the signal. The one exception is fotogrids_media_settings, which
+	 * Activator seeds on first activation and therefore only counts once it
+	 * diverges from the seeded defaults.
 	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
 	private static function has_configured_settings(): bool {
+		if ( \FotoGrids\Settings\Collection_Defaults_Store::has_any() ) {
+			return true;
+		}
+
 		$option_keys = array(
 			'fotogrids_general_settings',
-			'fotogrids_gallery_defaults',
 			'fotogrids_sharing_settings',
 			'fotogrids_view_settings',
 			'fotogrids_watermark_settings',

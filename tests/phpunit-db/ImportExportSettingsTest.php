@@ -8,6 +8,7 @@
 
 use FotoGrids\Collection_Defaults;
 use FotoGrids\Image_Size_Manager;
+use FotoGrids\Settings\Collection_Defaults_Store;
 use FotoGrids\Tools\ImportExport\Import_Export_Data;
 
 class ImportExportSettingsTest extends WP_UnitTestCase {
@@ -130,7 +131,7 @@ class ImportExportSettingsTest extends WP_UnitTestCase {
 		$this->assertSame( Image_Size_Manager::get_plugin_size_defaults(), get_option( 'fotogrids_media_settings' ) );
 	}
 
-	public function test_gallery_defaults_go_through_the_defaults_sanitizer(): void {
+	public function test_defaults_from_an_earlier_export_apply_to_galleries_and_albums(): void {
 		$key = $this->bool_default_key();
 
 		$this->import(
@@ -142,6 +143,61 @@ class ImportExportSettingsTest extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( array( $key => false ), get_option( 'fotogrids_gallery_defaults' ) );
+		$this->assertSame(
+			array(
+				'gallery' => array( $key => false ),
+				'album'   => array( $key => false ),
+			),
+			Collection_Defaults_Store::all()
+		);
+	}
+
+	public function test_each_type_imports_its_own_defaults_through_its_sanitizer(): void {
+		Collection_Defaults_Store::replace( 'album', array( 'layout' => 'grid' ) );
+
+		$this->import(
+			array(
+				'collection_defaults' => array(
+					'gallery' => array(
+						'layout'                    => 'justified',
+						'single_item_auto_progress' => '1',
+					),
+					'album'   => array(
+						'layout'                    => 'masonry',
+						'single_item_auto_progress' => '1',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'layout'                    => 'justified',
+				'single_item_auto_progress' => true,
+			),
+			Collection_Defaults_Store::get( 'gallery' )
+		);
+		$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
+	}
+
+	public function test_a_type_missing_from_the_file_keeps_its_defaults(): void {
+		Collection_Defaults_Store::replace( 'gallery', array( 'layout' => 'slider' ) );
+
+		$this->import( array( 'collection_defaults' => array( 'album' => array( 'layout' => 'masonry' ) ) ) );
+
+		$this->assertSame( array( 'layout' => 'slider' ), Collection_Defaults_Store::get( 'gallery' ) );
+		$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
+	}
+
+	public function test_the_export_carries_each_types_defaults(): void {
+		Collection_Defaults_Store::replace( 'gallery', array( 'layout' => 'justified' ) );
+		Collection_Defaults_Store::replace( 'album', array( 'layout' => 'masonry' ) );
+
+		$collect = new ReflectionMethod( Import_Export_Data::class, 'collect_export_data' );
+		$collect->setAccessible( true );
+		$settings = $collect->invoke( null, array( 'settings' ) )['settings'];
+
+		$this->assertSame( Collection_Defaults_Store::all(), $settings['collection_defaults'] );
+		$this->assertArrayNotHasKey( 'gallery_defaults', $settings );
 	}
 }

@@ -41,18 +41,13 @@ const autosaveIsOn = () => {
 	const raw = window.fotogridsAdmin?.autosave;
 	return true === raw || '1' === raw;
 };
-const SaveBar = ({
-	dirty,
-	saving = false,
-	status = null,
-	onSave,
-	disabled = false,
-	onDiscard,
-	savedHint,
-	saveLabel,
-	extraAction,
-	watch,
-}) => {
+
+/**
+ * Whether Autosave is on, following the Advanced tab's announcements.
+ *
+ * @return {boolean} True while Autosave is on.
+ */
+export const useAutosaveEnabled = () => {
 	const [autosave, setAutosave] = useState(autosaveIsOn);
 
 	// The Advanced tab announces the option changing, so the other tabs pick it
@@ -75,6 +70,23 @@ const SaveBar = ({
 				handleAutosaveChanged
 			);
 	}, []);
+
+	return autosave;
+};
+
+const SaveBar = ({
+	dirty,
+	saving = false,
+	status = null,
+	onSave,
+	disabled = false,
+	onDiscard,
+	savedHint,
+	saveLabel,
+	extraAction,
+	watch,
+}) => {
+	const autosave = useAutosaveEnabled();
 
 	// Held in a ref so a new onSave identity on each render does not restart
 	// the debounce.

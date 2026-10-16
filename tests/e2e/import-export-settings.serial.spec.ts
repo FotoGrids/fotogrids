@@ -25,7 +25,7 @@ const OPTIONS = [
 	'fotogrids_autosave',
 	'fotogrids_preserve_data_on_uninstall',
 	'fotogrids_media_settings',
-	'fotogrids_gallery_defaults',
+	'fotogrids_collection_defaults',
 	'fotogrids_import_export_log',
 ];
 
@@ -210,7 +210,10 @@ test.describe( 'stored values', () => {
 		writeOption( sharedWp, 'fotogrids_autosave', '1' );
 		writeOption( sharedWp, 'fotogrids_preserve_data_on_uninstall', '1' );
 		writeOption( sharedWp, 'fotogrids_media_settings', MEDIA );
-		writeOption( sharedWp, 'fotogrids_gallery_defaults', { layout: 'justified' } );
+		writeOption( sharedWp, 'fotogrids_collection_defaults', {
+			gallery: { layout: 'justified' },
+			album: { layout: 'justified' },
+		} );
 	} );
 
 	test( 'odd values are stored the way the settings screens store them', { tag: [ '@admin', '@settings' ] }, async ( { page, baseURL } ) => {
@@ -243,9 +246,11 @@ test.describe( 'stored values', () => {
 			thumbnail_width: 1,
 			thumbnail_crop: false,
 		} );
-		expect( readOption( sharedWp, 'fotogrids_gallery_defaults' ) ).toEqual( {
-			layout: 'masonry',
-			columns: { desktop: 5, tablet: 2, mobile: 1 },
+		// An export from before 1.3.0 holds one map for galleries and albums alike.
+		const imported = { layout: 'masonry', columns: { desktop: 5, tablet: 2, mobile: 1 } };
+		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
+			gallery: imported,
+			album: imported,
 		} );
 
 		await openAdvanced( page, baseURL as string );
@@ -257,7 +262,22 @@ test.describe( 'stored values', () => {
 		await importThroughUi( page, baseURL as string, 'not-a-map.json', exportFile( { media: 'not a map', gallery_defaults: 42 } ) );
 
 		expect( readOption( sharedWp, 'fotogrids_media_settings' ) ).toEqual( MEDIA );
-		expect( readOption( sharedWp, 'fotogrids_gallery_defaults' ) ).toEqual( { layout: 'justified' } );
+		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
+			gallery: { layout: 'justified' },
+			album: { layout: 'justified' },
+		} );
+
+		await importThroughUi(
+			page,
+			baseURL as string,
+			'not-a-map-per-type.json',
+			exportFile( { collection_defaults: { gallery: 42, album: 'not a map' } } )
+		);
+
+		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
+			gallery: { layout: 'justified' },
+			album: { layout: 'justified' },
+		} );
 	} );
 
 	test( 'an XML round trip keeps Soft crop', { tag: [ '@admin', '@settings' ] }, async ( { page, baseURL } ) => {

@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Migrations;
 
 use FotoGrids\Collection_Defaults;
-use FotoGrids\Settings\Collection_Defaults_Seeder;
+use FotoGrids\Settings\Collection_Defaults_Store;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -129,36 +129,36 @@ final class List_Setting_Repair {
 	}
 
 	/**
-	 * Store list values in the saved defaults option as arrays.
+	 * Store list values in each type's saved defaults as arrays.
 	 *
 	 * @since  1.2.0
 	 * @param  array<string, array<int, mixed>> $defaults List defaults keyed by setting.
 	 * @return int Number of values changed.
 	 */
 	private static function repair_saved_defaults( array $defaults ): int {
-		$saved = get_option( Collection_Defaults_Seeder::OPTION, array() );
-
-		if ( ! is_array( $saved ) ) {
-			return 0;
-		}
-
 		$changed = 0;
-		foreach ( array_intersect_key( $saved, $defaults ) as $key => $value ) {
-			if ( is_array( $value ) ) {
-				continue;
+
+		foreach ( Collection_Defaults_Store::all() as $type => $saved ) {
+			$type_changed = 0;
+
+			foreach ( array_intersect_key( $saved, $defaults ) as $key => $value ) {
+				if ( is_array( $value ) ) {
+					continue;
+				}
+
+				$decoded = is_string( $value ) ? json_decode( $value, true ) : null;
+				if ( is_array( $decoded ) ) {
+					$saved[ $key ] = $decoded;
+				} else {
+					unset( $saved[ $key ] );
+				}
+				++$type_changed;
 			}
 
-			$decoded = is_string( $value ) ? json_decode( $value, true ) : null;
-			if ( is_array( $decoded ) ) {
-				$saved[ $key ] = $decoded;
-			} else {
-				unset( $saved[ $key ] );
+			if ( $type_changed > 0 ) {
+				Collection_Defaults_Store::replace( $type, $saved );
+				$changed += $type_changed;
 			}
-			++$changed;
-		}
-
-		if ( $changed > 0 ) {
-			update_option( Collection_Defaults_Seeder::OPTION, $saved );
 		}
 
 		return $changed;

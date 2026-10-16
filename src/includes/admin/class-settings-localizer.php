@@ -26,7 +26,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Two surfaces consume it: the per-post metabox (real post id, real
  * settings) and the global defaults page in wp-admin (`is_defaults = true`,
- * post id 0, reads from the `fotogrids_gallery_defaults` option).
+ * post id 0, reads the collection type's entry of the
+ * `fotogrids_collection_defaults` option).
  *
  * Guarantees the encrypted password ciphertext never reaches the browser
  * even when callers pre-build the settings array.
@@ -73,7 +74,8 @@ final class Settings_Localizer {
 			$args['settings'] = self::build_settings_from_storage(
 				(array) $args['defaults'],
 				(int) $args['post_id'],
-				(bool) $args['is_defaults']
+				(bool) $args['is_defaults'],
+				(string) $args['post_type']
 			);
 		}
 
@@ -125,22 +127,23 @@ final class Settings_Localizer {
 
 	/**
 	 * Read each setting key from its storage (post meta for collections, the
-	 * `fotogrids_gallery_defaults` option for the defaults page) and decode
+	 * collection type's saved defaults for the defaults page) and decode
 	 * to the in-memory PHP shape that the JS payload expects.
 	 *
 	 * Keeps booleans as the strings '1' / '0', which the JS toggle's `=== '1'`
 	 * check depends on.
 	 *
-	 * @param array $defaults    Defaults array (drives the key list + type coercion).
-	 * @param int   $post_id     Post id (0 for defaults page).
-	 * @param bool  $is_defaults Defaults-page mode.
+	 * @param array  $defaults    Defaults array (drives the key list + type coercion).
+	 * @param int    $post_id     Post id (0 for defaults page).
+	 * @param bool   $is_defaults Defaults-page mode.
+	 * @param string $post_type   Collection post type.
 	 * @return array<string, mixed>
 	 */
-	private static function build_settings_from_storage( array $defaults, int $post_id, bool $is_defaults ): array {
+	private static function build_settings_from_storage( array $defaults, int $post_id, bool $is_defaults, string $post_type ): array {
 		$settings = array();
 
 		if ( $is_defaults ) {
-			$saved_defaults = get_option( 'fotogrids_gallery_defaults', array() );
+			$saved_defaults = \FotoGrids\Settings\Collection_Defaults_Store::get( $post_type );
 			foreach ( $defaults as $key => $default_value ) {
 				if ( ! isset( $saved_defaults[ $key ] ) ) {
 					$settings[ $key ] = $default_value;

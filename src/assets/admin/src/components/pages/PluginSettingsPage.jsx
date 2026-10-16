@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import Panel from '../shared/SidebarTabs/elements/Panel';
@@ -258,7 +258,15 @@ const PluginSettingsPage = () => {
 		setTimeout(attemptScroll, 300);
 	}, [activeTab]);
 
-	const handleTabChange = (tabId) => {
+	const defaultsTabRef = useRef(null);
+
+	// Resolves false when the user chooses to stay on the Defaults tab.
+	const leaveDefaults = () =>
+		defaultsTabRef.current
+			? defaultsTabRef.current.confirmLeave()
+			: Promise.resolve(true);
+
+	const handleTabChange = async (tabId) => {
 		// The Setup Wizard tab is a launcher, not a tab panel. Add the
 		// wizard query param to the current URL so the wizard opens *on
 		// top of* the Settings page, then dispatch a popstate so the
@@ -268,6 +276,14 @@ const PluginSettingsPage = () => {
 		if (tabId === 'setup_wizard') {
 			window.history.pushState({}, '', getSetupWizardUrl());
 			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		if (
+			'defaults' === activeTab &&
+			'defaults' !== tabId &&
+			!(await leaveDefaults())
+		) {
 			return;
 		}
 
@@ -301,7 +317,11 @@ const PluginSettingsPage = () => {
 		} catch (_e) {}
 	};
 
-	const handleSubTabChange = (subTabId) => {
+	const handleSubTabChange = async (subTabId) => {
+		if (subTabId === activeDefaultsSubTab || !(await leaveDefaults())) {
+			return;
+		}
+
 		setActiveDefaultsSubTab(subTabId);
 
 		if (uiState) {
@@ -350,6 +370,7 @@ const PluginSettingsPage = () => {
 						</Panel>
 						<DefaultsTab
 							key={activeDefaultsSubTab}
+							ref={defaultsTabRef}
 							type={activeDefaultsSubTab}
 						/>
 					</>

@@ -1,19 +1,78 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react';
 import { createRoot } from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Panel, SaveBar } from '../../shared/settings';
+import { useAutosaveEnabled } from '../../shared/SidebarTabs/elements/SaveBar';
 import ErrorBoundary from '../../shared/ErrorBoundary';
 
+const ENDPOINT = '/fotogrids/v1/admin/collection-defaults';
+
+// What each subtab has saved since the page loaded, layered over its
+// localized settings when the subtab is opened again.
+const savedSinceLoad = { gallery: {}, album: {} };
+
 /**
- * Unified component for rendering Gallery or Album defaults
+ * Decode a stored default into the shape the settings panel reads, the way
+ * Settings_Localizer decodes it on page load.
+ *
+ * @param {unknown} value        Stored value.
+ * @param {unknown} defaultValue The setting's default.
+ * @return {unknown} The panel value.
+ */
+export const toPanelValue = (value, defaultValue) => {
+	if ('boolean' === typeof defaultValue || 'string' !== typeof value) {
+		return value;
+	}
+
+	try {
+		const decoded = JSON.parse(value);
+		return null === decoded ? value : decoded;
+	} catch (e) {
+		return value;
+	}
+};
+
+/**
+ * The settings-panel payload for one collection type.
+ *
+ * @param {Object} payload That type's localized payload.
+ * @param {Object} saved   Values saved since the page loaded.
+ * @return {Object} The payload with the saved values applied.
+ */
+export const panelPayload = (payload, saved = {}) => {
+	const settings = { ...(payload.settings || {}) };
+
+	Object.keys(saved).forEach((key) => {
+		if (Object.prototype.hasOwnProperty.call(settings, key)) {
+			settings[key] = toPanelValue(saved[key], payload.defaults?.[key]);
+		}
+	});
+
+	return { ...payload, settings };
+};
+
+/**
+ * Gallery or Album defaults, saved per collection type.
+ *
+ * The ref exposes `confirmLeave()`, which the settings page awaits before it
+ * switches away: unsaved changes are saved straight away with Autosave on,
+ * and otherwise the user chooses to save, discard or stay.
  *
  * @param {Object} props
  * @param {string} props.type - 'gallery' or 'album'
  */
-const DefaultsTab = ({ type = 'gallery' }) => {
+const DefaultsTab = forwardRef(({ type = 'gallery' }, ref) => {
 	const containerRef = useRef(null);
 	const rootRef = useRef(null);
+	const autosave = useAutosaveEnabled();
 
 	// The settings panel is a separate React tree rendered by the plain
 	// collection-settings script, so it reports changes by event rather than by
@@ -22,6 +81,11 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 	const [pending, setPending] = useState({});
 	const [saving, setSaving] = useState(false);
 	const [status, setStatus] = useState(null);
+
+	const pendingRef = useRef(pending);
+	pendingRef.current = pending;
+	const autosaveRef = useRef(autosave);
+	autosaveRef.current = autosave;
 
 	useEffect(() => {
 		const handleSettingChanged = (e) => {
@@ -43,19 +107,26 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 			);
 	}, []);
 
-	const handleSave = async () => {
-		const payload = pending;
+	const handleSave = useCallback(async () => {
+		const payload = pendingRef.current;
 		if (0 === Object.keys(payload).length) {
-			return;
+			return true;
 		}
 
 		setSaving(true);
 		setStatus(null);
 		try {
-			await apiFetch({
-				path: '/fotogrids/v1/admin/gallery-defaults',
+			const response = await apiFetch({
+				path: ENDPOINT,
 				method: 'POST',
-				data: { defaults: payload },
+				data: { type, defaults: payload },
+			});
+			const stored = response?.defaults || {};
+			Object.keys(payload).forEach((key) => {
+				savedSinceLoad[type][key] =
+					Object.prototype.hasOwnProperty.call(stored, key)
+						? stored[key]
+						: payload[key];
 			});
 			// Drop only what was sent - the user may have edited on since.
 			setPending((prev) => {
@@ -69,12 +140,68 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 			});
 			setStatus('saved');
 			setTimeout(() => setStatus(null), 3000);
+			return true;
 		} catch (err) {
 			setStatus('error');
+			return false;
 		} finally {
 			setSaving(false);
 		}
-	};
+	}, [type]);
+
+	const confirmLeave = useCallback(async () => {
+		if (0 === Object.keys(pendingRef.current).length) {
+			return true;
+		}
+
+		if (autosaveRef.current) {
+			return handleSave();
+		}
+
+		const message = sprintf(
+			/* translators: %s: Settings subtab name, "Gallery Defaults" or "Album Defaults". */
+			__(
+				'You have unsaved changes on %s. Save them before you leave?',
+				'fotogrids'
+			),
+			'album' === type
+				? __('Album Defaults', 'fotogrids')
+				: __('Gallery Defaults', 'fotogrids')
+		);
+		const modal = window.FotoGridsAdmin?.modal;
+
+		if (!modal?.confirm) {
+			// eslint-disable-next-line no-alert -- fallback when the admin modal API has not loaded.
+			return window.confirm(message) ? handleSave() : false;
+		}
+
+		let closedBy = null;
+		const confirmed = await modal.confirm({
+			title: __('Unsaved changes', 'fotogrids'),
+			message,
+			confirmLabel: __('Save changes', 'fotogrids'),
+			cancelLabel: __('Discard changes', 'fotogrids'),
+			variant: 'warning',
+			onClose: (reason) => {
+				closedBy = reason;
+			},
+		});
+
+		if (confirmed) {
+			return handleSave();
+		}
+
+		// Esc, the close button and a click outside keep the user here.
+		if ('cancel' === closedBy) {
+			pendingRef.current = {};
+			setPending({});
+			return true;
+		}
+
+		return false;
+	}, [type, handleSave]);
+
+	useImperativeHandle(ref, () => ({ confirmLeave }), [confirmLeave]);
 
 	useEffect(() => {
 		if (!containerRef.current) {
@@ -83,11 +210,14 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 
 		const container = containerRef.current;
 		const typeLabel = type === 'gallery' ? 'gallery' : 'album';
-		const postType =
-			type === 'gallery' ? 'fotogrids_gallery' : 'fotogrids_album';
+		const payload = window.fotogridsDefaultsSettings?.[typeLabel];
 
-		if (window.fotogridsSettings) {
-			window.fotogridsSettings.postType = postType;
+		// Written before the panel mounts and left alone while it is mounted.
+		if (payload) {
+			window.fotogridsSettings = panelPayload(
+				payload,
+				savedSinceLoad[typeLabel]
+			);
 		}
 
 		const initializeApp = () => {
@@ -165,6 +295,8 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 			/>
 		</div>
 	);
-};
+});
+
+DefaultsTab.displayName = 'DefaultsTab';
 
 export default DefaultsTab;
