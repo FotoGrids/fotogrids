@@ -219,7 +219,7 @@ final class Plugin_Settings_Store {
 	 * @param  bool   $value  Value to store.
 	 * @return bool True when the option was written.
 	 */
-	private static function save_bool( string $option, bool $value ): bool {
+	public static function save_bool( string $option, bool $value ): bool {
 		return update_option( $option, $value ? '1' : '0' );
 	}
 

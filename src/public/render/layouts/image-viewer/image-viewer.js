@@ -183,7 +183,7 @@ function setup(collectionEl) {
 			return null;
 		}
 		return item.querySelector(
-			'.fg-item-media img, .fg-item-media .fg-video-poster, .fg-item-media .fg-video'
+			'.fg-item-media img, .fg-item-media .fg-video-poster, .fg-item-media .fg-video, .fg-item-media .fg-item-placeholder'
 		);
 	};
 
