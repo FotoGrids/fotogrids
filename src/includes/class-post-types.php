@@ -39,8 +39,6 @@ class Post_Types {
 	/**
 	 * Collection kind for a post type or a kind.
 	 *
-	 * Accepts either form, so `fotogrids_album` and `album` both return `album`.
-	 *
 	 * @since  1.3.0
 	 * @param  string|null $type Post type or collection kind.
 	 * @return string|null 'gallery', 'album', or null for anything else.

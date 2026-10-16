@@ -110,9 +110,6 @@ final class Settings_Localizer {
 	/**
 	 * Build the kind-dependent payload fields for each collection kind.
 	 *
-	 * The defaults page shows gallery and album defaults as subtabs of one
-	 * page load; each subtab applies its entry before mounting the settings UI.
-	 *
 	 * @since  1.3.0
 	 * @return array<string, array<string, mixed>> Fields keyed by collection kind.
 	 */

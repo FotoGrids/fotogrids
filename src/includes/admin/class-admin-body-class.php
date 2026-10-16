@@ -17,8 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Adds FotoGrids-owned body classes to the gallery and album list, edit and
- * new screens, so admin styles and scripts never depend on the post type name.
+ * Adds body classes to the gallery and album list, edit and new screens.
  *
  * - `fotogrids-collection-screen` on every collection screen.
  * - `fotogrids-collection-screen--gallery` or `--album` for the kind.
