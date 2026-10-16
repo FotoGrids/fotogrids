@@ -85,6 +85,24 @@ function libraryHas( name: string ): boolean {
 	` ).trim();
 }
 
+function usage( id: number ): number {
+	return Number(
+		wpEval( `
+			global $wpdb;
+			echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT usage_count FROM {$wpdb->prefix}fotogrids_tags WHERE id = %d", ${ id } ) );
+		` ).trim()
+	);
+}
+
+function storedLinks(): number {
+	return Number(
+		wpEval( `
+			global $wpdb;
+			echo (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}fotogrids_item_metadata WHERE attachment_id = %d", ${ itemId } ) );
+		` ).trim()
+	);
+}
+
 async function save( data: Record< string, unknown > ) {
 	const response = await api.post( SAVE_ROUTE( itemId ), {
 		headers: { 'X-WP-Nonce': nonce },
@@ -135,6 +153,33 @@ test.describe( 'save route', () => {
 			expect( title() ).toBe( titleBefore );
 		} );
 	}
+
+	test( 'an id with no library entry behind it is reported as an error and stores nothing', { tag: [ '@api' ] }, async () => {
+		const result = await save( {
+			tags: [ 999999, 0, tagA ],
+			people: [ { id: 999999 }, { id: tagB } ],
+			locations: [ { id: personId } ],
+		} );
+		expect( result.status ).toBe( 200 );
+		expect( result.body.metadata.tags ).toEqual( [ { id: tagA } ] );
+		expect( result.body.metadata.people ).toEqual( [] );
+		expect( result.body.metadata.locations ).toEqual( [] );
+		expect( result.body.metadata.errors ).toHaveLength( 5 );
+		expect( linked() ).toEqual( { tags: [ `${ PREFIX }tag-a` ], people: [], locations: [] } );
+		expect( storedLinks() ).toBe( 1 );
+	} );
+
+	test( 'a tag sent twice counts one use', { tag: [ '@api' ] }, async () => {
+		expect( ( await save( { tags: [] } ) ).status ).toBe( 200 );
+		const start = usage( tagA );
+
+		expect( ( await save( { tags: [ tagA, tagA ] } ) ).status ).toBe( 200 );
+		expect( linked().tags ).toEqual( [ `${ PREFIX }tag-a` ] );
+		expect( usage( tagA ) ).toBe( start + 1 );
+
+		expect( ( await save( { tags: [ tagA ] } ) ).status ).toBe( 200 );
+		expect( usage( tagA ) ).toBe( start + 1 );
+	} );
 
 	test( 'people and locations sent by name are created and linked beside tags sent by id', { tag: [ '@api' ] }, async () => {
 		const result = await save( {
