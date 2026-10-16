@@ -7,6 +7,7 @@ import Icon from '../shared/Icon';
 import LockedReason from './LockedReason';
 import { DASHBOARD_ACCESS } from './access';
 import { userCan } from '../../utils/capabilities';
+import { GALLERY_POST_TYPE } from '../../utils/post-types';
 
 const ChecklistItem = ({ completed, href, label, access }) => {
 	const marker = completed ? <Icon name="check" /> : <span />;
@@ -58,7 +59,7 @@ const buildSteps = ({
 	{
 		label: __('Create your first gallery', 'fotogrids'),
 		completed: galleriesTotal > 0,
-		href: 'post-new.php?post_type=fotogrids_gallery',
+		href: `post-new.php?post_type=${GALLERY_POST_TYPE}`,
 		access: DASHBOARD_ACCESS.gallery,
 	},
 	{
@@ -70,7 +71,7 @@ const buildSteps = ({
 	{
 		label: __('Publish gallery on your site', 'fotogrids'),
 		completed: galleriesPublished > 0,
-		href: 'edit.php?post_type=fotogrids_gallery',
+		href: `edit.php?post_type=${GALLERY_POST_TYPE}`,
 		access: DASHBOARD_ACCESS.gallery,
 	},
 ];

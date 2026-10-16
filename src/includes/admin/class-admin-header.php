@@ -2,6 +2,8 @@
 
 namespace FotoGrids\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -145,7 +147,7 @@ class Admin_Header {
 	 */
 	private function enqueue_page_structure() {
 		$screen = get_current_screen();
-		if ( ! $screen || ! in_array( $screen->post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! $screen || ! in_array( $screen->post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 
@@ -165,14 +167,12 @@ class Admin_Header {
 	 */
 	private function page_structure_css() {
 		return <<<'CSS'
-		body.post-type-fotogrids_gallery .wrap,
-		body.post-type-fotogrids_album .wrap {
+		body.fotogrids-collection-screen .wrap {
 			opacity: 0;
 			transition: opacity 0.1s ease-in;
 		}
 
-		body.post-type-fotogrids_gallery .wrap.fotogrids-structured,
-		body.post-type-fotogrids_album .wrap.fotogrids-structured {
+		body.fotogrids-collection-screen .wrap.fotogrids-structured {
 			opacity: 1;
 		}
 		CSS;
@@ -190,8 +190,7 @@ class Admin_Header {
 
 			function restructurePage() {
 				const body = document.body;
-				if (!body.classList.contains('post-type-fotogrids_gallery') &&
-					!body.classList.contains('post-type-fotogrids_album')) {
+				if (!body.classList.contains('fotogrids-collection-screen')) {
 					return;
 				}
 

@@ -16,6 +16,7 @@ use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Permissions\Permission_Check;
 use FotoGrids\Permissions\Permission_Gate;
 use FotoGrids\Permissions\Permission_Options;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -54,7 +55,7 @@ final class Metabox_Registrar {
 		// boxes out of `high` and reorder them - defeating the rewrite above.
 		// Disable the saved order on the FotoGrids screens so the forced
 		// `high`-bucket order governs.
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( Post_Types::COLLECTION_TYPES as $post_type ) {
 			add_filter(
 				"get_user_option_meta-box-order_{$post_type}",
 				'__return_empty_array'
@@ -81,11 +82,11 @@ final class Metabox_Registrar {
 	public static function force_metabox_priority( $post_or_type ): void {
 		$screen = $post_or_type instanceof \WP_Post ? $post_or_type->post_type : (string) $post_or_type;
 
-		if ( ! in_array( $screen, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! in_array( $screen, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 
-		$normal_lead = 'fotogrids_album' === $screen ? 'fotogrids_album_galleries' : 'fotogrids_gallery_items';
+		$normal_lead = Post_Types::ALBUM === $screen ? 'fotogrids_album_galleries' : 'fotogrids_gallery_items';
 
 		self::pin_context_to_top(
 			$screen,
@@ -185,14 +186,14 @@ final class Metabox_Registrar {
 			'fotogrids_gallery_items',
 			__( 'Gallery Items', 'fotogrids' ),
 			array( __CLASS__, 'render_gallery_items' ),
-			'fotogrids_gallery',
+			Post_Types::GALLERY,
 			'normal',
 			'high'
 		);
 
 		global $post;
 
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( Post_Types::COLLECTION_TYPES as $post_type ) {
 			// Apply the per-CPT settings cap. When the user lacks it:
 			//   - 'hidden'   -> skip add_meta_box entirely.
 			//   - 'readonly' -> register normally; the React app reads the
@@ -209,7 +210,7 @@ final class Metabox_Registrar {
 				continue;
 			}
 
-			$title = 'fotogrids_gallery' === $post_type
+			$title = Post_Types::GALLERY === $post_type
 				? __( 'Gallery Settings', 'fotogrids' )
 				: __( 'Album Settings', 'fotogrids' );
 
@@ -227,7 +228,7 @@ final class Metabox_Registrar {
 			'fotogrids_gallery_albums',
 			__( 'Album Assignment', 'fotogrids' ),
 			array( __CLASS__, 'render_gallery_albums' ),
-			'fotogrids_gallery',
+			Post_Types::GALLERY,
 			'side',
 			'default'
 		);
@@ -245,7 +246,7 @@ final class Metabox_Registrar {
 	public static function enqueue_assets( $hook ): void {
 		global $post_type;
 
-		if ( ! in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! in_array( $post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 
@@ -328,7 +329,7 @@ final class Metabox_Registrar {
 			)
 		);
 
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( Post_Types::GALLERY === $post_type ) {
 			wp_enqueue_script(
 				'fotogrids-album-assignment',
 				FOTOGRIDS_PLUGIN_URL . 'assets/js/album-assignment.js',
@@ -339,7 +340,7 @@ final class Metabox_Registrar {
 			wp_set_script_translations( 'fotogrids-album-assignment', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 		}
 
-		if ( 'fotogrids_album' === $post_type ) {
+		if ( Post_Types::ALBUM === $post_type ) {
 			self::enqueue_album_galleries_script();
 		}
 	}
@@ -659,7 +660,7 @@ final class Metabox_Registrar {
 		wp_set_script_translations( 'fotogrids-album-galleries', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
 		global $post;
-		if ( ! ( $post instanceof \WP_Post ) || 'fotogrids_album' !== $post->post_type ) {
+		if ( ! ( $post instanceof \WP_Post ) || Post_Types::ALBUM !== $post->post_type ) {
 			return;
 		}
 

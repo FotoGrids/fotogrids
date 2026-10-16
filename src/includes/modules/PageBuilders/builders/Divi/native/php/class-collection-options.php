@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Modules\PageBuilders\Builders\Divi\Native;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -46,7 +48,7 @@ final class Collection_Options {
 	 * @return array<string,array{label:string}>
 	 */
 	public static function map( string $kind ): array {
-		$post_type = 'album' === $kind ? 'fotogrids_album' : 'fotogrids_gallery';
+		$post_type = 'album' === $kind ? Post_Types::ALBUM : Post_Types::GALLERY;
 
 		$posts = get_posts(
 			array(

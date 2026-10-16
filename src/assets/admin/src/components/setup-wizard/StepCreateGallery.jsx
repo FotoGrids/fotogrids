@@ -1,6 +1,7 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
+import { GALLERY_POST_TYPE } from '../../utils/post-types';
 
 /**
  * Card artwork - one grid motif in two states.
@@ -124,7 +125,7 @@ const CARDS = [
 			'fotogrids'
 		),
 		cta: __('Build custom', 'fotogrids'),
-		href: 'post-new.php?post_type=fotogrids_gallery',
+		href: `post-new.php?post_type=${GALLERY_POST_TYPE}`,
 	},
 	{
 		id: 'template',

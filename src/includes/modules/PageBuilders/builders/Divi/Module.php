@@ -12,6 +12,7 @@ namespace FotoGrids\Modules\PageBuilders\Builders\Divi;
 
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Hooks\Filters_Render;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Request_Source;
 
@@ -364,8 +365,8 @@ final class Module {
 		return array(
 			'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
 			'restNonce'        => wp_create_nonce( 'wp_rest' ),
-			'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
-			'albumCreateUrl'   => admin_url( 'post-new.php?post_type=fotogrids_album' ),
+			'galleryCreateUrl' => admin_url( 'post-new.php?post_type=' . Post_Types::GALLERY ),
+			'albumCreateUrl'   => admin_url( 'post-new.php?post_type=' . Post_Types::ALBUM ),
 			'galleryEditBase'  => admin_url( 'post.php?action=edit&post=' ),
 			'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
 			// divi/select reads options from the bundle's static module.json, where

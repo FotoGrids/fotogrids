@@ -13,6 +13,49 @@ if ( ! defined( 'WPINC' ) ) {
 class Post_Types {
 
 	/**
+	 * Gallery post type.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const GALLERY = 'fotogrids_gallery';
+
+	/**
+	 * Album post type.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const ALBUM = 'fotogrids_album';
+
+	/**
+	 * The collection post types: galleries and albums.
+	 *
+	 * @since 1.3.0
+	 * @var string[]
+	 */
+	const COLLECTION_TYPES = array( self::GALLERY, self::ALBUM );
+
+	/**
+	 * Collection kind for a post type or a kind.
+	 *
+	 * @since  1.3.0
+	 * @param  string|null $type Post type or collection kind.
+	 * @return string|null 'gallery', 'album', or null for anything else.
+	 */
+	public static function kind_of( ?string $type ): ?string {
+		if ( self::GALLERY === $type || 'gallery' === $type ) {
+			return 'gallery';
+		}
+
+		if ( self::ALBUM === $type || 'album' === $type ) {
+			return 'album';
+		}
+
+		return null;
+	}
+
+	/**
 	 * Initialize the class
 	 */
 	public static function init() {
@@ -20,8 +63,8 @@ class Post_Types {
 		add_action( 'init', array( __CLASS__, 'register_meta' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'hide_featured_image_metabox' ), 99 );
-		add_action( 'save_post_fotogrids_gallery', array( __CLASS__, 'save_featured_image' ), 10, 2 );
-		add_action( 'save_post_fotogrids_album', array( __CLASS__, 'save_featured_image' ), 10, 2 );
+		add_action( 'save_post_' . self::GALLERY, array( __CLASS__, 'save_featured_image' ), 10, 2 );
+		add_action( 'save_post_' . self::ALBUM, array( __CLASS__, 'save_featured_image' ), 10, 2 );
 
 		add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
 	}
@@ -47,7 +90,7 @@ class Post_Types {
 	 * @return void
 	 */
 	public static function register_meta() {
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( self::COLLECTION_TYPES as $post_type ) {
 			register_post_meta(
 				$post_type,
 				self::FEATURED_IMAGE_META_KEY,
@@ -82,8 +125,8 @@ class Post_Types {
 	 * @return void
 	 */
 	public static function hide_featured_image_metabox() {
-		remove_meta_box( 'postimagediv', 'fotogrids_gallery', 'side' );
-		remove_meta_box( 'postimagediv', 'fotogrids_album', 'side' );
+		remove_meta_box( 'postimagediv', self::GALLERY, 'side' );
+		remove_meta_box( 'postimagediv', self::ALBUM, 'side' );
 	}
 
 	/**
@@ -168,7 +211,7 @@ class Post_Types {
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
 		);
 
-		register_post_type( 'fotogrids_gallery', $args );
+		register_post_type( self::GALLERY, $args );
 	}
 
 	/**
@@ -236,7 +279,7 @@ class Post_Types {
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
 		);
 
-		register_post_type( 'fotogrids_album', $args );
+		register_post_type( self::ALBUM, $args );
 	}
 
 	/**
@@ -308,7 +351,7 @@ class Post_Types {
 				'fotogrids_gallery_shortcode',
 				__( 'Gallery Shortcode', 'fotogrids' ),
 				array( __CLASS__, 'shortcode_meta_box' ),
-				'fotogrids_gallery',
+				self::GALLERY,
 				'side',
 				'high'
 			);
@@ -317,7 +360,7 @@ class Post_Types {
 				'fotogrids_album_shortcode',
 				__( 'Album Shortcode', 'fotogrids' ),
 				array( __CLASS__, 'shortcode_meta_box' ),
-				'fotogrids_album',
+				self::ALBUM,
 				'side',
 				'high'
 			);
@@ -327,12 +370,12 @@ class Post_Types {
 			'fotogrids_album_galleries',
 			__( 'Galleries', 'fotogrids' ),
 			array( __CLASS__, 'album_galleries_meta_box' ),
-			'fotogrids_album',
+			self::ALBUM,
 			'normal',
 			'high'
 		);
 
-		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+		foreach ( self::COLLECTION_TYPES as $post_type ) {
 			add_meta_box(
 				'fotogrids_featured_image',
 				__( 'Featured / Share Image', 'fotogrids' ),
@@ -364,7 +407,7 @@ class Post_Types {
 		$thumb_url     = $attachment_id > 0 ? (string) wp_get_attachment_image_url( $attachment_id, 'medium' ) : '';
 		$has_image     = '' !== $thumb_url;
 
-		$is_album    = 'fotogrids_album' === $post->post_type;
+		$is_album    = self::ALBUM === $post->post_type;
 		$description = $is_album
 			? __( 'Used as the album cover and social-share image. If left empty, FotoGrids uses the featured gallery’s cover, then the first available image.', 'fotogrids' )
 			: __( 'Used as the gallery cover and social-share image. If left empty, FotoGrids uses the featured item, then the first image in the gallery.', 'fotogrids' );
@@ -454,7 +497,7 @@ class Post_Types {
 		$post_id   = (int) $post->ID;
 		$post_type = get_post_type( $post );
 
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( self::GALLERY === $post_type ) {
 			$shortcode  = '[fotogrids_gallery id="' . $post_id . '"]';
 			$type_label = __( 'gallery', 'fotogrids' );
 		} else {
@@ -513,7 +556,7 @@ class Post_Types {
 	 * @return bool Whether to use block editor
 	 */
 	public static function disable_gutenberg( $current_status, $post_type ) {
-		if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' ), true ) ) {
+		if ( in_array( $post_type, array( self::GALLERY, self::ALBUM, 'fotogrids_embed' ), true ) ) {
 			return false;
 		}
 

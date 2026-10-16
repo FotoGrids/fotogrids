@@ -13,6 +13,7 @@ namespace FotoGrids\Metaboxes;
 use FotoGrids\Exif\Exif_Extractor;
 use FotoGrids\Galleries\Gallery_Items;
 use FotoGrids\Galleries\Item_Meta;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -473,7 +474,7 @@ final class Item_Ajax_Endpoints {
 		}
 
 		$post = get_post( $gallery_id );
-		if ( ! $post || 'fotogrids_gallery' !== $post->post_type ) {
+		if ( ! $post || Post_Types::GALLERY !== $post->post_type ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid gallery', 'fotogrids' ) ) );
 		}
 

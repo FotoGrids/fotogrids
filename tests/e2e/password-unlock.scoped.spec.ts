@@ -44,10 +44,10 @@ function passwordGallery(
 	return created;
 }
 
-/** A page the purge removes, holding whatever shortcodes it is given. */
-function pageWith( content: string ): string {
+/** A post the purge removes, holding whatever shortcodes it is given. */
+function postWith( content: string ): string {
 	return wpEval(
-		`$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
+		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
 	).trim();
 }
 
@@ -262,7 +262,7 @@ test.describe( 'with remember off', () => {
 	test( 'two galleries on one page unlock separately', { tag: '@gate' }, async ( { page } ) => {
 		const first = passwordGallery();
 		const second = passwordGallery();
-		const url = pageWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
+		const url = postWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
 		const one = new GalleryRender( page, first.id );
 		const two = new GalleryRender( page, second.id );
 
@@ -282,7 +282,7 @@ test.describe( 'with remember off', () => {
 	test( 'a gallery opened in place from an album pages after unlocking', { tag: '@gate' }, async ( { page } ) => {
 		const { id } = passwordGallery();
 		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
-		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
 		const gallery = new GalleryRender( page, id );
 
 		await page.goto( url );
@@ -421,7 +421,7 @@ test.describe( 'a Load More click as soon as the gallery appears', () => {
 	test( 'pages a gallery opened in place from an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
 		const { id } = galleryPage( PAGINATED, twelveItems() );
 		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
-		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
 		const gallery = new GalleryRender( page, id );
 		await slowLoadMoreScript( page );
 
@@ -434,7 +434,7 @@ test.describe( 'a Load More click as soon as the gallery appears', () => {
 	test( 'pages a password gallery unlocked inside an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
 		const { id } = passwordGallery();
 		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
-		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
 		const gallery = new GalleryRender( page, id );
 		await slowLoadMoreScript( page );
 

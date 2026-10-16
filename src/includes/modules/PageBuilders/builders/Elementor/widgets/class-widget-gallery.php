@@ -16,6 +16,7 @@ use FotoGrids\Modules\PageBuilders\Builders\Elementor\Controls\Gallery_Picker;
 use FotoGrids\Modules\PageBuilders\Builders\Elementor\Module as Elementor_Module;
 use FotoGrids\Modules\PageBuilders\Preview_Options;
 use FotoGrids\Modules\PageBuilders\Preview_Renderer;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Request_Source;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -160,7 +161,7 @@ class Widget_Gallery extends Widget_Base {
 			array(
 				'type' => Controls_Manager::RAW_HTML,
 				'raw'  => Elementor_Module::create_button_html(
-					admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
+					admin_url( 'post-new.php?post_type=' . Post_Types::GALLERY ),
 					__( 'Create new gallery', 'fotogrids' )
 				),
 			)

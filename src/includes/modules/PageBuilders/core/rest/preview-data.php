@@ -14,6 +14,7 @@ use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Preview_Options;
 use FotoGrids\Modules\PageBuilders\Preview_Renderer;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Asset_Resolver;
@@ -61,7 +62,7 @@ final class Preview_Data {
 		$gallery_id   = absint( $request->get_param( 'id' ) );
 		$gallery_post = get_post( $gallery_id );
 
-		if ( ! $gallery_post || 'fotogrids_gallery' !== $gallery_post->post_type ) {
+		if ( ! $gallery_post || Post_Types::GALLERY !== $gallery_post->post_type ) {
 			return new \WP_Error(
 				'fotogrids_preview_gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),
@@ -201,7 +202,7 @@ final class Preview_Data {
 		$album_id   = absint( $request->get_param( 'id' ) );
 		$album_post = get_post( $album_id );
 
-		if ( ! $album_post || 'fotogrids_album' !== $album_post->post_type ) {
+		if ( ! $album_post || Post_Types::ALBUM !== $album_post->post_type ) {
 			return new \WP_Error(
 				'fotogrids_preview_album_not_found',
 				__( 'Album not found.', 'fotogrids' ),
@@ -272,7 +273,7 @@ final class Preview_Data {
 		$search   = trim( (string) $request->get_param( 'search' ) );
 		$orderby  = (string) $request->get_param( 'orderby' );
 
-		$post_type = 'album' === $type ? 'fotogrids_album' : 'fotogrids_gallery';
+		$post_type = 'album' === $type ? Post_Types::ALBUM : Post_Types::GALLERY;
 
 		$caps       = get_post_type_object( $post_type )->cap ?? null;
 		$all_drafts = $caps && current_user_can( $caps->edit_others_posts );
@@ -394,7 +395,7 @@ final class Preview_Data {
 		$gallery_id = wp_insert_post(
 			array(
 				'post_title'  => sanitize_text_field( $title ),
-				'post_type'   => 'fotogrids_gallery',
+				'post_type'   => Post_Types::GALLERY,
 				'post_status' => 'draft',
 			),
 			true
