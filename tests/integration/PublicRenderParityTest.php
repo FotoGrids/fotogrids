@@ -84,6 +84,11 @@ namespace {
     if ( ! function_exists( 'wp_enqueue_script' ) ) {
         function wp_enqueue_script(): void {}
     }
+    if ( ! function_exists( 'wp_register_style' ) ) {
+        function wp_register_style(): bool {
+            return true;
+        }
+    }
     if ( ! function_exists( 'wp_enqueue_style' ) ) {
         function wp_enqueue_style(): void {}
     }
@@ -234,6 +239,7 @@ use FotoGrids\Render\Api\Render_Layout;
 use FotoGrids\Render\Api\Render_Meta;
 use FotoGrids\Render\Api\Render_Mode;
 use FotoGrids\Render\Api\Request_Source;
+use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Item_Renderer;
 use FotoGrids\Render\Internal\Module_Registry;
 use FotoGrids\Render\Internal\Render_Controller;
@@ -243,6 +249,7 @@ require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-mode.p
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-collection-kind.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-item-view.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-asset-decl.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-module-assets.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-meta.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-layout.php';
@@ -463,11 +470,19 @@ final class PublicRenderParityTest {
     private static function test_error_markup_visibility_respects_settings_flag(): void {
         Module_Registry::reset();
 
+        Asset_Resolver::register_plugin( 'fotogrids', 'https://example.com/wp-content/plugins/fotogrids/', '1.0.0' );
+
         $hidden_error_result = Render_Controller::factory()->render( self::make_context( false ) );
         self::assert_same( '<div class="fotogrids-error" hidden></div>', $hidden_error_result->html, 'Public error should remain hidden.' );
+        self::assert_true( ! isset( Asset_Resolver::instance()->get_css_asset_urls()['fotogrids-errors'] ), 'A hidden error should not enqueue the error stylesheet.' );
 
         $visible_error_result = Render_Controller::factory()->render( self::make_context( true, show_error: true, layout_id: 'carousel' ) );
         self::assert_contains( '<div class="fotogrids-error">', $visible_error_result->html, 'Admin-visible error block should be present when enabled.' );
+        self::assert_same(
+            'https://example.com/wp-content/plugins/fotogrids/public/render/../assets/fotogrids-errors.css',
+            Asset_Resolver::instance()->get_css_asset_urls()['fotogrids-errors'] ?? '',
+            'A visible error should enqueue the error stylesheet.'
+        );
     }
 
     private static function make_context( bool $with_item, bool $show_error = false, string $layout_id = 'grid' ): Render_Context {
