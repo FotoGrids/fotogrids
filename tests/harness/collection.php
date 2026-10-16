@@ -310,7 +310,7 @@ if ( 'adopt' === $op ) {
 if ( 'purge' === $op ) {
 	$owned = get_posts(
 		array(
-			'post_type'        => array( 'post', 'fotogrids_gallery', 'fotogrids_album' ),
+			'post_type'        => array( 'post', 'page', 'fotogrids_gallery', 'fotogrids_album' ),
 			'post_status'      => 'any',
 			'posts_per_page'   => -1,
 			'fields'           => 'ids',

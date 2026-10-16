@@ -1,5 +1,5 @@
 import { execFileSync, spawn, type ChildProcess } from 'child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'fs';
 import { createServer } from 'net';
 import { tmpdir } from 'os';
 import path from 'path';
@@ -87,6 +87,11 @@ export class ScratchSite {
 		const build = realpathSync( path.join( STATE, 'wp', 'wp-content', 'plugins', 'fotogrids' ) );
 		rmSync( plugin, { recursive: true, force: true } );
 		cpSync( build, plugin, { recursive: true, dereference: true } );
+
+		// A failed update check logs a core warning that phpErrors() would count.
+		const muPlugins = path.join( this.dir, 'wp-content', 'mu-plugins' );
+		mkdirSync( muPlugins, { recursive: true } );
+		copyFileSync( path.join( HARNESS, 'no-update-checks.php' ), path.join( muPlugins, 'no-update-checks.php' ) );
 
 		execFileSync( 'mysql', [
 			...mysqlArgs(),
