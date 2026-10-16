@@ -23,7 +23,8 @@
   "baseUrl": ".",
   "paths": {
     "@/*": ["src/assets/*"],
-    "@modules/*": ["src/includes/modules/*"]
+    "@modules/*": ["src/includes/modules/*"],
+    "@packages/*": ["src/packages/*"]
   },
     "declaration": true,
     "declarationMap": true,
@@ -33,6 +34,7 @@
     "src/assets/admin/src/**/*",
     "src/assets/admin/plain/**/*",
     "src/assets/frontend/src/**/*",
+    "src/packages/**/*",
     "tests/**/*.ts",
     "playwright.config.ts",
     "**/*.d.ts"
@@ -41,6 +43,7 @@
     "node_modules",
     "build",
     "dist",
-    "vendor"
+    "vendor",
+    "src/packages/*/tests"
   ]
 }

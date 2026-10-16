@@ -114,6 +114,38 @@ export default [
         },
     },
     {
+        files: ['src/packages/*/tests/**'],
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+            },
+        },
+    },
+    {
+        // Packages are self-contained: they import nothing from the app.
+        files: ['src/packages/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: ['@/*', '@modules/*', '@packages/*', '../../../*'],
+                },
+            ],
+        },
+    },
+    {
+        // The format package also runs on visitor pages: no framework imports.
+        files: ['src/packages/fg-formatted-text/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: ['@/*', '@modules/*', '@packages/*', '@wordpress/*', 'react', 'react-dom', '../../*'],
+                },
+            ],
+        },
+    },
+    {
         files: ['src/**/*.{js,jsx,ts,tsx}'],
         ignores: ['src/assets/admin/plain/**', 'src/public/assets/**'],
         rules: {

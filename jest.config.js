@@ -45,11 +45,13 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/assets/$1',
         '^@tests/(.*)$': '<rootDir>/src/tests/$1',
         '^@modules/(.*)$': '<rootDir>/src/includes/modules/$1',
+        '^@packages/(.*)$': '<rootDir>/src/packages/$1',
         '^@wordpress/media-utils$': '<rootDir>/src/tests/setup/mediaUtilsStub.js'
     },
 
     collectCoverageFrom: [
         'src/assets/**/*.{js,ts,tsx}',
+        'src/packages/**/*.{js,ts,tsx}',
         '!src/assets/**/*.d.ts',
         '!src/assets/**/index.{js,ts}',
         '!src/assets/**/*.stories.{js,ts,tsx}',
