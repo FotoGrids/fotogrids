@@ -132,6 +132,7 @@ async function publishFromAddNew( page: Page, kind: Kind, title: string ): Promi
 		).trim()
 	);
 	expect( id, `the ${ kind } was not saved` ).toBeGreaterThan( 0 );
+	expect( page.url(), 'Publish did not land on the editor' ).toContain( `post=${ id }&action=edit` );
 
 	return id;
 }
@@ -305,6 +306,8 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 			const list = await openFromMenu( page, LISTS[ kind ] );
 			await expectList( page, list, kind );
 			expect( await listedIds( page ) ).toContain( id );
+			await expect( page.locator( `#post-${ id } a.row-title` ) ).toHaveCount( 1 );
+			await expect( page.locator( `#post-${ id } .row-actions .trash a` ) ).toHaveCount( 1 );
 		} );
 	}
 } );
