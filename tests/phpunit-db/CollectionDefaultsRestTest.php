@@ -146,12 +146,10 @@ class CollectionDefaultsRestTest extends WP_UnitTestCase {
 
 		Admin_Init::enqueue_admin_scripts( 'fotogrids_page_fotogrids-settings' );
 
-		$data   = (string) wp_scripts()->get_data( 'fotogrids-collection-settings', 'data' );
-		$before = implode( "\n", (array) wp_scripts()->get_data( 'fotogrids-collection-settings', 'before' ) );
+		$data = (string) wp_scripts()->get_data( 'fotogrids-collection-settings', 'data' );
 
-		$this->assertStringContainsString( 'var fotogridsDefaultsSettings = ', $data );
-		$this->assertStringContainsString( '"postType":"fotogrids_gallery"', $data );
-		$this->assertStringContainsString( '"postType":"fotogrids_album"', $data );
-		$this->assertStringContainsString( 'window.fotogridsSettings = window.fotogridsDefaultsSettings["album"];', $before );
+		$this->assertMatchesRegularExpression( '/var fotogridsSettings = \{[^;]*"postType":"fotogrids_album"/', $data );
+		$this->assertMatchesRegularExpression( '/var fotogridsSettings = \{[^;]*"layout":"masonry"/', $data );
+		$this->assertMatchesRegularExpression( '/var fotogridsDefaultsByKind = \{"gallery":\{[^;]*"layout":"justified"[^;]*\},"album":\{[^;]*"layout":"masonry"/', $data );
 	}
 }

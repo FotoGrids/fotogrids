@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Migrations;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\Collection_Defaults_Store;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -107,9 +108,11 @@ final class List_Setting_Repair {
 					"SELECT pm.post_id, pm.meta_value
 					FROM {$wpdb->postmeta} pm
 					INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-					WHERE p.post_type IN ( 'fotogrids_gallery', 'fotogrids_album' )
+					WHERE p.post_type IN ( %s, %s )
 					AND pm.meta_key = %s
 					AND pm.meta_value <> ''",
+					Post_Types::GALLERY,
+					Post_Types::ALBUM,
 					$meta_key
 				)
 			);

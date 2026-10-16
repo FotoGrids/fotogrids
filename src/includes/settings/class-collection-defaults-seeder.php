@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Settings;
 
 use FotoGrids\Hooks\Filters_Settings;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -97,7 +98,7 @@ final class Collection_Defaults_Seeder {
 			return;
 		}
 
-		if ( ! in_array( $post->post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! in_array( $post->post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 
@@ -123,7 +124,7 @@ final class Collection_Defaults_Seeder {
 			return;
 		}
 
-		$defaults = 'fotogrids_album' === $post_type
+		$defaults = Post_Types::ALBUM === $post_type
 			? \FotoGrids\Collection_Defaults::resolve_album()
 			: \FotoGrids\Collection_Defaults::resolve_gallery();
 

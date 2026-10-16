@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Galleries;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -105,7 +107,7 @@ final class Item_Meta_Consolidation {
 	 * @return bool True when the list was written.
 	 */
 	public static function restore_list( int $gallery_id, array $attachment_ids ): bool {
-		if ( 'fotogrids_gallery' !== get_post_type( $gallery_id ) ) {
+		if ( Post_Types::GALLERY !== get_post_type( $gallery_id ) ) {
 			return false;
 		}
 		if ( metadata_exists( 'post', $gallery_id, 'fotogrids_gallery_items' ) ) {

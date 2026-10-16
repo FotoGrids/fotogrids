@@ -55,9 +55,7 @@ final class Collection_Defaults_Store {
 	 * @return string|null `gallery` or `album`, or null for anything else.
 	 */
 	public static function type( string $type ): ?string {
-		$type = 0 === strpos( $type, 'fotogrids_' ) ? substr( $type, strlen( 'fotogrids_' ) ) : $type;
-
-		return in_array( $type, self::TYPES, true ) ? $type : null;
+		return \FotoGrids\Post_Types::kind_of( $type );
 	}
 
 	/**

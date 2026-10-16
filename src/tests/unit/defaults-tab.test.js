@@ -47,9 +47,13 @@ beforeEach(() => {
 	apiFetch.mockImplementation(({ data }) =>
 		Promise.resolve({ type: data.type, defaults: data.defaults })
 	);
-	window.fotogridsDefaultsSettings = {
+	window.fotogridsDefaultsByKind = {
 		gallery: payload('gallery', 'justified'),
 		album: payload('album', 'masonry'),
+	};
+	window.fotogridsSettings = {
+		isDefaultsMode: true,
+		...payload('gallery', 'justified'),
 	};
 	window.fotogridsAdmin = { autosave: '1' };
 	delete window.FotoGridsAdmin;
@@ -57,7 +61,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	document.body.innerHTML = '';
-	delete window.fotogridsDefaultsSettings;
+	delete window.fotogridsDefaultsByKind;
 	delete window.fotogridsSettings;
 });
 

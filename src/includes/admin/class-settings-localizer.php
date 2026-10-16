@@ -13,6 +13,7 @@ namespace FotoGrids\Admin;
 use FotoGrids\Collection_Defaults;
 use FotoGrids\Links;
 use FotoGrids\Password_Crypto;
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\SEO_Settings_Store;
 use FotoGrids\Settings\Sharing_Settings_Store;
 use FotoGrids\Settings\Watermark_Settings_Store;
@@ -37,13 +38,27 @@ if ( ! defined( 'WPINC' ) ) {
 final class Settings_Localizer {
 
 	/**
+	 * Payload fields whose values depend on the collection kind.
+	 *
+	 * @var string[]
+	 */
+	private const KIND_FIELDS = array(
+		'postType',
+		'collectionKind',
+		'defaults',
+		'settings',
+		'defaultsUrl',
+		'documentationUrl',
+	);
+
+	/**
 	 * Build the localised data payload.
 	 *
 	 * @since 1.0.0
 	 * @param array $args {
 	 *     Optional. Localiser arguments.
 	 *     @type int          $post_id        Post ID (default: 0).
-	 *     @type string|null  $post_type      'fotogrids_gallery' | 'fotogrids_album'.
+	 *     @type string|null  $post_type      Post type, or the collection kind ('gallery' | 'album').
 	 *     @type bool         $is_defaults    Whether this is the global defaults page.
 	 *     @type array        $gallery_items  Pre-loaded gallery items (default: read from post meta).
 	 *     @type array|null   $settings       Pre-built settings array (default: read from post meta).
@@ -95,6 +110,29 @@ final class Settings_Localizer {
 	}
 
 	/**
+	 * Build the kind-dependent payload fields for each collection kind.
+	 *
+	 * @since  1.3.0
+	 * @return array<string, array<string, mixed>> Fields keyed by collection kind.
+	 */
+	public static function defaults_by_kind(): array {
+		$by_kind = array();
+
+		foreach ( Post_Types::COLLECTION_TYPES as $post_type ) {
+			$data = self::data_for_collection(
+				array(
+					'post_type'   => $post_type,
+					'is_defaults' => true,
+				)
+			);
+
+			$by_kind[ Post_Types::kind_of( $post_type ) ] = array_intersect_key( $data, array_flip( self::KIND_FIELDS ) );
+		}
+
+		return $by_kind;
+	}
+
+	/**
 	 * Resolve the effective post type from explicit args or by reading the
 	 * post.
 	 */
@@ -110,7 +148,7 @@ final class Settings_Localizer {
 			}
 		}
 
-		return 'gallery';
+		return Post_Types::GALLERY;
 	}
 
 	/**
@@ -119,7 +157,7 @@ final class Settings_Localizer {
 	 * @return array<string, mixed>
 	 */
 	private static function resolve_defaults( string $post_type, bool $is_defaults_page ): array {
-		if ( 'fotogrids_album' === $post_type ) {
+		if ( 'album' === Post_Types::kind_of( $post_type ) ) {
 			return Collection_Defaults::resolve_album( $is_defaults_page );
 		}
 		return Collection_Defaults::resolve_gallery( $is_defaults_page );
@@ -252,7 +290,7 @@ final class Settings_Localizer {
 	 * @return array<string, mixed>
 	 */
 	private static function assemble_payload( array $args, array $gallery_items ): array {
-		$fg_post_type = 'fotogrids_album' === $args['post_type'] ? 'album' : 'gallery';
+		$fg_post_type = Post_Types::kind_of( $args['post_type'] ) ?? 'gallery';
 
 		$data = array(
 			'settings'         => $args['settings'],
@@ -262,6 +300,7 @@ final class Settings_Localizer {
 			'globalWatermark'  => Watermark_Settings_Store::get(),
 			'postId'           => $args['post_id'],
 			'postType'         => $args['post_type'],
+			'collectionKind'   => $fg_post_type,
 			'nonce'            => wp_create_nonce( 'fotogrids_settings' ),
 			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
 			'allowGoogleFonts' => (bool) get_option( 'fotogrids_allow_google_fonts', true ),

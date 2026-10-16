@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
+use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Instance_Id_Factory;
@@ -620,7 +621,8 @@ class Public_Render {
 	/**
 	 * Localizes the runtime and enqueues the error stylesheet on pages with FotoGrids content.
 	 *
-	 * Gallery assets are enqueued by the render pipeline, not here.
+	 * Gallery assets are enqueued by the render pipeline, not here. Error blocks
+	 * rendered outside the post content enqueue the stylesheet themselves.
 	 */
 	public static function enqueue_frontend_scripts() {
 		\FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap::localize();
@@ -641,6 +643,8 @@ class Public_Render {
 	 * Returns the error block for a gallery that cannot be rendered.
 	 *
 	 * Only users who can edit posts see the message; others get a hidden block.
+	 * A visible block enqueues its stylesheet, so it is styled wherever the
+	 * shortcode runs: post content, template parts or widgets.
 	 *
 	 * @since 1.3.0
 	 * @param string $message Translated message.
@@ -650,6 +654,10 @@ class Public_Render {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return '<div class="fotogrids-error" hidden></div>';
 		}
+
+		$resolver = Asset_Resolver::instance();
+		$resolver->collect( Render_Result::error_assets(), 'fotogrids' );
+		$resolver->flush();
 
 		return '<div class="fotogrids-error">FotoGrids: ' . esc_html( $message ) . '</div>';
 	}
@@ -668,7 +676,7 @@ class Public_Render {
 		}
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return self::error_notice(
 				sprintf(
 					/* translators: %d: gallery ID. */

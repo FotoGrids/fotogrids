@@ -3,6 +3,7 @@ namespace FotoGrids\REST\Gallery;
 
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Filters_Security;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Internal\Gallery_Item_Sequence;
 use FotoGrids\Render\Internal\Render_Controller;
 
@@ -60,7 +61,7 @@ class Gallery_Permissions {
 	 */
 	public static function authorize_gallery_view( int $gallery_id ) {
 		$gallery = $gallery_id > 0 ? get_post( $gallery_id ) : null;
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),

@@ -108,6 +108,7 @@ namespace FotoGrids\Tests\Integration {
     require_once $src . 'includes/hooks/actions/class-actions-gallery.php';
     require_once $src . 'includes/settings/class-sharing-settings-store.php';
     require_once $src . 'includes/galleries/class-embed-store.php';
+    require_once $src . 'includes/class-post-types.php';
     require_once $src . 'includes/rest/stats/stats-data.php';
 
     /**

@@ -182,7 +182,7 @@ final class Render_Controller {
 			$layout_module = $this->select_layout( $render );
 			if ( null === $layout_module ) {
 				$show_inline_error = ! empty( $render->settings['_show_render_errors'] );
-				$this->asset_resolver->flush();
+				$this->flush_error_assets( $show_inline_error );
 				return Render_Result::error(
 					sprintf( "No layout supports id '%s'", $render->layout->layout_id ),
 					$render->meta->gallery_id,
@@ -314,7 +314,7 @@ final class Render_Controller {
 			return $render_result;
 		} catch ( \Throwable $throwable ) {
 			$show_inline_error = ! empty( $render->settings['_show_render_errors'] );
-			$this->asset_resolver->flush();
+			$this->flush_error_assets( $show_inline_error );
 			return Render_Result::error(
 				$throwable->getMessage(),
 				$render->meta->gallery_id,
@@ -325,6 +325,20 @@ final class Render_Controller {
 		} finally {
 			\FotoGrids\Watermark\Watermark_Render_Filter::end();
 		}
+	}
+
+	/**
+	 * Flushes collected assets, adding the error stylesheet when the error is shown.
+	 *
+	 * @since  1.3.0
+	 * @param  bool $show_inline_error Whether the error markup is visible.
+	 * @return void
+	 */
+	private function flush_error_assets( bool $show_inline_error ): void {
+		if ( $show_inline_error ) {
+			$this->asset_resolver->collect( Render_Result::error_assets(), 'fotogrids' );
+		}
+		$this->asset_resolver->flush();
 	}
 
 	/**

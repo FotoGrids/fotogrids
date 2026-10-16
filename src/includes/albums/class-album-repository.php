@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Albums;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -33,7 +34,7 @@ final class Album_Repository {
 	public static function get( int $album_id ): ?\WP_Post {
 		$album = get_post( $album_id );
 
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return null;
 		}
 

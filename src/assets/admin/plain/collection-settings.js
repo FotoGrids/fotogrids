@@ -268,7 +268,6 @@ const renderIcon = (iconName) => {
 window.FotoGridsCollectionSettings = window.FotoGridsCollectionSettings || {};
 
 function CollectionSettings() {
-	const postType = window.fotogridsSettings?.postType || 'gallery';
 	const isDefaultsMode = window.fotogridsSettings?.isDefaultsMode || false;
 	// Autosave drives ajax-save.js, which is only enqueued on the gallery and
 	// album edit screens, and its AJAX writer requires the settings cap. An
@@ -278,11 +277,7 @@ function CollectionSettings() {
 		window.fotogridsAdmin?.capabilities?.manage_fotogrids_settings !==
 			false;
 	const normalizedPostType =
-		postType === 'fotogrids_gallery'
-			? 'gallery'
-			: postType === 'fotogrids_album'
-				? 'album'
-				: postType;
+		window.fotogridsSettings?.collectionKind || 'gallery';
 
 	const uiState = window.FotoGridsUiState?.createNamespace({
 		area: 'collection-settings',

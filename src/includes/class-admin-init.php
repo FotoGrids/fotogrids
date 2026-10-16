@@ -34,8 +34,11 @@ class Admin_Init {
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-columns.php';
 		\FotoGrids\Admin\Admin_Columns::init();
 
-		add_filter( 'bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'gallery_bulk_actions' ) );
-		add_filter( 'handle_bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'handle_gallery_bulk_actions' ), 10, 3 );
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-body-class.php';
+		\FotoGrids\Admin\Admin_Body_Class::init();
+
+		add_filter( 'bulk_actions-edit-' . Post_Types::GALLERY, array( __CLASS__, 'gallery_bulk_actions' ) );
+		add_filter( 'handle_bulk_actions-edit-' . Post_Types::GALLERY, array( __CLASS__, 'handle_gallery_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( __CLASS__, 'bulk_action_admin_notices' ) );
 		add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_bulk_album_selector_assets' ) );
@@ -111,7 +114,7 @@ class Admin_Init {
 			__( 'Galleries', 'fotogrids' ),
 			__( 'Galleries', 'fotogrids' ),
 			'edit_fotogrids_galleries',
-			'edit.php?post_type=fotogrids_gallery',
+			'edit.php?post_type=' . Post_Types::GALLERY,
 			''
 		);
 
@@ -120,7 +123,7 @@ class Admin_Init {
 			__( 'Albums', 'fotogrids' ),
 			__( 'Albums', 'fotogrids' ),
 			'edit_fotogrids_albums',
-			'edit.php?post_type=fotogrids_album',
+			'edit.php?post_type=' . Post_Types::ALBUM,
 			''
 		);
 
@@ -382,26 +385,22 @@ class Admin_Init {
 			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true );
 
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$subtab = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
-			$active = ( 'album' === $subtab ) ? 'album' : 'gallery';
+			$subtab    = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
+			$post_type = ( 'album' === $subtab ) ? Post_Types::ALBUM : Post_Types::GALLERY;
 
-			$defaults_data = array();
-			foreach ( \FotoGrids\Settings\Collection_Defaults_Store::TYPES as $type ) {
-				$defaults_data[ $type ] = \FotoGrids\Admin\Settings_Localizer::data_for_collection(
-					array(
-						'post_id'     => 0,
-						'post_type'   => 'fotogrids_' . $type,
-						'is_defaults' => true,
-					)
-				);
-			}
+			$localized_data = \FotoGrids\Admin\Settings_Localizer::data_for_collection(
+				array(
+					'post_id'     => 0,
+					'post_type'   => $post_type,
+					'is_defaults' => true,
+				)
+			);
 
-			// DefaultsTab swaps fotogridsSettings to each subtab's entry before mounting it.
-			wp_localize_script( 'fotogrids-collection-settings', 'fotogridsDefaultsSettings', $defaults_data );
-			wp_add_inline_script(
+			wp_localize_script( 'fotogrids-collection-settings', 'fotogridsSettings', $localized_data );
+			wp_localize_script(
 				'fotogrids-collection-settings',
-				'window.fotogridsSettings = window.fotogridsDefaultsSettings[' . wp_json_encode( $active ) . '];',
-				'before'
+				'fotogridsDefaultsByKind',
+				\FotoGrids\Admin\Settings_Localizer::defaults_by_kind()
 			);
 		}
 	}
@@ -895,7 +894,7 @@ class Admin_Init {
 	private static function get_editable_albums(): array {
 		$albums = get_posts(
 			array(
-				'post_type'   => 'fotogrids_album',
+				'post_type'   => Post_Types::ALBUM,
 				'numberposts' => -1,
 				'post_status' => array( 'publish', 'draft', 'private' ),
 				'orderby'     => 'title',
@@ -958,13 +957,13 @@ class Admin_Init {
 					break;
 				}
 
-				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== 'fotogrids_album' || ! current_user_can( 'edit_post', $album_id ) ) {
+				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== Post_Types::ALBUM || ! current_user_can( 'edit_post', $album_id ) ) {
 					$redirect_to = add_query_arg( 'bulk_error', 'invalid_album', $redirect_to );
 					break;
 				}
 
 				foreach ( $post_ids as $post_id ) {
-					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
+					if ( get_post_type( $post_id ) === Post_Types::GALLERY ) {
 						$result = current_user_can( 'edit_post', $post_id )
 							&& \FotoGrids\Gallery_Album_Relations::add_gallery_to_album( $post_id, $album_id );
 						if ( $result ) {
@@ -987,7 +986,7 @@ class Admin_Init {
 
 			case 'remove_from_albums':
 				foreach ( $post_ids as $post_id ) {
-					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
+					if ( get_post_type( $post_id ) === Post_Types::GALLERY ) {
 						$albums        = current_user_can( 'edit_post', $post_id )
 							? \FotoGrids\Gallery_Album_Relations::get_albums_for_gallery( $post_id )
 							: array();
@@ -1030,7 +1029,7 @@ class Admin_Init {
 	public static function bulk_action_admin_notices() {
 		global $post_type, $pagenow;
 
-		if ( 'edit.php' !== $pagenow || 'fotogrids_gallery' !== $post_type ) {
+		if ( 'edit.php' !== $pagenow || Post_Types::GALLERY !== $post_type ) {
 			return;
 		}
 
@@ -1172,7 +1171,7 @@ class Admin_Init {
 	public static function bulk_action_album_selector() {
 		global $post_type;
 
-		if ( 'fotogrids_gallery' !== $post_type ) {
+		if ( Post_Types::GALLERY !== $post_type ) {
 			return;
 		}
 
@@ -1314,7 +1313,7 @@ class Admin_Init {
 		}
 
 		$screen = get_current_screen();
-		if ( ! $screen || 'fotogrids_gallery' !== $screen->post_type ) {
+		if ( ! $screen || Post_Types::GALLERY !== $screen->post_type ) {
 			return;
 		}
 
@@ -1492,13 +1491,13 @@ class Admin_Init {
 	public static function fix_menu_highlighting() {
 		global $parent_file, $submenu_file, $post_type;
 
-		if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( in_array( $post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			$parent_file = 'fotogrids'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 
-			if ( 'fotogrids_gallery' === $post_type ) {
-				$submenu_file = 'edit.php?post_type=fotogrids_gallery'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
-			} elseif ( 'fotogrids_album' === $post_type ) {
-				$submenu_file = 'edit.php?post_type=fotogrids_album'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
+			if ( Post_Types::GALLERY === $post_type ) {
+				$submenu_file = 'edit.php?post_type=' . Post_Types::GALLERY; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
+			} elseif ( Post_Types::ALBUM === $post_type ) {
+				$submenu_file = 'edit.php?post_type=' . Post_Types::ALBUM; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 			}
 		}
 	}

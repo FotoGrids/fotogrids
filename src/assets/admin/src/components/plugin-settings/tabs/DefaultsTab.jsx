@@ -4,6 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { Panel, SaveBar } from '../../shared/settings';
 import ErrorBoundary from '../../shared/ErrorBoundary';
+import { toPostType } from '../../../utils/post-types';
 
 const ENDPOINT = '/fotogrids/v1/admin/collection-defaults';
 
@@ -141,13 +142,18 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 
 		const container = containerRef.current;
 		const typeLabel = type === 'gallery' ? 'gallery' : 'album';
-		const payload = window.fotogridsDefaultsSettings?.[typeLabel];
+		const byKind = window.fotogridsDefaultsByKind?.[typeLabel];
 
 		// Written before the panel mounts and left alone while it is mounted.
-		if (payload) {
-			window.fotogridsSettings = panelPayload(
-				payload,
-				savedSinceLoad[typeLabel]
+		if (window.fotogridsSettings) {
+			Object.assign(
+				window.fotogridsSettings,
+				byKind
+					? panelPayload(byKind, savedSinceLoad[typeLabel])
+					: {
+							postType: toPostType(typeLabel),
+							collectionKind: typeLabel,
+						}
 			);
 		}
 

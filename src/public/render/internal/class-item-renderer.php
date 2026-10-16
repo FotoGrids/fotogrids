@@ -345,7 +345,7 @@ final class Item_Renderer {
 	}
 
 	/**
-	 * Renders the inline loading-icon SVG for one item, with IDs made unique per item.
+	 * Renders the inline loading-icon SVG for one item, with IDs unique per item and gallery instance.
 	 *
 	 * @since   1.0.0
 	 * @param   Item_View      $item_view Item data.
@@ -359,7 +359,7 @@ final class Item_Renderer {
 		}
 
 		if ( $item_view->id > 0 ) {
-			$instance_id = 'fgi' . $item_view->id;
+			$instance_id = $render_context->meta->instance_id . '-i' . $item_view->id;
 		} else {
 			++$this->loader_counter;
 			$instance_id = 'fgic' . $this->loader_counter;
