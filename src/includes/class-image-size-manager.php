@@ -687,7 +687,7 @@ final class Image_Size_Manager {
 		$settings = array(
 			'thumbnail_width'     => max( 1, (int) ( $raw['thumbnail_width'] ?? self::DEFAULT_THUMBNAIL_WIDTH ) ),
 			'thumbnail_height'    => max( 0, (int) ( $raw['thumbnail_height'] ?? self::DEFAULT_THUMBNAIL_HEIGHT ) ),
-			'thumbnail_crop'      => (bool) ( $raw['thumbnail_crop'] ?? self::DEFAULT_THUMBNAIL_CROP ),
+			'thumbnail_crop'      => rest_sanitize_boolean( $raw['thumbnail_crop'] ?? self::DEFAULT_THUMBNAIL_CROP ),
 			'thumbnail_alignment' => self::sanitize_alignment( (string) ( $raw['thumbnail_alignment'] ?? self::DEFAULT_THUMBNAIL_ALIGNMENT ) ),
 			'full_width'          => max( 1, (int) ( $raw['full_width'] ?? self::DEFAULT_FULL_WIDTH ) ),
 			'full_height'         => max( 0, (int) ( $raw['full_height'] ?? self::DEFAULT_FULL_HEIGHT ) ),

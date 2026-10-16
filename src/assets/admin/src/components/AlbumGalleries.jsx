@@ -189,7 +189,11 @@ const AlbumGalleries = () => {
 		if (config) {
 			setAssignedGalleries(config.assignedGalleries || []);
 			setAllGalleries(config.allGalleries || []);
-			setFeaturedGalleryId(config.featuredGalleryId ?? null);
+			setFeaturedGalleryId(
+				config.featuredGalleryId
+					? Number(config.featuredGalleryId)
+					: null
+			);
 		}
 	}, [config]);
 

@@ -170,7 +170,7 @@ test.describe("the album's Galleries box", () => {
 	 * cover stands in.
 	 */
 	test(
-		"ALB-17: the featured gallery becomes the album's share image, and a second click clears it",
+		"ALB-17: the featured gallery becomes the album's share image, survives a reload, and one click clears it",
 		{
 			tag: '@admin',
 		},
@@ -209,6 +209,9 @@ test.describe("the album's Galleries box", () => {
 			);
 			await expect(button).toHaveAttribute('aria-pressed', 'true');
 			await sharedCover(b1);
+
+			await openAlbum(page, parent.id);
+			await expect(button).toHaveAttribute('aria-pressed', 'true');
 
 			await restWrite(page, `/album/${parent.id}/featured-gallery`, () =>
 				button.click()
