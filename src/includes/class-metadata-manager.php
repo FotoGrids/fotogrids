@@ -425,12 +425,15 @@ class Metadata_Manager {
 	}
 
 	/**
-	 * Add metadata to item
+	 * Link a library entry to an item and count the new link.
+	 *
+	 * The entry's usage count rises only when a link is created, so linking an
+	 * item to an entry it already carries changes nothing.
 	 *
 	 * @param int $attachment_id Attachment ID
 	 * @param string $type Metadata type
 	 * @param int $metadata_id Metadata ID
-	 * @return bool|int False on failure, insert ID on success
+	 * @return bool True when the item carries the entry, false when the entry does not exist or the insert failed
 	 */
 	private static function add_metadata_relationship( $attachment_id, $type, $metadata_id ) {
 		if ( ! self::validate_type( $type ) ) {
@@ -438,6 +441,19 @@ class Metadata_Manager {
 		}
 
 		global $wpdb;
+
+		$entry = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT id FROM %i WHERE id = %d AND type = %s',
+				$wpdb->prefix . 'fotogrids_tags',
+				$metadata_id,
+				$type
+			)
+		);
+
+		if ( ! $entry ) {
+			return false;
+		}
 
 		$table = $wpdb->prefix . 'fotogrids_item_metadata';
 
@@ -466,11 +482,14 @@ class Metadata_Manager {
 			array( '%d', '%s', '%d', '%s' )
 		);
 
-		if ( $inserted ) {
-			\FotoGrids\Cache\Metadata_Cache::forget_item( (int) $attachment_id );
+		if ( ! $inserted ) {
+			return false;
 		}
 
-		return $inserted;
+		\FotoGrids\Cache\Metadata_Cache::forget_item( (int) $attachment_id );
+		self::increment_usage_count( $type, $metadata_id );
+
+		return true;
 	}
 
 	/**
@@ -486,12 +505,7 @@ class Metadata_Manager {
 			return false;
 		}
 
-		$result = self::add_metadata_relationship( $attachment_id, 'tag', $tag->id );
-		if ( $result ) {
-			self::increment_usage_count( 'tag', $tag->id );
-		}
-
-		return $result;
+		return self::add_metadata_relationship( $attachment_id, 'tag', $tag->id );
 	}
 
 	/**
@@ -506,11 +520,7 @@ class Metadata_Manager {
 	 * @return bool True on success, false on failure
 	 */
 	public static function link_tag_to_item( $attachment_id, $tag_id ) {
-		$result = self::add_metadata_relationship( $attachment_id, 'tag', $tag_id );
-		if ( $result ) {
-			self::increment_usage_count( 'tag', $tag_id );
-		}
-		return (bool) $result;
+		return self::add_metadata_relationship( $attachment_id, 'tag', $tag_id );
 	}
 
 	/**
@@ -527,12 +537,7 @@ class Metadata_Manager {
 			return false;
 		}
 
-		$result = self::add_metadata_relationship( $attachment_id, 'person', $person->id );
-		if ( $result ) {
-			self::increment_usage_count( 'person', $person->id );
-		}
-
-		return $result;
+		return self::add_metadata_relationship( $attachment_id, 'person', $person->id );
 	}
 
 	/**
@@ -547,11 +552,7 @@ class Metadata_Manager {
 	 * @return bool True on success, false on failure
 	 */
 	public static function link_person_to_item( $attachment_id, $person_id ) {
-		$result = self::add_metadata_relationship( $attachment_id, 'person', $person_id );
-		if ( $result ) {
-			self::increment_usage_count( 'person', $person_id );
-		}
-		return (bool) $result;
+		return self::add_metadata_relationship( $attachment_id, 'person', $person_id );
 	}
 
 	/**
@@ -569,12 +570,7 @@ class Metadata_Manager {
 			return false;
 		}
 
-		$result = self::add_metadata_relationship( $attachment_id, 'location', $location->id );
-		if ( $result ) {
-			self::increment_usage_count( 'location', $location->id );
-		}
-
-		return $result;
+		return self::add_metadata_relationship( $attachment_id, 'location', $location->id );
 	}
 
 	/**
@@ -589,11 +585,7 @@ class Metadata_Manager {
 	 * @return bool True on success, false on failure
 	 */
 	public static function link_location_to_item( $attachment_id, $location_id ) {
-		$result = self::add_metadata_relationship( $attachment_id, 'location', $location_id );
-		if ( $result ) {
-			self::increment_usage_count( 'location', $location_id );
-		}
-		return (bool) $result;
+		return self::add_metadata_relationship( $attachment_id, 'location', $location_id );
 	}
 
 	/**
