@@ -106,7 +106,8 @@ async function deactivate( page: Page ): Promise< void > {
 	await page.goto( `${ site.url }/wp-admin/plugins.php` );
 	await page.click( '#deactivate-fotogrids' );
 	await page.getByRole( 'button', { name: 'Skip & Deactivate' } ).click();
-	await page.waitForURL( /deactivate=true/ );
+	// Not the URL: WordPress strips deactivate=true from it as the page loads.
+	await expect( page.locator( '#message' ) ).toContainText( 'Plugin deactivated.' );
 }
 
 /** Delete from the Plugins screen and return the row WordPress shows. */
