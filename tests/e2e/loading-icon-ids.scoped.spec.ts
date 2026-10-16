@@ -119,3 +119,16 @@ test( 'a gallery opened in place from an album, next to the same gallery and a s
 
 	await expectUnique( page, 15 );
 } );
+
+test( 'a random-sorted gallery embedded twice, after each copy fetches its own set', { tag: [ '@layout' ] }, async ( { page } ) => {
+	const { id } = galleryPage( { ...RING, default_sort_order: 'random' } );
+	const fetched = page.waitForResponse(
+		( response ) => decodeURIComponent( response.url() ).includes( '/fotogrids/v1/gallery/render' )
+	);
+	await page.goto( multiGalleryPage( [ id, id ] ).url );
+	await fetched;
+	await expect( page.locator( `[data-fg-gallery-id="${ id }"] .fg-item` ) ).toHaveCount( 10 );
+	await page.waitForLoadState( 'networkidle' );
+
+	await expectUnique( page, 10 );
+} );

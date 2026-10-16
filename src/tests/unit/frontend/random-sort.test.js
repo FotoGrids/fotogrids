@@ -280,6 +280,29 @@ describe('random-sort', () => {
 			expect(orderOf(root)).toEqual(['a', 'b', 'c']);
 		});
 
+		it('sends the wrapper ID as the instance ID, and nothing for one the route would reject', () => {
+			const { collection } = makeCollection(['a', 'b'], {
+				mode: 'refetch',
+			});
+			collection.id = 'fg-9-2';
+			const { collection: foreign } = makeCollection(['c', 'd'], {
+				mode: 'refetch',
+			});
+			foreign.id = 'fg-10-1';
+			stubFetch({ html: itemsMarkup(['x']) });
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			expect(window.fetch).toHaveBeenCalledTimes(2);
+			expect(JSON.parse(window.fetch.mock.calls[0][1].body).instance_id).toBe(
+				'fg-9-2'
+			);
+			expect(JSON.parse(window.fetch.mock.calls[1][1].body).instance_id).toBe(
+				''
+			);
+		});
+
 		it('mints a fresh seed and sends it so later requests share the permutation', () => {
 			const { collection } = makeCollection(['a', 'b', 'c'], {
 				mode: 'refetch',
