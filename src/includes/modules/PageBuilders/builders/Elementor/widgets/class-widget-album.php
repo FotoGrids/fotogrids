@@ -16,6 +16,7 @@ use FotoGrids\Modules\PageBuilders\Builders\Elementor\Controls\Album_Picker;
 use FotoGrids\Modules\PageBuilders\Builders\Elementor\Module as Elementor_Module;
 use FotoGrids\Modules\PageBuilders\Preview_Options;
 use FotoGrids\Modules\PageBuilders\Preview_Renderer;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -113,7 +114,7 @@ class Widget_Album extends Widget_Base {
 			array(
 				'type' => Controls_Manager::RAW_HTML,
 				'raw'  => Elementor_Module::create_button_html(
-					admin_url( 'post-new.php?post_type=fotogrids_album' ),
+					admin_url( 'post-new.php?post_type=' . Post_Types::ALBUM ),
 					__( 'Create new album', 'fotogrids' )
 				),
 			)

@@ -11,6 +11,7 @@ namespace FotoGrids\Modules\ViewCollections;
 
 use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -47,7 +48,7 @@ class Integrated_Renderer {
 	 *
 	 * @var string[]
 	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	private const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * Per-request cache: posts whose assets are already enqueued.
@@ -363,7 +364,7 @@ class Integrated_Renderer {
 
 		$classes[] = 'fotogrids-view';
 		$classes[] = 'fotogrids-view--integrated';
-		$classes[] = 'fotogrids-view--' . ( 'fotogrids_album' === $post->post_type ? 'album' : 'gallery' );
+		$classes[] = 'fotogrids-view--' . ( Post_Types::ALBUM === $post->post_type ? 'album' : 'gallery' );
 
 		/**
 		 * Filter the integrated-mode body classes.

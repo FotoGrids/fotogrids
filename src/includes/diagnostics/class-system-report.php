@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Diagnostics;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -157,8 +159,8 @@ final class System_Report {
 			);
 		}
 
-		$rows[] = self::row( __( 'Galleries', 'fotogrids' ), self::count_posts( 'fotogrids_gallery' ) );
-		$rows[] = self::row( __( 'Albums', 'fotogrids' ), self::count_posts( 'fotogrids_album' ) );
+		$rows[] = self::row( __( 'Galleries', 'fotogrids' ), self::count_posts( Post_Types::GALLERY ) );
+		$rows[] = self::row( __( 'Albums', 'fotogrids' ), self::count_posts( Post_Types::ALBUM ) );
 		$rows[] = self::row( __( 'Embeds', 'fotogrids' ), self::count_posts( 'fotogrids_embed' ) );
 
 		if ( class_exists( '\FotoGrids\Tools\Tools_Registry' ) ) {

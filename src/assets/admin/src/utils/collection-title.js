@@ -6,6 +6,7 @@
  * @since 1.1.4
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { ALBUM_POST_TYPE } from './post-types';
 
 /**
  * Whether a stored gallery or album title is empty.
@@ -23,7 +24,7 @@ export const isUntitled = (title) => !title || !String(title).trim();
  * @returns {string} Placeholder label.
  */
 export const collectionPlaceholder = (kind, id) => {
-	if ('album' === kind || 'fotogrids_album' === kind) {
+	if ('album' === kind || ALBUM_POST_TYPE === kind) {
 		/* translators: %d: album ID. */
 		return sprintf(__('Album #%d', 'fotogrids'), id);
 	}

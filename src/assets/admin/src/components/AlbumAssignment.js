@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { collectionTitle } from '../utils/collection-title';
+import { ALBUM_POST_TYPE } from '../utils/post-types';
 
 const FotoGridsIcons = window.FotoGridsIcons || {};
 const AlbumAssignment = () => {
@@ -130,7 +131,7 @@ const AlbumAssignment = () => {
 	};
 
 	const handleCreateNewAlbum = () => {
-		window.open('post-new.php?post_type=fotogrids_album', '_blank');
+		window.open(`post-new.php?post_type=${ALBUM_POST_TYPE}`, '_blank');
 	};
 
 	const getAssignedAlbumsData = () => {
