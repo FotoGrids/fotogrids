@@ -7,6 +7,7 @@ const ADVANCED_REST = '/fotogrids/v1/admin/advanced-settings';
 
 export type Tab =
 	| 'media'
+	| 'gallery_items'
 	| 'responsiveness'
 	| 'defaults'
 	| 'view_pages'

@@ -954,12 +954,11 @@ class Import_Export_Data {
 			$text[ $key ] = isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ? (string) $item[ $key ] : '';
 		}
 
-		$unfiltered = current_user_can( 'unfiltered_html' );
-		$post       = array_filter(
+		$post = array_filter(
 			array(
 				'post_title'   => sanitize_text_field( $text['title'] ),
-				'post_excerpt' => $unfiltered ? $text['caption'] : wp_kses_post( $text['caption'] ),
-				'post_content' => $unfiltered ? $text['description'] : wp_kses_post( $text['description'] ),
+				'post_excerpt' => self::import_rich_text( $text['caption'], 'caption', $attachment_id ),
+				'post_content' => self::import_rich_text( $text['description'], 'description', $attachment_id ),
 			),
 			'strlen'
 		);
@@ -972,6 +971,29 @@ class Import_Export_Data {
 		if ( '' !== $alt ) {
 			update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
 		}
+	}
+
+	/**
+	 * Apply the caption and description save rules to an imported value.
+	 *
+	 * @since 1.3.0
+	 * @param string $value         Imported value.
+	 * @param string $field         'caption' or 'description'.
+	 * @param int    $attachment_id Attachment ID.
+	 * @return string
+	 */
+	private static function import_rich_text( string $value, string $field, int $attachment_id ): string {
+		if ( '' === $value ) {
+			return '';
+		}
+		return \FotoGrids\Formatted_Text\Formatted_Text::sanitize_for_save(
+			$value,
+			array(
+				'field'   => $field,
+				'item_id' => $attachment_id,
+				'source'  => 'import',
+			)
+		);
 	}
 
 	/**

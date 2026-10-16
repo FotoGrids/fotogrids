@@ -147,6 +147,19 @@ final class Core_Permissions {
 		Permission_Registry::register(
 			new Permission_Definition(
 				array(
+					'key'                 => \FotoGrids\Formatted_Text\Formatted_Text::CAPABILITY,
+					'label'               => __( 'Format captions and descriptions', 'fotogrids' ),
+					'description'         => __( 'Add bold, italic and links to item captions and descriptions in FotoGrids. It does not change what the WordPress Media Library allows.', 'fotogrids' ),
+					'group'               => 'media',
+					'panel'               => 'advanced',
+					'default_lowest_role' => 'author',
+				)
+			)
+		);
+
+		Permission_Registry::register(
+			new Permission_Definition(
+				array(
 					'key'                 => 'view_fotogrids_stats',
 					'label'               => __( 'View statistics', 'fotogrids' ),
 					'description'         => __( 'Open the Statistics screen and see view and share counts for galleries, albums and items.', 'fotogrids' ),
@@ -537,6 +550,20 @@ final class Core_Permissions {
 					'panel'               => 'simple',
 					'underlying_caps'     => array( 'manage_fotogrids_library' ),
 					'default_lowest_role' => 'editor',
+				)
+			)
+		);
+
+		Permission_Registry::register(
+			new Permission_Definition(
+				array(
+					'key'                 => 'fg_format_item_text',
+					'label'               => __( 'Format captions and descriptions', 'fotogrids' ),
+					'description'         => __( 'Lowest role that can add bold, italic and links to item captions and descriptions.', 'fotogrids' ),
+					'group'               => 'media',
+					'panel'               => 'simple',
+					'underlying_caps'     => array( \FotoGrids\Formatted_Text\Formatted_Text::CAPABILITY ),
+					'default_lowest_role' => 'author',
 				)
 			)
 		);

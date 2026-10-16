@@ -8,6 +8,7 @@ import AdvancedTab from '../plugin-settings/tabs/AdvancedTab';
 import MaintenanceTab from '../plugin-settings/tabs/MaintenanceTab';
 import PermissionsManagerTab from '../plugin-settings/tabs/PermissionsManagerTab';
 import MediaTab from '../plugin-settings/tabs/MediaTab';
+import GalleryItemsTab from '../plugin-settings/tabs/GalleryItemsTab';
 import SharingTab from '../plugin-settings/tabs/SharingTab';
 import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
@@ -17,6 +18,7 @@ import { confirmLeave } from '../shared/SidebarTabs/elements/unsaved-changes';
 
 const TAB_IDS = [
 	'media',
+	'gallery_items',
 	'responsiveness',
 	'defaults',
 	'view_pages',
@@ -50,6 +52,12 @@ const PluginSettingsPage = () => {
 		{
 			id: 'media',
 			label: __('Media', 'fotogrids'),
+			icon: 'image',
+			group: 'setup',
+		},
+		{
+			id: 'gallery_items',
+			label: __('Gallery Items', 'fotogrids'),
 			icon: 'image',
 			group: 'setup',
 		},
@@ -369,6 +377,8 @@ const PluginSettingsPage = () => {
 		switch (tabId) {
 			case 'media':
 				return <MediaTab />;
+			case 'gallery_items':
+				return <GalleryItemsTab />;
 			case 'responsiveness':
 				return <ResponsivenessTab />;
 			case 'defaults':
