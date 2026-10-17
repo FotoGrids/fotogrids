@@ -317,6 +317,48 @@ class ImportExportAttachmentMapTest extends WP_UnitTestCase {
 		$this->assertNull( Item_Meta::get( $unrelated ) );
 	}
 
+	/** @return array<int, array<string, string>> The analysis notices for a file. */
+	private function notices( array $file ): array {
+		$request = new WP_REST_Request( 'POST', '/fotogrids/v1/admin/tools/import-export/import' );
+		$request->set_param( 'phase', 'analyse' );
+		$request->set_param( 'file', wp_json_encode( $file ) );
+
+		return Import_Export_Data::import( $request )->get_data()['notices'];
+	}
+
+	public function test_the_analysis_warns_about_an_older_file_from_another_site(): void {
+		[ $file ] = $this->file_from_another_site();
+		unset( $file['media'] );
+
+		$this->assertSame( array( 'media_unmatched' ), array_column( $this->notices( $file ), 'code' ) );
+	}
+
+	public function test_the_analysis_does_not_warn_about_an_older_file_from_this_site(): void {
+		$this->gallery_with( $this->upload( 'photo.jpg', self::PHOTO ) );
+		$file = $this->export();
+		unset( $file['media'] );
+
+		$this->assertSame( array(), $this->notices( $file ) );
+	}
+
+	public function test_the_analysis_does_not_warn_about_a_current_file_from_another_site(): void {
+		[ $file ] = $this->file_from_another_site();
+
+		$this->assertSame( array(), $this->notices( $file ) );
+	}
+
+	public function test_the_analysis_does_not_warn_about_an_older_file_without_media(): void {
+		$file = array(
+			'meta'     => array(
+				'version'  => '1.2.0',
+				'site_url' => 'https://exporting.example',
+			),
+			'settings' => array( 'autosave' => true ),
+		);
+
+		$this->assertSame( array(), $this->notices( $file ) );
+	}
+
 	public function test_an_older_file_from_this_site_keeps_its_ids(): void {
 		$photo = $this->upload( 'photo.jpg', self::PHOTO );
 		$this->gallery_with( $photo );

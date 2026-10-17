@@ -564,14 +564,48 @@ class Import_Export_Data {
 			$contents['settings'] = true;
 		}
 
+		$notices  = array();
+		$site_url = is_string( $data['meta']['site_url'] ?? null ) ? $data['meta']['site_url'] : '';
+		if ( ! array_key_exists( 'media', $data ) && self::refers_to_media( $data ) && ! ( new Attachment_Map( null, $site_url ) )->is_same_site() ) {
+			$notices[] = array(
+				'type'    => 'warning',
+				'code'    => 'media_unmatched',
+				'message' => __( 'This file was exported by an earlier version of FotoGrids on another site, so it doesn\'t say which image files its items use. Its images will be skipped. To bring them across, update FotoGrids on the original site, export again, and import the new file.', 'fotogrids' ),
+			);
+		}
+
 		return new \WP_REST_Response(
 			array(
 				'valid'    => true,
 				'meta'     => $data['meta'],
 				'contents' => $contents,
+				'notices'  => $notices,
 			),
 			200
 		);
+	}
+
+	/**
+	 * Whether the file's galleries, albums or items refer to Media Library attachments.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $data Parsed file.
+	 * @return bool
+	 */
+	private static function refers_to_media( array $data ): bool {
+		if ( ! empty( $data['items'] ) ) {
+			return true;
+		}
+		foreach ( array( 'galleries', 'albums' ) as $key ) {
+			foreach ( is_array( $data[ $key ] ?? null ) ? $data[ $key ] : array() as $post ) {
+				$meta = is_array( $post ) && is_array( $post['meta'] ?? null ) ? $post['meta'] : array();
+				if ( Attachment_Map::list_ids( $meta['fotogrids_gallery_items'] ?? array() ) || ! empty( $meta[ Post_Types::FEATURED_IMAGE_META_KEY ] ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -612,18 +646,20 @@ class Import_Export_Data {
 
 			$gallery_id_map    = array(); // old_id => new_id
 			$written_galleries = array();
+			$previous_lists    = array();
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
-				[ $imp, $skip, $map, $written ] = self::import_collections(
+				[ $imp, $skip, $map, $written, $previous ] = self::import_collections(
 					$data['galleries'],
 					Post_Types::GALLERY,
 					$options['galleries'],
 					$attachments,
 					$embed_ids
 				);
-				$imported['galleries']          = $imp;
-				$skipped['galleries']           = $skip;
-				$gallery_id_map                 = $map;
-				$written_galleries              = $written;
+				$imported['galleries']                     = $imp;
+				$skipped['galleries']                      = $skip;
+				$gallery_id_map                            = $map;
+				$written_galleries                         = $written;
+				$previous_lists                            = $previous;
 			}
 
 			$album_id_map = array();
@@ -662,7 +698,7 @@ class Import_Export_Data {
 			}
 
 			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && is_array( $data['embeds'] ) ) {
-				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries, $attachments );
+				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries, $attachments, $previous_lists );
 				$imported['items'] = ( $imported['items'] ?? 0 ) + $imp;
 				$skipped['items']  = ( $skipped['items'] ?? 0 ) + $skip;
 
@@ -823,8 +859,9 @@ class Import_Export_Data {
 	 *
 	 * $conflict_mode: 'skip' | 'overwrite' | 'duplicate'
 	 *
-	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids],
-	 * where written_ids lists the posts the import created or overwrote.
+	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids, previous_lists],
+	 * where written_ids lists the posts the import created or overwrote, and
+	 * previous_lists maps each overwritten post to its item list before the import.
 	 *
 	 * @param array<int, mixed> $posts         Exported collections.
 	 * @param string            $post_type     Gallery or album post type.
@@ -837,6 +874,7 @@ class Import_Export_Data {
 		$skipped  = 0;
 		$id_map   = array();
 		$written  = array();
+		$previous = array();
 
 		foreach ( $posts as $post_data ) {
 			$old_id = (int) ( $post_data['id'] ?? 0 );
@@ -866,6 +904,7 @@ class Import_Export_Data {
 				}
 				if ( 'overwrite' === $conflict_mode ) {
 					// Update the existing post's meta only; keep its ID.
+					$previous[ $existing->ID ] = Gallery_Repository::get_item_ids( $existing->ID );
 					foreach ( $meta as $key => $value ) {
 						update_post_meta( $existing->ID, $key, $value );
 					}
@@ -909,7 +948,7 @@ class Import_Export_Data {
 			++$imported;
 		}
 
-		return array( $imported, $skipped, $id_map, $written );
+		return array( $imported, $skipped, $id_map, $written, $previous );
 	}
 
 	/**
@@ -1195,10 +1234,11 @@ class Import_Export_Data {
 	 * @param array<int, mixed> $embeds      Exported embed entries.
 	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
 	 * @param Attachment_Map    $attachments The file's attachments on this site.
+	 * @param array<int, int[]> $previous    Item lists of the overwritten galleries before the import.
 	 * @return array{0: int, 1: int} Embeds created or updated, and exported embeds no
 	 *                               written gallery lists.
 	 */
-	private static function import_embeds( array $embeds, array $gallery_ids, Attachment_Map $attachments ): array {
+	private static function import_embeds( array $embeds, array $gallery_ids, Attachment_Map $attachments, array $previous = array() ): array {
 		$by_old_id = array();
 		foreach ( $embeds as $embed ) {
 			$embed = self::sanitize_embed( (array) $embed, $attachments );
@@ -1208,6 +1248,7 @@ class Import_Export_Data {
 		}
 
 		$created = array();
+		$reused  = array();
 		$updated = 0;
 		$used    = array();
 		$lists   = array();
@@ -1223,6 +1264,17 @@ class Import_Export_Data {
 				$used[ $item_id ] = true;
 				if ( ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
 					Embed_Store::update( $item_id, $by_old_id[ $item_id ] );
+					$reused[ $item_id ] = true;
+					++$updated;
+					continue;
+				}
+
+				$own = self::own_embed_for( $previous[ $gallery_id ] ?? array(), $gallery_id, $by_old_id[ $item_id ], $reused );
+				if ( $own > 0 ) {
+					Embed_Store::update( $own, $by_old_id[ $item_id ] );
+					$reused[ $own ]     = true;
+					$item_ids[ $index ] = $own;
+					$placed[ $index ]   = true;
 					++$updated;
 					continue;
 				}
@@ -1253,6 +1305,35 @@ class Import_Export_Data {
 		}
 
 		return array( count( $created ) + $updated, count( $by_old_id ) - count( $used ) );
+	}
+
+	/**
+	 * An embed the gallery listed before the import that shows the exported video,
+	 * belongs to no other gallery and has not been reused yet.
+	 *
+	 * @since 1.3.0
+	 * @param int[]                $previous   The gallery's item list before the import.
+	 * @param int                  $gallery_id Gallery post ID.
+	 * @param array<string, mixed> $exported   Sanitized exported embed.
+	 * @param array<int, true>     $reused     Embed IDs the import already reused.
+	 * @return int Embed ID, or 0 when there is none.
+	 */
+	private static function own_embed_for( array $previous, int $gallery_id, array $exported, array $reused ): int {
+		foreach ( $previous as $item_id ) {
+			$item_id = (int) $item_id;
+			if ( isset( $reused[ $item_id ] ) ) {
+				continue;
+			}
+			$existing = Embed_Store::get( $item_id );
+			if ( null === $existing || $existing['item_type'] !== $exported['item_type'] || $existing['video_id'] !== $exported['video_id'] ) {
+				continue;
+			}
+			if ( array() === array_diff( Gallery_Repository::find_galleries_for_item( $item_id ), array( $gallery_id ) ) ) {
+				return $item_id;
+			}
+		}
+
+		return 0;
 	}
 
 	/**
