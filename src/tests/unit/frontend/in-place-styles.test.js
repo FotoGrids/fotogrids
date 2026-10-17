@@ -1,8 +1,5 @@
 /**
- * Pagination, random refetch, album-to-gallery and password unlock add only
- * the stylesheets a response needs that the page does not already link,
- * including ones WordPress printed as `{handle}-css`, and place them before
- * the site's own CSS.
+ * Stylesheets added by in-place renders: no duplicates, placed before site CSS.
  */
 
 const PAGINATION = '../../../public/render/features/pagination/pagination-core';

@@ -4,7 +4,7 @@
 
 /**
  * @param {Element} el
- * @return {boolean} Whether the element is a FotoGrids stylesheet or inline style.
+ * @return {boolean} Whether el is a FotoGrids <link> or <style>.
  */
 function isFotoGridsStyle(el) {
 	const isSheet =
@@ -14,10 +14,7 @@ function isFotoGridsStyle(el) {
 }
 
 /**
- * Returns the last element of the run of FotoGrids styles that starts at the
- * first FotoGrids stylesheet in the document, or null when there is none.
- *
- * @return {Element|null} Element new stylesheets are placed after.
+ * @return {Element|null} End of the first run of FotoGrids styles, or null.
  */
 function findAnchor() {
 	let anchor = document.querySelector(
@@ -34,11 +31,9 @@ function findAnchor() {
 }
 
 /**
- * Links each stylesheet in the map that the document does not already carry,
- * placed with the FotoGrids stylesheets WordPress printed so it keeps the
- * cascade position a page load would give it.
+ * Links each stylesheet the page lacks, after the printed FotoGrids styles.
  *
- * @param {Record<string, string>} cssUrls Handle → absolute URL map.
+ * @param {Record<string, string>} cssUrls Handle → URL map.
  */
 export function injectMissingStyles(cssUrls) {
 	if (!cssUrls || typeof cssUrls !== 'object') {
