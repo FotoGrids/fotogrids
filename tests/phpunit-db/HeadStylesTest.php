@@ -295,6 +295,30 @@ class HeadStylesTest extends WP_UnitTestCase {
 		$this->assertSame( 1, $entries() );
 	}
 
+	public function test_the_head_prints_the_styles_before_the_theme_on_a_miss_and_a_hit(): void {
+		$gallery = $this->gallery( array( 'enable_cache' => '1' ) );
+		$this->go_to( get_permalink( $this->page( '[fotogrids_gallery id="' . $gallery . '"]' ) ) );
+		$theme = static function () {
+			wp_enqueue_style( 'fg-test-theme', 'https://example.com/style.css', array(), '1' );
+		};
+		add_action( 'wp_enqueue_scripts', $theme );
+
+		foreach ( array( 'miss', 'hit' ) as $pass ) {
+			$this->reset_styles();
+			unset( $GLOBALS['wp_actions']['wp_head'], $GLOBALS['wp_actions']['wp_print_styles'] );
+			ob_start();
+			wp_head();
+			$head = (string) ob_get_clean();
+
+			$gallery_css = strpos( $head, "id='fotogrids-render-base-css'" );
+			$this->assertNotFalse( $gallery_css, $pass );
+			$this->assertLessThan( strpos( $head, "id='fg-test-theme-css'" ), $gallery_css, $pass );
+			$this->assertStringNotContainsString( 'function(ids)', $head, $pass );
+		}
+
+		remove_action( 'wp_enqueue_scripts', $theme );
+	}
+
 	public function test_styles_printed_after_the_head_move_into_it_on_a_page_view(): void {
 		ob_start();
 		do_action( 'wp_head' );

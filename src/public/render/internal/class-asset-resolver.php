@@ -186,7 +186,7 @@ final class Asset_Resolver {
 		// case - styles would otherwise never reach the page). Page-builder
 		// sub-modules can opt their preview / partial-render contexts in
 		// unconditionally via the SHOULD_INLINE_ASSETS filter.
-		$default_inline = did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0;
+		$default_inline = self::past_head_styles() || did_action( 'admin_head' ) > 0;
 		$should_inline  = (bool) apply_filters( Filters_Render::SHOULD_INLINE_ASSETS, $default_inline );
 
 		if ( $should_inline ) {
@@ -232,9 +232,19 @@ final class Asset_Resolver {
 			$new_css_handles[]                     = $handle;
 		}
 
-		if ( ! empty( $new_css_handles ) && did_action( 'wp_head' ) > 0 && ! doing_action( 'wp_head' ) ) {
+		if ( ! empty( $new_css_handles ) && self::past_head_styles() ) {
 			$this->print_late_styles( $new_css_handles );
 		}
+	}
+
+	/**
+	 * Whether the head has already printed its stylesheets, so new ones must print where they are.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	private static function past_head_styles(): bool {
+		return did_action( 'wp_head' ) > 0 && ( ! doing_action( 'wp_head' ) || did_action( 'wp_print_styles' ) > 0 );
 	}
 
 	/**

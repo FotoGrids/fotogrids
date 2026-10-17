@@ -24,13 +24,13 @@ if ( ! defined( 'WPINC' ) ) {
 final class Head_Styles {
 
 	/**
-	 * Hooks the head pass.
+	 * Hooks the head pass ahead of the theme's own stylesheets, the order block themes print.
 	 *
 	 * @since 1.3.0
 	 * @return void
 	 */
 	public static function init(): void {
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ), 20 );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ), 1 );
 	}
 
 	/**
