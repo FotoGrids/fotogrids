@@ -84,7 +84,10 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-seeder.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-legacy-defaults-option.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/options/class-option-registry.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-collection-defaults-split.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-list-setting-repair.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-entries-endpoint.php';
@@ -152,6 +155,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Settings\Collection_Defaults_Store::init();
 	FotoGrids\Settings\Collection_Defaults_Seeder::init();
 	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();

@@ -245,8 +245,10 @@ const MaintenanceTab = () => {
 					setDebugStatus((prev) => (prev === 'saved' ? null : prev)),
 				3000
 			);
+			return true;
 		} catch (_e) {
 			setDebugStatus('error');
+			return false;
 		} finally {
 			setDebugSaving(false);
 		}

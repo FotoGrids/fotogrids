@@ -229,6 +229,17 @@ class Public_Render {
 			}
 		}
 
+		$embed_atts = array();
+		if ( isset( $settings_overlay['layout'] ) && self::is_layout_key( $settings_overlay['layout'] ) ) {
+			$embed_atts['template'] = $settings_overlay['layout'];
+		}
+		if ( isset( $settings_overlay['columns'] ) ) {
+			$embed_atts['cols'] = $settings_overlay['columns']['desktop'];
+		}
+		if ( ! empty( $embed_atts ) ) {
+			$settings_overlay['_embed_atts'] = $embed_atts;
+		}
+
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
 
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
@@ -268,6 +279,28 @@ class Public_Render {
 		}
 
 		return (string) $render_result->html;
+	}
+
+	/**
+	 * Returns whether a value is the key of a registered layout.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $layout_key Value to check.
+	 * @return bool
+	 */
+	public static function is_layout_key( $layout_key ): bool {
+		if ( ! is_string( $layout_key ) || '' === $layout_key ) {
+			return false;
+		}
+
+		foreach ( \FotoGrids\Render\Internal\Module_Registry::all_modules( 'layouts' ) as $layout_class ) {
+			$layout = new $layout_class();
+			if ( $layout->layout_key() === $layout_key ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -494,21 +527,21 @@ class Public_Render {
 		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
 		$fonts = Font_Resolver::instance()->end_capture();
 
-		if ( null !== $cache_key ) {
+		$rendered = self::$last_render_result;
+		if ( null !== $cache_key && null !== $rendered && $rendered->http_status < 400 ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
 			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 			$css      = $resolver->get_css_asset_urls();
 			$js       = $resolver->get_js_asset_data();
-			$rendered = self::$last_render_result;
 			\FotoGrids\FotoGrids_Cache::put(
 				$gallery_id,
 				$cache_key,
 				$html,
 				$css,
 				$js,
-				null !== $rendered ? $rendered->inline_css : '',
-				null !== $rendered ? $rendered->inline_js : '',
-				null !== $rendered ? $rendered->json_ld : '',
+				$rendered->inline_css,
+				$rendered->inline_js,
+				$rendered->json_ld,
 				$duration,
 				$fonts
 			);
@@ -593,6 +626,9 @@ class Public_Render {
 
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
 			$album_settings['layout'] = $atts['template'];
+			if ( self::is_layout_key( $atts['template'] ) ) {
+				$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
+			}
 		}
 
 		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {

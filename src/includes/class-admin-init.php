@@ -19,7 +19,6 @@ class Admin_Init {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_scripts' ) );
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_activation_redirect' ), 1 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
@@ -435,72 +434,14 @@ class Admin_Init {
 	}
 
 	/**
-	 * Admin initialization
+	 * Register plugin options with the Settings API.
+	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Plugin settings save through REST and AJAX, so no option is registered with the Settings API.
+	 * @return void
 	 */
 	public static function admin_init() {
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_general_settings',
-			array(
-				'type'              => 'array',
-				'default'           => self::get_general_settings_defaults(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_general_settings' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_permission_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_integration_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_share_statistics',
-			array(
-				'type'              => 'boolean',
-				'default'           => false,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_share_statistics' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_autosave',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_allow_google_fonts',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => 'rest_sanitize_boolean',
-			)
-		);
-	}
-
-	/**
-	 * Return default values for general settings.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function get_general_settings_defaults() {
-		return \FotoGrids\Settings\Plugin_Settings_Store::general_defaults();
+		_deprecated_function( __METHOD__, '1.3.0' );
 	}
 
 	/**
@@ -555,10 +496,14 @@ class Admin_Init {
 	/**
 	 * Sanitize general settings option.
 	 *
-	 * @param mixed $value Raw option value.
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Use Plugin_Settings_Store::sanitize_general().
+	 * @param  mixed $value Raw option value.
 	 * @return array<string, mixed>
 	 */
 	public static function sanitize_general_settings( $value ) {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::sanitize_general()' );
+
 		return \FotoGrids\Settings\Plugin_Settings_Store::sanitize_general( $value );
 	}
 
@@ -566,15 +511,28 @@ class Admin_Init {
 	 * Generic array-settings sanitizer.
 	 *
 	 * Recursively sanitises an arbitrary settings array: scalar values are
-	 * passed through sanitize_text_field() and nested arrays are walked. Used
-	 * for option groups that do not have a typed per-key sanitizer of
-	 * their own. Non-array input collapses to an empty array.
+	 * passed through sanitize_text_field() and nested arrays are walked.
+	 * Non-array input collapses to an empty array.
 	 *
-	 * @since  1.0.0
-	 * @param  mixed $value Raw option value from options.php.
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 No plugin option is sanitised this way any more.
+	 * @param  mixed $value Raw option value.
 	 * @return array<string, mixed>
 	 */
 	public static function sanitize_settings_array( $value ): array {
+		_deprecated_function( __METHOD__, '1.3.0' );
+
+		return self::sanitize_array_recursive( $value );
+	}
+
+	/**
+	 * Recursively sanitise an arbitrary settings array.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $value Raw value.
+	 * @return array<string, mixed>
+	 */
+	private static function sanitize_array_recursive( $value ): array {
 		if ( ! is_array( $value ) ) {
 			return array();
 		}
@@ -583,7 +541,7 @@ class Admin_Init {
 		foreach ( $value as $key => $item ) {
 			$clean_key = sanitize_key( (string) $key );
 			if ( is_array( $item ) ) {
-				$sanitized[ $clean_key ] = self::sanitize_settings_array( $item );
+				$sanitized[ $clean_key ] = self::sanitize_array_recursive( $item );
 			} elseif ( is_bool( $item ) ) {
 				$sanitized[ $clean_key ] = $item;
 			} elseif ( is_int( $item ) || is_float( $item ) ) {
@@ -600,7 +558,7 @@ class Admin_Init {
 	 * Sanitize a boolean setting submitted via a Toggle component.
 	 *
 	 * @since  1.0.0
-	 * @param  mixed $value Raw option value from options.php.
+	 * @param  mixed $value Raw value.
 	 * @return bool
 	 */
 	private static function sanitize_boolean_setting( $value ): bool {
@@ -610,20 +568,28 @@ class Admin_Init {
 	/**
 	 * Sanitize share statistics setting.
 	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Share usage data is saved by Plugin_Settings_Store::apply_share_statistics_consent().
 	 * @param mixed $value Input value.
 	 * @return bool
 	 */
 	public static function sanitize_share_statistics( $value ): bool {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::apply_share_statistics_consent()' );
+
 		return self::sanitize_boolean_setting( $value );
 	}
 
 	/**
 	 * Sanitize autosave setting.
 	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Autosave is saved by Plugin_Settings_Store::save_advanced().
 	 * @param mixed $value Input value.
 	 * @return bool
 	 */
 	public static function sanitize_autosave( $value ): bool {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::save_advanced()' );
+
 		return self::sanitize_boolean_setting( $value );
 	}
 

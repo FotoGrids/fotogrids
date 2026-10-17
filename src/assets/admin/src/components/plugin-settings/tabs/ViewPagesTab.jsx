@@ -95,9 +95,11 @@ const ViewPagesTab = () => {
 			setSaved(next);
 			setStatus('saved');
 			setTimeout(() => setStatus(null), 3000);
+			return true;
 		} catch (err) {
 			setStatus('error');
 			setErrorMessage(err?.message || null);
+			return false;
 		} finally {
 			setSaving(false);
 		}
