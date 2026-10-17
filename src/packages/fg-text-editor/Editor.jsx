@@ -303,7 +303,7 @@ const Editor = ({
 		}
 		event.preventDefault();
 		const count = toolbarButtons.length;
-		let next = focusIndex;
+		let next;
 		if (event.key === 'ArrowRight') {
 			next = (focusIndex + 1) % count;
 		} else if (event.key === 'ArrowLeft') {

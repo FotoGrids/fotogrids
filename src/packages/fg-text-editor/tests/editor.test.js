@@ -313,4 +313,42 @@ describe('Editor', () => {
 		expect(tool('Clear')).toBeTruthy();
 		unmount();
 	});
+
+	it('moves focus along the toolbar with the arrow keys, Home and End', () => {
+		const { unmount } = mount();
+		const tools = () =>
+			Array.from(
+				document.querySelectorAll('.fotogrids-text-editor__tool')
+			);
+		const toolbar = document.querySelector('[role="toolbar"]');
+		const press = (key) =>
+			act(() => {
+				toolbar.dispatchEvent(
+					new window.KeyboardEvent('keydown', {
+						key,
+						bubbles: true,
+						cancelable: true,
+					})
+				);
+			});
+		const focused = () => tools().indexOf(document.activeElement);
+		const last = tools().length - 1;
+
+		tools()[0].focus();
+		press('ArrowRight');
+		expect(focused()).toBe(1);
+		press('ArrowLeft');
+		expect(focused()).toBe(0);
+		press('ArrowLeft');
+		expect(focused()).toBe(last);
+		press('ArrowRight');
+		expect(focused()).toBe(0);
+		press('End');
+		expect(focused()).toBe(last);
+		press('Home');
+		expect(focused()).toBe(0);
+		expect(tools()[0].tabIndex).toBe(0);
+		expect(tools()[1].tabIndex).toBe(-1);
+		unmount();
+	});
 });
