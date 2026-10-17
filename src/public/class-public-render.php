@@ -209,8 +209,9 @@ class Public_Render {
 	 */
 	private static function gallery_settings_overlay( $atts ): array {
 		$settings_overlay = array();
-		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
-			$settings_overlay['layout'] = sanitize_text_field( $atts['template'] );
+		$template         = is_string( $atts['template'] ?? null ) ? sanitize_text_field( $atts['template'] ) : '';
+		if ( self::is_layout_key( $template ) ) {
+			$settings_overlay['layout'] = $template;
 		}
 
 		if ( ! empty( $atts['cols'] ) ) {
@@ -225,7 +226,7 @@ class Public_Render {
 		}
 
 		$embed_atts = array();
-		if ( isset( $settings_overlay['layout'] ) && self::is_layout_key( $settings_overlay['layout'] ) ) {
+		if ( isset( $settings_overlay['layout'] ) ) {
 			$embed_atts['template'] = $settings_overlay['layout'];
 		}
 		if ( isset( $settings_overlay['columns'] ) ) {
@@ -327,7 +328,7 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
-		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
+		if ( self::is_layout_key( $atts['template'] ) ) {
 			$album_settings['layout'] = $atts['template'];
 		}
 
@@ -762,11 +763,9 @@ class Public_Render {
 			$album_settings['enable_statistics'] = false;
 		}
 
-		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
-			$album_settings['layout'] = $atts['template'];
-			if ( self::is_layout_key( $atts['template'] ) ) {
-				$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
-			}
+		if ( self::is_layout_key( $atts['template'] ) ) {
+			$album_settings['layout']      = $atts['template'];
+			$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
 		}
 
 		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {

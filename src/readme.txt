@@ -196,6 +196,7 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * Fixed the Mini and Grid Lightboxes not opening when a caption or description holds a quote mark entity.
 * Fixed tags showing in share text, page titles, link previews and the SEO checks.
 * Fixed line breaks in captions and descriptions not showing in thumbnails.
+* Fixed a gallery or album embed whose `template` names a layout that does not exist showing nothing. It now shows the gallery's or album's own layout, before and after a password unlock.
 
 = 1.2.0 =
 
