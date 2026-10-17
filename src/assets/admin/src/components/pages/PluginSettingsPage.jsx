@@ -58,7 +58,7 @@ const PluginSettingsPage = () => {
 		{
 			id: 'gallery_items',
 			label: __('Gallery Items', 'fotogrids'),
-			icon: 'image',
+			icon: 'layout',
 			group: 'setup',
 		},
 		{
@@ -70,7 +70,7 @@ const PluginSettingsPage = () => {
 		{
 			id: 'defaults',
 			label: __('Defaults', 'fotogrids'),
-			icon: 'layout',
+			icon: 'sliders',
 			group: 'setup',
 		},
 		{
