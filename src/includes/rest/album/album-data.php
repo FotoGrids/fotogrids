@@ -207,7 +207,10 @@ class Album_Data {
 		$_COOKIE[ $cookie_key ] = $cookie_value;
 
 		$html     = \FotoGrids\Public_Render::render_album_embed(
-			array( 'id' => $album_id ),
+			array(
+				'id'       => $album_id,
+				'template' => (string) $request->get_param( 'template' ),
+			),
 			(string) $request->get_param( 'instance_id' )
 		);
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
