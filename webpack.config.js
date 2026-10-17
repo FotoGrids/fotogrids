@@ -597,6 +597,10 @@ const mainConfig = {
                 chunk.name !== 'featured-image-picker' &&
                 chunk.name !== 'global-modal-init' &&
                 chunk.name !== 'deactivation-feedback' &&
+                chunk.name !== 'pagination-core' &&
+                chunk.name !== 'random-sort' &&
+                chunk.name !== 'album-to-gallery-ajax' &&
+                chunk.name !== 'password-gate' &&
                 !chunk.name?.startsWith('tool-') &&
                 !chunk.name?.startsWith('module-') &&
                 !chunk.name?.startsWith('layout-'),
@@ -609,6 +613,10 @@ const mainConfig = {
                         chunk.name !== 'featured-image-picker' &&
                         chunk.name !== 'global-modal-init' &&
                         chunk.name !== 'deactivation-feedback' &&
+                        chunk.name !== 'pagination-core' &&
+                        chunk.name !== 'random-sort' &&
+                        chunk.name !== 'album-to-gallery-ajax' &&
+                        chunk.name !== 'password-gate' &&
                         !chunk.name?.startsWith('tool-') &&
                         !chunk.name?.startsWith('module-') &&
                         !chunk.name?.startsWith('layout-'),

@@ -3,37 +3,10 @@
  * the lock screen for the returned gallery or album HTML.
  */
 
+import { injectMissingStyles } from '../../_helpers/stylesheets.js';
+
 (function () {
 	'use strict';
-
-	/**
-	 * Adds a stylesheet <link> for each handle not already in the document.
-	 *
-	 * @param {Record<string, string>} cssUrls  handle → absolute URL map
-	 */
-	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') {
-			return;
-		}
-
-		Object.keys(cssUrls).forEach(function (handle) {
-			const url = cssUrls[handle];
-			if (!handle || !url) {
-				return;
-			}
-
-			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) {
-				return;
-			}
-
-			const link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.id = linkId;
-			link.href = url;
-			document.head.appendChild(link);
-		});
-	}
 
 	/**
 	 * Adds a <script> for each handle not already in the document.
