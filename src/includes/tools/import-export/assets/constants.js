@@ -41,7 +41,7 @@ export const EXPORT_TYPES = [
 		key: 'settings',
 		label: __('Settings', 'fotogrids'),
 		description: __(
-			'Plugin settings - overwrites the settings on this site.',
+			'Plugin settings. Choose which ones replace this site’s own.',
 			'fotogrids'
 		),
 	},
@@ -58,6 +58,50 @@ export const EXPORT_TYPES = [
 		label: __('Templates', 'fotogrids'),
 		description: __(
 			'Saved gallery templates included in the export file.',
+			'fotogrids'
+		),
+	},
+];
+
+/**
+ * The settings an import can apply, in the order the Import screen lists them.
+ * Keys match Import_Export_Data::SETTINGS_KEYS.
+ */
+export const SETTINGS_TYPES = [
+	{
+		key: 'media',
+		label: __('Media sizes', 'fotogrids'),
+		description: __(
+			'The image sizes on the Media settings tab.',
+			'fotogrids'
+		),
+	},
+	{
+		key: 'collection_defaults',
+		label: __('Gallery and album defaults', 'fotogrids'),
+		description: __(
+			'The settings new galleries and albums start with.',
+			'fotogrids'
+		),
+	},
+	{
+		key: 'autosave',
+		label: __('Autosave', 'fotogrids'),
+		description: __('Whether changes save as you make them.', 'fotogrids'),
+	},
+	{
+		key: 'preserve_data_on_uninstall',
+		label: __('Delete all data on uninstall', 'fotogrids'),
+		description: __(
+			'Whether deleting FotoGrids also removes every gallery, album, template, statistic and setting.',
+			'fotogrids'
+		),
+	},
+	{
+		key: 'share_statistics',
+		label: __('Share usage data', 'fotogrids'),
+		description: __(
+			'Opts this site in to or out of sharing usage data, as the Advanced tab does.',
 			'fotogrids'
 		),
 	},
