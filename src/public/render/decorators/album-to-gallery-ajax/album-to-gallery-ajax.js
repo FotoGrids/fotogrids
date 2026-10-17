@@ -55,8 +55,8 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * modules its own render needed; a swapped-in gallery can need more.
 	 * The swap waits for them, so a module is bound before its markup is live.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
-	 *     handle → {src, in_footer} map. in_footer is ignored; scripts are
+	 * @param {Record<string, {src: string, deps: string[], version: string, in_footer: boolean}>} jsData
+	 *     handle → script data map. Only src is read; scripts are
 	 *     appended to <head> and execute in order.
 	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */
