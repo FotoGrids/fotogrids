@@ -187,6 +187,7 @@ const mainConfig = {
         'lightbox-mini': './src/public/render/lightbox/mini/lightbox-mini.js',
         'lightbox-grid': './src/public/render/lightbox/grid/lightbox-grid.js',
         'lightbox-mini-viewer': './src/public/render/lightbox/mini-viewer/lightbox-mini-viewer.js',
+        'formatted-text': './src/public/render/formatted-text/formatted-text.js',
         'album-to-gallery-ajax': './src/public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
         'collection-header': './src/public/render/features/collection-header/collection-header.js',
         'pagination-core': './src/public/render/features/pagination/pagination-core.js',
@@ -251,14 +252,26 @@ const mainConfig = {
         alias: {
             '@': path.resolve(__dirname, 'src/assets'),
             '@modules': path.resolve(__dirname, 'src/includes/modules'),
+            '@shared': path.resolve(__dirname, 'src/shared'),
         },
     },
     module: {
         rules: [
             {
+                // Type checking runs separately (npm run type-check).
                 test: /\.tsx?$/,
-                use: 'ts-loader',
                 exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                        compilerOptions: {
+                            noEmit: false,
+                            declaration: false,
+                            declarationMap: false,
+                        },
+                    },
+                },
             },
             {
                 test: /\.jsx?$/,
@@ -361,6 +374,11 @@ const mainConfig = {
                     globOptions: {
                         ignore: ['**/.DS_Store'],
                     },
+                },
+                {
+                    // Formatting rules shared by the PHP and browser formatters.
+                    from: 'src/shared/formatted-text/schema.json',
+                    to: 'shared/formatted-text/schema.json',
                 },
                 {
                     from: 'src/includes/rest/templates/templates/**/*.json',
@@ -601,6 +619,7 @@ const mainConfig = {
                 chunk.name !== 'random-sort' &&
                 chunk.name !== 'album-to-gallery-ajax' &&
                 chunk.name !== 'password-gate' &&
+                chunk.name !== 'formatted-text' &&
                 !chunk.name?.startsWith('tool-') &&
                 !chunk.name?.startsWith('module-') &&
                 !chunk.name?.startsWith('layout-'),
@@ -617,6 +636,7 @@ const mainConfig = {
                         chunk.name !== 'random-sort' &&
                         chunk.name !== 'album-to-gallery-ajax' &&
                         chunk.name !== 'password-gate' &&
+                        chunk.name !== 'formatted-text' &&
                         !chunk.name?.startsWith('tool-') &&
                         !chunk.name?.startsWith('module-') &&
                         !chunk.name?.startsWith('layout-'),

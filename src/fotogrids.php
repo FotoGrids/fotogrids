@@ -79,6 +79,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-setting-value-codec.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-sharing-settings-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-text-formatting-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-watermark-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
@@ -119,6 +120,12 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-reader.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-extractor.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/albums/class-album-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-array-field.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-attribute-value.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/formatted-text/class-schema.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/formatted-text/class-entities.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/formatted-text/class-tokenizer.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/formatted-text/class-formatter.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/formatted-text/class-formatted-text.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-check.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-definition.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-registry.php';
@@ -127,6 +134,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-tool-harvester.p
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-module-harvester.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-options.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-published-collection-caps.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 
 \FotoGrids\Licensing\Freemius_Bootstrap::init();
@@ -147,6 +155,7 @@ function fotogrids_init() {
 
 	FotoGrids\Kses::register();
 	FotoGrids\Post_Types::init();
+	FotoGrids\Permissions\Published_Collection_Caps::init();
 	FotoGrids\Collection_Title::init();
 	FotoGrids\REST::init();
 	FotoGrids\Gallery_Album_Relations::init();

@@ -266,7 +266,7 @@ final class Lightbox implements Feature {
 		$s     = $render_context->settings;
 		$attrs = array(
 			'data-fg-click'     => 'lightbox',
-			'data-fg-lb-labels' => (string) wp_json_encode( self::client_labels() ),
+			'data-fg-lb-labels' => \FotoGrids\Sanitization\Attribute_Value::json( self::client_labels() ),
 		);
 
 		// Theme
@@ -559,7 +559,7 @@ final class Lightbox implements Feature {
 			$enabled_fields = $info_scope->exif_fields();
 			if ( ! empty( $enabled_fields ) ) {
 				$attrs['data-fg-lb-exif-fields'] = implode( ' ', $enabled_fields );
-				$attrs['data-fg-lb-exif-labels'] = (string) wp_json_encode(
+				$attrs['data-fg-lb-exif-labels'] = \FotoGrids\Sanitization\Attribute_Value::json(
 					array_intersect_key(
 						\FotoGrids\Exif\Exif_Fields::labels(),
 						array_flip( $enabled_fields )
@@ -595,7 +595,7 @@ final class Lightbox implements Feature {
 
 		$attrs['data-fg-lb-mobile-max'] = (string) Breakpoint_Config::from_settings()->mobile_max_width;
 
-		return $attrs;
+		return array_merge( $attrs, \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::wrapper_attrs( 'lightbox', $render_context ) );
 	}
 
 	public function style_vars( Render_Context $render_context ): array {
@@ -649,8 +649,8 @@ final class Lightbox implements Feature {
 					array(),
 					false,
 				),
-			),
-			array(
+			) + \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::css(),
+			\FotoGrids\Render\Formatted_Text\Formatted_Text_Client::js() + array(
 				// Tooltip module - loaded before lightbox so FgTooltip is available.
 				'fotogrids-fg-tooltip' => new Asset_Decl(
 					'../../assets/js/fg-tooltip.js',
@@ -659,7 +659,7 @@ final class Lightbox implements Feature {
 				),
 				'fotogrids-lightbox'   => new Asset_Decl(
 					'../../assets/js/lightbox.js',
-					array( 'fotogrids-runtime', 'fotogrids-fg-tooltip' ),
+					array( 'fotogrids-runtime', 'fotogrids-fg-tooltip', \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::HANDLE ),
 					true,
 				),
 			)

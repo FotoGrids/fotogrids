@@ -914,7 +914,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Resolves caption_title and caption_description on every loaded item.
+	 * Resolves caption_title and caption_description, as plain text, on every loaded item.
 	 *
 	 * @since  1.0.0
 	 * @param  array<int, Item_View>  $items           Loaded items.
@@ -922,13 +922,6 @@ final class Context_Builder {
 	 * @return array<int, Item_View>
 	 */
 	private function resolve_captions( array $items, array $render_settings ): array {
-		// Image Viewer hides these settings in the admin; stored values must not apply.
-		$layout = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : '';
-		if ( 'image-viewer' === $layout ) {
-			$render_settings['caption_hide_description']   = true;
-			$render_settings['caption_limit_title_length'] = 'no';
-		}
-
 		$builder  = new Caption_Content_Builder();
 		$resolved = array();
 

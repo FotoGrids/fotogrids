@@ -135,7 +135,7 @@ final class Video_Lightbox_Mini implements Feature {
 		return array(
 			'data-fg-mini-theme'        => $theme,
 			'data-fg-mini-blur'         => $blur,
-			'data-fg-video-mini-labels' => (string) wp_json_encode( self::client_labels() ),
+			'data-fg-video-mini-labels' => \FotoGrids\Sanitization\Attribute_Value::json( self::client_labels() ),
 		);
 	}
 

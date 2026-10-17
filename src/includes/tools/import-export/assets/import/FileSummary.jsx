@@ -44,6 +44,11 @@ const FileSummary = ({ file, summary }) => {
 					})}
 				</div>
 			)}
+			{(summary?.notices ?? []).map(({ code, message }) => (
+				<div key={code} className="fg-ie-warning-notice" role="status">
+					{message}
+				</div>
+			))}
 		</div>
 	);
 };

@@ -309,6 +309,9 @@ class Activator {
 			if ( version_compare( $current, '1.4', '<' ) ) {
 				self::grant_statistics_to_authors();
 			}
+			if ( version_compare( $current, '1.5', '<' ) ) {
+				self::grant_text_formatting();
+			}
 		}
 		update_option( 'fotogrids_caps_version', self::CAPS_VERSION, false );
 	}
@@ -353,11 +356,27 @@ class Activator {
 	}
 
 	/**
+	 * Grant caption and description formatting to authors, editors and
+	 * administrators.
+	 *
+	 * @since 1.3.0
+	 * @return void
+	 */
+	private static function grant_text_formatting(): void {
+		foreach ( array( 'author', 'editor', 'administrator' ) as $role_name ) {
+			$role = get_role( $role_name );
+			if ( $role ) {
+				$role->add_cap( \FotoGrids\Formatted_Text\Formatted_Text::CAPABILITY );
+			}
+		}
+	}
+
+	/**
 	 * Current capability-catalogue version. Each bump adds a step to
 	 * Activator::maybe_resync_capabilities so existing installs receive the
 	 * change once.
 	 */
-	private const CAPS_VERSION = '1.4';
+	private const CAPS_VERSION = '1.5';
 
 	/**
 	 * Add plugin capabilities to WordPress roles.

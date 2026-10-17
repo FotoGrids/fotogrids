@@ -158,6 +158,10 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
 
+= Can I use bold, italic and links in captions? =
+
+Yes. Item captions and descriptions can hold bold, italic, links and line breaks, added with the small editor in Edit Item. Links work in the Lightbox; thumbnails and album tiles show them as text. Every other tag is removed when the text is shown, whoever wrote it. To show captions and descriptions as plain text instead, go to FotoGrids > Settings > Gallery Items. The "Format captions and descriptions" permission decides who can add formatting.
+
 = Can I help translate FotoGrids? =
 
 Please do - FotoGrids is not yet available in any language other than English. Pick your language at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise. No development setup, and no need to finish the whole plugin in one sitting.
@@ -176,6 +180,22 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 6. Statistics dashboard showing views and shares.
 
 == Changelog ==
+
+= 1.3.0 =
+
+**New**
+
+* Captions and descriptions can now hold bold, italic, links and line breaks, with a small visual editor in Edit Item.
+* New Gallery Items settings tab: show captions and descriptions with basic formatting or as plain text, and choose whether links open in a new tab or carry nofollow. Each link can make its own choice.
+* New "Format captions and descriptions" permission, given to Authors and above.
+
+**Fixed**
+
+* Fixed the Lightbox showing HTML tags as text in captions and descriptions.
+* Fixed saving an item in Edit Item removing the formatting of its caption and description.
+* Fixed the Mini and Grid Lightboxes not opening when a caption or description holds a quote mark entity.
+* Fixed tags showing in share text, page titles, link previews and the SEO checks.
+* Fixed line breaks in captions and descriptions not showing in thumbnails.
 
 = 1.2.0 =
 
@@ -378,6 +398,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Captions and descriptions can now hold bold, italic and links. Line breaks now show in thumbnails, so caption heights can change in Justified and Masonry. Custom roles need the new "Format captions and descriptions" permission granted in Permissions Manager.
 
 = 1.2.0 =
 FotoGrids now works in Bricks! This update also fixes multi-choice settings, statistics, cached galleries and password galleries, and keeps protected galleries out of caches.
