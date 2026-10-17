@@ -588,8 +588,6 @@ final class Metabox_Registrar {
 	 * @param \WP_Post $post Current post (gallery).
 	 */
 	public static function render_gallery_albums( $post ): void {
-		wp_nonce_field( 'fotogrids_gallery_albums', 'fotogrids_gallery_albums_nonce' );
-
 		$assigned_albums = array_map(
 			static function ( $album ) {
 				return array(
