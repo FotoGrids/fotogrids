@@ -114,7 +114,7 @@
 	flex-direction: column;
 	justify-content: var(--fg-caption-overlay-align);
 	padding: var(--fg-caption-overlay-padding, 1rem);
-	color: var(--fg-caption-title-color);
+	color: var(--fg-caption-title-color, #fff);
 }
 
 .fotogrids-collection .fg-caption-title {
@@ -126,7 +126,7 @@
 	line-height: var(--fg-caption-title-line-height, normal);
 	letter-spacing: var(--fg-caption-title-letter-spacing, normal);
 	word-spacing: var(--fg-caption-title-word-spacing, normal);
-	color: var(--fg-caption-title-color);
+	color: var(--fg-caption-title-color, inherit);
 }
 
 /* Distance between Title and Description. The adjacent-sibling selector means
@@ -145,7 +145,20 @@
 	line-height: var(--fg-caption-desc-line-height, normal);
 	letter-spacing: var(--fg-caption-desc-letter-spacing, normal);
 	word-spacing: var(--fg-caption-desc-word-spacing, normal);
-	color: var(--fg-caption-desc-color);
+	color: var(
+		--fg-caption-desc-color,
+		color-mix(in srgb, currentColor 70%, transparent)
+	);
+}
+
+/* Unset caption colours: white over the image in overlay placement; the
+   surrounding text colour in top/bottom placement. */
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-title {
+	color: var(--fg-caption-title-color, #fff);
+}
+
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-description {
+	color: var(--fg-caption-desc-color, rgba(255, 255, 255, 0.7));
 }
 
 /* Line-clamp - active when the decorator emits an integer for

@@ -1096,7 +1096,7 @@ class Collection_Defaults {
 				'tablet'  => 15,
 				'mobile'  => 14,
 			),
-			'caption_title_color'                          => 'rgba(255, 255, 255, 1)',
+			'caption_title_color'                          => '',
 			'caption_hide_description'                     => false,
 			'caption_description_source'                   => 'item_caption',
 			'caption_description_font_family'              => 'default',
@@ -1106,7 +1106,7 @@ class Collection_Defaults {
 				'tablet'  => 11,
 				'mobile'  => 10,
 			),
-			'caption_description_color'                    => 'rgba(255, 255, 255, 0.7)',
+			'caption_description_color'                    => '',
 			'caption_limit_title_length'                   => 'lines',
 			'caption_max_title_characters'                 => array(
 				'desktop' => 200,
