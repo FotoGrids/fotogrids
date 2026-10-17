@@ -255,7 +255,11 @@ class Gallery_Data {
 		// Render the gallery HTML server-side so the frontend can swap it in
 		// without a full page reload.
 		$html     = \FotoGrids\Public_Render::render_gallery_embed(
-			array( 'id' => $gallery_id ),
+			array(
+				'id'       => $gallery_id,
+				'cols'     => absint( $request->get_param( 'cols' ) ),
+				'template' => (string) $request->get_param( 'template' ),
+			),
 			(string) $request->get_param( 'instance_id' )
 		);
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();

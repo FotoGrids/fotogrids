@@ -224,6 +224,17 @@ class Public_Render {
 			}
 		}
 
+		$embed_atts = array();
+		if ( isset( $settings_overlay['layout'] ) && self::is_layout_key( $settings_overlay['layout'] ) ) {
+			$embed_atts['template'] = $settings_overlay['layout'];
+		}
+		if ( isset( $settings_overlay['columns'] ) ) {
+			$embed_atts['cols'] = $settings_overlay['columns']['desktop'];
+		}
+		if ( ! empty( $embed_atts ) ) {
+			$settings_overlay['_embed_atts'] = $embed_atts;
+		}
+
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
 
 		return $settings_overlay;
@@ -406,6 +417,28 @@ class Public_Render {
 		}
 
 		return (string) $render_result->html;
+	}
+
+	/**
+	 * Returns whether a value is the key of a registered layout.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $layout_key Value to check.
+	 * @return bool
+	 */
+	public static function is_layout_key( $layout_key ): bool {
+		if ( ! is_string( $layout_key ) || '' === $layout_key ) {
+			return false;
+		}
+
+		foreach ( \FotoGrids\Render\Internal\Module_Registry::all_modules( 'layouts' ) as $layout_class ) {
+			$layout = new $layout_class();
+			if ( $layout->layout_key() === $layout_key ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -731,6 +764,9 @@ class Public_Render {
 
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
 			$album_settings['layout'] = $atts['template'];
+			if ( self::is_layout_key( $atts['template'] ) ) {
+				$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
+			}
 		}
 
 		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {
