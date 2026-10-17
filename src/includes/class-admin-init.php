@@ -118,6 +118,8 @@ class Admin_Init {
 			''
 		);
 
+		self::add_new_page( Post_Types::GALLERY );
+
 		add_submenu_page(
 			'fotogrids',
 			__( 'Albums', 'fotogrids' ),
@@ -126,6 +128,8 @@ class Admin_Init {
 			'edit.php?post_type=' . Post_Types::ALBUM,
 			''
 		);
+
+		self::add_new_page( Post_Types::ALBUM );
 
 		add_submenu_page(
 			'fotogrids',
@@ -184,6 +188,30 @@ class Admin_Init {
 		}
 
 		remove_submenu_page( 'fotogrids', 'fotogrids' );
+	}
+
+	/**
+	 * Add the Add New entry for a collection type, shown under its list.
+	 *
+	 * @since 1.3.0
+	 * @param string $post_type Collection post type.
+	 * @return void
+	 */
+	private static function add_new_page( string $post_type ): void {
+		$post_type_object = get_post_type_object( $post_type );
+
+		if ( ! $post_type_object ) {
+			return;
+		}
+
+		add_submenu_page(
+			'fotogrids',
+			$post_type_object->labels->add_new_item,
+			$post_type_object->labels->add_new_item,
+			$post_type_object->cap->create_posts,
+			'post-new.php?post_type=' . $post_type,
+			''
+		);
 	}
 
 	/**
@@ -1446,12 +1474,9 @@ class Admin_Init {
 		$is_fotogrids = \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook );
 		$show_upgrade = ! \FotoGrids\License_Manager::has_pro();
 
-		if ( ! $is_fotogrids && ! $show_upgrade ) {
-			return;
-		}
-
 		wp_register_style( 'fotogrids-admin-chrome', false, array(), FOTOGRIDS_VERSION );
 		wp_enqueue_style( 'fotogrids-admin-chrome' );
+		wp_add_inline_style( 'fotogrids-admin-chrome', self::add_new_menu_css() );
 
 		if ( $is_fotogrids ) {
 			wp_add_inline_style( 'fotogrids-admin-chrome', self::notice_suppression_css() );
@@ -1490,17 +1515,23 @@ class Admin_Init {
 	 * Fix menu highlighting for FotoGrids custom post types
 	 */
 	public static function fix_menu_highlighting() {
-		global $parent_file, $submenu_file, $post_type;
+		global $parent_file, $submenu_file, $post_type, $pagenow;
 
 		if ( in_array( $post_type, Post_Types::COLLECTION_TYPES, true ) ) {
-			$parent_file = 'fotogrids'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
-
-			if ( Post_Types::GALLERY === $post_type ) {
-				$submenu_file = 'edit.php?post_type=' . Post_Types::GALLERY; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
-			} elseif ( Post_Types::ALBUM === $post_type ) {
-				$submenu_file = 'edit.php?post_type=' . Post_Types::ALBUM; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
-			}
+			$parent_file  = 'fotogrids'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
+			$submenu_file = ( 'post-new.php' === $pagenow ? 'post-new.php' : 'edit.php' ) . '?post_type=' . $post_type; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 		}
+	}
+
+	/**
+	 * CSS that marks each Add New menu entry as a child of the list above it.
+	 *
+	 * @since  1.3.0
+	 * @return string
+	 */
+	private static function add_new_menu_css() {
+		return '#adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\2192";content:"\2192" / "";font-size:.8em;opacity:.55;margin-inline-end:6px;}'
+			. '.rtl #adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\2190";content:"\2190" / "";}';
 	}
 
 	/**
