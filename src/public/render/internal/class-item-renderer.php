@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Formatted_Text\Entities;
+use FotoGrids\Formatted_Text\Formatted_Text;
 use FotoGrids\Render\Api\Item_Overlay;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Sanitization\Attribute_Value;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -68,7 +71,7 @@ final class Item_Renderer {
 			);
 
 		if ( $is_image_viewer && '' !== $item_view->caption_title ) {
-			$data_attrs['data-fg-caption-title'] = $item_view->caption_title;
+			$data_attrs['data-fg-caption-title'] = Attribute_Value::text( $item_view->caption_title );
 		}
 
 		$data_attributes = $this->serialize_data_attrs( $data_attrs );
@@ -77,10 +80,10 @@ final class Item_Renderer {
 		if ( ! $suppress_caption && ( '' !== $item_view->caption_title || '' !== $item_view->caption_description ) ) {
 			$content = '';
 			if ( '' !== $item_view->caption_title ) {
-				$content .= '<span class="fg-caption-title">' . esc_html( $item_view->caption_title ) . '</span>';
+				$content .= '<span class="fg-caption-title">' . Entities::escape_text( $item_view->caption_title, true ) . '</span>';
 			}
 			if ( '' !== $item_view->caption_description ) {
-				$content .= '<span class="fg-caption-description">' . esc_html( $item_view->caption_description ) . '</span>';
+				$content .= '<span class="fg-caption-description">' . $this->description_html( $item_view, $render_context ) . '</span>';
 			}
 			$caption_html = '<figcaption class="fg-caption">'
 				. '<span class="fg-caption-bg" aria-hidden="true"></span>'
@@ -98,6 +101,47 @@ final class Item_Renderer {
 			$data_attributes,
 			$style_attribute,
 			$figure_inner
+		);
+	}
+
+	/**
+	 * Returns the caption description as safe HTML.
+	 *
+	 * A description the caption pipeline resolved is formatted; any other
+	 * value set on the item is shown as plain text.
+	 *
+	 * @since   1.3.0
+	 * @param   Item_View      $item_view      Item data.
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	private function description_html( Item_View $item_view, Render_Context $render_context ): string {
+		$content = ( new Caption_Content_Builder() )->resolve_display( $item_view, $render_context );
+		if ( $content->description === $item_view->caption_description ) {
+			return $content->description_html;
+		}
+		return nl2br( Entities::escape_text( $item_view->caption_description, true ), false );
+	}
+
+	/**
+	 * Returns the alt text, falling back to the title as one line of plain text.
+	 *
+	 * @since   1.3.0
+	 * @param   Item_View $item_view Item data.
+	 * @return  string Attribute-ready value.
+	 */
+	private function alt_attribute( Item_View $item_view ): string {
+		if ( '' !== $item_view->alt ) {
+			return esc_attr( $item_view->alt );
+		}
+		return Attribute_Value::text(
+			Formatted_Text::single_line(
+				$item_view->title,
+				array(
+					'use'     => 'aria',
+					'item_id' => $item_view->id,
+				)
+			)
 		);
 	}
 
@@ -175,7 +219,7 @@ final class Item_Renderer {
 
 		$image_attributes = array(
 			'src'               => esc_url( $thumb_url ),
-			'alt'               => esc_attr( '' !== $item_view->alt ? $item_view->alt : $item_view->title ),
+			'alt'               => $this->alt_attribute( $item_view ),
 			'data-fg-thumb-src' => esc_url( $thumb_url ),
 			'data-fg-full-src'  => esc_url( $full_url ),
 			'data-id'           => (string) $item_view->id,
@@ -254,7 +298,7 @@ final class Item_Renderer {
 		$poster_attrs = array(
 			'class'             => 'fg-video-poster',
 			'src'               => esc_url( $item_view->poster_url ),
-			'alt'               => esc_attr( '' !== $item_view->alt ? $item_view->alt : $item_view->title ),
+			'alt'               => $this->alt_attribute( $item_view ),
 			'data-fg-thumb-src' => esc_url( $item_view->poster_url ),
 			'data-id'           => (string) $item_view->id,
 		);
@@ -296,8 +340,8 @@ final class Item_Renderer {
 			$video_attrs['data-fg-embed-id'] = esc_attr( $item_view->embed_id );
 		}
 		if ( ! empty( $item_view->embed_settings ) ) {
-			$encoded = wp_json_encode( $item_view->embed_settings );
-			if ( is_string( $encoded ) ) {
+			$encoded = \FotoGrids\Sanitization\Attribute_Value::json( $item_view->embed_settings );
+			if ( '' !== $encoded ) {
 				$video_attrs['data-fg-embed-settings'] = esc_attr( $encoded );
 			}
 		}

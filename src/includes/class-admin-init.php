@@ -320,6 +320,7 @@ class Admin_Init {
 				'sharingSettings'    => \FotoGrids\Settings\Sharing_Settings_Store::get(),
 				'watermarkSettings'  => \FotoGrids\Settings\Watermark_Settings_Store::get(),
 				'seoSettings'        => \FotoGrids\Settings\SEO_Settings_Store::get(),
+				'textFormatting'     => \FotoGrids\Settings\Text_Formatting_Settings_Store::get(),
 				'viewSettings'       => \FotoGrids\Settings\View_Settings_Store::get(),
 				'viewDefaults'       => \FotoGrids\Settings\View_Settings_Store::defaults(),
 				'shareStatistics'    => self::resolve_share_statistics_state(),

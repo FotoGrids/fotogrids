@@ -112,7 +112,7 @@ final class Lightbox_Mini_Viewer implements Feature {
 				'thumb'       => $item_view->thumb_url,
 				'alt'         => $item_view->alt,
 				'title'       => $item_view->title,
-				'caption'     => '' !== $item_view->caption_title ? $item_view->caption_title : $item_view->caption,
+				'caption'     => '' !== $item_view->caption_title ? \FotoGrids\Formatted_Text\Entities::escape_text( $item_view->caption_title ) : $item_view->caption,
 				'description' => $item_view->description,
 				'video'       => $is_video,
 			);
@@ -128,7 +128,7 @@ final class Lightbox_Mini_Viewer implements Feature {
 			: 'light';
 
 		$attrs = array(
-			'data-fg-mini-items'   => wp_json_encode( $items ),
+			'data-fg-mini-items'   => \FotoGrids\Sanitization\Attribute_Value::json( $items ),
 			'data-fg-mini-theme'   => $theme,
 			'data-fg-mini-close'   => empty( $settings['lightbox_mini_show_close'] ) ? '0' : '1',
 			'data-fg-mini-arrows'  => empty( $settings['lightbox_mini_show_arrows'] ) ? '0' : '1',
@@ -138,7 +138,7 @@ final class Lightbox_Mini_Viewer implements Feature {
 			'data-fg-mini-border'  => empty( $settings['lightbox_mini_show_border'] ) ? '0' : '1',
 			'data-fg-mini-shadow'  => empty( $settings['lightbox_mini_show_shadow'] ) ? '0' : '1',
 			'data-fg-mini-radius'  => empty( $settings['lightbox_mini_show_radius'] ) ? '0' : '1',
-			'data-fg-mini-labels'  => (string) wp_json_encode( self::client_labels() ),
+			'data-fg-mini-labels'  => \FotoGrids\Sanitization\Attribute_Value::json( self::client_labels() ),
 		);
 
 		if ( ! empty( $settings['lightbox_lite_caption_show'] ) ) {
@@ -152,7 +152,7 @@ final class Lightbox_Mini_Viewer implements Feature {
 		// padding from this attribute rather than inheriting a CSS variable.
 		$attrs['data-fg-mini-padding'] = $this->padding_css( $render_context );
 
-		return $attrs;
+		return array_merge( $attrs, \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::wrapper_attrs( 'lightbox_mini', $render_context ) );
 	}
 
 	/**
@@ -203,11 +203,11 @@ final class Lightbox_Mini_Viewer implements Feature {
 		return new Module_Assets(
 			array(
 				'fotogrids-lightbox-mini-viewer' => new Asset_Decl( 'lightbox/mini-viewer/lightbox-mini-viewer.css' ),
-			),
-			array(
+			) + \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::css(),
+			\FotoGrids\Render\Formatted_Text\Formatted_Text_Client::js() + array(
 				'fotogrids-lightbox-mini-viewer' => new Asset_Decl(
 					'../../assets/js/lightbox-mini-viewer.js',
-					array( 'fotogrids-runtime' ),
+					array( 'fotogrids-runtime', \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::HANDLE ),
 					true,
 				),
 			)

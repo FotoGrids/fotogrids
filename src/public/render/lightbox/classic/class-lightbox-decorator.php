@@ -11,6 +11,7 @@ use FotoGrids\Render\Api\Item_Wrapper;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Hooks;
+use FotoGrids\Sanitization\Attribute_Value;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -101,11 +102,11 @@ final class Lightbox_Decorator implements Decorator {
 			}
 
 			if ( '' !== $item_view->caption ) {
-				$wrapper_attrs['data-fg-caption'] = esc_attr( $item_view->caption );
+				$wrapper_attrs['data-fg-caption'] = Attribute_Value::text( $item_view->caption );
 			}
 
 			if ( '' !== $item_view->title ) {
-				$wrapper_attrs['data-fg-title'] = esc_attr( $item_view->title );
+				$wrapper_attrs['data-fg-title'] = Attribute_Value::text( $item_view->title );
 			}
 
 			$wrapper_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $wrapper_attrs, $render_context );

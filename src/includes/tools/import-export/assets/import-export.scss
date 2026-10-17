@@ -1,424 +1,435 @@
 // FotoGrids Import / Export Tool
 
 .fg-ie-banner {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    background: var(--fg-background-warning);
-    border: 1px solid var(--fg-yellow);
-    border-radius: 4px;
-    font-size: 13px;
-    color: var(--fg-text-primary);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 20px;
+	background: var(--fg-background-warning);
+	border: 1px solid var(--fg-yellow);
+	border-radius: 4px;
+	font-size: 13px;
+	color: var(--fg-text-primary);
 
-    &__spinner {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 2px solid var(--fg-yellow);
-        border-top-color: var(--fg-text-primary);
-        border-radius: 50%;
-        animation: fg-ie-spin 0.7s linear infinite;
-        flex-shrink: 0;
-    }
+	&__spinner {
+		display: inline-block;
+		width: 14px;
+		height: 14px;
+		border: 2px solid var(--fg-yellow);
+		border-top-color: var(--fg-text-primary);
+		border-radius: 50%;
+		animation: fg-ie-spin 0.7s linear infinite;
+		flex-shrink: 0;
+	}
 
-    &__message {
-        font-weight: 500;
-    }
+	&__message {
+		font-weight: 500;
+	}
 }
 
 @keyframes fg-ie-spin {
-    to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .fg-ie-import-count {
-    color: var(--fg-text-secondary);
-    background: var(--fg-background-secondary);
-    border: 1px solid var(--fg-border-secondary);
-    border-radius: 20px;
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	color: var(--fg-text-secondary);
+	background: var(--fg-background-secondary);
+	border: 1px solid var(--fg-border-secondary);
+	border-radius: 20px;
+	width: 20px;
+	height: 20px;
+	font-size: 10px;
+	font-weight: 400;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .fg-ie-hint {
-    margin: 8px 0 0;
-    font-size: 12px;
-    color: var(--fg-text-secondary);
-    line-height: 1.5;
+	margin: 8px 0 0;
+	font-size: 12px;
+	color: var(--fg-text-secondary);
+	line-height: 1.5;
 
-    &--loading {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+	&--loading {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
 }
 
 .fg-ie-link-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: 12px;
-    color: var(--fg-blue);
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+	background: none;
+	border: none;
+	padding: 0;
+	font-size: 12px;
+	color: var(--fg-blue);
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 2px;
 
-    &:hover {
-        color: var(--fg-blue-dark);
-    }
+	&:hover {
+		color: var(--fg-blue-dark);
+	}
 }
 
 .fg-ie-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 16px;
 }
 
 .fg-ie-warning {
-    font-size: 12px;
-    color: var(--fg-red);
+	font-size: 12px;
+	color: var(--fg-red);
 }
 
 .fg-ie-error-notice {
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: rgba(240, 30, 50, 0.1);
-    border: 1px solid rgba(240, 30, 50, 0.3);
-    border-radius: 4px;
-    font-size: 13px;
-    color: var(--fg-red);
+	margin-top: 12px;
+	padding: 8px 12px;
+	background: rgba(240, 30, 50, 0.1);
+	border: 1px solid rgba(240, 30, 50, 0.3);
+	border-radius: 4px;
+	font-size: 13px;
+	color: var(--fg-red);
+}
+
+.fg-ie-warning-notice {
+	padding: 8px 12px;
+	background: var(--fg-status-warning-bg);
+	border: 1px solid var(--fg-status-warning-border);
+	border-radius: 4px;
+	font-size: 13px;
+	color: var(--fg-status-warning-text);
 }
 
 .fg-ie-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 
-    &__file {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+	&__file {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
 
-    &__file-name {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--fg-text-primary);
-    }
+	&__file-name {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
 
-    &__file-size {
-        font-size: 12px;
-        color: var(--fg-text-secondary);
-    }
+	&__file-size {
+		font-size: 12px;
+		color: var(--fg-text-secondary);
+	}
 
-    &__chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
+	&__chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
 
-    &__chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 8px 16px;
-        background: var(--fg-background-secondary);
-        border: 1px solid var(--fg-border-secondary);
-        border-radius: 4px;
-        font-size: 12px;
-        color: var(--fg-text-secondary);
+	&__chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 8px 16px;
+		background: var(--fg-background-secondary);
+		border: 1px solid var(--fg-border-secondary);
+		border-radius: 4px;
+		font-size: 12px;
+		color: var(--fg-text-secondary);
 
-        strong {
-            color: var(--fg-text-primary);
-            font-weight: 600;
-        }
-    }
+		strong {
+			color: var(--fg-text-primary);
+			font-weight: 600;
+		}
+	}
 }
 
 .fg-ie-import-row {
-    align-items: center;
+	align-items: center;
 
-    .fotogrids-sidebar-layout__panel__row__title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+	.fotogrids-sidebar-layout__panel__row__title {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
 }
 
 .fg-ie-import-row-control {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
 }
 
 .fg-ie-conflict-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--fg-border-light);
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid var(--fg-border-light);
 
-    &__label {
-        margin: 0 0 12px;
-        font-size: 12px;
-        color: var(--fg-text-secondary);
-    }
+	&__label {
+		margin: 0 0 12px;
+		font-size: 12px;
+		color: var(--fg-text-secondary);
+	}
 }
 
 .fg-ie-conflict-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 8px 0;
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 8px 0;
 
-    & + & {
-        border-top: 1px solid var(--fg-border-light);
-    }
+	& + & {
+		border-top: 1px solid var(--fg-border-light);
+	}
 
-    &__label {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--fg-text-primary);
-        min-width: 80px;
-    }
+	&__label {
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--fg-text-primary);
+		min-width: 80px;
+	}
 
-    .fotogrids-segmented {
-        flex: 1;
-    }
+	.fotogrids-segmented {
+		flex: 1;
+	}
 }
 
 .fg-ie-done {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 32px 0;
-    text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+	padding: 32px 0;
+	text-align: center;
 
-    .fotogrids-icon svg {
-        width: 48px;
-        height: 48px;
-        color: var(--fg-green);
-    }
+	.fotogrids-icon svg {
+		width: 48px;
+		height: 48px;
+		color: var(--fg-green);
+	}
 
-    &__content {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+	&__content {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
 
-    h3 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--fg-text-primary);
-    }
+	h3 {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
 
-    p {
-        margin: 0;
-        font-size: 13px;
-        color: var(--fg-text-secondary);
-    }
+	p {
+		margin: 0;
+		font-size: 13px;
+		color: var(--fg-text-secondary);
+	}
 
-    &--nothing-imported .fotogrids-icon svg {
-        color: var(--fg-status-warning-text);
-    }
+	&--nothing-imported .fotogrids-icon svg {
+		color: var(--fg-status-warning-text);
+	}
 
-    &__result {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
+	&__result {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
 
-    &__result-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--fg-text-secondary);
-    }
+	&__result-title {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--fg-text-secondary);
+	}
 }
 
 .fg-ie-empty {
-    padding: 24px 0;
-    text-align: center;
-    font-size: 13px;
-    color: var(--fg-text-secondary);
+	padding: 24px 0;
+	text-align: center;
+	font-size: 13px;
+	color: var(--fg-text-secondary);
 }
 
 .fg-ie-log-table {
-    border-collapse: collapse;
-    width: 100%;
+	border-collapse: collapse;
+	width: 100%;
 
-    th, td {
-        font-size: 13px;
-        vertical-align: middle;
-    }
+	th,
+	td {
+		font-size: 13px;
+		vertical-align: middle;
+	}
 
-    th {
-        font-weight: 600;
-    }
+	th {
+		font-weight: 600;
+	}
 }
 
 .fg-ie-log-op,
 .fg-ie-log-status {
-    white-space: nowrap;
-    width: 1%;
+	white-space: nowrap;
+	width: 1%;
 }
 
 .fg-ie-log-date {
-    white-space: nowrap;
-    width: 1%;
-    color: var(--fg-text-secondary);
+	white-space: nowrap;
+	width: 1%;
+	color: var(--fg-text-secondary);
 }
 
 .fg-ie-log-detail {
-    width: auto;
-    word-break: normal;
-    overflow-wrap: anywhere;
+	width: auto;
+	word-break: normal;
+	overflow-wrap: anywhere;
 
-    &__empty {
-        color: var(--fg-text-muted);
-    }
+	&__empty {
+		color: var(--fg-text-muted);
+	}
 }
 
 // Shared pill geometry for the Type and Status columns.
 %fg-ie-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border: 1px solid transparent;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 600;
-    line-height: 1.6;
-    text-transform: uppercase;
-    white-space: nowrap;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 3px 10px;
+	border: 1px solid transparent;
+	border-radius: 20px;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.6;
+	text-transform: uppercase;
+	white-space: nowrap;
 
-    .fotogrids-icon svg,
-    svg {
-        width: 12px;
-        height: 12px;
+	.fotogrids-icon svg,
+	svg {
+		width: 12px;
+		height: 12px;
 
-        path {
-            stroke-width: 2.4 !important;
-
-        }
-    }
+		path {
+			stroke-width: 2.4 !important;
+		}
+	}
 }
 
 .fg-ie-type-pill {
-    @extend %fg-ie-pill;
+	@extend %fg-ie-pill;
 
-    // Solid fill, no visible border. The transparent border from the
-    // placeholder is kept so type and status pills stay the same height.
-    border-color: transparent;
-    color: var(--fg-text-inverse);
+	// Solid fill, no visible border. The transparent border from the
+	// placeholder is kept so type and status pills stay the same height.
+	border-color: transparent;
+	color: var(--fg-text-inverse);
 
-    &--import {
-        background: var(--fg-green);
-    }
+	&--import {
+		background: var(--fg-green);
+	}
 
-    &--export {
-        background: var(--fg-blue);
-    }
+	&--export {
+		background: var(--fg-blue);
+	}
 }
 
 .fg-ie-status-pill {
-    @extend %fg-ie-pill;
+	@extend %fg-ie-pill;
 
-    // Unknown / legacy status values fall back to a neutral pill.
-    background: var(--fg-background-tertiary);
-    border-color: var(--fg-border-secondary);
-    color: var(--fg-text-secondary);
+	// Unknown / legacy status values fall back to a neutral pill.
+	background: var(--fg-background-tertiary);
+	border-color: var(--fg-border-secondary);
+	color: var(--fg-text-secondary);
 
-    &--complete,
-    &--success {
-        background: rgba(70, 180, 80, 0.1);
-        border-color: rgba(70, 180, 80, 0.25);
-        color: var(--fg-green);
-    }
+	&--complete,
+	&--success {
+		background: rgba(70, 180, 80, 0.1);
+		border-color: rgba(70, 180, 80, 0.25);
+		color: var(--fg-green);
+	}
 
-    &--error,
-    &--failed {
-        background: rgba(240, 30, 50, 0.08);
-        border-color: rgba(240, 30, 50, 0.2);
-        color: var(--fg-red);
-    }
+	&--error,
+	&--failed {
+		background: rgba(240, 30, 50, 0.08);
+		border-color: rgba(240, 30, 50, 0.2);
+		color: var(--fg-red);
+	}
 
-    &--partial {
-        background: var(--fg-status-warning-bg);
-        border-color: var(--fg-status-warning-border);
-        color: var(--fg-status-warning-text);
-    }
+	&--partial {
+		background: var(--fg-status-warning-bg);
+		border-color: var(--fg-status-warning-border);
+		color: var(--fg-status-warning-text);
+	}
 }
 
 // Details column: one light-grey chip per data type.
 .fg-ie-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    padding: 2px 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 2px 0;
 }
 
 .fg-ie-chip {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 4px;
-    padding: 2px 8px;
-    border: 1px solid var(--fg-border-secondary);
-    border-radius: 4px;
-    background: var(--fg-background-tertiary);
-    font-size: 11px;
-    line-height: 1.7;
-    white-space: nowrap;
-    color: var(--fg-text-secondary);
+	display: inline-flex;
+	align-items: baseline;
+	gap: 4px;
+	padding: 2px 8px;
+	border: 1px solid var(--fg-border-secondary);
+	border-radius: 4px;
+	background: var(--fg-background-tertiary);
+	font-size: 11px;
+	line-height: 1.7;
+	white-space: nowrap;
+	color: var(--fg-text-secondary);
 
-    &__count {
-        font-weight: 600;
-        font-variant-numeric: tabular-nums;
-        color: var(--fg-text-primary);
-    }
+	&__count {
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--fg-text-primary);
+	}
 
-    &__label {
-        font-weight: 500;
-    }
+	&__label {
+		font-weight: 500;
+	}
 
-    // Zero counts stay visible but recede.
-    &--empty {
-        opacity: 0.55;
+	// Zero counts stay visible but recede.
+	&--empty {
+		opacity: 0.55;
 
-        .fg-ie-chip__count {
-            color: var(--fg-text-secondary);
-        }
-    }
+		.fg-ie-chip__count {
+			color: var(--fg-text-secondary);
+		}
+	}
 
-    // File format marker (JSON / XML).
-    &--format {
-        background: transparent;
-        border-color: var(--fg-border-secondary);
-        border-style: dashed;
-        letter-spacing: 0.4px;
+	// File format marker (JSON / XML).
+	&--format {
+		background: transparent;
+		border-color: var(--fg-border-secondary);
+		border-style: dashed;
+		letter-spacing: 0.4px;
 
-        .fg-ie-chip__label {
-            font-weight: 600;
-        }
-    }
+		.fg-ie-chip__label {
+			font-weight: 600;
+		}
+	}
 
-    // Skipped records reported by the importer.
-    &--skipped {
-        background: var(--fg-status-warning-bg);
-        border-color: var(--fg-status-warning-border);
-        color: var(--fg-status-warning-text);
+	// Skipped records reported by the importer.
+	&--skipped {
+		background: var(--fg-status-warning-bg);
+		border-color: var(--fg-status-warning-border);
+		color: var(--fg-status-warning-text);
 
-        .fg-ie-chip__count {
-            color: var(--fg-status-warning-text);
-        }
-    }
+		.fg-ie-chip__count {
+			color: var(--fg-status-warning-text);
+		}
+	}
 }
