@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-16T18:52:03+00:00\n"
+"POT-Creation-Date: 2026-10-17T11:09:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -44,20 +44,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:259
+#: fotogrids.php:266
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:260
-#: fotogrids.php:269
+#: fotogrids.php:267
+#: fotogrids.php:276
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:268
+#: fotogrids.php:275
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:284
+#: fotogrids.php:291
 #: includes/class-admin-init.php:159
 #: includes/class-admin-init.php:160
 #: includes/tools/import-export/assets/constants.js:42
@@ -65,11 +65,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:301
+#: fotogrids.php:308
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:326
+#: fotogrids.php:333
 #: assets/admin/src/components/dashboard/LearnSection.jsx:85
 msgid "Help Center"
 msgstr ""
@@ -95,7 +95,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-album/class-album-module.php:71
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:96
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:104
-#: includes/rest/admin/admin-data.php:1535
+#: includes/rest/admin/admin-data.php:1567
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:446
 #: assets/admin/src/components/pages/TemplatesPage.jsx:451
@@ -256,7 +256,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/BeaverBuilder/modules/fotogrids-gallery/class-gallery-module.php:107
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:107
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:128
-#: includes/rest/admin/admin-data.php:1535
+#: includes/rest/admin/admin-data.php:1567
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:447
 #: assets/admin/src/components/pages/TemplatesPage.jsx:450
@@ -282,8 +282,8 @@ msgid "News & Updates"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:241
-#: includes/metaboxes/class-metabox-registrar.php:633
-#: includes/metaboxes/class-metabox-registrar.php:723
+#: includes/metaboxes/class-metabox-registrar.php:632
+#: includes/metaboxes/class-metabox-registrar.php:722
 #: includes/metaboxes/class-metabox-strings.php:64
 msgid "Loading..."
 msgstr ""
@@ -329,6 +329,7 @@ msgstr ""
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:529
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:916
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:207
+#: shared/text-editor/LinkPopover.jsx:188
 msgid "Cancel"
 msgstr ""
 
@@ -391,7 +392,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-strings.php:281
 #: assets/admin/plain/collection-settings.js:2306
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:100
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:108
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:307
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:424
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:33
@@ -2400,7 +2401,7 @@ msgid "Loop Gallery"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:502
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:106
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:114
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:268
 msgid "Maintenance"
 msgstr ""
@@ -2470,7 +2471,7 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:56
 #: includes/diagnostics/class-system-report.php:356
 #: includes/metaboxes/class-metabox-strings.php:374
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:52
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:54
 msgid "Media"
 msgstr ""
 
@@ -2956,7 +2957,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:629
 #: includes/class-upgrade-modal.php:34
 #: includes/metaboxes/class-metabox-strings.php:280
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:88
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:96
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:163
 msgid "SEO"
 msgstr ""
@@ -3080,7 +3081,7 @@ msgid "Share block won't appear"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:658
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:76
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:84
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:184
 msgid "Sharing"
 msgstr ""
@@ -3708,7 +3709,7 @@ msgid "View Page"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:809
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:70
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:78
 msgid "View Pages"
 msgstr ""
 
@@ -3991,47 +3992,47 @@ msgstr ""
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:575
+#: includes/class-admin-init.php:576
 #: includes/metaboxes/class-collection-save-pipeline.php:107
 #: includes/metaboxes/class-item-ajax-endpoints.php:468
 #: includes/rest/admin/admin-data.php:221
 #: includes/rest/admin/admin-data.php:257
 #: includes/rest/admin/admin-data.php:277
-#: includes/rest/admin/admin-data.php:830
+#: includes/rest/admin/admin-data.php:863
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:601
+#: includes/class-admin-init.php:602
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:609
+#: includes/class-admin-init.php:610
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:618
-#: includes/class-admin-init.php:665
+#: includes/class-admin-init.php:619
+#: includes/class-admin-init.php:666
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:670
+#: includes/class-admin-init.php:671
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:922
+#: includes/class-admin-init.php:923
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:923
+#: includes/class-admin-init.php:924
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1051
+#: includes/class-admin-init.php:1052
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1057
+#: includes/class-admin-init.php:1058
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4039,8 +4040,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1070
-#: includes/class-admin-init.php:1084
+#: includes/class-admin-init.php:1071
+#: includes/class-admin-init.php:1085
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4048,7 +4049,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1103
+#: includes/class-admin-init.php:1104
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4056,32 +4057,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1115
-#: includes/class-admin-init.php:1129
+#: includes/class-admin-init.php:1116
+#: includes/class-admin-init.php:1130
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1147
-#: includes/class-admin-init.php:1326
+#: includes/class-admin-init.php:1148
+#: includes/class-admin-init.php:1327
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1150
+#: includes/class-admin-init.php:1151
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1153
+#: includes/class-admin-init.php:1154
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1190
+#: includes/class-admin-init.php:1191
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1193
+#: includes/class-admin-init.php:1194
 msgid "Choose an album..."
 msgstr ""
 
@@ -4224,12 +4225,12 @@ msgstr ""
 
 #: includes/class-post-types.php:166
 #: includes/metaboxes/class-metabox-registrar.php:325
-#: includes/metaboxes/class-metabox-registrar.php:722
+#: includes/metaboxes/class-metabox-registrar.php:721
 msgid "Edit Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:167
-#: includes/metaboxes/class-metabox-registrar.php:721
+#: includes/metaboxes/class-metabox-registrar.php:720
 msgid "View Gallery"
 msgstr ""
 
@@ -4475,7 +4476,7 @@ msgstr ""
 msgid "Publish to display on the frontend."
 msgstr ""
 
-#: includes/class-post-types.php:543
+#: includes/class-post-types.php:541
 msgid "Loading gallery manager..."
 msgstr ""
 
@@ -5130,6 +5131,10 @@ msgstr ""
 msgid "%s m"
 msgstr ""
 
+#: includes/formatted-text/class-formatted-text.php:314
+msgid "(opens in a new tab)"
+msgstr ""
+
 #. translators: %s: Method name.
 #: includes/galleries/class-gallery-items.php:64
 #, php-format
@@ -5190,6 +5195,7 @@ msgid "Failed to reorder items"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:187
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:60
 msgid "Gallery Items"
 msgstr ""
 
@@ -5255,119 +5261,119 @@ msgstr ""
 msgid "You have unsaved changes. Are you sure you want to leave?"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:576
+#: includes/metaboxes/class-metabox-registrar.php:577
 msgid "You're viewing these settings in read-only mode. Ask a site administrator if changes are needed."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:626
+#: includes/metaboxes/class-metabox-registrar.php:625
 msgid "Search albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:627
+#: includes/metaboxes/class-metabox-registrar.php:626
 msgid "No available albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:628
+#: includes/metaboxes/class-metabox-registrar.php:627
 msgid "No more albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:629
+#: includes/metaboxes/class-metabox-registrar.php:628
 msgid "Create New Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:630
+#: includes/metaboxes/class-metabox-registrar.php:629
 msgid "Assigned to"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:631
+#: includes/metaboxes/class-metabox-registrar.php:630
 msgid "Not assigned to any"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:632
+#: includes/metaboxes/class-metabox-registrar.php:631
 msgid "albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:634
+#: includes/metaboxes/class-metabox-registrar.php:633
 msgid "Error loading albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:635
+#: includes/metaboxes/class-metabox-registrar.php:634
 msgid "Album assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:642
+#: includes/metaboxes/class-metabox-registrar.php:641
 msgid "Loading albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:708
+#: includes/metaboxes/class-metabox-registrar.php:707
 msgid "Assigned Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:709
+#: includes/metaboxes/class-metabox-registrar.php:708
 msgid "Available Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:710
+#: includes/metaboxes/class-metabox-registrar.php:709
 msgid "Search Galleries..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:711
+#: includes/metaboxes/class-metabox-registrar.php:710
 msgid "No Galleries assigned to this Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:712
+#: includes/metaboxes/class-metabox-registrar.php:711
 msgid "No available Galleries found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:713
+#: includes/metaboxes/class-metabox-registrar.php:712
 msgid "Drag to reorder Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:714
+#: includes/metaboxes/class-metabox-registrar.php:713
 msgid "Remove from Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:715
+#: includes/metaboxes/class-metabox-registrar.php:714
 msgid "Add to Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:716
+#: includes/metaboxes/class-metabox-registrar.php:715
 msgid "Set as featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:717
+#: includes/metaboxes/class-metabox-registrar.php:716
 msgid "Clear featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:718
+#: includes/metaboxes/class-metabox-registrar.php:717
 msgid "Featured Gallery set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:719
+#: includes/metaboxes/class-metabox-registrar.php:718
 msgid "Featured Gallery cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:720
+#: includes/metaboxes/class-metabox-registrar.php:719
 msgid "Error saving featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:724
+#: includes/metaboxes/class-metabox-registrar.php:723
 msgid "Gallery assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:725
+#: includes/metaboxes/class-metabox-registrar.php:724
 msgid "Error updating Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:726
+#: includes/metaboxes/class-metabox-registrar.php:725
 msgid "items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:727
+#: includes/metaboxes/class-metabox-registrar.php:726
 msgid "No items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:728
+#: includes/metaboxes/class-metabox-registrar.php:727
 msgid "Drop item here"
 msgstr ""
 
@@ -5702,6 +5708,8 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:199
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:396
+#: shared/text-editor/LinkPopover.jsx:102
+#: shared/text-editor/registry.js:13
 msgid "Link"
 msgstr ""
 
@@ -6628,13 +6636,13 @@ msgstr ""
 msgid "Failed to save template."
 msgstr ""
 
-#: includes/modules/ViewCollections/class-integrated-renderer.php:234
+#: includes/modules/ViewCollections/class-integrated-renderer.php:261
 #: includes/modules/ViewCollections/templates/view-collection.php:71
 msgid "Draft preview - this collection is not published yet."
 msgstr ""
 
 #. translators: 1: gallery count, 2: album title
-#: includes/modules/ViewCollections/class-renderer.php:458
+#: includes/modules/ViewCollections/class-renderer.php:475
 #, php-format
 msgid "%1$d gallery in %2$s."
 msgid_plural "%1$d galleries in %2$s."
@@ -6642,7 +6650,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: item count, 2: gallery title
-#: includes/modules/ViewCollections/class-renderer.php:470
+#: includes/modules/ViewCollections/class-renderer.php:487
 #, php-format
 msgid "%1$d photo in %2$s."
 msgid_plural "%1$d photos in %2$s."
@@ -6652,7 +6660,7 @@ msgstr[1] ""
 #. translators: %d: number of galleries in the album.
 #. translators: %d: number of galleries.
 #. translators: %d: gallery count
-#: includes/modules/ViewCollections/class-renderer.php:748
+#: includes/modules/ViewCollections/class-renderer.php:765
 #: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:157
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:149
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:140
@@ -6667,7 +6675,7 @@ msgstr[1] ""
 #. translators: %d: number of items in the gallery.
 #. translators: %d: number of items.
 #. translators: %d: item count
-#: includes/modules/ViewCollections/class-renderer.php:750
+#: includes/modules/ViewCollections/class-renderer.php:767
 #: assets/admin/src/components/library/MergeDialog.jsx:119
 #: assets/admin/src/components/library/MergeDialog.jsx:175
 #: includes/modules/PageBuilders/builders/BeaverBuilder/assets/src/editor.jsx:162
@@ -6702,7 +6710,7 @@ msgid "Master capability. Grants every other FotoGrids permission as a fallback.
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:124
-#: includes/permissions/class-core-permissions.php:562
+#: includes/permissions/class-core-permissions.php:589
 msgid "Manage plugin settings"
 msgstr ""
 
@@ -6711,8 +6719,8 @@ msgid "Open the FotoGrids settings screen and change the defaults that apply sit
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:138
-#: includes/permissions/class-core-permissions.php:534
-msgid "Manage library (tags, people, locations)"
+#: includes/permissions/class-core-permissions.php:547
+msgid "Manage tags, people and locations"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:139
@@ -6720,147 +6728,160 @@ msgid "Create, rename and delete the tags, people and locations that items are f
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:151
-#: includes/permissions/class-core-permissions.php:548
-msgid "View statistics"
+#: includes/permissions/class-core-permissions.php:561
+msgid "Format captions and descriptions"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:152
-msgid "Open the Statistics screen and see view and share counts for galleries, albums and items."
+msgid "Add bold, italic and links to item captions and descriptions in FotoGrids. It does not change what the WordPress Media Library allows."
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:164
-msgid "Manage permissions"
+#: includes/permissions/class-core-permissions.php:575
+msgid "View statistics"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:165
+msgid "Open the Statistics screen and see view and share counts for galleries, albums and items."
+msgstr ""
+
+#: includes/permissions/class-core-permissions.php:177
+msgid "Manage permissions"
+msgstr ""
+
+#: includes/permissions/class-core-permissions.php:178
 msgid "Open the Permissions Manager, and change who holds each permission. Cannot be revoked from administrators."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:182
-#: includes/permissions/class-core-permissions.php:441
+#: includes/permissions/class-core-permissions.php:195
+#: includes/permissions/class-core-permissions.php:454
 msgid "Modify gallery settings"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:183
+#: includes/permissions/class-core-permissions.php:196
 msgid "Change layout, Lightbox, captions, SEO, password, sharing and custom CSS/JS on a gallery, and apply or save templates."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:197
-#: includes/permissions/class-core-permissions.php:500
+#: includes/permissions/class-core-permissions.php:210
+#: includes/permissions/class-core-permissions.php:513
 msgid "Modify album settings"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:198
+#: includes/permissions/class-core-permissions.php:211
 msgid "Change layout, behaviour, SEO, sharing and custom CSS/JS on an album, and apply or save templates."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:311
+#: includes/permissions/class-core-permissions.php:324
 msgid "Create and edit own galleries"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:312
+#: includes/permissions/class-core-permissions.php:325
 msgid "Create and edit own albums"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:314
+#: includes/permissions/class-core-permissions.php:327
 msgid "Create a gallery and edit the ones they own - title, items, captions and item details. Does not cover gallery settings."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:315
+#: includes/permissions/class-core-permissions.php:328
 msgid "Create an album and edit the ones they own - title and which galleries it holds. Does not cover album settings."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:335
+#: includes/permissions/class-core-permissions.php:348
 msgid "Publish galleries"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:336
+#: includes/permissions/class-core-permissions.php:349
 msgid "Publish albums"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:338
+#: includes/permissions/class-core-permissions.php:351
 msgid "Take a gallery out of draft so it renders on the front end. Without this a gallery can be built but only submitted for review."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:339
+#: includes/permissions/class-core-permissions.php:352
 msgid "Take an album out of draft so it renders on the front end. Without this an album can be built but only submitted for review."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:349
+#: includes/permissions/class-core-permissions.php:362
 msgid "Delete own galleries"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:350
+#: includes/permissions/class-core-permissions.php:363
 msgid "Delete own albums"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:352
+#: includes/permissions/class-core-permissions.php:365
 msgid "Move galleries they own to the trash, published ones included."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:353
+#: includes/permissions/class-core-permissions.php:366
 msgid "Move albums they own to the trash, published ones included. The galleries inside are not deleted."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:371
-#: includes/permissions/class-core-permissions.php:455
+#: includes/permissions/class-core-permissions.php:384
+#: includes/permissions/class-core-permissions.php:468
 msgid "Manage galleries created by others"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:372
-#: includes/permissions/class-core-permissions.php:514
+#: includes/permissions/class-core-permissions.php:385
+#: includes/permissions/class-core-permissions.php:527
 msgid "Manage albums created by others"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:374
+#: includes/permissions/class-core-permissions.php:387
 msgid "Edit and delete other users' galleries, including private ones."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:375
+#: includes/permissions/class-core-permissions.php:388
 msgid "Edit and delete other users' albums, including private ones."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:417
-msgid "Create gallery, add and edit gallery items"
+#: includes/permissions/class-core-permissions.php:430
+msgid "Create galleries, add and edit items"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:418
+#: includes/permissions/class-core-permissions.php:431
 msgid "Lowest role that can create galleries and add, edit, reorder or delete items inside them. Does not include changing layout, lightbox, SEO or other gallery settings."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:442
+#: includes/permissions/class-core-permissions.php:455
 msgid "Lowest role that can change layout, lightbox, captions, SEO, password, sharing, custom CSS/JS, and apply or save templates on galleries."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:456
+#: includes/permissions/class-core-permissions.php:469
 msgid "Lowest role that can edit and delete other users' galleries, including private ones."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:476
-msgid "Create album, assign and unassign galleries"
+#: includes/permissions/class-core-permissions.php:489
+msgid "Create albums and assign galleries"
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:477
+#: includes/permissions/class-core-permissions.php:490
 msgid "Lowest role that can create albums and add or remove galleries from them. Does not include changing album layout or other settings."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:501
+#: includes/permissions/class-core-permissions.php:514
 msgid "Lowest role that can change album layout, behaviour, SEO, sharing, custom CSS/JS, and apply or save templates on albums."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:515
+#: includes/permissions/class-core-permissions.php:528
 msgid "Lowest role that can edit and delete other users' albums, including private ones."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:535
+#: includes/permissions/class-core-permissions.php:548
 msgid "Lowest role that can create, rename and delete the tags, people and locations that items are filed under."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:549
+#: includes/permissions/class-core-permissions.php:562
+msgid "Lowest role that can add bold, italic and links to item captions and descriptions."
+msgstr ""
+
+#: includes/permissions/class-core-permissions.php:576
 msgid "Lowest role that can view gallery and album statistics."
 msgstr ""
 
-#: includes/permissions/class-core-permissions.php:563
+#: includes/permissions/class-core-permissions.php:590
 msgid "Lowest role that can change FotoGrids plugin settings."
 msgstr ""
 
@@ -6952,38 +6973,38 @@ msgstr ""
 msgid "Full Size"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:659
+#: includes/rest/admin/admin-data.php:692
 msgid "The defaults could not be saved."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:777
+#: includes/rest/admin/admin-data.php:810
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:136
 msgid "Attachment not found."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:786
+#: includes/rest/admin/admin-data.php:819
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:145
 msgid "Attachment file not found on disk."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:861
+#: includes/rest/admin/admin-data.php:894
 msgid "Unable to fetch Google Fonts metadata."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:870
+#: includes/rest/admin/admin-data.php:903
 msgid "Google Fonts metadata endpoint returned an unexpected response."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:913
+#: includes/rest/admin/admin-data.php:946
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1407
+#: includes/rest/admin/admin-data.php:1439
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1432
+#: includes/rest/admin/admin-data.php:1464
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
@@ -7135,88 +7156,88 @@ msgstr ""
 msgid "Invalid item ID."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:75
+#: includes/rest/items/register-items-routes.php:79
 msgid "Poster and playback settings for Media Library video items."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:161
+#: includes/rest/items/register-items-routes.php:165
 msgid "The full YouTube or Vimeo URL to resolve."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:168
-#: includes/rest/items/register-items-routes.php:196
-#: includes/rest/items/register-items-routes.php:249
+#: includes/rest/items/register-items-routes.php:172
+#: includes/rest/items/register-items-routes.php:200
+#: includes/rest/items/register-items-routes.php:253
 msgid "The embed platform identifier."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:189
+#: includes/rest/items/register-items-routes.php:193
 msgid "The gallery to add the embed to."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:202
-#: includes/rest/items/register-items-routes.php:255
+#: includes/rest/items/register-items-routes.php:206
+#: includes/rest/items/register-items-routes.php:259
 msgid "The full embed URL."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:209
-#: includes/rest/items/register-items-routes.php:262
+#: includes/rest/items/register-items-routes.php:213
+#: includes/rest/items/register-items-routes.php:266
 msgid "Optional caption for the embed item."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:215
-#: includes/rest/items/register-items-routes.php:268
+#: includes/rest/items/register-items-routes.php:219
+#: includes/rest/items/register-items-routes.php:272
 msgid "Platform-specific embed settings (autoplay, mute, loop, etc.)."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:221
-#: includes/rest/items/register-items-routes.php:274
+#: includes/rest/items/register-items-routes.php:225
+#: includes/rest/items/register-items-routes.php:278
 msgid "Optional custom poster (poster_id and/or poster_url)."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:242
+#: includes/rest/items/register-items-routes.php:246
 msgid "The embed item_meta row ID to update."
 msgstr ""
 
-#: includes/rest/items/register-items-routes.php:287
+#: includes/rest/items/register-items-routes.php:291
 msgid "The embed item_meta row ID to delete."
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:53
+#: includes/rest/items/save-item-data.php:54
 #: includes/rest/lightbox/lightbox-data.php:57
 msgid "Item not found."
 msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:144
+#: includes/rest/items/save-item-data.php:164
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:167
+#: includes/rest/items/save-item-data.php:187
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
-#: includes/rest/items/save-item-data.php:186
+#: includes/rest/items/save-item-data.php:206
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:208
+#: includes/rest/items/save-item-data.php:228
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
-#: includes/rest/items/save-item-data.php:227
+#: includes/rest/items/save-item-data.php:247
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:250
+#: includes/rest/items/save-item-data.php:271
 msgid "Item saved successfully."
 msgstr ""
 
@@ -8344,8 +8365,8 @@ msgid "Configure Gallery defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2228
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:64
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:379
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:72
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:388
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:222
 msgid "Defaults"
 msgstr ""
@@ -8542,7 +8563,7 @@ msgid "No fonts found for this search."
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderFontFamily.js:470
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:121
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:129
 msgid "System"
 msgstr ""
 
@@ -8836,7 +8857,7 @@ msgid "Learn & Get Inspired"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/LearnSection.jsx:36
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:122
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:130
 msgid "Getting Started"
 msgstr ""
 
@@ -8955,6 +8976,10 @@ msgstr ""
 msgid "View all albums"
 msgstr ""
 
+#: assets/admin/src/components/item-edit-modal/tabs/TabDetails.jsx:25
+msgid "Bold, italic and links show in Lightboxes. Thumbnails and album tiles show links as plain text."
+msgstr ""
+
 #: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:27
 msgid "Location map"
 msgstr ""
@@ -8989,6 +9014,18 @@ msgstr ""
 
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:137
 msgid "AI detected faces"
+msgstr ""
+
+#: assets/admin/src/components/item-edit-modal/useTextEditorConfig.js:24
+msgid "Your role can't add formatting to captions and descriptions."
+msgstr ""
+
+#: assets/admin/src/components/item-edit-modal/useTextEditorConfig.js:29
+msgid "This site shows captions and descriptions as plain text."
+msgstr ""
+
+#: assets/admin/src/components/item-edit-modal/useTextEditorConfig.js:36
+msgid "Change it in Gallery Items settings"
 msgstr ""
 
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:136
@@ -9404,45 +9441,45 @@ msgstr ""
 msgid "No library entity types are registered."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 msgid "Gallery Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:39
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:41
 msgid "Album Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:58
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:66
 msgid "Responsiveness"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:82
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:90
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:190
 msgid "Watermark"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:94
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:102
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:508
 msgid "Permissions Manager"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:112
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:120
 msgid "Setup Wizard"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:120
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:128
 msgid "Setup"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:380
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:389
 msgid "Default settings applied to new Galleries and Albums."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:415
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:424
 msgid "Select a tab to configure settings"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:430
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:439
 msgid "Settings sections"
 msgstr ""
 
@@ -9582,6 +9619,7 @@ msgstr ""
 #: assets/admin/src/components/pages/TemplatesPage.jsx:105
 #: assets/admin/src/components/pages/TemplatesPage.jsx:624
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:240
+#: shared/text-editor/LinkPopover.jsx:195
 msgid "Apply"
 msgstr ""
 
@@ -9808,8 +9846,74 @@ msgstr ""
 msgid "Enable data deletion"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:230
+#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:229
 msgid "Save defaults"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:111
+msgid "Captions and descriptions show as plain text, so links show as their text only."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:122
+msgid "Captions and descriptions"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:123
+msgid "How item captions and descriptions appear in thumbnails, album tiles and Lightboxes. These settings apply site-wide."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:129
+#: shared/text-editor/Editor.jsx:356
+msgid "Formatting"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:132
+msgid "Every tag is removed and the text is shown as typed. Line breaks are kept."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:136
+msgid "Bold, italic, links and line breaks are shown. Every other tag is removed."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:143
+msgid "Formatting in captions and descriptions"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:152
+msgid "Basic formatting"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:156
+msgid "Plain text"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:164
+msgid "Links"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:166
+msgid "Defaults for links in captions and descriptions. A link can override them in the item editor, where you add it."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:172
+msgid "Open links in a new tab"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:173
+msgid "Links open in a new browser tab, and screen readers announce it."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:186
+#: shared/text-editor/LinkPopover.jsx:166
+msgid "Ask search engines not to follow"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:187
+msgid "Adds rel=\"nofollow\", which tells search engines you do not vouch for the linked pages."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:201
+msgid "Links are off"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:79
@@ -10115,7 +10219,7 @@ msgid "Unauthorised settings panels"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:297
-msgid "How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings."
+msgid "How to show the Settings and Templates metaboxes to users who can edit a gallery or album but cannot change its settings."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:318
@@ -12068,6 +12172,58 @@ msgstr ""
 
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:579
 msgid "No FotoGrids JavaScript errors recorded."
+msgstr ""
+
+#: shared/text-editor/Editor.jsx:325
+msgid "This text has markup the visual editor cannot show. Remove it to switch back to Visual."
+msgstr ""
+
+#: shared/text-editor/Editor.jsx:457
+msgid "HTML"
+msgstr ""
+
+#: shared/text-editor/Editor.jsx:458
+msgid "Visual"
+msgstr ""
+
+#: shared/text-editor/Editor.jsx:516
+msgid "Changing this text saves it without its formatting."
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:59
+msgid "Enter a web address (https://…), an email address or a phone link."
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:89
+msgid "Site default: on"
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:90
+msgid "Site default: off"
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:108
+msgid "Link address"
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:145
+msgid "Open in a new tab"
+msgstr ""
+
+#: shared/text-editor/LinkPopover.jsx:180
+msgid "Remove link"
+msgstr ""
+
+#: shared/text-editor/registry.js:11
+msgid "Bold"
+msgstr ""
+
+#: shared/text-editor/registry.js:12
+msgid "Italic"
+msgstr ""
+
+#: shared/text-editor/registry.js:14
+msgid "Clear formatting"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Gutenberg/blocks/album/block.json

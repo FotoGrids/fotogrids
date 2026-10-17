@@ -201,6 +201,44 @@ function captionTextFor(it, source) {
 }
 
 /**
+ * Stored text as one trimmed line of plain text.
+ *
+ * @param {string} raw
+ * @return {string}
+ */
+function plainLine(raw) {
+	const formatter = window.FotoGrids?.modules?.formattedText;
+	const text = formatter ? formatter.toPlainText(raw) : String(raw ?? '');
+	return text.replace(/\s*\n\s*/g, ' ').trim();
+}
+
+/**
+ * Write an item's caption into an element: formatted for the caption and
+ * description sources, plain text for the title.
+ *
+ * @param {HTMLElement} el
+ * @param {object}      it        Stamped grid item.
+ * @param {string}      source    'caption' | 'title' | 'description'.
+ * @param {boolean}     links     Keep links; false shows their text only.
+ * @param {HTMLElement} galleryEl Gallery wrapper.
+ */
+function renderCaption(el, it, source, links, galleryEl) {
+	const raw = captionTextFor(it, source);
+	const formatter = window.FotoGrids?.modules?.formattedText;
+	if (formatter && source !== 'title') {
+		formatter.render(el, raw, {
+			surface: 'lightbox_grid',
+			field: source,
+			links,
+			itemId: it.id,
+			galleryEl,
+		});
+	} else {
+		el.textContent = plainLine(raw);
+	}
+}
+
+/**
  * Open the LightboxGrid overlay.
  *
  * @param {object} config
@@ -308,7 +346,9 @@ function open(config) {
 				(it.video ? ' fg-lb-grid-tile--video' : '');
 			tile.setAttribute(
 				'aria-label',
-				it.title || it.caption || labels.item.replace('%d', idx + 1)
+				plainLine(it.title) ||
+					plainLine(it.caption) ||
+					labels.item.replace('%d', idx + 1)
 			);
 
 			// The image lives inside an aspect-ratio frame that owns the
@@ -323,14 +363,14 @@ function open(config) {
 			media.appendChild(img);
 			tile.appendChild(media);
 
-			if (showCaptions) {
-				const text = captionTextFor(it, captionSource);
-				if (text) {
-					const cap = document.createElement('span');
-					cap.className = 'fg-lb-grid-tile-caption';
-					cap.textContent = text;
-					tile.appendChild(cap);
-				}
+			if (
+				showCaptions &&
+				plainLine(captionTextFor(it, captionSource)) !== ''
+			) {
+				const cap = document.createElement('span');
+				cap.className = 'fg-lb-grid-tile-caption';
+				renderCaption(cap, it, captionSource, false, config.galleryEl);
+				tile.appendChild(cap);
 			}
 
 			tile.addEventListener('click', () => openZoom(idx));
@@ -408,6 +448,7 @@ function open(config) {
 		animating: false,
 		fullCaptions: config.fullCaptions === true,
 		captionSource,
+		galleryEl: config.galleryEl || null,
 	};
 
 	keyHandler = (e) => {
@@ -802,11 +843,21 @@ function paintZoom() {
 	view.zoomImg.src = it.full || it.thumb || '';
 	view.zoomImg.alt = it.alt || '';
 
-	const text = view.fullCaptions
-		? captionTextFor(it, view.captionSource)
-		: '';
-	view.zoomCap.textContent = text;
-	view.zoomCap.style.display = text ? '' : 'none';
+	const visible =
+		view.fullCaptions &&
+		plainLine(captionTextFor(it, view.captionSource)) !== '';
+	if (visible) {
+		renderCaption(
+			view.zoomCap,
+			it,
+			view.captionSource,
+			true,
+			view.galleryEl
+		);
+	} else {
+		view.zoomCap.textContent = '';
+	}
+	view.zoomCap.style.display = visible ? '' : 'none';
 
 	view.counter.textContent = view.config.labels.item_of
 		.replace('%1$d', view.zoomIndex + 1)

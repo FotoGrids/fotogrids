@@ -111,6 +111,10 @@ test( 'LIFE-18: a reset clears every settings tab and keeps permissions and priv
 	await fill( page, '#fg-masonry-width', '777' );
 	await expect.poll( () => option( 'fotogrids_media_settings' ) ).toContain( '777' );
 
+	await openTab( page, 'gallery_items' );
+	await page.getByRole( 'radio', { name: 'Plain text' } ).click();
+	await expect.poll( () => setting( 'fotogrids_text_formatting', 'mode' ) ).toBe( 'plain' );
+
 	await openTab( page, 'view_pages' );
 	await fill( page, '#fg-view-base-gallery', 'portfolio' );
 	await expect.poll( () => option( 'fotogrids_view_settings' ) ).toContain( 'portfolio' );
@@ -177,6 +181,7 @@ test( 'LIFE-18: a reset clears every settings tab and keeps permissions and priv
 		'fotogrids_watermark_settings',
 		'fotogrids_watermark_config_hash',
 		'fotogrids_seo_settings',
+		'fotogrids_text_formatting',
 		'fotogrids_autosave',
 		'fotogrids_debug_channels',
 	] ) {
@@ -198,6 +203,8 @@ test( 'LIFE-18: a reset clears every settings tab and keeps permissions and priv
 	await expect( page.locator( '.fotogrids-sidebar-layout__panel__row' ).filter( { hasText: 'Enable watermark' } ).getByRole( 'switch' ).first() ).toHaveAttribute( 'aria-checked', 'false' );
 	await openTab( page, 'seo' );
 	await expect( page.locator( '#fg-seo-twitter-handle' ) ).toHaveValue( '' );
+	await openTab( page, 'gallery_items' );
+	await expect( page.getByRole( 'radio', { name: 'Basic formatting' } ) ).toHaveAttribute( 'aria-checked', 'true' );
 	await openTab( page, 'advanced' );
 	await expect( page.locator( '#fotogrids_autosave' ) ).toHaveAttribute( 'aria-checked', 'true' );
 	await expect( page.locator( '#fotogrids_allow_google_fonts' ) ).toHaveAttribute( 'aria-checked', 'false' );
