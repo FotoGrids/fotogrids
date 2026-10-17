@@ -151,29 +151,38 @@ test(
 );
 
 /**
- * PAG-15. A Fill gallery one item past the page size: Load More reaches the
- * last item.
+ * PAG-15. Fill galleries whose item count is off a page boundary. Thirteen
+ * items at twelve a page snap to one page holding all thirteen, so Load More
+ * starts hidden; twenty-five page through Load More to the last item.
  */
 test(
 	'PAG-15: Load More reaches every item of a justified Fill gallery',
 	{ tag: '@layout' },
 	async ({ page }) => {
-		const items = sixty().slice(0, 13);
-		const { id, url } = galleryPage(
-			{
-				layout: 'justified',
-				layout_justified_page_trailing_row: 'fill',
-				pagination_type: 'paginated',
-				pagination_method: 'load_more',
-				items_per_page: PER_PAGE(12),
-			},
-			items
-		);
-		const gallery = await open(page, url, id);
-		await loadAll(gallery);
-
 		const byId = (a: number, b: number) => a - b;
-		expect((await itemIds(gallery)).sort(byId)).toEqual([...items].sort(byId));
+
+		for (const count of [13, 25]) {
+			const items = sixty().slice(0, count);
+			const { id, url } = galleryPage(
+				{
+					layout: 'justified',
+					layout_justified_page_trailing_row: 'fill',
+					pagination_type: 'paginated',
+					pagination_method: 'load_more',
+					items_per_page: PER_PAGE(12),
+				},
+				items
+			);
+			const gallery = await open(page, url, id);
+			const counts = await loadAll(gallery);
+
+			if (13 === count) {
+				expect(counts, '13 items load as one page').toEqual([13]);
+			}
+			expect((await itemIds(gallery)).sort(byId)).toEqual(
+				[...items].sort(byId)
+			);
+		}
 	}
 );
 
