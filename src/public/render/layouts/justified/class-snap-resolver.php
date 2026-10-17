@@ -247,16 +247,10 @@ final class Snap_Resolver {
 			}
 
 			if ( $is_last_page_candidates ) {
-				$page_size    = min( $target_page_size, $total_items - $cursor );
 				$boundaries[] = array(
 					'offset'    => $cursor,
-					'page_size' => $page_size,
+					'page_size' => $total_items - $cursor,
 				);
-				$cursor      += $page_size;
-				$row_index    = $candidate_row_ix + 1;
-				while ( $row_index < $row_count ) {
-					++$row_index;
-				}
 				break;
 			}
 

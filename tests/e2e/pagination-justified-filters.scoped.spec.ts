@@ -90,8 +90,8 @@ test(
 /**
  * PAG-10. The snap resolver, called directly over a spread of item counts and
  * aspect ratios: its pages follow on from each other, each starts and ends on
- * a packed row, and every page but the last holds at least the window's
- * minimum.
+ * a packed row, every page but the last holds at least the window's minimum,
+ * and together they cover every item.
  */
 test(
 	'PAG-10: snap pages are contiguous, row-aligned and inside the window',
@@ -135,6 +135,7 @@ test(
 									if ( $p < $pages && $r['page_size'] < $min ) { $broken[] = "$case holds {$r['page_size']}, under $min"; }
 									$next = $end;
 								}
+								if ( $next !== $n ) { $broken[] = "n=$n target=$target window=$window $direction pages end at $next of $n"; }
 								++$runs;
 							}
 						}
@@ -146,6 +147,33 @@ test(
 
 		expect(report.runs).toBe(270);
 		expect(report.broken).toEqual([]);
+	}
+);
+
+/**
+ * PAG-15. A Fill gallery one item past the page size: Load More reaches the
+ * last item.
+ */
+test(
+	'PAG-15: Load More reaches every item of a justified Fill gallery',
+	{ tag: '@layout' },
+	async ({ page }) => {
+		const items = sixty().slice(0, 13);
+		const { id, url } = galleryPage(
+			{
+				layout: 'justified',
+				layout_justified_page_trailing_row: 'fill',
+				pagination_type: 'paginated',
+				pagination_method: 'load_more',
+				items_per_page: PER_PAGE(12),
+			},
+			items
+		);
+		const gallery = await open(page, url, id);
+		await loadAll(gallery);
+
+		const byId = (a: number, b: number) => a - b;
+		expect((await itemIds(gallery)).sort(byId)).toEqual([...items].sort(byId));
 	}
 );
 
