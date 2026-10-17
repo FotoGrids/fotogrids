@@ -127,7 +127,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 	 * @param array $attrs Block attributes.
 	 * @return int
 	 */
-	private static function resolve_id( array $attrs ): int {
+	public static function resolve_id( array $attrs ): int {
 		$raw = $attrs['gallery']['innerContent']['desktop']['value']['galleryId'] ?? 0;
 		return absint( $raw );
 	}
