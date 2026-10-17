@@ -206,11 +206,12 @@ class Integrated_Renderer {
 	 * @return \WP_Post[]
 	 */
 	public static function keep_first_singular_match( array $posts, \WP_Query $query ): array {
-		if ( count( $posts ) < 2 || ! $query->is_main_query() || ! $query->is_singular() ) {
-			return $posts;
-		}
-
-		if ( ! in_array( get_post_type( $posts[0] ), self::POST_TYPES, true ) ) {
+		if (
+			count( $posts ) < 2
+			|| ! $query->is_main_query()
+			|| ! $query->is_singular()
+			|| ! in_array( get_post_type( $posts[0] ), self::POST_TYPES, true )
+		) {
 			return $posts;
 		}
 
