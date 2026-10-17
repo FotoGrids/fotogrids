@@ -23,6 +23,11 @@ const LISTS: Record< Kind, string > = {
 	fotogrids_album: 'Albums',
 };
 
+const ADD_NEW: Record< Kind, string > = {
+	fotogrids_gallery: 'Add New Gallery',
+	fotogrids_album: 'Add New Album',
+};
+
 function fotogridsMenu( page: Page ) {
 	return page
 		.locator( '#adminmenu li.menu-top' )
@@ -58,7 +63,7 @@ async function openAddNewFromMenu( page: Page, kind: Kind ): Promise< void > {
 	await menu.hover();
 
 	const link = menu.locator( `.wp-submenu a[href$="post-new.php?post_type=${ kind }"]` );
-	await expect( link ).toHaveAccessibleName( 'Add New' );
+	await expect( link ).toHaveAccessibleName( ADD_NEW[ kind ] );
 	await expect( menu.locator( `.wp-submenu li:has(> a[href$="edit.php?post_type=${ kind }"]) + li > a` ) ).toHaveAttribute(
 		'href',
 		`post-new.php?post_type=${ kind }`
@@ -295,7 +300,7 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 			const links = await fotogridsMenu( page )
 				.locator( '.wp-submenu a' )
 				.allInnerTexts();
-			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ], 'Add New' ] );
+			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ], ADD_NEW[ kind ] ] );
 
 			const top = fotogridsMenu( page ).locator( 'a.menu-top' );
 			const response = await follow( page, () => top.click() );

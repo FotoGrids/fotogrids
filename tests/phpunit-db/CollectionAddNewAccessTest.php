@@ -193,16 +193,25 @@ class CollectionAddNewAccessTest extends WP_UnitTestCase {
 		$this->assertSame( $expected, $collection_entries );
 	}
 
-	public function test_the_add_new_entry_is_labelled_add_new(): void {
+	public function test_each_add_new_entry_names_its_type(): void {
 		global $submenu;
 
 		$this->build_menu( $this->user( 'administrator' ) );
 
+		$labels = array();
 		foreach ( $submenu['fotogrids'] as $item ) {
 			if ( 0 === strpos( $item[2], 'post-new.php?post_type=fotogrids_' ) ) {
-				$this->assertSame( 'Add New', $item[0], $item[2] );
+				$labels[ $item[2] ] = $item[0];
 			}
 		}
+
+		$this->assertSame(
+			array(
+				'post-new.php?post_type=fotogrids_gallery' => 'Add New Gallery',
+				'post-new.php?post_type=fotogrids_album'   => 'Add New Album',
+			),
+			$labels
+		);
 	}
 
 	public function screens(): array {

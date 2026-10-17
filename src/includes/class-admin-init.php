@@ -208,7 +208,7 @@ class Admin_Init {
 		add_submenu_page(
 			'fotogrids',
 			$post_type_object->labels->add_new_item,
-			$post_type_object->labels->add_new,
+			$post_type_object->labels->add_new_item,
 			$post_type_object->cap->create_posts,
 			'post-new.php?post_type=' . $post_type,
 			''

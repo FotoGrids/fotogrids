@@ -117,7 +117,7 @@ test.describe( 'the fotogrids/permissions/check filter', () => {
 		test( 'LIB-01: opens Library from the menu and adds a tag', { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
-			expect( await submenu( page ) ).toEqual( [ 'Dashboard', 'Galleries', 'Add New', 'Albums', 'Add New', 'Library', 'Statistics' ] );
+			expect( await submenu( page ) ).toEqual( [ 'Dashboard', 'Galleries', 'Add New Gallery', 'Albums', 'Add New Album', 'Library', 'Statistics' ] );
 
 			await expectLibrary( page, await openLibraryFromMenu( page ) );
 
@@ -157,7 +157,7 @@ test.describe( 'the fotogrids/permissions/check filter', () => {
 			page,
 		} ) => {
 			await expectRefused( page );
-			expect( await submenu( page ) ).toEqual( [ 'Dashboard', 'Galleries', 'Add New', 'Albums', 'Add New', 'Statistics' ] );
+			expect( await submenu( page ) ).toEqual( [ 'Dashboard', 'Galleries', 'Add New Gallery', 'Albums', 'Add New Album', 'Statistics' ] );
 		} );
 	} );
 
