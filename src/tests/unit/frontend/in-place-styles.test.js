@@ -1,7 +1,8 @@
 /**
  * Pagination, random refetch, album-to-gallery and password unlock add only
  * the stylesheets a response needs that the page does not already link,
- * including ones WordPress printed as `{handle}-css`.
+ * including ones WordPress printed as `{handle}-css`, and place them before
+ * the site's own CSS.
  */
 
 const PAGINATION = '../../../public/render/features/pagination/pagination-core';
@@ -28,6 +29,10 @@ function printStylesheet() {
 	link.id = 'fotogrids-captions-css';
 	link.href = PRINTED_URL;
 	document.head.appendChild(link);
+
+	const siteCss = document.createElement('style');
+	siteCss.id = 'wp-custom-css';
+	document.head.appendChild(siteCss);
 }
 
 function linksTo(url) {
@@ -58,9 +63,10 @@ function expectOnlyMissingAdded() {
 	expect(
 		document.getElementById('fotogrids-css-fotogrids-captions')
 	).toBeNull();
-	expect(
-		document.getElementById('fotogrids-css-fotogrids-lightbox')
-	).not.toBeNull();
+	const added = document.getElementById('fotogrids-css-fotogrids-lightbox');
+	expect(added).not.toBeNull();
+	expect(added.previousElementSibling.id).toBe('fotogrids-captions-css');
+	expect(added.nextElementSibling.id).toBe('wp-custom-css');
 }
 
 beforeEach(() => {
@@ -74,7 +80,7 @@ afterEach(() => {
 	delete window.fetch;
 });
 
-it('pagination adds only the stylesheets the page does not link', async () => {
+it('pagination adds only the stylesheets the page does not link, before site CSS', async () => {
 	const subscribers = [];
 	window.FotoGrids = {
 		modules: {},
@@ -112,7 +118,7 @@ it('pagination adds only the stylesheets the page does not link', async () => {
 	expectOnlyMissingAdded();
 });
 
-it('random refetch adds only the stylesheets the page does not link', async () => {
+it('random refetch adds only the stylesheets the page does not link, before site CSS', async () => {
 	const subscribers = [];
 	window.FotoGrids = {
 		onCollection(cb) {
@@ -137,7 +143,7 @@ it('random refetch adds only the stylesheets the page does not link', async () =
 	expectOnlyMissingAdded();
 });
 
-it('album-to-gallery adds only the stylesheets the page does not link', async () => {
+it('album-to-gallery adds only the stylesheets the page does not link, before site CSS', async () => {
 	const subscribers = [];
 	window.FotoGrids = {
 		modules: {},
@@ -155,22 +161,20 @@ it('album-to-gallery adds only the stylesheets the page does not link', async ()
 
 	load(ALBUM);
 	subscribers.forEach((cb) => cb(album));
-	album
-		.querySelector('[data-fg-album-ajax-trigger]')
-		.dispatchEvent(
-			new MouseEvent('click', {
-				bubbles: true,
-				cancelable: true,
-				button: 0,
-			})
-		);
+	album.querySelector('[data-fg-album-ajax-trigger]').dispatchEvent(
+		new MouseEvent('click', {
+			bubbles: true,
+			cancelable: true,
+			button: 0,
+		})
+	);
 	await flush();
 
 	expect(window.fetch).toHaveBeenCalledTimes(1);
 	expectOnlyMissingAdded();
 });
 
-it('password unlock adds only the stylesheets the page does not link', async () => {
+it('password unlock adds only the stylesheets the page does not link, before site CSS', async () => {
 	const gate = document.createElement('div');
 	gate.className = 'fotogrids-gate';
 	gate.innerHTML =

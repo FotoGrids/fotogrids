@@ -12,6 +12,8 @@
  * coordination such as preload_next_page lives here.
  */
 
+import { injectMissingStyles } from '../../_helpers/stylesheets.js';
+
 (function () {
 	'use strict';
 
@@ -219,37 +221,6 @@
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Inject <link rel="stylesheet"> tags for any CSS handles the render
-	 * pipeline collected that aren't already in the document. Mirrors the
-	 * Album_To_Gallery_Ajax helper exactly.
-	 *
-	 * @param {Record<string,string>} cssUrls
-	 */
-	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') {
-			return;
-		}
-		Object.keys(cssUrls).forEach(function (handle) {
-			const url = cssUrls[handle];
-			if (!handle || !url) {
-				return;
-			}
-			const linkId = 'fotogrids-css-' + handle;
-			if (
-				document.getElementById(linkId) ||
-				document.getElementById(handle + '-css')
-			) {
-				return;
-			}
-			const link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.id = linkId;
-			link.href = url;
-			document.head.appendChild(link);
-		});
 	}
 
 	/**

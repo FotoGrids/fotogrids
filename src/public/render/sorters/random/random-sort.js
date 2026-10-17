@@ -26,6 +26,8 @@
  * No imports - standalone vanilla JS compiled by webpack.
  */
 
+import { injectMissingStyles } from '../../_helpers/stylesheets.js';
+
 (function () {
 	'use strict';
 
@@ -127,36 +129,6 @@
 	 */
 	function mintSeed() {
 		return Math.floor(Math.random() * SEED_MAX) + 1;
-	}
-
-	/**
-	 * Adds <link> tags for any stylesheet the response needs that the page
-	 * does not already carry. Mirrors the pagination module's helper.
-	 *
-	 * @param {Record<string,string>} cssUrls
-	 */
-	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') {
-			return;
-		}
-		Object.keys(cssUrls).forEach(function (handle) {
-			const url = cssUrls[handle];
-			if (!handle || !url) {
-				return;
-			}
-			const linkId = 'fotogrids-css-' + handle;
-			if (
-				document.getElementById(linkId) ||
-				document.getElementById(handle + '-css')
-			) {
-				return;
-			}
-			const link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.id = linkId;
-			link.href = url;
-			document.head.appendChild(link);
-		});
 	}
 
 	/**
