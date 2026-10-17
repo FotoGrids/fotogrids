@@ -142,8 +142,7 @@ class Attachment_Map {
 	}
 
 	/**
-	 * Whether the file was exported from this site, so an ID it holds already
-	 * belongs to this site.
+	 * Whether the file was exported from this site.
 	 *
 	 * @since 1.3.0
 	 * @return bool
@@ -242,8 +241,7 @@ class Attachment_Map {
 	 * Each attachment is listed under its file's lowercase stem, without the
 	 * `-scaled` or `-rotated` WordPress adds to a resized original. A stem that
 	 * ends in a number suffix such as `-2` is also listed under the stem before
-	 * it followed by `-`, so a duplicate upload is found from the original name.
-	 * One query serves the whole import.
+	 * it followed by `-`.
 	 *
 	 * @return array<string, int[]>
 	 */

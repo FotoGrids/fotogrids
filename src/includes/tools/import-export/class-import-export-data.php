@@ -957,9 +957,9 @@ class Import_Export_Data {
 	 * Point a collection's exported item list and featured image at this site's IDs.
 	 *
 	 * A listed attachment takes the ID of the attachment on this site that holds its
-	 * file, and is dropped when there is none. An exported embed keeps its ID for
-	 * import_embeds() to replace. Any other ID is kept only in a file exported from
-	 * this site.
+	 * file, and is dropped when there is none. An exported embed keeps its ID, and
+	 * its position is returned for import_embeds() to replace. Any other ID is kept
+	 * only in a file exported from this site.
 	 *
 	 * @since 1.3.0
 	 * @param array<string, mixed> $meta        Exported `fotogrids_*` post meta.
@@ -974,7 +974,6 @@ class Import_Export_Data {
 		if ( array_key_exists( 'fotogrids_gallery_items', $meta ) ) {
 			$item_ids = array();
 			$local    = array();
-			// An exported embed ID can equal the ID of an attachment on this site, so embeds are tracked by position.
 			foreach ( Attachment_Map::list_ids( $meta['fotogrids_gallery_items'] ) as $item_id ) {
 				if ( isset( $embed_ids[ $item_id ] ) ) {
 					if ( ! in_array( $item_id, $slots, true ) ) {
@@ -1274,7 +1273,6 @@ class Import_Export_Data {
 					continue;
 				}
 				if ( ! isset( $by_old_id[ $item_id ] ) ) {
-					// The exporting site's ID means nothing here.
 					if ( ! $attachments->is_same_site() ) {
 						$item_ids[ $index ] = 0;
 					}
