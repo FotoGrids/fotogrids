@@ -44,10 +44,13 @@ function passwordGallery(
 	return created;
 }
 
-/** A post the purge removes, holding whatever shortcodes it is given. */
+/**
+ * A post the purge removes, holding whatever shortcodes it is given. The slug
+ * is set because two workers can otherwise be handed the same one.
+ */
 function postWith( content: string ): string {
 	return wpEval(
-		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
+		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_name' => 'unlock-page-' . strtolower( wp_generate_password( 8, false ) ), 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
 	).trim();
 }
 
