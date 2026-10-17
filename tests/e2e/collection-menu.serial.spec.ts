@@ -23,6 +23,11 @@ const LISTS: Record< Kind, string > = {
 	fotogrids_album: 'Albums',
 };
 
+const ADD_NEW: Record< Kind, string > = {
+	fotogrids_gallery: 'Add New Gallery',
+	fotogrids_album: 'Add New Album',
+};
+
 function fotogridsMenu( page: Page ) {
 	return page
 		.locator( '#adminmenu li.menu-top' )
@@ -48,6 +53,26 @@ async function openFromMenu( page: Page, label: string ): Promise< Response > {
 	return follow( page, () =>
 		menu.locator( '.wp-submenu' ).getByRole( 'link', { name: label, exact: true } ).click()
 	);
+}
+
+/** Open a type's Add New from the menu; it is served, sits right after its list, and is highlighted. */
+async function openAddNewFromMenu( page: Page, kind: Kind ): Promise< void > {
+	await page.goto( '/wp-admin/' );
+
+	const menu = fotogridsMenu( page );
+	await menu.hover();
+
+	const link = menu.locator( `.wp-submenu a[href$="post-new.php?post_type=${ kind }"]` );
+	await expect( link ).toHaveAccessibleName( ADD_NEW[ kind ] );
+	await expect( menu.locator( `.wp-submenu li:has(> a[href$="edit.php?post_type=${ kind }"]) + li > a` ) ).toHaveAttribute(
+		'href',
+		`post-new.php?post_type=${ kind }`
+	);
+
+	const response = await follow( page, () => link.click() );
+	expect( response.status(), `Add New answered ${ response.status() }` ).toBe( 200 );
+	expect( page.url() ).toContain( `post-new.php?post_type=${ kind }` );
+	await expect( menu.locator( '.wp-submenu li.current a' ) ).toHaveAttribute( 'href', `post-new.php?post_type=${ kind }` );
 }
 
 /** The list screen is served, titled, and highlighted in the menu. */
@@ -118,6 +143,25 @@ function deletePosts( ids: number[] ): void {
 	}
 }
 
+/** Publish a collection from its Add New screen; returns the saved id. */
+async function publishFromAddNew( page: Page, kind: Kind, title: string ): Promise< number > {
+	const response = await page.goto( `/wp-admin/post-new.php?post_type=${ kind }` );
+	expect( response?.status(), `Add New answered ${ response?.status() }` ).toBe( 200 );
+
+	await page.locator( '#title' ).fill( title );
+	await follow( page, () => page.locator( '#publish' ).click() );
+
+	const id = Number(
+		wpEval(
+			`$p = get_posts( array( 'post_type' => '${ kind }', 'title' => '${ title }', 'fields' => 'ids', 'post_status' => 'any' ) ); echo $p ? $p[0] : 0;`
+		).trim()
+	);
+	expect( id, `the ${ kind } was not saved` ).toBeGreaterThan( 0 );
+	expect( page.url(), 'Publish did not land on the editor' ).toContain( `post=${ id }&action=edit` );
+
+	return id;
+}
+
 /** Row ids in the list table currently on screen. */
 async function listedIds( page: Page ): Promise< number[] > {
 	const ids = await page.locator( '#the-list tr[id^="post-"]' ).evaluateAll( ( rows ) =>
@@ -130,12 +174,13 @@ for ( const role of [ 'administrator', 'editor', 'author' ] as const satisfies r
 	test.describe( `as ${ role }`, () => {
 		test.use( { storageState: storageStateFor( role ) } );
 
-		test( `MENU-01: opens Galleries and Albums from the FotoGrids menu`, { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
+		test( `MENU-01: opens Galleries, Albums and each Add New from the FotoGrids menu`, { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
 			for ( const kind of Object.keys( LISTS ) as Kind[] ) {
 				const response = await openFromMenu( page, LISTS[ kind ] );
 				await expectList( page, response, kind );
+				await openAddNewFromMenu( page, kind );
 			}
 		} );
 
@@ -190,18 +235,7 @@ test.describe( 'an author', () => {
 	test( 'MENU-04: a gallery they publish from Add New appears in their list', { tag: [ '@admin', '@permissions' ] }, async ( {
 		page,
 	} ) => {
-		const title = `MENU-04 ${ Date.now() }`;
-
-		await page.goto( '/wp-admin/post-new.php?post_type=fotogrids_gallery' );
-		await page.locator( '#title' ).fill( title );
-		await follow( page, () => page.locator( '#publish' ).click() );
-
-		const id = Number(
-			wpEval(
-				`$p = get_posts( array( 'post_type' => 'fotogrids_gallery', 'title' => '${ title }', 'fields' => 'ids', 'post_status' => 'any' ) ); echo $p ? $p[0] : 0;`
-			).trim()
-		);
-		expect( id, 'the gallery was not saved' ).toBeGreaterThan( 0 );
+		const id = await publishFromAddNew( page, 'fotogrids_gallery', `MENU-04 ${ Date.now() }` );
 		created.push( id );
 
 		const response = await openFromMenu( page, 'Galleries' );
@@ -218,6 +252,7 @@ test.describe( 'a role holding only one collection type', () => {
 	} );
 
 	let roles: string;
+	const created: number[] = [];
 
 	test.beforeAll( () => {
 		roles = snapshotRoles();
@@ -235,6 +270,7 @@ foreach ( array( 'gallery' => 'galleries', 'album' => 'albums' ) as $one => $man
 	} );
 
 	test.afterAll( () => {
+		deletePosts( created );
 		wpEval( `
 require_once ABSPATH . 'wp-admin/includes/user.php';
 foreach ( array( 'gallery', 'album' ) as $one ) {
@@ -255,7 +291,7 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 		[ 'gallery', 'fotogrids_gallery', 'fotogrids_album' ],
 		[ 'album', 'fotogrids_album', 'fotogrids_gallery' ],
 	] as const ) {
-		test( `MENU-05: a ${ one }-only role - the menu leads to the Dashboard and their list, and nowhere else`, { tag: [ '@admin', '@permissions' ] }, async ( {
+		test( `MENU-05: a ${ one }-only role - the menu leads to the Dashboard and their list, and nowhere else; Add New publishes into that list`, { tag: [ '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
 			await signIn( page, `fg-menu-${ one }` );
@@ -264,7 +300,7 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 			const links = await fotogridsMenu( page )
 				.locator( '.wp-submenu a' )
 				.allInnerTexts();
-			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ] ] );
+			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ], ADD_NEW[ kind ] ] );
 
 			const top = fotogridsMenu( page ).locator( 'a.menu-top' );
 			const response = await follow( page, () => top.click() );
@@ -286,6 +322,20 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 				"Your role can't open Statistics."
 			);
 			await expect( page.locator( '.fotogrids-overview a.fg-stat-card' ) ).toHaveCount( 0 );
+
+			await openAddNewFromMenu( page, kind );
+
+			const otherNew = await page.goto( `/wp-admin/post-new.php?post_type=${ other }` );
+			expect( otherNew?.status() ).toBe( 403 );
+
+			const id = await publishFromAddNew( page, kind, `MENU-05 ${ one } ${ Date.now() }` );
+			created.push( id );
+
+			const list = await openFromMenu( page, LISTS[ kind ] );
+			await expectList( page, list, kind );
+			expect( await listedIds( page ) ).toContain( id );
+			await expect( page.locator( `#post-${ id } a.row-title` ) ).toHaveCount( 1 );
+			await expect( page.locator( `#post-${ id } .row-actions .trash a` ) ).toHaveCount( 1 );
 		} );
 	}
 } );

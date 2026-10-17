@@ -150,6 +150,13 @@ for ( const role of [ 'contributor', 'subscriber' ] as const satisfies readonly 
 					'refused'
 				);
 			}
+
+			for ( const postType of [ 'fotogrids_gallery', 'fotogrids_album' ] ) {
+				for ( const screen of [ 'edit.php', 'post-new.php' ] ) {
+					const response = await page.goto( `/wp-admin/${ screen }?post_type=${ postType }` );
+					expect( response?.status(), `${ role } reached ${ screen } for ${ postType }` ).toBe( 403 );
+				}
+			}
 		} );
 	} );
 }
