@@ -66,6 +66,13 @@ final class Asset_Resolver {
 	private array $enqueued_js_handles = array();
 
 	/**
+	 * Assets flushed since begin_capture(), or null when no capture is running.
+	 *
+	 * @var array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}|null
+	 */
+	private ?array $capture = null;
+
+	/**
 	 * Returns the request-scoped singleton resolver.
 	 *
 	 * @since   1.0.0
@@ -198,9 +205,48 @@ final class Asset_Resolver {
 			}
 		}
 
+		if ( null !== $this->capture ) {
+			$this->capture['css'] += $this->queued_css();
+			foreach ( $this->js_queue as $handle => $js_asset ) {
+				$this->capture['js'][ $handle ] = array(
+					'src'       => $js_asset['src'],
+					'in_footer' => $js_asset['in_footer'],
+				);
+			}
+		}
+
 		// Clear the per-render queues so the next gallery render starts fresh.
 		$this->css_queue = array();
 		$this->js_queue  = array();
+	}
+
+	/**
+	 * Starts recording the assets each flush asks for, already enqueued or not.
+	 *
+	 * @since 1.3.0
+	 * @return void
+	 */
+	public function begin_capture(): void {
+		$this->capture = array(
+			'css' => array(),
+			'js'  => array(),
+		);
+	}
+
+	/**
+	 * Stops recording and returns the assets flushed since begin_capture().
+	 *
+	 * @since 1.3.0
+	 * @return array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}
+	 */
+	public function end_capture(): array {
+		$captured      = $this->capture ?? array(
+			'css' => array(),
+			'js'  => array(),
+		);
+		$this->capture = null;
+
+		return $captured;
 	}
 
 	/**

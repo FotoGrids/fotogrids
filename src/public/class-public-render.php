@@ -628,22 +628,22 @@ class Public_Render {
 			}
 		}
 
+		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+		$resolver->begin_capture();
 		Font_Resolver::instance()->begin_capture();
-		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
-		$fonts = Font_Resolver::instance()->end_capture();
+		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
+		$fonts  = Font_Resolver::instance()->end_capture();
+		$assets = $resolver->end_capture();
 
 		$rendered = self::$last_render_result;
 		if ( null !== $cache_key && null !== $rendered && $rendered->http_status < 400 ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
-			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
-			$css      = $resolver->get_css_asset_urls();
-			$js       = $resolver->get_js_asset_data();
 			\FotoGrids\FotoGrids_Cache::put(
 				$gallery_id,
 				$cache_key,
 				$html,
-				$css,
-				$js,
+				$assets['css'],
+				$assets['js'],
 				$rendered->inline_css,
 				$rendered->inline_js,
 				$rendered->json_ld,
