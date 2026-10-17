@@ -494,21 +494,21 @@ class Public_Render {
 		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
 		$fonts = Font_Resolver::instance()->end_capture();
 
-		if ( null !== $cache_key ) {
+		$rendered = self::$last_render_result;
+		if ( null !== $cache_key && null !== $rendered && $rendered->http_status < 400 ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
 			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 			$css      = $resolver->get_css_asset_urls();
 			$js       = $resolver->get_js_asset_data();
-			$rendered = self::$last_render_result;
 			\FotoGrids\FotoGrids_Cache::put(
 				$gallery_id,
 				$cache_key,
 				$html,
 				$css,
 				$js,
-				null !== $rendered ? $rendered->inline_css : '',
-				null !== $rendered ? $rendered->inline_js : '',
-				null !== $rendered ? $rendered->json_ld : '',
+				$rendered->inline_css,
+				$rendered->inline_js,
+				$rendered->json_ld,
 				$duration,
 				$fonts
 			);
