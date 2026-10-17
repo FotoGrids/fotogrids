@@ -14,6 +14,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+require_once __DIR__ . '/class-attachment-map.php';
+
 /**
  * Import / Export Data
  *
@@ -316,6 +318,10 @@ class Import_Export_Data {
 			$data['templates'] = $all_templates;
 		}
 
+		if ( array_intersect( array( 'galleries', 'albums', 'items', 'statistics' ), $include_types ) ) {
+			$data['media'] = Attachment_Map::export( $data );
+		}
+
 		return $data;
 	}
 
@@ -580,6 +586,17 @@ class Import_Export_Data {
 		$errors   = array();
 		$known    = self::known_item_ids();
 
+		$attachments = new Attachment_Map(
+			array_key_exists( 'media', $data ) ? ( $data['media'] ?? array() ) : null,
+			is_string( $data['meta']['site_url'] ?? null ) ? $data['meta']['site_url'] : ''
+		);
+		$embed_ids   = array();
+		if ( in_array( 'items', $include, true ) && is_array( $data['embeds'] ?? null ) ) {
+			foreach ( $data['embeds'] as $embed ) {
+				$embed_ids[ (int) ( ( (array) $embed )['id'] ?? 0 ) ] = true;
+			}
+		}
+
 		$wpdb->query( 'START TRANSACTION' );
 
 		try {
@@ -599,7 +616,9 @@ class Import_Export_Data {
 				[ $imp, $skip, $map, $written ] = self::import_collections(
 					$data['galleries'],
 					Post_Types::GALLERY,
-					$options['galleries']
+					$options['galleries'],
+					$attachments,
+					$embed_ids
 				);
 				$imported['galleries']          = $imp;
 				$skipped['galleries']           = $skip;
@@ -612,7 +631,9 @@ class Import_Export_Data {
 				[ $imp, $skip, $map ] = self::import_collections(
 					$data['albums'],
 					Post_Types::ALBUM,
-					$options['albums']
+					$options['albums'],
+					$attachments,
+					$embed_ids
 				);
 				$imported['albums']   = $imp;
 				$skipped['albums']    = $skip;
@@ -622,8 +643,6 @@ class Import_Export_Data {
 			if ( ! empty( $data['gallery_albums'] ) && ( $gallery_id_map || $album_id_map ) ) {
 				self::import_gallery_albums( $data['gallery_albums'], $gallery_id_map, $album_id_map );
 			}
-
-			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
 
 			$kinds = array(
 				'imported' => array(
@@ -637,13 +656,13 @@ class Import_Export_Data {
 			);
 
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
-				[ $imp, $skip, $kinds ] = self::import_items( $data['items'], $gallery_id_map, $known );
+				[ $imp, $skip, $kinds ] = self::import_items( $data['items'], $gallery_id_map, $known, $attachments );
 				$imported['items']      = $imp;
 				$skipped['items']       = $skip;
 			}
 
 			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && is_array( $data['embeds'] ) ) {
-				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries );
+				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries, $attachments );
 				$imported['items'] = ( $imported['items'] ?? 0 ) + $imp;
 				$skipped['items']  = ( $skipped['items'] ?? 0 ) + $skip;
 
@@ -658,7 +677,7 @@ class Import_Export_Data {
 
 			// Item metadata is imported after both items and tags exist.
 			if ( in_array( 'items', $include, true ) && ! empty( $data['item_metadata'] ) ) {
-				self::import_item_metadata( $data['item_metadata'], $tag_id_map );
+				self::import_item_metadata( $data['item_metadata'], $tag_id_map, $attachments );
 			}
 
 			if ( in_array( 'settings', $include, true ) && ! empty( $data['settings'] ) ) {
@@ -667,7 +686,7 @@ class Import_Export_Data {
 			}
 
 			if ( in_array( 'statistics', $include, true ) && ! empty( $data['statistics'] ) ) {
-				[ $imp ]                = self::import_statistics( $data['statistics'], $gallery_id_map, $album_id_map );
+				[ $imp ]                = self::import_statistics( $data['statistics'], $gallery_id_map, $album_id_map, $attachments );
 				$imported['statistics'] = $imp;
 			}
 
@@ -806,8 +825,14 @@ class Import_Export_Data {
 	 *
 	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids],
 	 * where written_ids lists the posts the import created or overwrote.
+	 *
+	 * @param array<int, mixed> $posts         Exported collections.
+	 * @param string            $post_type     Gallery or album post type.
+	 * @param string            $conflict_mode 'skip' | 'overwrite' | 'duplicate'.
+	 * @param Attachment_Map    $attachments   The file's attachments on this site.
+	 * @param array<int, true>  $embed_ids     Exported embed IDs the import recreates.
 	 */
-	private static function import_collections( array $posts, string $post_type, string $conflict_mode ): array {
+	private static function import_collections( array $posts, string $post_type, string $conflict_mode, Attachment_Map $attachments, array $embed_ids ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$id_map   = array();
@@ -819,7 +844,7 @@ class Import_Export_Data {
 			$title  = sanitize_text_field( $post_data['title'] ?? '' );
 			$status = sanitize_key( $post_data['status'] ?? '' );
 			$date   = is_string( $post_data['date'] ?? null ) ? $post_data['date'] : '';
-			$meta   = is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array();
+			$meta   = self::local_media_meta( is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array(), $attachments, $embed_ids );
 
 			if ( ! in_array( $status, self::COLLECTION_STATUSES, true ) ) {
 				$status = 'publish';
@@ -885,6 +910,50 @@ class Import_Export_Data {
 		}
 
 		return array( $imported, $skipped, $id_map, $written );
+	}
+
+	/**
+	 * Point a collection's exported item list and featured image at this site's IDs.
+	 *
+	 * A listed attachment takes the ID of the attachment on this site that holds its
+	 * file, and is dropped when there is none. An exported embed keeps its ID for
+	 * import_embeds() to replace. Any other ID is kept only in a file exported from
+	 * this site.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $meta        Exported `fotogrids_*` post meta.
+	 * @param Attachment_Map       $attachments The file's attachments on this site.
+	 * @param array<int, true>     $embed_ids   Exported embed IDs the import recreates.
+	 * @return array<string, mixed>
+	 */
+	private static function local_media_meta( array $meta, Attachment_Map $attachments, array $embed_ids ): array {
+		if ( array_key_exists( 'fotogrids_gallery_items', $meta ) ) {
+			$item_ids = array();
+			foreach ( Attachment_Map::list_ids( $meta['fotogrids_gallery_items'] ) as $item_id ) {
+				if ( isset( $embed_ids[ $item_id ] ) ) {
+					$local = $item_id;
+				} elseif ( $attachments->lists( $item_id ) || ! $attachments->is_same_site() ) {
+					$local = $attachments->resolve( $item_id );
+				} else {
+					$local = $item_id;
+				}
+				if ( $local > 0 && ! in_array( $local, $item_ids, true ) ) {
+					$item_ids[] = $local;
+				}
+			}
+			$meta['fotogrids_gallery_items'] = wp_json_encode( $item_ids );
+		}
+
+		if ( array_key_exists( Post_Types::FEATURED_IMAGE_META_KEY, $meta ) ) {
+			$featured = $attachments->resolve( (int) ( is_scalar( $meta[ Post_Types::FEATURED_IMAGE_META_KEY ] ) ? $meta[ Post_Types::FEATURED_IMAGE_META_KEY ] : 0 ) );
+			if ( $featured > 0 ) {
+				$meta[ Post_Types::FEATURED_IMAGE_META_KEY ] = $featured;
+			} else {
+				unset( $meta[ Post_Types::FEATURED_IMAGE_META_KEY ] );
+			}
+		}
+
+		return $meta;
 	}
 
 	/** Import gallery-album relationship rows, remapping IDs. */
@@ -983,10 +1052,11 @@ class Import_Export_Data {
 	 * @param array<int, array<string, mixed>> $items          Exported item entries.
 	 * @param array<int, int>                  $gallery_id_map Old gallery ID => new gallery ID.
 	 * @param array<int, true>                 $known          Attachment IDs already used as items.
+	 * @param Attachment_Map                   $attachments    The file's attachments on this site.
 	 * @return array{0: int, 1: int, 2: array<string, array<string, int>>} Imported and skipped
 	 *         counts, and both again split into images and videos.
 	 */
-	private static function import_items( array $items, array $gallery_id_map, array $known ): array {
+	private static function import_items( array $items, array $gallery_id_map, array $known, Attachment_Map $attachments ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$lists    = array();
@@ -1009,7 +1079,7 @@ class Import_Export_Data {
 				},
 				(array) $item
 			);
-			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
+			$attachment_id = $attachments->resolve( (int) ( $item['attachment_id'] ?? 0 ) );
 			$kind          = self::media_kind( $item, $attachment_id );
 
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
@@ -1124,13 +1194,14 @@ class Import_Export_Data {
 	 * @since 1.3.0
 	 * @param array<int, mixed> $embeds      Exported embed entries.
 	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
+	 * @param Attachment_Map    $attachments The file's attachments on this site.
 	 * @return array{0: int, 1: int} Embeds created or updated, and exported embeds no
 	 *                               written gallery lists.
 	 */
-	private static function import_embeds( array $embeds, array $gallery_ids ): array {
+	private static function import_embeds( array $embeds, array $gallery_ids, Attachment_Map $attachments ): array {
 		$by_old_id = array();
 		foreach ( $embeds as $embed ) {
-			$embed = self::sanitize_embed( (array) $embed );
+			$embed = self::sanitize_embed( (array) $embed, $attachments );
 			if ( null !== $embed ) {
 				$by_old_id[ $embed['id'] ] = $embed;
 			}
@@ -1188,10 +1259,11 @@ class Import_Export_Data {
 	 * Clean an exported embed entry into Embed_Store data.
 	 *
 	 * @since 1.3.0
-	 * @param array<string, mixed> $embed Exported embed entry.
+	 * @param array<string, mixed> $embed       Exported embed entry.
+	 * @param Attachment_Map       $attachments The file's attachments on this site.
 	 * @return array<string, mixed>|null Embed data with its exported `id`, or null when unusable.
 	 */
-	private static function sanitize_embed( array $embed ): ?array {
+	private static function sanitize_embed( array $embed, Attachment_Map $attachments ): ?array {
 		$old_id    = (int) ( $embed['id'] ?? 0 );
 		$item_type = sanitize_key( (string) ( $embed['item_type'] ?? '' ) );
 		$url       = esc_url_raw( is_string( $embed['url'] ?? null ) ? $embed['url'] : '' );
@@ -1207,13 +1279,11 @@ class Import_Export_Data {
 			}
 		}
 
-		$poster_id  = (int) ( $embed['poster_id'] ?? 0 );
+		$exported   = (int) ( $embed['poster_id'] ?? 0 );
+		$poster_id  = $attachments->resolve( $exported );
 		$poster_url = is_string( $embed['poster_url'] ?? null ) ? $embed['poster_url'] : '';
-		if ( $poster_id > 0 && 'attachment' !== get_post_type( $poster_id ) ) {
-			$poster_id = 0;
-			if ( '' === $poster_url && is_string( $embed['poster_src'] ?? null ) ) {
-				$poster_url = $embed['poster_src'];
-			}
+		if ( $exported > 0 && 0 === $poster_id && '' === $poster_url && is_string( $embed['poster_src'] ?? null ) ) {
+			$poster_url = $embed['poster_src'];
 		}
 
 		return array(
@@ -1253,14 +1323,18 @@ class Import_Export_Data {
 	 * Each row's metadata_id is translated through `$tag_id_map` from
 	 * import_tags(). Rows whose tag or attachment is not on this site are
 	 * skipped, and every linked tag's usage count is recomputed.
+	 *
+	 * @param array<int, mixed>               $rows        Exported item metadata rows.
+	 * @param array<string, array<int, int>> $tag_id_map  Type => exported tag ID => site tag ID.
+	 * @param Attachment_Map                  $attachments The file's attachments on this site.
 	 */
-	private static function import_item_metadata( array $rows, array $tag_id_map ): void {
+	private static function import_item_metadata( array $rows, array $tag_id_map, Attachment_Map $attachments ): void {
 		global $wpdb;
 		$table  = $wpdb->prefix . 'fotogrids_item_metadata';
 		$linked = array();
 
 		foreach ( $rows as $row ) {
-			$attachment_id = (int) ( $row['attachment_id'] ?? 0 );
+			$attachment_id = $attachments->resolve( (int) ( $row['attachment_id'] ?? 0 ) );
 			$metadata_type = sanitize_text_field( $row['metadata_type'] ?? '' );
 			$metadata_id   = (int) ( $tag_id_map[ $metadata_type ][ (int) ( $row['metadata_id'] ?? 0 ) ] ?? 0 );
 
@@ -1328,12 +1402,11 @@ class Import_Export_Data {
 	}
 
 	/**
-	 * Import statistics. Remaps gallery/album IDs using the provided maps.
-	 * Items are matched by attachment_id which is site-local, so item stats
-	 * are imported as-is when the attachment exists.
+	 * Import statistics. Remaps gallery and album IDs through the import's maps,
+	 * and item IDs to the attachment on this site that holds the item's file.
 	 * Returns [imported_count].
 	 */
-	private static function import_statistics( array $rows, array $gallery_map, array $album_map ): array {
+	private static function import_statistics( array $rows, array $gallery_map, array $album_map, Attachment_Map $attachments ): array {
 		global $wpdb;
 		$table    = $wpdb->prefix . 'fotogrids_statistics';
 		$imported = 0;
@@ -1346,6 +1419,8 @@ class Import_Export_Data {
 				$object_id = $gallery_map[ $object_id ] ?? 0;
 			} elseif ( 'album' === $object_type ) {
 				$object_id = $album_map[ $object_id ] ?? 0;
+			} elseif ( 'item' === $object_type ) {
+				$object_id = $attachments->resolve( $object_id );
 			}
 
 			if ( ! $object_id || ! in_array( $object_type, array( 'gallery', 'album', 'item' ), true ) ) {
