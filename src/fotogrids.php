@@ -127,6 +127,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-tool-harvester.p
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-module-harvester.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-options.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-published-collection-caps.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 
 \FotoGrids\Licensing\Freemius_Bootstrap::init();
@@ -147,6 +148,7 @@ function fotogrids_init() {
 
 	FotoGrids\Kses::register();
 	FotoGrids\Post_Types::init();
+	FotoGrids\Permissions\Published_Collection_Caps::init();
 	FotoGrids\Collection_Title::init();
 	FotoGrids\REST::init();
 	FotoGrids\Gallery_Album_Relations::init();
