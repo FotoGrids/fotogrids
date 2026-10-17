@@ -11,7 +11,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	/**
 	 * Adds a <script> for each handle not already in the document.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+	 * @param {Record<string, {src: string, deps: string[], version: string, in_footer: boolean}>} jsData
 	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */
 	function injectMissingScripts(jsData) {
