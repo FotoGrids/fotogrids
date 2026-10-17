@@ -2,8 +2,6 @@ import type { Frame, Page } from '@playwright/test';
 import { test, expect } from './support/test';
 import { adopt, galleryPage } from './support/collections';
 import { fixture } from './support/fixtures';
-import { GalleryRender } from './support/gallery-render';
-import { Lightbox } from './support/lightbox';
 import { storageStateFor, wpEval } from './support/roles';
 
 /**
