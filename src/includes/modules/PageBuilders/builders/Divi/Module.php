@@ -131,6 +131,7 @@ final class Module {
 		// serialized blocks in `post_content`, so a cheap block-name scan
 		// catches our modules.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_divi' ), 10, 2 );
+		add_filter( Filters_Page_Builders::EMBEDS, array( self::class, 'embeds_in_divi' ), 10, 2 );
 
 		// Suppress Divi's global overlay/lightbox over FotoGrids anchors
 		// during a Divi-sourced render.
@@ -405,6 +406,67 @@ final class Module {
 
 		return strpos( $content, 'wp:' . self::GALLERY_BLOCK ) !== false
 			|| strpos( $content, 'wp:' . self::ALBUM_BLOCK ) !== false;
+	}
+
+	/**
+	 * Adds the Divi gallery and album modules in content, at any nesting depth.
+	 *
+	 * @since 1.3.0
+	 * @param array  $embeds  Embeds found so far.
+	 * @param string $content Post or widget content.
+	 * @return array
+	 */
+	public static function embeds_in_divi( $embeds, $content ): array {
+		$embeds = is_array( $embeds ) ? $embeds : array();
+		if ( ! is_string( $content )
+			|| ( false === strpos( $content, 'wp:' . self::GALLERY_BLOCK ) && false === strpos( $content, 'wp:' . self::ALBUM_BLOCK ) )
+			|| ! class_exists( Native\Gallery_Module::class, false )
+			|| ! class_exists( Native\Album_Module::class, false ) ) {
+			return $embeds;
+		}
+
+		return array_merge( $embeds, self::divi_embeds( parse_blocks( $content ) ) );
+	}
+
+	/**
+	 * Returns the Divi gallery and album modules in a parsed block tree.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, array> $blocks Parsed blocks.
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function divi_embeds( array $blocks ): array {
+		$embeds = array();
+
+		foreach ( $blocks as $block ) {
+			$attrs = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
+			if ( self::GALLERY_BLOCK === $block['blockName'] ) {
+				$id = Native\Gallery_Module::resolve_id( $attrs );
+				if ( $id > 0 ) {
+					$embeds[] = array(
+						'type' => 'gallery',
+						'atts' => array(
+							'id'      => $id,
+							'_source' => Request_Source::DIVI,
+						),
+					);
+				}
+			} elseif ( self::ALBUM_BLOCK === $block['blockName'] ) {
+				$id = Native\Album_Module::resolve_id( $attrs );
+				if ( $id > 0 ) {
+					$embeds[] = array(
+						'type' => 'album',
+						'atts' => array( 'id' => $id ),
+					);
+				}
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$embeds = array_merge( $embeds, self::divi_embeds( $block['innerBlocks'] ) );
+			}
+		}
+
+		return $embeds;
 	}
 
 	/**

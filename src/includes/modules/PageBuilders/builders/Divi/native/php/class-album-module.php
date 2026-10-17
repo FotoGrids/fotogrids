@@ -106,7 +106,7 @@ class Album_Module implements \ET\Builder\Framework\DependencyManagement\Interfa
 	 * @param array $attrs Block attributes.
 	 * @return int
 	 */
-	private static function resolve_id( array $attrs ): int {
+	public static function resolve_id( array $attrs ): int {
 		$raw = $attrs['album']['innerContent']['desktop']['value']['albumId'] ?? 0;
 		return absint( $raw );
 	}

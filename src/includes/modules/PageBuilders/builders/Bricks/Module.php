@@ -10,10 +10,12 @@ declare(strict_types=1);
 
 namespace FotoGrids\Modules\PageBuilders\Builders\Bricks;
 
+use FotoGrids\Head_Styles;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Builders\Bricks\Elements\Element_Album;
 use FotoGrids\Modules\PageBuilders\Builders\Bricks\Elements\Element_Gallery;
 use FotoGrids\Post_Types;
+use FotoGrids\Render\Api\Request_Source;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -98,6 +100,7 @@ final class Module {
 		add_action( 'init', array( self::class, 'register_elements' ), 11 );
 		add_filter( 'bricks/builder/i18n', array( self::class, 'add_category_label' ) );
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_bricks' ), 10, 2 );
+		add_filter( Filters_Page_Builders::EMBEDS, array( self::class, 'embeds_in_bricks' ), 10, 3 );
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
 	}
 
@@ -230,8 +233,79 @@ final class Module {
 			return true;
 		}
 
-		if ( ! class_exists( '\Bricks\Database' ) ) {
+		$elements = self::page_elements();
+		if ( empty( $elements ) ) {
 			return false;
+		}
+
+		$json = (string) wp_json_encode( $elements );
+
+		return false !== strpos( $json, '"name":"' . self::GALLERY_ELEMENT . '"' )
+			|| false !== strpos( $json, '"name":"' . self::ALBUM_ELEMENT . '"' )
+			|| false !== strpos( $json, '[fotogrids_' );
+	}
+
+	/**
+	 * Adds the gallery and album elements on the current Bricks page, and shortcodes in element text.
+	 *
+	 * Elements whose ID comes from dynamic data are left to the render.
+	 *
+	 * @since 1.3.0
+	 * @param array         $embeds  Embeds found so far.
+	 * @param string        $content Post or widget content.
+	 * @param \WP_Post|null $post    Post the content belongs to.
+	 * @return array
+	 */
+	public static function embeds_in_bricks( $embeds, $content, $post ): array {
+		unset( $content );
+		$embeds = is_array( $embeds ) ? $embeds : array();
+		if ( ! $post instanceof \WP_Post || ! class_exists( Element_Gallery::class, false ) ) {
+			return $embeds;
+		}
+
+		foreach ( self::page_elements() as $element ) {
+			$name     = is_array( $element ) ? ( $element['name'] ?? '' ) : '';
+			$settings = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+			$static   = 'dynamic' !== ( $settings[ Element_Gallery::SOURCE_SETTING ] ?? '' );
+
+			if ( $static && self::GALLERY_ELEMENT === $name && ! empty( $settings[ Element_Gallery::SETTING_ID ] ) ) {
+				$embeds[] = array(
+					'type' => 'gallery',
+					'atts' => array(
+						'id'      => absint( $settings[ Element_Gallery::SETTING_ID ] ),
+						'_source' => Request_Source::BRICKS,
+					),
+				);
+			} elseif ( $static && self::ALBUM_ELEMENT === $name && ! empty( $settings[ Element_Gallery::SETTING_ID ] ) ) {
+				$embeds[] = array(
+					'type' => 'album',
+					'atts' => array( 'id' => absint( $settings[ Element_Gallery::SETTING_ID ] ) ),
+				);
+			}
+
+			array_walk_recursive(
+				$settings,
+				static function ( $value ) use ( &$embeds ) {
+					if ( is_string( $value ) ) {
+						$embeds = array_merge( $embeds, Head_Styles::shortcode_embeds( $value ) );
+					}
+				}
+			);
+		}
+
+		return $embeds;
+	}
+
+	/**
+	 * Returns the Bricks elements of the current page: header, content,
+	 * footer, active popups, nested templates and components.
+	 *
+	 * @since 1.3.0
+	 * @return array<int, array>
+	 */
+	private static function page_elements(): array {
+		if ( ! class_exists( '\Bricks\Database' ) ) {
+			return array();
 		}
 
 		$elements = array();
@@ -251,7 +325,7 @@ final class Module {
 		}
 
 		if ( empty( $elements ) ) {
-			return false;
+			return array();
 		}
 
 		$nested = \Bricks\Database::get_nested_template_data( $elements );
@@ -259,11 +333,6 @@ final class Module {
 			$elements = array_merge( $elements, $nested );
 		}
 
-		$elements = \Bricks\Database::get_component_data( $elements );
-		$json     = (string) wp_json_encode( $elements );
-
-		return false !== strpos( $json, '"name":"' . self::GALLERY_ELEMENT . '"' )
-			|| false !== strpos( $json, '"name":"' . self::ALBUM_ELEMENT . '"' )
-			|| false !== strpos( $json, '[fotogrids_' );
+		return (array) \Bricks\Database::get_component_data( $elements );
 	}
 }

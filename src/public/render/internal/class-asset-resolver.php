@@ -66,6 +66,13 @@ final class Asset_Resolver {
 	private array $enqueued_js_handles = array();
 
 	/**
+	 * Assets flushed since begin_capture(), or null when no capture is running.
+	 *
+	 * @var array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}|null
+	 */
+	private ?array $capture = null;
+
+	/**
 	 * Returns the request-scoped singleton resolver.
 	 *
 	 * @since   1.0.0
@@ -186,15 +193,25 @@ final class Asset_Resolver {
 		// case - styles would otherwise never reach the page). Page-builder
 		// sub-modules can opt their preview / partial-render contexts in
 		// unconditionally via the SHOULD_INLINE_ASSETS filter.
-		$default_inline = did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0;
+		$default_inline = self::past_head_styles() || did_action( 'admin_head' ) > 0;
 		$should_inline  = (bool) apply_filters( Filters_Render::SHOULD_INLINE_ASSETS, $default_inline );
 
 		if ( $should_inline ) {
 			if ( ! empty( $new_css_handles ) ) {
-				wp_print_styles( $new_css_handles );
+				$this->print_late_styles( $new_css_handles );
 			}
 			if ( ! empty( $new_js_handles ) ) {
 				wp_print_scripts( $new_js_handles );
+			}
+		}
+
+		if ( null !== $this->capture ) {
+			$this->capture['css'] += $this->queued_css();
+			foreach ( $this->js_queue as $handle => $js_asset ) {
+				$this->capture['js'][ $handle ] = array(
+					'src'       => $js_asset['src'],
+					'in_footer' => $js_asset['in_footer'],
+				);
 			}
 		}
 
@@ -202,6 +219,114 @@ final class Asset_Resolver {
 		$this->css_queue = array();
 		$this->js_queue  = array();
 	}
+
+	/**
+	 * Starts recording the assets each flush asks for, already enqueued or not.
+	 *
+	 * @since 1.3.0
+	 * @return void
+	 */
+	public function begin_capture(): void {
+		$this->capture = array(
+			'css' => array(),
+			'js'  => array(),
+		);
+	}
+
+	/**
+	 * Stops recording and returns the assets flushed since begin_capture().
+	 *
+	 * @since 1.3.0
+	 * @return array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}
+	 */
+	public function end_capture(): array {
+		$captured      = $this->capture ?? array(
+			'css' => array(),
+			'js'  => array(),
+		);
+		$this->capture = null;
+
+		return $captured;
+	}
+
+	/**
+	 * Returns the stylesheets queued for the current render, keyed by handle.
+	 *
+	 * @since 1.3.0
+	 * @return array<string, string> Handle → URL.
+	 */
+	public function queued_css(): array {
+		return wp_list_pluck( $this->css_queue, 'src', 'handle' );
+	}
+
+	/**
+	 * Enqueues stylesheets from a stored handle → URL map and records them as enqueued.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, string> $css Handle → URL.
+	 * @return void
+	 */
+	public function replay_styles( array $css ): void {
+		$new_css_handles = array();
+		foreach ( $css as $handle => $src ) {
+			if ( isset( $this->enqueued_css_handles[ $handle ] ) ) {
+				continue;
+			}
+			wp_register_style( $handle, $src, array(), FOTOGRIDS_VERSION );
+			wp_enqueue_style( $handle );
+			$this->enqueued_css_handles[ $handle ] = $src;
+			$new_css_handles[]                     = $handle;
+		}
+
+		if ( ! empty( $new_css_handles ) && self::past_head_styles() ) {
+			$this->print_late_styles( $new_css_handles );
+		}
+	}
+
+	/**
+	 * Whether the head has already printed its stylesheets, so new ones must print where they are.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	private static function past_head_styles(): bool {
+		return did_action( 'wp_head' ) > 0 && ( ! doing_action( 'wp_head' ) || did_action( 'wp_print_styles' ) > 0 );
+	}
+
+	/**
+	 * Prints stylesheets after the head and, on a page view, moves them into it.
+	 *
+	 * Each moved stylesheet goes after the FotoGrids stylesheets already in the
+	 * head, or ahead of the head's first stylesheet, so the site's own CSS keeps
+	 * its precedence. The move waits until the stylesheets have loaded, while
+	 * they still block rendering where they were printed.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, string> $handles Stylesheet handles.
+	 * @return void
+	 */
+	public function print_late_styles( array $handles ): void {
+		wp_print_styles( $handles );
+
+		if ( did_action( 'wp_head' ) > 0 && ! doing_action( 'wp_head' ) && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			wp_print_inline_script_tag( sprintf( self::LATE_STYLES_MOVER, wp_json_encode( array_values( $handles ) ) ) );
+		}
+	}
+
+	/**
+	 * Script that moves late-printed stylesheets into the head; %s is the handle list.
+	 *
+	 * @since 1.3.0
+	 */
+	private const LATE_STYLES_MOVER = '(function(ids){var head=document.head;'
+		. 'var links=ids.map(function(id){return document.getElementById(id+"-css");}).filter(function(l){return l&&l.parentNode!==head;});'
+		. 'function anchor(){var el=head.querySelector(\'link[rel="stylesheet"][id^="fotogrids-"]\');'
+		. 'while(el&&el.nextElementSibling&&/^fotogrids-/.test(el.nextElementSibling.id)&&/^(LINK|STYLE)$/.test(el.nextElementSibling.tagName)){el=el.nextElementSibling;}return el;}'
+		. 'function moveAll(){var after=anchor();var first=head.querySelector(\'link[rel="stylesheet"],style\');'
+		. 'links.forEach(function(link){if(after){after.parentNode.insertBefore(link,after.nextSibling);}else{head.insertBefore(link,first);}after=link;});}'
+		. 'var pending=links.filter(function(l){return !l.sheet;}).length;if(!pending){moveAll();return;}'
+		. 'links.forEach(function(l){if(l.sheet){return;}var done=function(){if(--pending===0){moveAll();}};'
+		. 'l.addEventListener("load",done,{once:true});l.addEventListener("error",done,{once:true});});})(%s);';
 
 	/**
 	 * Returns CSS asset URLs keyed by handle for all assets enqueued this request.

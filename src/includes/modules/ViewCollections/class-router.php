@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Post_Types;
 
@@ -43,6 +44,13 @@ class Router {
 	private static $current_post = null;
 
 	/**
+	 * Whether the current request renders the bundled view page shell.
+	 *
+	 * @var bool
+	 */
+	private static $serves_shell = false;
+
+	/**
 	 * Rewrite rules version. Bump when the query handling changes; the base
 	 * itself is covered by the signature the stamp is built from.
 	 *
@@ -66,6 +74,7 @@ class Router {
 	public static function init(): void {
 		add_filter( 'register_post_type_args', array( __CLASS__, 'filter_cpt_args' ), 10, 2 );
 		add_filter( 'template_include', array( __CLASS__, 'route' ), 99 );
+		add_filter( Filters_Render::WIDGET_EMBEDS, array( __CLASS__, 'filter_widget_embeds' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_flush_rewrite_rules' ), 100 );
 	}
 
@@ -229,6 +238,8 @@ class Router {
 	 * @return string
 	 */
 	public static function route( string $template ): string {
+		self::$serves_shell = false;
+
 		$post = self::view_post();
 		if ( null === $post ) {
 			return $template;
@@ -294,11 +305,23 @@ class Router {
 		 * @param string   $path
 		 * @param \WP_Post $post
 		 */
-		return apply_filters(
-			Filters_View::TEMPLATE,
-			FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ViewCollections/templates/view-collection.php',
-			$post
-		);
+		$shell = FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ViewCollections/templates/view-collection.php';
+		$path  = (string) apply_filters( Filters_View::TEMPLATE, $shell, $post );
+
+		self::$serves_shell = $shell === $path;
+
+		return $path;
+	}
+
+	/**
+	 * Drops widget-area collections on view pages the bundled shell renders; it prints no widget areas.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $embeds Collections in the active sidebars.
+	 * @return mixed
+	 */
+	public static function filter_widget_embeds( $embeds ) {
+		return self::$serves_shell ? array() : $embeds;
 	}
 
 	/**

@@ -638,13 +638,13 @@ final class Lightbox implements Feature {
 		return new Module_Assets(
 			array(
 				// Tooltip styles - shared across all frontend surfaces.
-				'fotogrids-tooltip'  => new Asset_Decl(
+				'fotogrids-fg-tooltip' => new Asset_Decl(
 					'../../assets/css/fg-tooltip.css',
 					array(),
 					false,
 				),
 				// Full overlay stylesheet compiled from lightbox.scss.
-				'fotogrids-lightbox' => new Asset_Decl(
+				'fotogrids-lightbox'   => new Asset_Decl(
 					'../../assets/css/lightbox-styles.css',
 					array(),
 					false,
@@ -652,14 +652,14 @@ final class Lightbox implements Feature {
 			) + \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::css(),
 			\FotoGrids\Render\Formatted_Text\Formatted_Text_Client::js() + array(
 				// Tooltip module - loaded before lightbox so FgTooltip is available.
-				'fotogrids-tooltip'  => new Asset_Decl(
+				'fotogrids-fg-tooltip' => new Asset_Decl(
 					'../../assets/js/fg-tooltip.js',
 					array(),
 					true,
 				),
-				'fotogrids-lightbox' => new Asset_Decl(
+				'fotogrids-lightbox'   => new Asset_Decl(
 					'../../assets/js/lightbox.js',
-					array( 'fotogrids-runtime', 'fotogrids-tooltip', \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::HANDLE ),
+					array( 'fotogrids-runtime', 'fotogrids-fg-tooltip', \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::HANDLE ),
 					true,
 				),
 			)
