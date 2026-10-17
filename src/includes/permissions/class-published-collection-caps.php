@@ -24,13 +24,6 @@ if ( ! defined( 'WPINC' ) ) {
 final class Published_Collection_Caps {
 
 	/**
-	 * Post types the fallback applies to.
-	 *
-	 * @var string[]
-	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
-
-	/**
 	 * Meta capability => [ published-state capability key, fallback capability key ].
 	 *
 	 * @var array<string, string[]>
@@ -67,7 +60,7 @@ final class Published_Collection_Caps {
 		}
 
 		$post = get_post( (int) $args[0] );
-		if ( ! $post || ! in_array( $post->post_type, self::POST_TYPES, true ) || (int) $post->post_author !== (int) $user_id ) {
+		if ( ! $post || ! in_array( $post->post_type, \FotoGrids\Post_Types::COLLECTION_TYPES, true ) || (int) $post->post_author !== (int) $user_id ) {
 			return $caps;
 		}
 

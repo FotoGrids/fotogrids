@@ -25,6 +25,8 @@ class CollectionAddNewAccessTest extends WP_UnitTestCase {
 		'typenow',
 		'plugin_page',
 		'parent_file',
+		'post_type',
+		'submenu_file',
 	);
 
 	private array $saved = array();
@@ -163,20 +165,81 @@ class CollectionAddNewAccessTest extends WP_UnitTestCase {
 	/**
 	 * @dataProvider users
 	 */
-	public function test_add_new_is_not_in_the_visible_menu( string $who ): void {
+	public function test_each_add_new_follows_its_own_list( string $who, bool $gallery, bool $album ): void {
 		global $submenu;
 
 		$this->build_menu( $this->user( $who ) );
 
-		$visible = array_column( $submenu['fotogrids'] ?? array(), 2 );
-		$add_new = array_filter(
-			$visible,
-			static function ( $slug ) {
-				return 0 === strpos( $slug, 'post-new.php' );
+		$visible  = array_column( $submenu['fotogrids'] ?? array(), 2 );
+		$expected = array();
+		foreach ( array( 'fotogrids_gallery' => $gallery, 'fotogrids_album' => $album ) as $type => $can_create ) {
+			if ( in_array( "edit.php?post_type=$type", $visible, true ) ) {
+				$expected[] = "edit.php?post_type=$type";
 			}
+			if ( $can_create ) {
+				$expected[] = "post-new.php?post_type=$type";
+			}
+		}
+
+		$collection_entries = array_values(
+			array_filter(
+				$visible,
+				static function ( $slug ) {
+					return 1 === preg_match( '/^(edit|post-new)\.php\?post_type=fotogrids_/', $slug );
+				}
+			)
 		);
 
-		$this->assertSame( array(), array_values( $add_new ) );
+		$this->assertSame( $expected, $collection_entries );
+	}
+
+	public function test_the_add_new_entry_is_labelled_add_new(): void {
+		global $submenu;
+
+		$this->build_menu( $this->user( 'administrator' ) );
+
+		foreach ( $submenu['fotogrids'] as $item ) {
+			if ( 0 === strpos( $item[2], 'post-new.php?post_type=fotogrids_' ) ) {
+				$this->assertSame( 'Add New', $item[0], $item[2] );
+			}
+		}
+	}
+
+	public function screens(): array {
+		return array(
+			'gallery list'    => array( 'edit.php', 'fotogrids_gallery', 'edit.php?post_type=fotogrids_gallery' ),
+			'gallery add new' => array( 'post-new.php', 'fotogrids_gallery', 'post-new.php?post_type=fotogrids_gallery' ),
+			'gallery edit'    => array( 'post.php', 'fotogrids_gallery', 'edit.php?post_type=fotogrids_gallery' ),
+			'album list'      => array( 'edit.php', 'fotogrids_album', 'edit.php?post_type=fotogrids_album' ),
+			'album add new'   => array( 'post-new.php', 'fotogrids_album', 'post-new.php?post_type=fotogrids_album' ),
+			'album edit'      => array( 'post.php', 'fotogrids_album', 'edit.php?post_type=fotogrids_album' ),
+		);
+	}
+
+	/**
+	 * @dataProvider screens
+	 */
+	public function test_the_current_screen_is_highlighted( string $screen, string $type, string $highlighted ): void {
+		global $pagenow, $post_type, $parent_file, $submenu_file;
+
+		$pagenow   = $screen;
+		$post_type = $type;
+
+		Admin_Init::fix_menu_highlighting();
+
+		$this->assertSame( 'fotogrids', $parent_file );
+		$this->assertSame( $highlighted, $submenu_file );
+	}
+
+	public function test_the_add_new_marker_is_styled_on_every_admin_screen(): void {
+		Admin_Init::enqueue_admin_chrome_styles( 'index.php' );
+
+		$css = implode( '', (array) wp_styles()->get_data( 'fotogrids-admin-chrome', 'after' ) );
+
+		$this->assertStringContainsString( 'a[href^="post-new.php?post_type=fotogrids_"]::before', $css );
+		$this->assertStringContainsString( '"\\21B3" / ""', $css );
+
+		wp_deregister_style( 'fotogrids-admin-chrome' );
 	}
 
 	public function test_only_the_types_a_role_can_create_are_registered(): void {

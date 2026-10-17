@@ -50,6 +50,26 @@ async function openFromMenu( page: Page, label: string ): Promise< Response > {
 	);
 }
 
+/** Open a type's Add New from the menu; it is served, sits right after its list, and is highlighted. */
+async function openAddNewFromMenu( page: Page, kind: Kind ): Promise< void > {
+	await page.goto( '/wp-admin/' );
+
+	const menu = fotogridsMenu( page );
+	await menu.hover();
+
+	const link = menu.locator( `.wp-submenu a[href$="post-new.php?post_type=${ kind }"]` );
+	await expect( link ).toHaveAccessibleName( 'Add New' );
+	await expect( menu.locator( `.wp-submenu li:has(> a[href$="edit.php?post_type=${ kind }"]) + li > a` ) ).toHaveAttribute(
+		'href',
+		`post-new.php?post_type=${ kind }`
+	);
+
+	const response = await follow( page, () => link.click() );
+	expect( response.status(), `Add New answered ${ response.status() }` ).toBe( 200 );
+	expect( page.url() ).toContain( `post-new.php?post_type=${ kind }` );
+	await expect( menu.locator( '.wp-submenu li.current a' ) ).toHaveAttribute( 'href', `post-new.php?post_type=${ kind }` );
+}
+
 /** The list screen is served, titled, and highlighted in the menu. */
 async function expectList( page: Page, response: Response, kind: Kind ) {
 	expect( response.status(), `${ LISTS[ kind ] } answered ${ response.status() }` ).toBe( 200 );
@@ -149,12 +169,13 @@ for ( const role of [ 'administrator', 'editor', 'author' ] as const satisfies r
 	test.describe( `as ${ role }`, () => {
 		test.use( { storageState: storageStateFor( role ) } );
 
-		test( `MENU-01: opens Galleries and Albums from the FotoGrids menu`, { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
+		test( `MENU-01: opens Galleries, Albums and each Add New from the FotoGrids menu`, { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
 			page,
 		} ) => {
 			for ( const kind of Object.keys( LISTS ) as Kind[] ) {
 				const response = await openFromMenu( page, LISTS[ kind ] );
 				await expectList( page, response, kind );
+				await openAddNewFromMenu( page, kind );
 			}
 		} );
 
@@ -274,7 +295,7 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 			const links = await fotogridsMenu( page )
 				.locator( '.wp-submenu a' )
 				.allInnerTexts();
-			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ] ] );
+			expect( links ).toEqual( [ 'Dashboard', LISTS[ kind ], 'Add New' ] );
 
 			const top = fotogridsMenu( page ).locator( 'a.menu-top' );
 			const response = await follow( page, () => top.click() );
@@ -296,6 +317,8 @@ foreach ( array( 'gallery', 'album' ) as $one ) {
 				"Your role can't open Statistics."
 			);
 			await expect( page.locator( '.fotogrids-overview a.fg-stat-card' ) ).toHaveCount( 0 );
+
+			await openAddNewFromMenu( page, kind );
 
 			const otherNew = await page.goto( `/wp-admin/post-new.php?post_type=${ other }` );
 			expect( otherNew?.status() ).toBe( 403 );
