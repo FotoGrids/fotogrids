@@ -32,6 +32,23 @@ const SETTINGS = {
 	caption_hide_description: true,
 };
 
+const LAYOUTS = [
+	'grid',
+	'masonry',
+	'justified',
+	'slider',
+	'single-item',
+	'featured-item',
+	'image-viewer',
+	'instant-photos',
+] as const;
+
+// Instant Photos tilts each item by an angle seeded from the gallery id, and
+// every run makes a new gallery; flat items keep the picture the same.
+const PER_LAYOUT: Partial< Record< ( typeof LAYOUTS )[ number ], Record< string, unknown > > > = {
+	'instant-photos': { instant_photo_max_rotation: { desktop: 0, tablet: 0, mobile: 0 } },
+};
+
 let site: SiteState;
 
 test.beforeAll( () => {
@@ -42,18 +59,23 @@ test.afterAll( () => {
 	restoreSite( site );
 } );
 
-for ( const layout of [ 'grid', 'masonry' ] as const ) {
+for ( const layout of LAYOUTS ) {
 	for ( const [ name, viewport ] of Object.entries( VIEWPORTS ) ) {
 		test( `${ layout } at ${ name }`, { tag: '@visual' }, async ( { page } ) => {
 			await page.setViewportSize( viewport );
 
-			const { id, url } = galleryPage( { layout, ...SETTINGS } );
+			const { id, url } = galleryPage( { layout, ...SETTINGS, ...PER_LAYOUT[ layout ] } );
 			const gallery = new GalleryRender( page, id );
 
 			await page.goto( url );
 			await gallery.waitFor();
 
 			const target = page.locator( '.fotogrids-gallery' ).first();
+
+			// Off-screen slides are lazy and never scrolled to; load them now.
+			await target
+				.locator( 'img[loading="lazy"]' )
+				.evaluateAll( ( images ) => images.forEach( ( image ) => ( ( image as HTMLImageElement ).loading = 'eager' ) ) );
 
 			await expectNoText( target );
 			await expectStable( page, target, `${ layout }-${ name }` );
