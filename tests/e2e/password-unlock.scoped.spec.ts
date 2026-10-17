@@ -1,6 +1,6 @@
 import type { Page, Response } from '@playwright/test';
 import { test, expect } from './support/test';
-import { album, galleryPage, type Settings } from './support/collections';
+import { album, galleryPage, shortcodePage, type Settings } from './support/collections';
 import { fixture, twelveItems } from './support/fixtures';
 import { wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
@@ -44,10 +44,13 @@ function passwordGallery(
 	return created;
 }
 
-/** A page the purge removes, holding whatever shortcodes it is given. */
-function pageWith( content: string ): string {
+/**
+ * A post the purge removes, holding whatever shortcodes it is given. The slug
+ * is set because two workers can otherwise be handed the same one.
+ */
+function postWith( content: string ): string {
 	return wpEval(
-		`$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
+		`$id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Unlock page', 'post_name' => 'unlock-page-' . strtolower( wp_generate_password( 8, false ) ), 'post_content' => '${ content }' ) ); update_post_meta( $id, '_fg_scoped', 1 ); echo get_permalink( $id );`
 	).trim();
 }
 
@@ -55,11 +58,16 @@ function unlockRoute( galleryId: number ): string {
 	return `/?rest_route=${ encodeURIComponent( `/fotogrids/v1/gallery/${ galleryId }/unlock` ) }`;
 }
 
-/** Fill and submit the lock form inside `scope`, then wait for the items. */
-async function unlockThroughForm( page: Page, gallery: GalleryRender, count = 6 ): Promise< void > {
+/** Fill and submit the gallery's lock form. */
+async function submitLockForm( page: Page, gallery: GalleryRender ): Promise< void > {
 	const form = page.locator( `.fg-lock-form[data-gallery-id="${ gallery.galleryId }"]` );
 	await form.locator( '.fg-lock-input' ).fill( PASSWORD );
 	await form.locator( '.fg-lock-submit' ).click();
+}
+
+/** Fill and submit the lock form, then wait for the items. */
+async function unlockThroughForm( page: Page, gallery: GalleryRender, count = 6 ): Promise< void > {
+	await submitLockForm( page, gallery );
 	await expect( gallery.items() ).toHaveCount( count, { timeout: 15000 } );
 }
 
@@ -160,9 +168,11 @@ test.describe( 'with remember off', () => {
 		const seen = watchRest( page );
 
 		await page.goto( url );
-		await unlockThroughForm( page, gallery );
+		await submitLockForm( page, gallery );
+		await expect( gallery.items().first() ).toBeVisible( { timeout: 15000 } );
 
-		await page.locator( '[data-fg-pagination-sentinel="true"]' ).scrollIntoViewIfNeeded();
+		// Endless scroll is bound when the gallery arrives, so a sentinel already in view loads page 2 at once.
+		await page.evaluate( () => window.scrollTo( 0, document.body.scrollHeight ) );
 		await expect( gallery.items() ).toHaveCount( 12 );
 		await expectAllAuthorised( seen );
 	} );
@@ -255,7 +265,7 @@ test.describe( 'with remember off', () => {
 	test( 'two galleries on one page unlock separately', { tag: '@gate' }, async ( { page } ) => {
 		const first = passwordGallery();
 		const second = passwordGallery();
-		const url = pageWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
+		const url = postWith( `[fotogrids_gallery id="${ first.id }"][fotogrids_gallery id="${ second.id }"]` );
 		const one = new GalleryRender( page, first.id );
 		const two = new GalleryRender( page, second.id );
 
@@ -275,7 +285,7 @@ test.describe( 'with remember off', () => {
 	test( 'a gallery opened in place from an album pages after unlocking', { tag: '@gate' }, async ( { page } ) => {
 		const { id } = passwordGallery();
 		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
-		const url = pageWith( `[fotogrids_album id="${ albumId }"]` );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
 		const gallery = new GalleryRender( page, id );
 
 		await page.goto( url );
@@ -394,4 +404,89 @@ test( 'an unlock token opens only its own gallery, and only unaltered', { tag: [
 		).trim();
 	expect( await opens( first.id, signedFor( 60 ) ) ).toBe( true );
 	expect( await opens( first.id, signedFor( -60 ) ) ).toBe( false );
+} );
+
+test.describe( 'a Load More click as soon as the gallery appears', () => {
+	/** Hold the pagination script back so a click can only work if the swap waits for it. */
+	async function slowLoadMoreScript( page: Page ): Promise< void > {
+		await page.route( '**/load-more.js*', async ( route ) => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
+			await route.continue();
+		} );
+	}
+
+	/** Click Load More the moment the first item is on the page. */
+	async function loadMoreAtOnce( gallery: GalleryRender ): Promise< void > {
+		await expect( gallery.items().first() ).toBeVisible( { timeout: 15000 } );
+		await gallery.root.locator( '[data-fg-pagination-trigger="load-more"]' ).click();
+	}
+
+	test( 'pages a gallery opened in place from an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = galleryPage( PAGINATED, twelveItems() );
+		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
+		const gallery = new GalleryRender( page, id );
+		await slowLoadMoreScript( page );
+
+		await page.goto( url );
+		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
+		await loadMoreAtOnce( gallery );
+		await expect( gallery.items() ).toHaveCount( 12 );
+	} );
+
+	test( 'pages a password gallery unlocked inside an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = passwordGallery();
+		const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
+		const url = postWith( `[fotogrids_album id="${ albumId }"]` );
+		const gallery = new GalleryRender( page, id );
+		await slowLoadMoreScript( page );
+
+		await page.goto( url );
+		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
+		await submitLockForm( page, gallery );
+		await loadMoreAtOnce( gallery );
+		await expect( gallery.items() ).toHaveCount( 12 );
+	} );
+} );
+
+test.describe( 'an embed with shortcode attributes', () => {
+	test( "unlocks with the embed's cols and template", { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = passwordGallery( { columns: { desktop: 3, tablet: 3, mobile: 3 } } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( shortcodePage( id, 'template="masonry" cols="2"' ).url );
+		await unlockThroughForm( page, gallery );
+
+		expect( await gallery.layout() ).toBe( 'masonry' );
+		expect( await gallery.cssVar( 'cols' ) ).toBe( '2' );
+	} );
+
+	test( 'unlocks with the saved cols and layout when the embed sets none', { tag: [ '@gate', '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = passwordGallery( { columns: { desktop: 3, tablet: 3, mobile: 3 } } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( postWith( `[fotogrids_gallery id="${ id }"]` ) );
+		await unlockThroughForm( page, gallery );
+
+		expect( await gallery.layout() ).toBe( 'grid' );
+		expect( await gallery.cssVar( 'cols' ) ).toBe( '3' );
+	} );
+
+	test( 'the unlock route accepts only a registered layout and a positive column count', { tag: [ '@gate', '@api' ] }, async ( {
+		request,
+	} ) => {
+		const { id } = passwordGallery();
+		const unlock = ( data: Record< string, unknown > ) =>
+			request.post( unlockRoute( id ), { data: { password: PASSWORD, ...data } } );
+
+		expect( ( await unlock( { template: 'not-a-layout' } ) ).status() ).toBe( 400 );
+		expect( ( await unlock( { cols: -1 } ) ).status() ).toBe( 400 );
+		expect( ( await unlock( { cols: 'two' } ) ).status() ).toBe( 400 );
+
+		const accepted = await unlock( { template: 'masonry', cols: 2 } );
+		expect( accepted.status() ).toBe( 200 );
+		expect( ( await accepted.json() ).html as string ).toContain( 'data-fg-layout="masonry"' );
+	} );
 } );

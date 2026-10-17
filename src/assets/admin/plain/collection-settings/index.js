@@ -13,7 +13,7 @@ window.FotoGridsSettings = window.FotoGridsSettings || {};
  * Fetching Free's JSON files from the browser would miss Pro and third-party
  * files, which live in other plugin directories.
  *
- * @param {string} postType
+ * @param {string} postType Post type or collection kind.
  * @param {boolean} isDefaultsMode
  * @returns {Promise<Object<string, Object>>} Map of tab id → tab node.
  */
@@ -21,13 +21,6 @@ const loadSettingsGroups = async (
 	postType = 'gallery',
 	isDefaultsMode = false
 ) => {
-	const normalizedPostType =
-		postType === 'fotogrids_gallery'
-			? 'gallery'
-			: postType === 'fotogrids_album'
-				? 'album'
-				: postType;
-
 	const restBase =
 		window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '';
 
@@ -37,7 +30,7 @@ const loadSettingsGroups = async (
 
 	const separator = endpoint.includes('?') ? '&' : '?';
 	const url = `${endpoint}${separator}post_type=${encodeURIComponent(
-		normalizedPostType
+		postType
 	)}&_locale=user`;
 
 	try {

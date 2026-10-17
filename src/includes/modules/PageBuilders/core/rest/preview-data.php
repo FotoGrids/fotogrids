@@ -14,6 +14,7 @@ use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Preview_Options;
 use FotoGrids\Modules\PageBuilders\Preview_Renderer;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Asset_Resolver;
@@ -27,14 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Handlers behind `/preview/gallery/{id}`, `/preview/album/{id}`, and
- * `/picker/items`.
- *
- * Generic, builder-agnostic. Used by every page-builder host - the
- * Gutenberg block in the first instance, Elementor / Divi / Bricks once
- * those sub-modules ship.
- *
- * Album preview is built here because no existing endpoint renders
- * albums for an admin caller.
+ * `/picker/items`, shared by every page-builder host.
  *
  * @since 1.0.0
  */
@@ -57,13 +51,8 @@ final class Preview_Data {
 	/**
 	 * `POST /preview/gallery/{id}`.
 	 *
-	 * Renders a gallery through the same public-render pipeline used on
-	 * the front-of-site, then flips `is_preview = true` on the meta so
-	 * preview-aware modules take the preview path.
-	 *
-	 * `build_for_public()` rather than `build_for_preview()` gives the preview
-	 * the full sorter + filter + pagination behaviour, so paginated galleries
-	 * render the correct page and chrome.
+	 * Renders a gallery through the public-render pipeline with
+	 * `is_preview = true` on the meta.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -73,7 +62,7 @@ final class Preview_Data {
 		$gallery_id   = absint( $request->get_param( 'id' ) );
 		$gallery_post = get_post( $gallery_id );
 
-		if ( ! $gallery_post || 'fotogrids_gallery' !== $gallery_post->post_type ) {
+		if ( ! $gallery_post || Post_Types::GALLERY !== $gallery_post->post_type ) {
 			return new \WP_Error(
 				'fotogrids_preview_gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),
@@ -98,19 +87,7 @@ final class Preview_Data {
 			? (array) \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id )
 			: array();
 
-		// Per-host preview-feature toggles (Gutenberg block, metabox, page
-		// builders), applied as settings overrides.
-		//
-		//   click_behavior=false  -> override item_click_behavior with
-		//                            'nothing' so no decorator wires
-		//                            click handlers. The gallery still
-		//                            renders with full styling; clicks
-		//                            do nothing.
-		//   pagination=false      -> leave pagination_type alone so the
-		//                            chrome still renders. The client
-		//                            neutralises load-more / page-button
-		//                            clicks via a capture-phase
-		//                            listener on LivePreview.
+		// pagination=false is handled client-side by LivePreview.
 		$preview_options = self::read_preview_options( $request );
 		if ( false === $preview_options['click_behavior'] ) {
 			$render_settings['item_click_behavior'] = 'nothing';
@@ -139,12 +116,10 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Return a copy of the render context with `is_preview = true` and the
-	 * supplied source stamped on the meta, plus preview-only settings
-	 * markers merged in.
+	 * Return a copy of the render context with `is_preview = true`, the
+	 * given source on the meta, and preview-only settings merged in.
 	 *
-	 * Render_Context::with() explicitly forbids replacing the meta field,
-	 * so the underlying constructor is used instead.
+	 * Uses the constructor because Render_Context::with() forbids replacing meta.
 	 *
 	 * @since 1.0.0
 	 * @param \FotoGrids\Render\Api\Render_Context $context
@@ -187,10 +162,7 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Resolve a gallery's normalized settings - the exact shape the
-	 * renderer expects, including nested keys like columns.desktop /
-	 * item_spacing.desktop. Delegates to Gallery_Repository, which is
-	 * also what Public_Render::get_gallery_settings wraps internally.
+	 * Resolve a gallery's normalized settings in the shape the renderer expects.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id
@@ -204,19 +176,8 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Read the per-host preview feature toggles off the REST request.
-	 *
-	 * Defaults and normalisation are delegated to {@see Preview_Options}
-	 * so every builder (Gutenberg via REST, Elementor and Divi via direct
-	 * PHP) speaks the same vocabulary.
-	 *
-	 * Both toggles are eventually applied:
-	 *   - click_behavior=false overrides item_click_behavior server-side
-	 *     so no decorator binds a click handler at render time.
-	 *   - pagination=false is consumed client-side by LivePreview, which
-	 *     catches pagination-button clicks in the capture phase. The
-	 *     server still renders pagination chrome and slicing exactly
-	 *     like the live page.
+	 * Read the preview feature toggles off the REST request, normalised by
+	 * {@see Preview_Options}.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -231,7 +192,7 @@ final class Preview_Data {
 	 * `POST /preview/album/{id}`.
 	 *
 	 * Renders an album through the Render_Controller pipeline with
-	 * `is_preview = true`, like the gallery preview.
+	 * `is_preview = true`.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -241,7 +202,7 @@ final class Preview_Data {
 		$album_id   = absint( $request->get_param( 'id' ) );
 		$album_post = get_post( $album_id );
 
-		if ( ! $album_post || 'fotogrids_album' !== $album_post->post_type ) {
+		if ( ! $album_post || Post_Types::ALBUM !== $album_post->post_type ) {
 			return new \WP_Error(
 				'fotogrids_preview_album_not_found',
 				__( 'Album not found.', 'fotogrids' ),
@@ -288,8 +249,7 @@ final class Preview_Data {
 
 		$render_result = Render_Controller::factory()->render( $render_context );
 
-		// wp_footer never fires in REST, so fire the FotoGrids-only late-assets
-		// action that page-scope modules (loading-icon) also hook.
+		// wp_footer never fires in REST; LATE_ASSETS stands in for it.
 		do_action( Actions_Render::LATE_ASSETS, $render_context );
 
 		$payload = self::serialize_render_payload( $render_result, $render_context );
@@ -300,25 +260,7 @@ final class Preview_Data {
 	/**
 	 * `GET /picker/items`.
 	 *
-	 * Paged, searchable listing of galleries or albums for the page-builder
-	 * picker. Returns picker-card-shaped data:
-	 *
-	 *   {
-	 *     items: [
-	 *       {
-	 *         id,
-	 *         can_edit,          // whether the user can edit it
-	 *         title,
-	 *         item_count,
-	 *         featured_thumb,    // URL or null
-	 *         created_at,        // ISO-8601
-	 *         updated_at,        // ISO-8601
-	 *         layout             // current layout id for visual hint
-	 *       }
-	 *     ],
-	 *     total,
-	 *     has_more
-	 *   }
+	 * Paged, searchable listing of galleries or albums as picker cards.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -331,7 +273,7 @@ final class Preview_Data {
 		$search   = trim( (string) $request->get_param( 'search' ) );
 		$orderby  = (string) $request->get_param( 'orderby' );
 
-		$post_type = 'album' === $type ? 'fotogrids_album' : 'fotogrids_gallery';
+		$post_type = 'album' === $type ? Post_Types::ALBUM : Post_Types::GALLERY;
 
 		$caps       = get_post_type_object( $post_type )->cap ?? null;
 		$all_drafts = $caps && current_user_can( $caps->edit_others_posts );
@@ -400,9 +342,7 @@ final class Preview_Data {
 		}
 
 		/**
-		 * Lets Pro / third parties mutate (or add fields to) a picker item
-		 * before it's returned. Common use: append a Pro Stats "Views"
-		 * column.
+		 * Filters the picker items before they are returned.
 		 *
 		 * @since 1.0.0
 		 * @param array[] $items
@@ -424,10 +364,8 @@ final class Preview_Data {
 	/**
 	 * `POST /import/core-gallery`.
 	 *
-	 * Creates a new `fotogrids_gallery` post from a list of attachment IDs
-	 * and returns the new gallery's id + edit URL. The core gallery → block
-	 * transform calls this; the user is taken to the new gallery's edit
-	 * screen to finish setup.
+	 * Creates a draft `fotogrids_gallery` from attachment IDs and returns its
+	 * id and edit URL.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -457,7 +395,7 @@ final class Preview_Data {
 		$gallery_id = wp_insert_post(
 			array(
 				'post_title'  => sanitize_text_field( $title ),
-				'post_type'   => 'fotogrids_gallery',
+				'post_type'   => Post_Types::GALLERY,
 				'post_status' => 'draft',
 			),
 			true
@@ -547,11 +485,18 @@ final class Preview_Data {
 			? (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id )
 			: array();
 
-		$status = $post ? $post->post_status : 'publish';
+		$status   = $post ? $post->post_status : 'publish';
+		$can_edit = current_user_can( 'edit_post', $album_id );
+
+		if ( ! $can_edit && ! empty( $settings['password_protect'] )
+			&& \FotoGrids\Password_Crypto::is_encrypted( (string) ( $settings['_password_encrypted'] ?? '' ) )
+		) {
+			$thumb = null;
+		}
 
 		return array(
 			'id'             => $album_id,
-			'can_edit'       => current_user_can( 'edit_post', $album_id ),
+			'can_edit'       => $can_edit,
 			'title'          => $post ? html_entity_decode( $post->post_title, ENT_QUOTES, 'UTF-8' ) : '',
 			'status'         => $status,
 			'status_label'   => self::status_label( $status ),
@@ -564,11 +509,7 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Resolve a localized, human-readable label for a post status.
-	 *
-	 * Uses {@see get_post_status_object()} so any registered status -
-	 * including custom ones - gets the registrant's intended label.
-	 * Falls back to the raw slug if WordPress doesn't know the status.
+	 * Resolve a localized label for a post status, falling back to the slug.
 	 *
 	 * @since 1.0.0
 	 * @param string $status Post status slug.
@@ -583,16 +524,13 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Resolve a gallery's thumbnail URL: featured item -> first item ->
-	 * null. One DB query at most, no mosaic fallback.
+	 * Resolve a gallery's medium-size cover URL, or null.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery ID.
 	 * @return string|null
 	 */
 	private static function resolve_gallery_thumb_url( int $gallery_id ): ?string {
-		// Poster-aware cover resolution handles image, video-file, and embed
-		// items uniformly, so embed-only / video-only galleries still preview.
 		if ( class_exists( '\FotoGrids\Galleries\Cover_Resolver' ) ) {
 			$url = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( (int) $gallery_id, 'medium' );
 			if ( '' !== $url ) {
@@ -604,8 +542,8 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Resolve an album's thumbnail URL: featured gallery -> first child
-	 * gallery's featured/first item -> null.
+	 * Resolve an album's thumbnail URL from its first visible child gallery
+	 * that has one, or null.
 	 *
 	 * @since 1.0.0
 	 * @param int $album_id Album ID.
@@ -637,8 +575,7 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Response packaging, factored out so the gallery and album endpoints
-	 * produce the same shape.
+	 * Build the preview response payload for the gallery and album endpoints.
 	 *
 	 * @since 1.0.0
 	 * @param object $render_result Render_Controller render result.
@@ -685,7 +622,7 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Topo-sorted serialisation of enqueued JS handles.
+	 * Serialise enqueued JS handles in dependency order.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, array{src: string, in_footer: bool}> $js_assets

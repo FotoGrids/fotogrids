@@ -19,7 +19,6 @@ class Admin_Init {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_scripts' ) );
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_activation_redirect' ), 1 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
@@ -35,8 +34,11 @@ class Admin_Init {
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-columns.php';
 		\FotoGrids\Admin\Admin_Columns::init();
 
-		add_filter( 'bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'gallery_bulk_actions' ) );
-		add_filter( 'handle_bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'handle_gallery_bulk_actions' ), 10, 3 );
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-body-class.php';
+		\FotoGrids\Admin\Admin_Body_Class::init();
+
+		add_filter( 'bulk_actions-edit-' . Post_Types::GALLERY, array( __CLASS__, 'gallery_bulk_actions' ) );
+		add_filter( 'handle_bulk_actions-edit-' . Post_Types::GALLERY, array( __CLASS__, 'handle_gallery_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( __CLASS__, 'bulk_action_admin_notices' ) );
 		add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_bulk_album_selector_assets' ) );
@@ -112,7 +114,7 @@ class Admin_Init {
 			__( 'Galleries', 'fotogrids' ),
 			__( 'Galleries', 'fotogrids' ),
 			'edit_fotogrids_galleries',
-			'edit.php?post_type=fotogrids_gallery',
+			'edit.php?post_type=' . Post_Types::GALLERY,
 			''
 		);
 
@@ -121,7 +123,7 @@ class Admin_Init {
 			__( 'Albums', 'fotogrids' ),
 			__( 'Albums', 'fotogrids' ),
 			'edit_fotogrids_albums',
-			'edit.php?post_type=fotogrids_album',
+			'edit.php?post_type=' . Post_Types::ALBUM,
 			''
 		);
 
@@ -384,7 +386,7 @@ class Admin_Init {
 
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$subtab    = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
-			$post_type = ( 'album' === $subtab ) ? 'album' : 'gallery';
+			$post_type = ( 'album' === $subtab ) ? Post_Types::ALBUM : Post_Types::GALLERY;
 
 			$localized_data = \FotoGrids\Admin\Settings_Localizer::data_for_collection(
 				array(
@@ -395,76 +397,23 @@ class Admin_Init {
 			);
 
 			wp_localize_script( 'fotogrids-collection-settings', 'fotogridsSettings', $localized_data );
+			wp_localize_script(
+				'fotogrids-collection-settings',
+				'fotogridsDefaultsByKind',
+				\FotoGrids\Admin\Settings_Localizer::defaults_by_kind()
+			);
 		}
 	}
 
 	/**
-	 * Admin initialization
+	 * Register plugin options with the Settings API.
+	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Plugin settings save through REST and AJAX, so no option is registered with the Settings API.
+	 * @return void
 	 */
 	public static function admin_init() {
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_general_settings',
-			array(
-				'type'              => 'array',
-				'default'           => self::get_general_settings_defaults(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_general_settings' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_permission_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_integration_settings',
-			array(
-				'type'              => 'array',
-				'default'           => array(),
-				'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_share_statistics',
-			array(
-				'type'              => 'boolean',
-				'default'           => false,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_share_statistics' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_autosave',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
-			)
-		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_allow_google_fonts',
-			array(
-				'type'              => 'boolean',
-				'default'           => true,
-				'sanitize_callback' => 'rest_sanitize_boolean',
-			)
-		);
-	}
-
-	/**
-	 * Return default values for general settings.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function get_general_settings_defaults() {
-		return \FotoGrids\Settings\Plugin_Settings_Store::general_defaults();
+		_deprecated_function( __METHOD__, '1.3.0' );
 	}
 
 	/**
@@ -519,10 +468,14 @@ class Admin_Init {
 	/**
 	 * Sanitize general settings option.
 	 *
-	 * @param mixed $value Raw option value.
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Use Plugin_Settings_Store::sanitize_general().
+	 * @param  mixed $value Raw option value.
 	 * @return array<string, mixed>
 	 */
 	public static function sanitize_general_settings( $value ) {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::sanitize_general()' );
+
 		return \FotoGrids\Settings\Plugin_Settings_Store::sanitize_general( $value );
 	}
 
@@ -530,15 +483,28 @@ class Admin_Init {
 	 * Generic array-settings sanitizer.
 	 *
 	 * Recursively sanitises an arbitrary settings array: scalar values are
-	 * passed through sanitize_text_field() and nested arrays are walked. Used
-	 * for option groups that do not have a typed per-key sanitizer of
-	 * their own. Non-array input collapses to an empty array.
+	 * passed through sanitize_text_field() and nested arrays are walked.
+	 * Non-array input collapses to an empty array.
 	 *
-	 * @since  1.0.0
-	 * @param  mixed $value Raw option value from options.php.
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 No plugin option is sanitised this way any more.
+	 * @param  mixed $value Raw option value.
 	 * @return array<string, mixed>
 	 */
 	public static function sanitize_settings_array( $value ): array {
+		_deprecated_function( __METHOD__, '1.3.0' );
+
+		return self::sanitize_array_recursive( $value );
+	}
+
+	/**
+	 * Recursively sanitise an arbitrary settings array.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $value Raw value.
+	 * @return array<string, mixed>
+	 */
+	private static function sanitize_array_recursive( $value ): array {
 		if ( ! is_array( $value ) ) {
 			return array();
 		}
@@ -547,7 +513,7 @@ class Admin_Init {
 		foreach ( $value as $key => $item ) {
 			$clean_key = sanitize_key( (string) $key );
 			if ( is_array( $item ) ) {
-				$sanitized[ $clean_key ] = self::sanitize_settings_array( $item );
+				$sanitized[ $clean_key ] = self::sanitize_array_recursive( $item );
 			} elseif ( is_bool( $item ) ) {
 				$sanitized[ $clean_key ] = $item;
 			} elseif ( is_int( $item ) || is_float( $item ) ) {
@@ -564,7 +530,7 @@ class Admin_Init {
 	 * Sanitize a boolean setting submitted via a Toggle component.
 	 *
 	 * @since  1.0.0
-	 * @param  mixed $value Raw option value from options.php.
+	 * @param  mixed $value Raw value.
 	 * @return bool
 	 */
 	private static function sanitize_boolean_setting( $value ): bool {
@@ -574,20 +540,28 @@ class Admin_Init {
 	/**
 	 * Sanitize share statistics setting.
 	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Share usage data is saved by Plugin_Settings_Store::apply_share_statistics_consent().
 	 * @param mixed $value Input value.
 	 * @return bool
 	 */
 	public static function sanitize_share_statistics( $value ): bool {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::apply_share_statistics_consent()' );
+
 		return self::sanitize_boolean_setting( $value );
 	}
 
 	/**
 	 * Sanitize autosave setting.
 	 *
+	 * @since      1.0.0
+	 * @deprecated 1.3.0 Autosave is saved by Plugin_Settings_Store::save_advanced().
 	 * @param mixed $value Input value.
 	 * @return bool
 	 */
 	public static function sanitize_autosave( $value ): bool {
+		_deprecated_function( __METHOD__, '1.3.0', 'FotoGrids\\Settings\\Plugin_Settings_Store::save_advanced()' );
+
 		return self::sanitize_boolean_setting( $value );
 	}
 
@@ -920,7 +894,7 @@ class Admin_Init {
 	private static function get_editable_albums(): array {
 		$albums = get_posts(
 			array(
-				'post_type'   => 'fotogrids_album',
+				'post_type'   => Post_Types::ALBUM,
 				'numberposts' => -1,
 				'post_status' => array( 'publish', 'draft', 'private' ),
 				'orderby'     => 'title',
@@ -983,13 +957,13 @@ class Admin_Init {
 					break;
 				}
 
-				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== 'fotogrids_album' || ! current_user_can( 'edit_post', $album_id ) ) {
+				if ( ! get_post( $album_id ) || get_post_type( $album_id ) !== Post_Types::ALBUM || ! current_user_can( 'edit_post', $album_id ) ) {
 					$redirect_to = add_query_arg( 'bulk_error', 'invalid_album', $redirect_to );
 					break;
 				}
 
 				foreach ( $post_ids as $post_id ) {
-					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
+					if ( get_post_type( $post_id ) === Post_Types::GALLERY ) {
 						$result = current_user_can( 'edit_post', $post_id )
 							&& \FotoGrids\Gallery_Album_Relations::add_gallery_to_album( $post_id, $album_id );
 						if ( $result ) {
@@ -1012,7 +986,7 @@ class Admin_Init {
 
 			case 'remove_from_albums':
 				foreach ( $post_ids as $post_id ) {
-					if ( get_post_type( $post_id ) === 'fotogrids_gallery' ) {
+					if ( get_post_type( $post_id ) === Post_Types::GALLERY ) {
 						$albums        = current_user_can( 'edit_post', $post_id )
 							? \FotoGrids\Gallery_Album_Relations::get_albums_for_gallery( $post_id )
 							: array();
@@ -1055,7 +1029,7 @@ class Admin_Init {
 	public static function bulk_action_admin_notices() {
 		global $post_type, $pagenow;
 
-		if ( 'edit.php' !== $pagenow || 'fotogrids_gallery' !== $post_type ) {
+		if ( 'edit.php' !== $pagenow || Post_Types::GALLERY !== $post_type ) {
 			return;
 		}
 
@@ -1197,7 +1171,7 @@ class Admin_Init {
 	public static function bulk_action_album_selector() {
 		global $post_type;
 
-		if ( 'fotogrids_gallery' !== $post_type ) {
+		if ( Post_Types::GALLERY !== $post_type ) {
 			return;
 		}
 
@@ -1339,7 +1313,7 @@ class Admin_Init {
 		}
 
 		$screen = get_current_screen();
-		if ( ! $screen || 'fotogrids_gallery' !== $screen->post_type ) {
+		if ( ! $screen || Post_Types::GALLERY !== $screen->post_type ) {
 			return;
 		}
 
@@ -1517,13 +1491,13 @@ class Admin_Init {
 	public static function fix_menu_highlighting() {
 		global $parent_file, $submenu_file, $post_type;
 
-		if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( in_array( $post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			$parent_file = 'fotogrids'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 
-			if ( 'fotogrids_gallery' === $post_type ) {
-				$submenu_file = 'edit.php?post_type=fotogrids_gallery'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
-			} elseif ( 'fotogrids_album' === $post_type ) {
-				$submenu_file = 'edit.php?post_type=fotogrids_album'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
+			if ( Post_Types::GALLERY === $post_type ) {
+				$submenu_file = 'edit.php?post_type=' . Post_Types::GALLERY; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
+			} elseif ( Post_Types::ALBUM === $post_type ) {
+				$submenu_file = 'edit.php?post_type=' . Post_Types::ALBUM; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 			}
 		}
 	}

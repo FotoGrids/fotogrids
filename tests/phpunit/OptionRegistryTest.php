@@ -32,7 +32,6 @@ final class OptionRegistryTest extends TestCase {
 	 */
 	private const NAME_SOURCES = array(
 		'/\bsave_bool\(\s*([\'"][^\'"]+[\'"])/',
-		'/\bregister_setting\(\s*[\'"][^\'"]+[\'"],\s*([\'"][^\'"]+[\'"])/',
 		'/\$(?:boolean_settings|string_settings|option_keys|map)\s*=\s*array\((.*?)\);/s',
 	);
 
@@ -88,9 +87,7 @@ final class OptionRegistryTest extends TestCase {
 		$this->assertArrayHasKey( 'fotogrids_watermark_config_hash', $found, 'class constant' );
 		$this->assertArrayHasKey( 'fotogrids_custom_sizes', $found, 'private class constant' );
 		$this->assertArrayHasKey( 'fotogrids_allow_news_updates', $found, 'Plugin_Settings_Store::save_bool()' );
-		$this->assertArrayHasKey( 'fotogrids_general_settings', $found, 'register_setting()' );
 		$this->assertArrayHasKey( 'fotogrids_user_persona', $found, 'AJAX setting allowlist' );
-		$this->assertArrayHasKey( 'fotogrids_album_defaults', $found, 'list read through a variable' );
 		$this->assertGreaterThan( 30, count( $found ) );
 	}
 

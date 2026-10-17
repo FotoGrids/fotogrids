@@ -84,7 +84,10 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-seeder.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-legacy-defaults-option.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/options/class-option-registry.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-collection-defaults-split.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-list-setting-repair.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-entries-endpoint.php';
@@ -150,6 +153,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Settings\Collection_Defaults_Store::init();
 	FotoGrids\Settings\Collection_Defaults_Seeder::init();
 	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
@@ -278,8 +282,7 @@ add_filter(
 		$settings_link = '<a href="' . esc_url(
 			admin_url( 'admin.php?page=fotogrids-settings' )
 		) . '">' . __( 'Settings', 'fotogrids' ) . '</a>';
-		array_unshift( $links, $settings_link );
-		return $links;
+		return array( 'settings' => $settings_link ) + $links;
 	}
 );
 
@@ -298,10 +301,10 @@ add_filter(
 			. __( 'Get FotoGrids Pro', 'fotogrids' ) .
 			'</a>';
 		$new_links = array();
-		foreach ( $links as $link ) {
-			$new_links[] = $link;
-			if ( str_contains( $link, 'deactivate' ) ) {
-				$new_links[] = $pro_link;
+		foreach ( $links as $key => $link ) {
+			$new_links[ $key ] = $link;
+			if ( 'deactivate' === $key ) {
+				$new_links['get-pro'] = $pro_link;
 			}
 		}
 		return $new_links;

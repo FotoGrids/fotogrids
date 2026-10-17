@@ -69,11 +69,11 @@ final class Collection_Save_Pipeline {
 		}
 
 		$post_type = get_post_type( $post_id );
-		if ( ! in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! in_array( $post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return;
 		}
 
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( Post_Types::GALLERY === $post_type ) {
 			self::persist_item_order( (int) $post_id, $_POST );
 		}
 
@@ -85,9 +85,9 @@ final class Collection_Save_Pipeline {
 			return;
 		}
 
-		if ( 'fotogrids_gallery' === $post_type ) {
+		if ( Post_Types::GALLERY === $post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, (int) $post_id );
-		} elseif ( 'fotogrids_album' === $post_type ) {
+		} elseif ( Post_Types::ALBUM === $post_type ) {
 			do_action( Actions_Album::SETTINGS_SAVED, (int) $post_id );
 		}
 	}
@@ -113,7 +113,7 @@ final class Collection_Save_Pipeline {
 		}
 
 		$post = get_post( $post_id );
-		if ( ! $post || ! in_array( $post->post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! $post || ! in_array( $post->post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid collection', 'fotogrids' ) ) );
 		}
 
@@ -154,7 +154,7 @@ final class Collection_Save_Pipeline {
 			}
 		}
 
-		if ( 'fotogrids_gallery' === $post->post_type ) {
+		if ( Post_Types::GALLERY === $post->post_type ) {
 			self::persist_item_order( $post_id, $_POST );
 		}
 
@@ -164,13 +164,13 @@ final class Collection_Save_Pipeline {
 
 		$gated_result = self::persist_settings_with_gate( (int) $post_id, $_POST );
 
-		if ( 'fotogrids_gallery' === $post->post_type ) {
+		if ( Post_Types::GALLERY === $post->post_type ) {
 			do_action( Actions_Gallery::SETTINGS_SAVED, $post_id );
 		} elseif ( 'fotogrids_album' === $post->post_type ) {
 			do_action( Actions_Album::SETTINGS_SAVED, $post_id );
 		}
 
-		$collection_type = 'fotogrids_album' === $post->post_type
+		$collection_type = Post_Types::ALBUM === $post->post_type
 			? __( 'Album', 'fotogrids' )
 			: __( 'Gallery', 'fotogrids' );
 
@@ -313,7 +313,7 @@ final class Collection_Save_Pipeline {
 		// value (settings, not content). If the user lacks the per-CPT
 		// settings cap, drop them all and report the skipped keys (Option A
 		// behaviour - silent skip, surfaced to caller).
-		$post_type    = get_post_type( $post_id ) ?: 'fotogrids_gallery';
+		$post_type    = get_post_type( $post_id ) ?: Post_Types::GALLERY;
 		$settings_cap = Permission_Gate::settings_cap_for( $post_type );
 		$skipped      = array();
 		if ( null !== $settings_cap && ! Permission_Check::can( $settings_cap, $post_id ) && ! empty( $incoming ) ) {

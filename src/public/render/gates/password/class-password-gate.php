@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Gates\Password;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Gate;
 use FotoGrids\Render\Api\Gate_Card;
 use FotoGrids\Render\Api\Gate_Renderer;
@@ -17,33 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Password Gate
- *
- * Intercepts the render pipeline when a gallery is password-protected and the
- * visitor has not yet unlocked it. Returns a ghost-grid placeholder with a
- * centred password form overlay instead of the real gallery HTML.
- *
- * Rendering is delegated to Gate_Renderer, which owns the shared ghost-grid /
- * overlay / card-chrome template. This gate supplies the password form as the
- * Gate_Card body, plus its own CSS for form-specific styles.
- *
- * Unlock cookie
- * -------------
- * A successful unlock via POST /gallery/{id}/unlock sets an httpOnly cookie
- * named fotogrids_unlocked_{gallery_id}. This gate checks that cookie on every
- * render; if it is present and its HMAC matches the stored ciphertext, the gate
- * passes without any extra DB query.
- *
- * When the gallery does not remember visitors, no cookie is set. The unlock
- * response carries a short-lived token instead, which the page sends back in
- * the X-FotoGrids-Unlock header on its own follow-up requests.
- *
- * Preview bypass
- * --------------
- * The gate never blocks admin previews ($render_context->meta->is_preview)
- * unless the settings carry PREVIEW_KEEPS_GATE.
- * The simulate_state='password_required' query parameter causes the gate to
- * render the lock screen even in preview mode (for design/QA purposes).
+ * Shows a password form in place of a protected gallery or album.
  *
  * @package FotoGrids\Render\Gates\Password
  * @since   1.0.0
@@ -70,10 +45,8 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Returns true when password protection is active for this gallery.
-	 *
-	 * Skips preview renders unless the simulate_state override is set, so
-	 * admins always see their galleries while editing.
+	 * Whether the collection is protected. Previews pass unless simulated or
+	 * PREVIEW_KEEPS_GATE is set.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
@@ -82,19 +55,15 @@ final class Password_Gate implements Gate {
 	public function supports( Render_Context $render_context ): bool {
 		$settings = $render_context->settings;
 
-		// Allow simulate_state='password_required' to force the lock screen in
-		// preview mode for design/QA purposes.
 		$simulate = (string) ( $settings['_simulate_state'] ?? '' );
 		if ( 'password_required' === $simulate ) {
 			return true;
 		}
 
-		// Never block admin previews unless explicitly simulated (above).
 		if ( $render_context->meta->is_preview && empty( $settings[ self::PREVIEW_KEEPS_GATE ] ) ) {
 			return false;
 		}
 
-		// Requires the toggle to be on AND an actual password to be stored.
 		$protect   = ! empty( $settings['password_protect'] );
 		$has_crypt = \FotoGrids\Password_Crypto::is_encrypted(
 			(string) ( $settings['_password_encrypted'] ?? '' )
@@ -104,30 +73,26 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Evaluates whether the current visitor has unlocked this gallery.
-	 *
-	 * Passes on a valid unlock cookie or a valid X-FotoGrids-Unlock token, both
-	 * issued by POST /gallery/{id}/unlock. Otherwise returns the lock screen.
+	 * Passes on a valid unlock cookie or token; otherwise returns the lock screen.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
 	 * @return Gate_Result
 	 */
 	public function evaluate( Render_Context $render_context ): Gate_Result {
-		$gallery_id = $render_context->meta->gallery_id;
-		$settings   = $render_context->settings;
-		$simulate   = (string) ( $settings['_simulate_state'] ?? '' );
+		$collection_id = self::collection_id( $render_context );
+		$settings      = $render_context->settings;
+		$simulate      = (string) ( $settings['_simulate_state'] ?? '' );
 
-		// Simulated lock - always show the lock screen, skip cookie check.
 		if ( 'password_required' !== $simulate ) {
 			$stored     = (string) ( $settings['_password_encrypted'] ?? '' );
-			$cookie_key = 'fotogrids_unlocked_' . $gallery_id;
+			$cookie_key = 'fotogrids_unlocked_' . $collection_id;
 			$cookie_val = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_key ] ?? '' ) );
 
 			if (
 				'' !== $cookie_val
 				&& hash_equals(
-					Gallery_Data::make_unlock_cookie_value( $gallery_id, $stored ),
+					Gallery_Data::make_unlock_cookie_value( $collection_id, $stored ),
 					$cookie_val
 				)
 			) {
@@ -135,7 +100,7 @@ final class Password_Gate implements Gate {
 			}
 
 			$token = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FOTOGRIDS_UNLOCK'] ?? '' ) );
-			if ( '' !== $token && Gallery_Data::verify_unlock_token( $gallery_id, $stored, $token ) ) {
+			if ( '' !== $token && Gallery_Data::verify_unlock_token( $collection_id, $stored, $token ) ) {
 				return Gate_Result::pass();
 			}
 		}
@@ -148,7 +113,7 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * CSS assets: shared gate chrome + password-specific form styles.
+	 * Returns the gate's styles and the lock form script.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
@@ -175,21 +140,30 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Builds the lock screen HTML via Gate_Renderer.
+	 * Builds the lock screen HTML.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
 	 * @return string
 	 */
 	private function render_lock_screen( Render_Context $render_context ): string {
-		$gallery_id = $render_context->meta->gallery_id;
-		$rest_url   = esc_url( rest_url( 'fotogrids/v1/gallery/' . $gallery_id . '/unlock' ) );
-		$nonce      = esc_attr( wp_create_nonce( 'wp_rest' ) );
+		$is_album      = Collection_Kind::ALBUM === $render_context->meta->collection_kind;
+		$collection_id = self::collection_id( $render_context );
+		$route         = ( $is_album ? 'album/' : 'gallery/' ) . $collection_id . '/unlock';
+		$rest_url      = esc_url( rest_url( 'fotogrids/v1/' . $route ) );
+		$nonce         = esc_attr( wp_create_nonce( 'wp_rest' ) );
 
-		/* translators: heading shown on the gallery password lock screen */
-		$title = esc_html__( 'Gallery Protected', 'fotogrids' );
-		/* translators: instruction text shown below the lock screen heading */
-		$description = esc_html__( 'Enter the password to view this gallery.', 'fotogrids' );
+		if ( $is_album ) {
+			/* translators: heading shown on the album password lock screen */
+			$title = esc_html__( 'Album Protected', 'fotogrids' );
+			/* translators: instruction text shown below the album lock screen heading */
+			$description = esc_html__( 'Enter the password to view this album.', 'fotogrids' );
+		} else {
+			/* translators: heading shown on the gallery password lock screen */
+			$title = esc_html__( 'Gallery Protected', 'fotogrids' );
+			/* translators: instruction text shown below the lock screen heading */
+			$description = esc_html__( 'Enter the password to view this gallery.', 'fotogrids' );
+		}
 		/* translators: placeholder text inside the password input on the lock screen */
 		$placeholder = esc_attr__( 'Password', 'fotogrids' );
 		/* translators: label/text for the submit button on the gallery lock screen */
@@ -197,20 +171,16 @@ final class Password_Gate implements Gate {
 		/* translators: error shown when the visitor enters an incorrect gallery password */
 		$error_text = esc_html__( 'Incorrect password. Please try again.', 'fotogrids' );
 
-		// Per-gallery credential identity. Browsers key saved passwords on
-		// (username + origin), so a hidden username field carrying a stable
-		// per-gallery token makes the browser store and autofill the password
-		// for THIS gallery specifically rather than offering one site-wide
-		// credential on every lock screen. It is visually hidden (not
-		// type="hidden") because credential managers ignore type="hidden"
-		// fields - they need a real, autocomplete="username" input in the form.
-		$credential_user = esc_attr( 'fotogrids-gallery-' . $gallery_id );
+		// Per-collection username for password managers, which ignore type="hidden".
+		$credential_user = esc_attr( ( $is_album ? 'fotogrids-album-' : 'fotogrids-gallery-' ) . $collection_id );
+		$id_attribute    = $is_album ? 'data-album-id' : 'data-gallery-id';
+		$embed_atts      = self::embed_atts_html( $render_context );
 
 		$body_html = sprintf(
 			'<form class="fg-lock-form" method="post"'
-			. ' data-gallery-id="%1$d"'
+			. ' %8$s="%1$d"'
 			. ' data-unlock-url="%2$s"'
-			. ' data-nonce="%3$s">'
+			. ' data-nonce="%3$s"%9$s>'
 			. '<input class="fg-lock-user" type="text" name="fg_gallery_user"'
 			. ' value="%7$s" autocomplete="username" readonly tabindex="-1"'
 			. ' aria-hidden="true" />'
@@ -220,13 +190,15 @@ final class Password_Gate implements Gate {
 			. '</div>'
 			. '<p class="fg-lock-error" role="alert">%6$s</p>'
 			. '</form>',
-			$gallery_id,
+			$collection_id,
 			$rest_url,
 			$nonce,
 			$placeholder,
 			$submit_label,
 			$error_text,
-			$credential_user
+			$credential_user,
+			$id_attribute,
+			$embed_atts
 		);
 
 		$card = new Gate_Card(
@@ -241,10 +213,46 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Returns a self-contained SVG lock icon (no external dependency).
+	 * Builds the lock form attributes that carry embed attributes to the unlock request.
 	 *
-	 * Uses the Heroicons "lock-closed" outline path - MIT licensed, inline so
-	 * no extra HTTP request is needed.
+	 * @since  1.3.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	private static function embed_atts_html( Render_Context $render_context ): string {
+		$embed_atts = $render_context->settings['_embed_atts'] ?? array();
+		if ( ! is_array( $embed_atts ) ) {
+			return '';
+		}
+
+		$html = '';
+		if ( ! empty( $embed_atts['cols'] ) ) {
+			$html .= ' data-fg-embed-cols="' . absint( $embed_atts['cols'] ) . '"';
+		}
+		if ( ! empty( $embed_atts['template'] ) && is_string( $embed_atts['template'] ) ) {
+			$html .= ' data-fg-embed-template="' . esc_attr( $embed_atts['template'] ) . '"';
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Returns the ID of the gallery or album being rendered.
+	 *
+	 * @since  1.3.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return int
+	 */
+	private static function collection_id( Render_Context $render_context ): int {
+		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
+			return (int) $render_context->meta->album_id;
+		}
+
+		return $render_context->meta->gallery_id;
+	}
+
+	/**
+	 * Returns the inline lock icon (Heroicons "lock-closed", MIT).
 	 *
 	 * @since  1.0.0
 	 * @return string

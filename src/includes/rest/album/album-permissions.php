@@ -2,6 +2,7 @@
 namespace FotoGrids\REST\Album;
 
 use FotoGrids\Albums\Album_Repository;
+use FotoGrids\Post_Types;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Render_Controller;
 
@@ -10,35 +11,39 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Album Permissions Handler
- *
- * Handles permission checks for album-related REST API endpoints.
+ * Permission checks for the album REST API endpoints.
  *
  * @since 1.0.0
  */
 class Album_Permissions {
 
 	/**
-	 * Permission check for reading albums
-	 *
-	 * Determines if the current user has permission to read album data.
-	 * Currently allows public access for all published albums.
+	 * Permission check for reading an album; always allows.
 	 *
 	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return bool True if access is allowed, false otherwise
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return bool Always true.
 	 */
 	public static function check_album_read( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return true;
 	}
 
 	/**
+	 * Permission check for unlocking a password-protected album.
+	 *
+	 * @since 1.3.0
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return bool Always true.
+	 */
+	public static function check_album_unlock( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return true;
+	}
+
+	/**
 	 * Permission check for the album list endpoint.
 	 *
-	 * The list includes draft and private albums of every author, so it is
-	 * restricted to FotoGrids managers. Public surfaces render specific
-	 * published albums through the shortcode, which uses the publish-guarded
-	 * read path.
+	 * Requires manage_fotogrids: the list includes every author's draft and
+	 * private albums.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request The REST API request object.
@@ -49,9 +54,8 @@ class Album_Permissions {
 	}
 
 	/**
-	 * Permission check for writing an album's featured gallery.
-	 *
-	 * Mirrors WP's `edit_post` cap for the specific album ID.
+	 * Permission check for writing an album's featured gallery; requires
+	 * `edit_post` on the album.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -79,8 +83,8 @@ class Album_Permissions {
 	/**
 	 * Decides whether the current visitor may see an album and its galleries.
 	 *
-	 * The album must be published, and every gate that would run on its
-	 * public render must pass.
+	 * The album must be published and pass its public-render gates. Gated
+	 * albums are sent with Cache-Control: no-store.
 	 *
 	 * @since 1.3.0
 	 * @param int $album_id Album post ID.
@@ -88,7 +92,7 @@ class Album_Permissions {
 	 */
 	public static function authorize_album_view( int $album_id ) {
 		$album = $album_id > 0 ? get_post( $album_id ) : null;
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return new \WP_Error(
 				'album_not_found',
 				__( 'Album not found', 'fotogrids' ),
@@ -105,6 +109,10 @@ class Album_Permissions {
 		}
 
 		$context = Context_Builder::for_public()->build_for_album( $album_id, Album_Repository::get_settings( $album_id ) );
+		if ( Render_Controller::has_active_gates( $context ) && ! headers_sent() ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+		}
+
 		if ( ! Render_Controller::evaluate_gates( $context )->passed ) {
 			return new \WP_Error(
 				'fotogrids_album_locked',

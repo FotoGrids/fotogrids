@@ -412,7 +412,40 @@ class Register_Admin_Routes {
 			)
 		);
 
-		// Collection defaults: GET / POST /admin/gallery-defaults
+		// Collection defaults, one map per collection type: GET / POST /admin/collection-defaults
+		$collection_type_arg = array(
+			'type'     => 'string',
+			'enum'     => \FotoGrids\Settings\Collection_Defaults_Store::TYPES,
+			'required' => true,
+		);
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/collection-defaults',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_collection_defaults' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+					'args'                => array(
+						'type' => $collection_type_arg,
+					),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_collection_defaults' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+					'args'                => array(
+						'type'     => $collection_type_arg,
+						'defaults' => array(
+							'type'     => 'object',
+							'required' => true,
+						),
+					),
+				),
+			)
+		);
+
+		// Deprecated since 1.3.0 - the gallery entry of /admin/collection-defaults.
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/gallery-defaults',

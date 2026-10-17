@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Admin;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -50,10 +52,10 @@ final class Admin_Screen {
 	 * @var string[]
 	 */
 	private const POST_SCREEN_IDS = array(
-		'edit-fotogrids_gallery',
-		'fotogrids_gallery',
-		'edit-fotogrids_album',
-		'fotogrids_album',
+		'edit-' . Post_Types::GALLERY,
+		Post_Types::GALLERY,
+		'edit-' . Post_Types::ALBUM,
+		Post_Types::ALBUM,
 	);
 
 	/**
@@ -61,7 +63,7 @@ final class Admin_Screen {
 	 *
 	 * @var string[]
 	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	private const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * The screen-hook allowlist, filtered through

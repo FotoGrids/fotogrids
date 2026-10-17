@@ -62,11 +62,13 @@ class Save_Item_Data {
 		$description = sanitize_textarea_field( $request->get_param( 'description' ) ?? '' );
 
 		$post_result = wp_update_post(
-			array(
-				'ID'           => $item_id,
-				'post_title'   => $title,
-				'post_excerpt' => $caption,
-				'post_content' => $description,
+			wp_slash(
+				array(
+					'ID'           => $item_id,
+					'post_title'   => $title,
+					'post_excerpt' => $caption,
+					'post_content' => $description,
+				)
 			),
 			true
 		);
@@ -79,7 +81,7 @@ class Save_Item_Data {
 			);
 		}
 
-		update_post_meta( $item_id, '_wp_attachment_image_alt', $alt );
+		update_post_meta( $item_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
 
 		// ── fotogrids_item_meta row ──────────────────────────────────────────
 		$credit       = sanitize_text_field( $request->get_param( 'credit' ) ?? '' );
@@ -131,46 +133,18 @@ class Save_Item_Data {
 			'errors'    => array(),
 		);
 
-		// Tags - FE sends integer IDs.
-		foreach ( $tags as $tag_data ) {
-			if ( is_int( $tag_data ) || ( is_numeric( $tag_data ) && (float) intval( $tag_data ) === (float) $tag_data ) ) {
-				$tag_id = (int) $tag_data;
-				$result = \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, $tag_id );
-				if ( $result ) {
-					$meta_results['tags'][] = array( 'id' => $tag_id );
-				} else {
-					$meta_results['errors'][] = sprintf(
-						/* translators: 1: tag ID, 2: item ID. */
-						__( 'Failed to link tag ID %1$d to item %2$d', 'fotogrids' ),
-						$tag_id,
-						$item_id
-					);
-				}
+		// Tags - the route schema accepts integer IDs only.
+		foreach ( $tags as $tag_id ) {
+			$tag_id = (int) $tag_id;
+			if ( \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, $tag_id ) ) {
+				$meta_results['tags'][] = array( 'id' => $tag_id );
 			} else {
-				// Fallback: name string (backwards compat).
-				$tag_name = is_string( $tag_data ) ? trim( $tag_data ) : ( isset( $tag_data['name'] ) ? trim( $tag_data['name'] ) : '' );
-				if ( empty( $tag_name ) ) {
-					continue;
-				}
-				$tag = Metadata_Data::resolve_entry(
-					'tag',
-					$tag_name,
-					function () use ( $tag_name ) {
-						return \FotoGrids\Metadata_Manager::add_or_get_tag( $tag_name );
-					}
+				$meta_results['errors'][] = sprintf(
+					/* translators: 1: tag ID, 2: item ID. */
+					__( 'Failed to link tag ID %1$d to item %2$d', 'fotogrids' ),
+					$tag_id,
+					$item_id
 				);
-				if ( is_wp_error( $tag ) ) {
-					$meta_results['errors'][] = $tag->get_error_message();
-				} elseif ( $tag && \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, (int) $tag->id ) ) {
-					$meta_results['tags'][] = array( 'name' => $tag_name );
-				} else {
-					$meta_results['errors'][] = sprintf(
-						/* translators: 1: tag name, 2: item ID. */
-						__( 'Failed to add tag: %1$s to item %2$d', 'fotogrids' ),
-						$tag_name,
-						$item_id
-					);
-				}
 			}
 		}
 

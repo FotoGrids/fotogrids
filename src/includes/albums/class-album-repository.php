@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Albums;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -18,9 +19,6 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Reads albums and their resolved settings.
- *
- * Validates the post-type guard so callers never have to repeat the
- * `$post->post_type === 'fotogrids_album'` check.
  *
  * @since 1.0.0
  */
@@ -36,7 +34,7 @@ final class Album_Repository {
 	public static function get( int $album_id ): ?\WP_Post {
 		$album = get_post( $album_id );
 
-		if ( ! $album || 'fotogrids_album' !== $album->post_type ) {
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
 			return null;
 		}
 
@@ -46,9 +44,8 @@ final class Album_Repository {
 	/**
 	 * Get an album's resolved settings (defaults merged with saved post meta).
 	 *
-	 * Each per-setting post-meta value is read by key
-	 * (`fotogrids_<setting_key>`). Strings that decode as JSON arrays are
-	 * merged into the default; everything else replaces the default.
+	 * Saved `fotogrids_<key>` meta replaces each default; JSON arrays merge into
+	 * associative-array defaults. Adds `_password_encrypted` and blanks `password`.
 	 *
 	 * @since 1.0.0
 	 * @param int $album_id Album post ID.
@@ -78,6 +75,9 @@ final class Album_Repository {
 				$settings[ $key ] = $saved_value;
 			}
 		}
+
+		$settings['_password_encrypted'] = (string) get_post_meta( $album_id, 'fotogrids_password', true );
+		$settings['password']            = '';
 
 		return $settings;
 	}

@@ -11,6 +11,7 @@ namespace FotoGrids\Modules\ViewCollections;
 
 use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -47,7 +48,7 @@ class Integrated_Renderer {
 	 *
 	 * @var string[]
 	 */
-	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
+	private const POST_TYPES = Post_Types::COLLECTION_TYPES;
 
 	/**
 	 * Per-request cache: posts whose assets are already enqueued.
@@ -77,6 +78,8 @@ class Integrated_Renderer {
 		// Comments support is added on `init` priority 20, after
 		// Post_Types::register_cpts runs at 11.
 		add_action( 'init', array( __CLASS__, 'register_cpt_support' ), 20 );
+
+		add_filter( 'the_posts', array( __CLASS__, 'keep_first_singular_match' ), 10, 2 );
 
 		// Singular-request hooks. All gated on `should_run()`, which checks
 		// both layout_mode and is_singular(CPTs).
@@ -188,6 +191,31 @@ class Integrated_Renderer {
 		foreach ( self::POST_TYPES as $type ) {
 			add_post_type_support( $type, 'comments' );
 		}
+	}
+
+	/**
+	 * Keep only the first post when a view page's slug matches several.
+	 *
+	 * Collections created at the same moment can share a slug. The first match
+	 * is the queried object, so trimming to it keeps the theme's loop - and
+	 * with it inject_gallery() - on the collection the head meta describes.
+	 *
+	 * @since 1.3.0
+	 * @param \WP_Post[] $posts Posts the query found.
+	 * @param \WP_Query  $query The query.
+	 * @return \WP_Post[]
+	 */
+	public static function keep_first_singular_match( array $posts, \WP_Query $query ): array {
+		if (
+			count( $posts ) < 2
+			|| ! $query->is_main_query()
+			|| ! $query->is_singular()
+			|| ! in_array( get_post_type( $posts[0] ), self::POST_TYPES, true )
+		) {
+			return $posts;
+		}
+
+		return array( $posts[0] );
 	}
 
 	/**
@@ -363,7 +391,7 @@ class Integrated_Renderer {
 
 		$classes[] = 'fotogrids-view';
 		$classes[] = 'fotogrids-view--integrated';
-		$classes[] = 'fotogrids-view--' . ( 'fotogrids_album' === $post->post_type ? 'album' : 'gallery' );
+		$classes[] = 'fotogrids-view--' . ( Post_Types::ALBUM === $post->post_type ? 'album' : 'gallery' );
 
 		/**
 		 * Filter the integrated-mode body classes.

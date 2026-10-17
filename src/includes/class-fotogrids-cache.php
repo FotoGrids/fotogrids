@@ -8,6 +8,7 @@ use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Hooks\Actions_Item;
+use FotoGrids\Hooks\Actions_Library;
 use FotoGrids\Hooks\Actions_Maintenance;
 use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Galleries\Gallery_Repository;
@@ -81,11 +82,14 @@ class FotoGrids_Cache {
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::IMPORTED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
-		add_action( 'save_post_fotogrids_gallery', array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( 'save_post_' . Post_Types::GALLERY, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Album::GALLERY_ADDED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Album::GALLERY_REMOVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Album::SETTINGS_SAVED, array( __CLASS__, 'on_album_mutation' ), 10, 1 );
-		add_action( 'save_post_fotogrids_album', array( __CLASS__, 'on_album_mutation' ), 10, 1 );
+		add_action( 'save_post_' . Post_Types::ALBUM, array( __CLASS__, 'on_album_mutation' ), 10, 1 );
+		add_action( Actions_Library::UPDATED, array( __CLASS__, 'flush_all' ), 10, 0 );
+		add_action( Actions_Library::DELETED, array( __CLASS__, 'flush_all' ), 10, 0 );
+		add_action( Actions_Library::MERGED, array( __CLASS__, 'flush_all' ), 10, 0 );
 		add_action( Actions_Maintenance::OPTIONS_RESET, array( __CLASS__, 'flush_all' ), 10, 0 );
 
 		add_action( 'init', array( __CLASS__, 'init_purge_schedule' ) );

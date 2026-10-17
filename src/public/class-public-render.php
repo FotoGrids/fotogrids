@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
+use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Instance_Id_Factory;
@@ -19,18 +20,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Public Render Class
- *
- * Handles frontend rendering for FotoGrids
+ * Renders galleries and albums on the front end.
  */
 class Public_Render {
 
 	/**
-	 * Thread-local flag: when true, every gallery/album shortcode call made
-	 * during this request lands in Render_Meta with `view_page=true`.
-	 * Set by ViewCollections\Renderer::gallery_html() around its call to
-	 * gallery_shortcode() / album_shortcode() so the Collection_Header
-	 * feature can gate its "view_pages" placement.
+	 * Whether gallery renders in this request get `view_page=true` in Render_Meta.
 	 *
 	 * @var bool
 	 * @since 1.0.0
@@ -38,11 +33,7 @@ class Public_Render {
 	private static bool $view_page_context = false;
 
 	/**
-	 * Toggle the view-page context flag. ViewCollections wraps its
-	 * shortcode call in `set_view_page_context(true)` … `set_view_page_context(false)`
-	 * so a single page render can have view-page chrome on the gallery and
-	 * still rely on plain `gallery_shortcode()` for normal embeds (which
-	 * stay context-free).
+	 * Sets the view-page context flag. Callers must reset it to false after rendering.
 	 *
 	 * @since 1.0.0
 	 * @param bool $is_view_page
@@ -53,6 +44,8 @@ class Public_Render {
 	}
 
 	/**
+	 * Returns the view-page context flag.
+	 *
 	 * @since 1.0.0
 	 * @return bool
 	 */
@@ -61,7 +54,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Initialize the public rendering
+	 * Registers the shortcodes and front-end hooks.
 	 */
 	public static function init() {
 		add_shortcode( 'fotogrids_gallery', array( __CLASS__, 'gallery_shortcode' ) );
@@ -105,7 +98,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Get gallery settings with defaults
+	 * Returns gallery settings merged with defaults.
 	 *
 	 * @param int $gallery_id Gallery ID
 	 * @return array Gallery settings
@@ -115,7 +108,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Opt the current page out of host, page-builder and CDN caching when the
+	 * Opts the current page out of page caching when the
 	 * fotogrids/cache/bypass_page_cache filter asks for it.
 	 *
 	 * @since  1.0.0
@@ -130,6 +123,16 @@ class Public_Render {
 			return;
 		}
 
+		self::send_no_cache_headers();
+	}
+
+	/**
+	 * Opts the current page out of host, page-builder and CDN caching.
+	 *
+	 * @since  1.3.0
+	 * @return void
+	 */
+	private static function send_no_cache_headers(): void {
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- De-facto constant read by host and plugin page caches; the name is fixed, not plugin-owned.
 		}
@@ -140,11 +143,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Re-enqueue the CSS and JS assets that were collected during the original render.
-	 *
-	 * On a cache hit the render pipeline never runs, so Asset_Resolver never
-	 * collects module assets. This method replays both stored maps directly,
-	 * mirroring Asset_Resolver::flush() for both sides.
+	 * Re-enqueues the CSS and JS assets stored with a cache entry.
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, string>                             $css Handle → URL map.
@@ -180,14 +179,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Re-emit the per-render inline CSS, inline JS and JSON-LD stored with a
-	 * cache entry.
-	 *
-	 * Routed through Inline_Asset_Emitter rather than printed here so the
-	 * late-print behaviour (wp_head already fired) and the
-	 * fotogrids/render/should_inline_assets filter behave identically on a
-	 * cache hit and a cache miss. The emitter self-gates on REST/AJAX, so this
-	 * is a no-op there.
+	 * Re-emits the inline CSS, inline JS and JSON-LD stored with a cache entry.
 	 *
 	 * @since  1.0.0
 	 * @param  array{inline_css: string, inline_js: string, json_ld: string} $cached Decoded cache entry.
@@ -208,7 +200,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Render one gallery through the render controller pipeline.
+	 * Renders one gallery through the render controller pipeline.
 	 *
 	 * @param int   $gallery_id Gallery ID.
 	 * @param array $settings Gallery settings.
@@ -237,6 +229,17 @@ class Public_Render {
 			}
 		}
 
+		$embed_atts = array();
+		if ( isset( $settings_overlay['layout'] ) && self::is_layout_key( $settings_overlay['layout'] ) ) {
+			$embed_atts['template'] = $settings_overlay['layout'];
+		}
+		if ( isset( $settings_overlay['columns'] ) ) {
+			$embed_atts['cols'] = $settings_overlay['columns']['desktop'];
+		}
+		if ( ! empty( $embed_atts ) ) {
+			$settings_overlay['_embed_atts'] = $embed_atts;
+		}
+
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
 
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
@@ -253,9 +256,6 @@ class Public_Render {
 		} else {
 			$render_settings          = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
 			$effective_meta_overrides = is_array( $meta_overrides ) ? $meta_overrides : array();
-			// Promote the request-scoped view-page flag into the per-render
-			// meta overrides so downstream features (Collection_Header) can
-			// gate behaviour on it. Caller-supplied overrides win.
 			if ( self::is_view_page_context() && ! array_key_exists( 'view_page', $effective_meta_overrides ) ) {
 				$effective_meta_overrides['view_page'] = true;
 			}
@@ -273,9 +273,7 @@ class Public_Render {
 		self::$last_render_meta   = $render_context->meta;
 		self::$last_render_result = $render_result;
 
-		// Direct page renders enqueue their per-render inline CSS/JS; REST/AJAX
-		// and preview renders skip this (the emitter self-gates on the request
-		// context) and expose the assets via last_render_result() instead.
+		// Preview renders expose inline assets via last_render_result() instead.
 		if ( ! $is_preview ) {
 			Inline_Asset_Emitter::enqueue( $render_result );
 		}
@@ -284,10 +282,29 @@ class Public_Render {
 	}
 
 	/**
-	 * Holds the Render_Meta of the most recent render_gallery_with_pipeline()
-	 * call within this request. REST handlers read it to surface
-	 * pagination metadata (snap-aware page size and total page count)
-	 * that Context_Builder resolved during the render.
+	 * Returns whether a value is the key of a registered layout.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $layout_key Value to check.
+	 * @return bool
+	 */
+	public static function is_layout_key( $layout_key ): bool {
+		if ( ! is_string( $layout_key ) || '' === $layout_key ) {
+			return false;
+		}
+
+		foreach ( \FotoGrids\Render\Internal\Module_Registry::all_modules( 'layouts' ) as $layout_class ) {
+			$layout = new $layout_class();
+			if ( $layout->layout_key() === $layout_key ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Render_Meta of the most recent gallery render in this request.
 	 *
 	 * @since 1.0.0
 	 * @var \FotoGrids\Render\Api\Render_Meta|null
@@ -295,9 +312,7 @@ class Public_Render {
 	private static ?\FotoGrids\Render\Api\Render_Meta $last_render_meta = null;
 
 	/**
-	 * Holds the full Render_Result of the most recent render in this request.
-	 * REST/AJAX handlers read it to return the per-render inline CSS/JS/JSON-LD
-	 * for the client to inject.
+	 * Render_Result of the most recent render in this request.
 	 *
 	 * @since 1.0.0
 	 * @var Render_Result|null
@@ -305,8 +320,7 @@ class Public_Render {
 	private static ?Render_Result $last_render_result = null;
 
 	/**
-	 * Returns the Render_Meta from the most recent gallery render in this
-	 * request, or null when no render has run yet.
+	 * Returns the Render_Meta of the most recent gallery render, or null.
 	 *
 	 * @since  1.0.0
 	 */
@@ -315,8 +329,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Returns the full Render_Result from the most recent gallery render in this
-	 * request, or null when no render has run yet.
+	 * Returns the Render_Result of the most recent render, or null.
 	 *
 	 * @since  1.0.0
 	 */
@@ -325,25 +338,16 @@ class Public_Render {
 	}
 
 	/**
-	 * REST entry point for rendering a gallery with pagination + partial
-	 * options.
+	 * Renders a published gallery for the /fotogrids/v1/gallery/render endpoint.
 	 *
-	 * Used by the /fotogrids/v1/gallery/render REST endpoint. Unlike the
-	 * shortcode path, this bypasses caching (per-(gallery, page, breakpoint)
-	 * cache keys are a v2 concern - see PLAN.md §8.5) and never re-enters
-	 * the shortcode atts parser. Returns the raw rendered HTML - the REST
-	 * handler still owns the CSS-handle map and the pagination metadata
-	 * envelope.
+	 * Bypasses the render cache.
 	 *
 	 * @since 1.0.0
 	 * @param int                            $gallery_id     Gallery ID.
 	 * @param array<string, mixed>           $meta_overrides Optional Render_Meta overrides:
 	 *                                                       requested_page, requested_per_page,
 	 *                                                       breakpoint, partial.
-	 * @param value-of<Request_Source::ALL>  $source         Request source (defaults to
-	 *                                                       ALBUM_AJAX because the existing
-	 *                                                       /gallery/render callers use it that
-	 *                                                       way; the REST handler can override).
+	 * @param value-of<Request_Source::ALL>  $source         Request source.
 	 * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
 	 */
 	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), string $source = Request_Source::ALBUM_AJAX ): string {
@@ -358,8 +362,6 @@ class Public_Render {
 			return '';
 		}
 
-		// Synthetic atts mirroring what the shortcode produces - the
-		// pipeline reads a small subset and the rest are inert.
 		$atts = array(
 			'id'       => $gallery_id,
 			'album_id' => 0,
@@ -379,7 +381,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Gallery shortcode handler
+	 * Handles the [fotogrids_gallery] shortcode.
 	 *
 	 * @param array $atts Shortcode attributes
 	 * @return string Rendered gallery HTML
@@ -402,17 +404,16 @@ class Public_Render {
 				'id'                => 0,
 				'template'          => '',
 				'cols'              => 0,
-				'template_preview'  => 'false', // Template preview mode
-				'template_settings' => '', // JSON-encoded template settings
-				'template_items'    => '', // JSON-encoded template items
-				'album_id'          => 0, // Album ID if gallery is accessed from album context
-				'_source'           => '', // Internal source discriminator
+				'template_preview'  => 'false',
+				'template_settings' => '', // JSON.
+				'template_items'    => '', // JSON.
+				'album_id'          => 0,
+				'_source'           => '', // Internal Request_Source value.
 			),
 			$atts,
 			'fotogrids_gallery'
 		);
 
-		// Template preview mode - use provided settings and items
 		if ( 'true' === $atts['template_preview'] ) {
 			$settings = array();
 			if ( ! empty( $atts['template_settings'] ) ) {
@@ -526,21 +527,21 @@ class Public_Render {
 		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
 		$fonts = Font_Resolver::instance()->end_capture();
 
-		if ( null !== $cache_key ) {
+		$rendered = self::$last_render_result;
+		if ( null !== $cache_key && null !== $rendered && $rendered->http_status < 400 ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
 			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 			$css      = $resolver->get_css_asset_urls();
 			$js       = $resolver->get_js_asset_data();
-			$rendered = self::$last_render_result;
 			\FotoGrids\FotoGrids_Cache::put(
 				$gallery_id,
 				$cache_key,
 				$html,
 				$css,
 				$js,
-				null !== $rendered ? $rendered->inline_css : '',
-				null !== $rendered ? $rendered->inline_js : '',
-				null !== $rendered ? $rendered->json_ld : '',
+				$rendered->inline_css,
+				$rendered->inline_js,
+				$rendered->json_ld,
 				$duration,
 				$fonts
 			);
@@ -551,20 +552,24 @@ class Public_Render {
 	}
 
 	/**
-	 * Album shortcode handler.
-	 *
-	 * Albums render through the same Render_Controller pipeline as
-	 * galleries, with collection_kind = ALBUM. Each "item" in the render
-	 * context is a child gallery summary (Album_Item_Loader). The same
-	 * Grid / Justified / Masonry layouts and the visual decorators
-	 * (Captions, Border, Shadow, Hover_Effects, Image_Filters) apply
-	 * uniformly. Click behaviour is supplied by Album_To_View_Page or
-	 * Album_To_Gallery_Ajax depending on the use_ajax_from_album setting.
+	 * Handles the [fotogrids_album] shortcode.
 	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string Rendered album HTML.
 	 */
 	public static function album_shortcode( $atts ) {
+		return self::render_album_embed( $atts );
+	}
+
+	/**
+	 * Renders one album embed from shortcode attributes.
+	 *
+	 * @since 1.3.0
+	 * @param array|string $atts        Shortcode attributes.
+	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @return string Rendered album HTML.
+	 */
+	public static function render_album_embed( $atts, string $instance_id = '' ) {
 		$atts = shortcode_atts(
 			array(
 				'id'       => 0,
@@ -596,7 +601,6 @@ class Public_Render {
 			return '';
 		}
 
-		// Reduce to bare IDs in album-stored order.
 		$child_gallery_ids = array_values(
 			array_filter(
 				array_map(
@@ -620,17 +624,28 @@ class Public_Render {
 			$album_settings['enable_statistics'] = false;
 		}
 
-		// Allow the shortcode's `template` attribute to override the
-		// layout (e.g. [fotogrids_album id=42 template=masonry]).
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
 			$album_settings['layout'] = $atts['template'];
+			if ( self::is_layout_key( $atts['template'] ) ) {
+				$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
+			}
+		}
+
+		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {
+			$instance_id = '';
 		}
 
 		$context = Context_Builder::for_public()->build_for_album(
 			$album_id,
 			$album_settings,
 			$child_gallery_ids,
+			Request_Source::SHORTCODE,
+			$instance_id
 		);
+
+		if ( Render_Controller::has_active_gates( $context ) ) {
+			self::send_no_cache_headers();
+		}
 
 		$result                   = Render_Controller::factory()->render( $context );
 		self::$last_render_result = $result;
@@ -640,26 +655,10 @@ class Public_Render {
 	}
 
 	/**
-	 * Enqueue frontend scripts and styles.
+	 * Localizes the runtime and enqueues the error stylesheet on pages with FotoGrids content.
 	 *
-	 * After the frontend refactor, almost everything reaches the page via
-	 * the render pipeline (Asset_Resolver). The only assets enqueued here
-	 * are:
-	 *
-	 *   • fg-tooltip JS/CSS - still globally enqueued because multiple
-	 *     modules (sharing, filter UI, lightbox) bind tooltips and
-	 *     fg-tooltip is not yet wrapped as a render module dependency.
-	 *     Task 15 of the refactor will move this.
-	 *   • fotogrids-errors.css - tiny always-on stylesheet for the
-	 *     `.fotogrids-error` block. Lives outside the render pipeline
-	 *     because error markup can be emitted before any layout module
-	 *     runs (e.g. "gallery not found"), so collection-base.css is
-	 *     never enqueued for those paths.
-	 *
-	 * The window.fotogrids payload is attached to the `fotogrids-runtime`
-	 * handle on every front-end page, so it prints wherever a gallery
-	 * enqueues the runtime - including galleries rendered outside the
-	 * post content, which has_fotogrids_content() cannot see.
+	 * Gallery assets are enqueued by the render pipeline, not here. Error blocks
+	 * rendered outside the post content enqueue the stylesheet themselves.
 	 */
 	public static function enqueue_frontend_scripts() {
 		\FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap::localize();
@@ -667,13 +666,6 @@ class Public_Render {
 		if ( ! self::has_fotogrids_content() ) {
 			return;
 		}
-
-		// fg-tooltip and deep-linking are NOT enqueued here anymore.
-		// • fg-tooltip is declared as a dep by Sharing_Decorator and
-		//   Lightbox features; Asset_Resolver pulls it in when either is
-		//   active on the page.
-		// • deep-linking is declared by the Deep_Linking feature. On the
-		//   View Page it's pulled in directly by Renderer::enqueue_assets.
 
 		wp_enqueue_style(
 			'fotogrids-errors',
@@ -684,10 +676,11 @@ class Public_Render {
 	}
 
 	/**
-	 * Error block for a gallery that cannot be rendered.
+	 * Returns the error block for a gallery that cannot be rendered.
 	 *
-	 * Users who can edit posts see the message; everyone else gets the
-	 * hidden block the render pipeline emits for its own errors.
+	 * Only users who can edit posts see the message; others get a hidden block.
+	 * A visible block enqueues its stylesheet, so it is styled wherever the
+	 * shortcode runs: post content, template parts or widgets.
 	 *
 	 * @since 1.3.0
 	 * @param string $message Translated message.
@@ -698,13 +691,15 @@ class Public_Render {
 			return '<div class="fotogrids-error" hidden></div>';
 		}
 
+		$resolver = Asset_Resolver::instance();
+		$resolver->collect( Render_Result::error_assets(), 'fotogrids' );
+		$resolver->flush();
+
 		return '<div class="fotogrids-error">FotoGrids: ' . esc_html( $message ) . '</div>';
 	}
 
 	/**
-	 * Render gallery preview (for admin)
-	 *
-	 * Similar to gallery_shortcode but allows previewing unpublished galleries
+	 * Renders an admin preview of a gallery in any post status.
 	 *
 	 * @param int $gallery_id Gallery ID
 	 * @param array $atts Optional attributes to override settings
@@ -717,7 +712,7 @@ class Public_Render {
 		}
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return self::error_notice(
 				sprintf(
 					/* translators: %d: gallery ID. */
@@ -744,10 +739,9 @@ class Public_Render {
 	}
 
 	/**
-	 * Render template preview
+	 * Renders a template preview from supplied items and settings.
 	 *
-	 * Public method to render a gallery preview with custom items and settings
-	 * Used for template previews in admin
+	 * Returns a self-contained fragment with inline CSS, JS and JSON-LD embedded.
 	 *
 	 * @param array $items Gallery items
 	 * @param string $layout Layout type
@@ -811,9 +805,7 @@ class Public_Render {
 		);
 
 		$item_views = self::build_template_item_views( is_array( $items ) ? $items : array() );
-		// Run demo items through the same caption resolver as real items so
-		// caption_title / caption_description honour the template's caption
-		// settings (source, hide, length) instead of staying blank.
+		// Demo items carry no resolved captions until this runs.
 		$item_views = Context_Builder::for_preview()->resolve_captions_for( $item_views, $render_settings );
 
 		$render_context = $render_context->with(
@@ -824,11 +816,7 @@ class Public_Render {
 
 		$result = Render_Controller::factory()->render( $render_context );
 
-		// Template previews render into a self-contained document (admin
-		// picker iframe / REST preview) that has no wp_head/wp_footer to
-		// enqueue into, so the per-render CSS/JS are embedded here - in the
-		// document-assembly layer, not in the render pipeline - alongside the
-		// pure markup the controller returns.
+		// The preview document has no wp_head/wp_footer, so inline assets are embedded.
 		$head = '' !== $result->inline_css
 			? '<style class="fotogrids-inline-css">' . $result->inline_css . '</style>'
 			: '';
@@ -845,7 +833,7 @@ class Public_Render {
 	}
 
 	/**
-	 * Convert template preview payload to item value objects.
+	 * Converts template preview items to Item_View objects.
 	 *
 	 * @param array $items Template preview items.
 	 * @return array
@@ -863,9 +851,7 @@ class Public_Render {
 			$full_width  = isset( $item['full_width'] ) && $item['full_width'] ? (int) $item['full_width'] : null;
 			$full_height = isset( $item['full_height'] ) && $item['full_height'] ? (int) $item['full_height'] : null;
 
-			// Demo preview items are not media-library attachments. Passing id 0
-			// keeps the item renderer from resolving an attachment srcset off a
-			// colliding ID, which would pull real gallery images into the preview.
+			// ID 0: demo items are not attachments, so no srcset is resolved from a colliding ID.
 			$item_view = new Item_View(
 				0,
 				(string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
@@ -892,21 +878,11 @@ class Public_Render {
 		return $item_views;
 	}
 
-
-	// render_album() removed - album rendering now goes through the
-	// standard Render_Controller pipeline. See album_shortcode() above.
-
 	/**
-	 * Check if current page has FotoGrids content.
+	 * Checks whether the current page has FotoGrids content.
 	 *
-	 * Gates the always-on `fotogrids-errors.css` stylesheet. Per-render
-	 * module CSS/JS is owned by Asset_Resolver and ships regardless of
-	 * this gate.
-	 *
-	 * Page-builder integrations (Elementor, Divi, Bricks, …) store their
-	 * widget trees outside `$post->post_content`, so the default
-	 * shortcode + block detection cannot see them. They hook the
-	 * {@see Filters_Page_Builders::HAS_CONTENT} filter to opt the page in.
+	 * Detects shortcodes only; blocks and page builders opt in through
+	 * {@see Filters_Page_Builders::HAS_CONTENT}.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -921,11 +897,6 @@ class Public_Render {
 				has_shortcode( $post->post_content, 'fotogrids_album' ) ) {
 				$detected = true;
 			}
-			// Block detection lives on the page-builders filter (see
-			// PageBuilders\Builders\Gutenberg\Module::detect_in_gutenberg),
-			// mirroring how Elementor / Divi / Bricks opt their pages
-			// in. Every host stays self-contained and this method
-			// doesn't grow per-builder branches.
 		}
 
 		return (bool) apply_filters( Filters_Page_Builders::HAS_CONTENT, $detected, $post );

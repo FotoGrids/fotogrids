@@ -11,6 +11,7 @@ import {
 import Toggle from '../../shared/Toggle';
 import InfoBlock from '../../shared/InfoBlock';
 import { Button } from '../../shared/Button';
+import { ALBUM_POST_TYPE, GALLERY_POST_TYPE } from '../../../utils/post-types';
 
 // View_Settings_Store::defaults() reaches the browser through
 // wp_localize_script, so PHP owns the values. Nested arrays keep their types
@@ -94,9 +95,11 @@ const ViewPagesTab = () => {
 			setSaved(next);
 			setStatus('saved');
 			setTimeout(() => setStatus(null), 3000);
+			return true;
 		} catch (err) {
 			setStatus('error');
 			setErrorMessage(err?.message || null);
+			return false;
 		} finally {
 			setSaving(false);
 		}
@@ -273,7 +276,7 @@ const ViewPagesTab = () => {
 					{urlPreview(
 						settings.base_gallery_segment,
 						'gallery-name',
-						'fotogrids_gallery'
+						GALLERY_POST_TYPE
 					)}
 				</PanelRow>
 
@@ -298,7 +301,7 @@ const ViewPagesTab = () => {
 					{urlPreview(
 						settings.base_album_segment,
 						'album-name',
-						'fotogrids_album'
+						ALBUM_POST_TYPE
 					)}
 				</PanelRow>
 

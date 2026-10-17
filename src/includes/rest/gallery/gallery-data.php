@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Gallery;
 
+use FotoGrids\Post_Types;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -30,7 +32,7 @@ class Gallery_Data {
 		$gallery_id = (int) $request['id'];
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'fotogrids_gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),
@@ -107,7 +109,7 @@ class Gallery_Data {
 		$is_preview = (bool) $request['preview'];
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found', 'fotogrids' ),
@@ -158,7 +160,7 @@ class Gallery_Data {
 		$gallery_id = (int) $request['id'];
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found', 'fotogrids' ),
@@ -193,7 +195,7 @@ class Gallery_Data {
 		$submitted  = (string) ( $request->get_param( 'password' ) ?? '' );
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found', 'fotogrids' ),
@@ -253,7 +255,11 @@ class Gallery_Data {
 		// Render the gallery HTML server-side so the frontend can swap it in
 		// without a full page reload.
 		$html     = \FotoGrids\Public_Render::render_gallery_embed(
-			array( 'id' => $gallery_id ),
+			array(
+				'id'       => $gallery_id,
+				'cols'     => absint( $request->get_param( 'cols' ) ),
+				'template' => (string) $request->get_param( 'template' ),
+			),
 			(string) $request->get_param( 'instance_id' )
 		);
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
@@ -320,7 +326,7 @@ class Gallery_Data {
 		}
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error(
 				'gallery_not_found',
 				__( 'Gallery not found.', 'fotogrids' ),
@@ -546,7 +552,7 @@ class Gallery_Data {
 		$search   = $request['search'];
 
 		$args = array(
-			'post_type'      => 'fotogrids_gallery',
+			'post_type'      => Post_Types::GALLERY,
 			'post_status'    => 'publish',
 			'posts_per_page' => $per_page,
 			'paged'          => $page,
@@ -594,7 +600,7 @@ class Gallery_Data {
 		$offset     = (int) $request['offset'];
 
 		$gallery = get_post( $gallery_id );
-		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+		if ( ! $gallery || Post_Types::GALLERY !== $gallery->post_type ) {
 			return new \WP_Error( 'gallery_not_found', __( 'Gallery not found.', 'fotogrids' ), array( 'status' => 404 ) );
 		}
 

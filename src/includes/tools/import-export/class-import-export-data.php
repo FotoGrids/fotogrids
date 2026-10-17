@@ -1,10 +1,15 @@
 <?php
 namespace FotoGrids\Tools\ImportExport;
 
+use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Post_Types;
+use FotoGrids\REST\Items\Embed_Data;
+use FotoGrids\Settings\Collection_Defaults_Store;
+use FotoGrids\Settings\Plugin_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -67,7 +72,8 @@ class Import_Export_Data {
 		$type_counts = array();
 		foreach ( array( 'galleries', 'albums', 'items', 'tags', 'templates' ) as $key ) {
 			if ( isset( $data[ $key ] ) ) {
-				$type_counts[] = count( $data[ $key ] ) . ' ' . $key;
+				$count         = count( $data[ $key ] ) + ( 'items' === $key ? count( $data['embeds'] ?? array() ) : 0 );
+				$type_counts[] = $count . ' ' . $key;
 			}
 		}
 		if ( isset( $data['settings'] ) ) {
@@ -191,7 +197,7 @@ class Import_Export_Data {
 		if ( in_array( 'galleries', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_gallery',
+					'post_type'      => Post_Types::GALLERY,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -217,7 +223,7 @@ class Import_Export_Data {
 		if ( in_array( 'albums', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => 'fotogrids_album',
+					'post_type'      => Post_Types::ALBUM,
 					'post_status'    => self::COLLECTION_STATUSES,
 					'posts_per_page' => -1,
 					'orderby'        => 'date',
@@ -257,6 +263,8 @@ class Import_Export_Data {
 				) ?: array()
 			);
 
+			$data['embeds'] = self::export_embeds();
+
 			$meta_table            = $wpdb->prefix . 'fotogrids_item_metadata';
 			$data['item_metadata'] = $wpdb->get_results(
 				$wpdb->prepare( 'SELECT * FROM %i', $meta_table ),
@@ -275,7 +283,7 @@ class Import_Export_Data {
 		if ( in_array( 'settings', $include_types, true ) ) {
 			$data['settings'] = array(
 				'media'                      => get_option( 'fotogrids_media_settings', array() ),
-				'gallery_defaults'           => get_option( 'fotogrids_gallery_defaults', array() ),
+				'collection_defaults'        => Collection_Defaults_Store::all(),
 				'autosave'                   => get_option( 'fotogrids_autosave', true ),
 				'share_statistics'           => get_option( 'fotogrids_share_statistics', false ),
 				'preserve_data_on_uninstall' => get_option( 'fotogrids_preserve_data_on_uninstall', true ),
@@ -314,7 +322,8 @@ class Import_Export_Data {
 
 	/**
 	 * Build the exported item entries: every item row, plus every attachment in a
-	 * gallery the export includes that has no row, each carrying the attachment's own text.
+	 * gallery the export includes that has no row, each carrying the attachment's own
+	 * text and whether it is an image or a video.
 	 *
 	 * @since 1.2.0
 	 * @param array<int, array<string, mixed>> $rows Item meta rows.
@@ -342,9 +351,32 @@ class Import_Export_Data {
 			$rows[ $index ]['caption']     = $attachment->post_excerpt;
 			$rows[ $index ]['description'] = $attachment->post_content;
 			$rows[ $index ]['alt']         = (string) get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+			$rows[ $index ]['media_type']  = wp_attachment_is( 'video', $attachment ) ? 'video' : 'image';
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Build the exported video embed entries: every embed in a gallery the export
+	 * includes. `poster_src` carries the URL of a Media Library poster.
+	 *
+	 * @since 1.3.0
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function export_embeds(): array {
+		$embeds = array();
+
+		foreach ( Gallery_Repository::all_item_ids( self::COLLECTION_STATUSES ) as $item_id ) {
+			$embed = Embed_Store::get( $item_id );
+			if ( null === $embed ) {
+				continue;
+			}
+			$embed['poster_src'] = $embed['poster_id'] > 0 ? (string) wp_get_attachment_url( $embed['poster_id'] ) : '';
+			$embeds[]            = $embed;
+		}
+
+		return $embeds;
 	}
 
 	/**
@@ -501,9 +533,26 @@ class Import_Export_Data {
 	 */
 	private static function analyse( array $data ): \WP_REST_Response {
 		$contents = array();
-		foreach ( array( 'galleries', 'albums', 'items', 'tags', 'item_metadata', 'templates', 'statistics' ) as $key ) {
+		foreach ( array( 'galleries', 'albums', 'tags', 'item_metadata', 'templates', 'statistics' ) as $key ) {
 			if ( isset( $data[ $key ] ) && is_array( $data[ $key ] ) ) {
 				$contents[ $key ] = count( $data[ $key ] );
+			}
+		}
+
+		$items  = is_array( $data['items'] ?? null ) ? $data['items'] : array();
+		$embeds = is_array( $data['embeds'] ?? null ) ? $data['embeds'] : array();
+		if ( isset( $data['items'] ) || $embeds ) {
+			$contents['items'] = count( $items ) + count( $embeds );
+
+			if ( self::has_media_types( $items ) ) {
+				$detail = array(
+					'images' => 0,
+					'videos' => count( $embeds ),
+				);
+				foreach ( $items as $item ) {
+					++$detail[ self::media_kind( (array) $item ) ];
+				}
+				$contents['items_detail'] = $detail;
 			}
 		}
 		if ( isset( $data['settings'] ) ) {
@@ -545,23 +594,25 @@ class Import_Export_Data {
 				}
 			}
 
-			$gallery_id_map = array(); // old_id => new_id
+			$gallery_id_map    = array(); // old_id => new_id
+			$written_galleries = array();
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
-				[ $imp, $skip, $map ]  = self::import_collections(
+				[ $imp, $skip, $map, $written ] = self::import_collections(
 					$data['galleries'],
-					'fotogrids_gallery',
+					Post_Types::GALLERY,
 					$options['galleries']
 				);
-				$imported['galleries'] = $imp;
-				$skipped['galleries']  = $skip;
-				$gallery_id_map        = $map;
+				$imported['galleries']          = $imp;
+				$skipped['galleries']           = $skip;
+				$gallery_id_map                 = $map;
+				$written_galleries              = $written;
 			}
 
 			$album_id_map = array();
 			if ( in_array( 'albums', $include, true ) && ! empty( $data['albums'] ) ) {
 				[ $imp, $skip, $map ] = self::import_collections(
 					$data['albums'],
-					'fotogrids_album',
+					Post_Types::ALBUM,
 					$options['albums']
 				);
 				$imported['albums']   = $imp;
@@ -574,10 +625,36 @@ class Import_Export_Data {
 			}
 
 			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
+
+			$kinds = array(
+				'imported' => array(
+					'images' => 0,
+					'videos' => 0,
+				),
+				'skipped'  => array(
+					'images' => 0,
+					'videos' => 0,
+				),
+			);
+
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
-				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map, $known );
-				$imported['items'] = $imp;
-				$skipped['items']  = $skip;
+				[ $imp, $skip, $kinds ] = self::import_items( $data['items'], $gallery_id_map, $known );
+				$imported['items']      = $imp;
+				$skipped['items']       = $skip;
+			}
+
+			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && is_array( $data['embeds'] ) ) {
+				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries );
+				$imported['items'] = ( $imported['items'] ?? 0 ) + $imp;
+				$skipped['items']  = ( $skipped['items'] ?? 0 ) + $skip;
+
+				$kinds['imported']['videos'] += $imp;
+				$kinds['skipped']['videos']  += $skip;
+			}
+
+			if ( isset( $imported['items'] ) && self::has_media_types( is_array( $data['items'] ?? null ) ? $data['items'] : array() ) ) {
+				$imported['items_detail'] = $kinds['imported'];
+				$skipped['items_detail']  = $kinds['skipped'];
 			}
 
 			// Item metadata is imported after both items and tags exist.
@@ -728,12 +805,14 @@ class Import_Export_Data {
 	 *
 	 * $conflict_mode: 'skip' | 'overwrite' | 'duplicate'
 	 *
-	 * Returns [imported_count, skipped_count, old_id_to_new_id_map].
+	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids],
+	 * where written_ids lists the posts the import created or overwrote.
 	 */
 	private static function import_collections( array $posts, string $post_type, string $conflict_mode ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$id_map   = array();
+		$written  = array();
 
 		foreach ( $posts as $post_data ) {
 			$old_id = (int) ( $post_data['id'] ?? 0 );
@@ -767,6 +846,7 @@ class Import_Export_Data {
 						update_post_meta( $existing->ID, $key, $value );
 					}
 					$id_map[ $old_id ] = $existing->ID;
+					$written[]         = $existing->ID;
 					++$imported;
 					continue;
 				}
@@ -796,15 +876,16 @@ class Import_Export_Data {
 				update_post_meta( $new_id, $key, $value );
 			}
 
-			if ( 'fotogrids_gallery' === $post_type ) {
+			if ( Post_Types::GALLERY === $post_type ) {
 				do_action( Actions_Gallery::IMPORTED, $new_id, $old_id );
 			}
 
 			$id_map[ $old_id ] = $new_id;
+			$written[]         = $new_id;
 			++$imported;
 		}
 
-		return array( $imported, $skipped, $id_map );
+		return array( $imported, $skipped, $id_map, $written );
 	}
 
 	/** Import gallery-album relationship rows, remapping IDs. */
@@ -903,12 +984,23 @@ class Import_Export_Data {
 	 * @param array<int, array<string, mixed>> $items          Exported item entries.
 	 * @param array<int, int>                  $gallery_id_map Old gallery ID => new gallery ID.
 	 * @param array<int, true>                 $known          Attachment IDs already used as items.
-	 * @return array{0: int, 1: int} Imported and skipped counts.
+	 * @return array{0: int, 1: int, 2: array<string, array<string, int>>} Imported and skipped
+	 *         counts, and both again split into images and videos.
 	 */
 	private static function import_items( array $items, array $gallery_id_map, array $known ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$lists    = array();
+		$kinds    = array(
+			'imported' => array(
+				'images' => 0,
+				'videos' => 0,
+			),
+			'skipped'  => array(
+				'images' => 0,
+				'videos' => 0,
+			),
+		);
 
 		foreach ( $items as $item ) {
 			// An empty or null element in an XML file parses to an array.
@@ -919,9 +1011,11 @@ class Import_Export_Data {
 				(array) $item
 			);
 			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
+			$kind          = self::media_kind( $item, $attachment_id );
 
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 				continue;
 			}
 
@@ -932,6 +1026,7 @@ class Import_Export_Data {
 
 			if ( null !== Item_Meta::get( $attachment_id ) ) {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 				continue;
 			}
 
@@ -955,8 +1050,10 @@ class Import_Export_Data {
 					self::import_item_text( $attachment_id, $item );
 				}
 				++$imported;
+				++$kinds['imported'][ $kind ];
 			} else {
 				++$skipped;
+				++$kinds['skipped'][ $kind ];
 			}
 		}
 
@@ -970,7 +1067,185 @@ class Import_Export_Data {
 			Item_Meta_Consolidation::restore_list( $gallery_id, array_column( $entries, 1 ) );
 		}
 
-		return array( $imported, $skipped );
+		return array( $imported, $skipped, $kinds );
+	}
+
+	/**
+	 * Whether an exported item entry is an image or a video.
+	 *
+	 * Reads the entry's `media_type`, then the attachment on this site, then the
+	 * entry's item type.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $item          Exported item entry.
+	 * @param int                  $attachment_id Attachment ID on this site, or 0.
+	 * @return string `images` or `videos`.
+	 */
+	private static function media_kind( array $item, int $attachment_id = 0 ): string {
+		$type = $item['media_type'] ?? '';
+		if ( 'image' === $type || 'video' === $type ) {
+			return $type . 's';
+		}
+		if ( $attachment_id > 0 && 'attachment' === get_post_type( $attachment_id ) ) {
+			return wp_attachment_is( 'video', $attachment_id ) ? 'videos' : 'images';
+		}
+
+		return false !== strpos( (string) ( $item['item_type'] ?? '' ), 'video' ) ? 'videos' : 'images';
+	}
+
+	/**
+	 * Whether a file's item entries say which are images and which are videos.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, mixed> $items Exported item entries.
+	 * @return bool
+	 */
+	private static function has_media_types( array $items ): bool {
+		if ( empty( $items ) ) {
+			return true;
+		}
+		foreach ( $items as $item ) {
+			if ( isset( ( (array) $item )['media_type'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Recreate the exported video embeds in each gallery the import wrote, and
+	 * point the gallery's item list at them.
+	 *
+	 * An embed already on this site that shows the same video and belongs to no
+	 * other gallery keeps its ID and takes the file's data. Every other exported
+	 * embed in the list is created as a new embed owned by that gallery, and no
+	 * other list keeps the new embed's ID.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, mixed> $embeds      Exported embed entries.
+	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
+	 * @return array{0: int, 1: int} Embeds created or updated, and exported embeds no
+	 *                               written gallery lists.
+	 */
+	private static function import_embeds( array $embeds, array $gallery_ids ): array {
+		$by_old_id = array();
+		foreach ( $embeds as $embed ) {
+			$embed = self::sanitize_embed( (array) $embed );
+			if ( null !== $embed ) {
+				$by_old_id[ $embed['id'] ] = $embed;
+			}
+		}
+
+		$created = array();
+		$updated = 0;
+		$used    = array();
+		$lists   = array();
+
+		foreach ( array_unique( array_map( 'intval', $gallery_ids ) ) as $gallery_id ) {
+			$item_ids = Gallery_Repository::get_item_ids( $gallery_id );
+			$placed   = array();
+
+			foreach ( $item_ids as $index => $item_id ) {
+				if ( ! isset( $by_old_id[ $item_id ] ) ) {
+					continue;
+				}
+				$used[ $item_id ] = true;
+				if ( ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
+					Embed_Store::update( $item_id, $by_old_id[ $item_id ] );
+					++$updated;
+					continue;
+				}
+
+				$new_id = Embed_Store::create( $by_old_id[ $item_id ] );
+				if ( $new_id > 0 ) {
+					$created[ $new_id ] = true;
+				}
+				$item_ids[ $index ] = $new_id;
+				$placed[ $index ]   = true;
+			}
+
+			$lists[ $gallery_id ] = array( $item_ids, $placed );
+		}
+
+		// A list can still hold an ID from the exporting site that a new embed has just taken.
+		foreach ( $lists as $gallery_id => $list ) {
+			$kept = array();
+			foreach ( $list[0] as $index => $item_id ) {
+				if ( $item_id > 0 && ( isset( $list[1][ $index ] ) || ! isset( $created[ $item_id ] ) ) ) {
+					$kept[] = $item_id;
+				}
+			}
+
+			if ( Gallery_Repository::get_item_ids( $gallery_id ) !== $kept ) {
+				Gallery_Repository::set_item_ids( $gallery_id, $kept );
+			}
+		}
+
+		return array( count( $created ) + $updated, count( $by_old_id ) - count( $used ) );
+	}
+
+	/**
+	 * Clean an exported embed entry into Embed_Store data.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $embed Exported embed entry.
+	 * @return array<string, mixed>|null Embed data with its exported `id`, or null when unusable.
+	 */
+	private static function sanitize_embed( array $embed ): ?array {
+		$old_id    = (int) ( $embed['id'] ?? 0 );
+		$item_type = sanitize_key( (string) ( $embed['item_type'] ?? '' ) );
+		$url       = esc_url_raw( is_string( $embed['url'] ?? null ) ? $embed['url'] : '' );
+
+		if ( $old_id <= 0 || '' === $url || ! in_array( $item_type, array( 'video_youtube', 'video_vimeo' ), true ) ) {
+			return null;
+		}
+
+		$settings = is_array( $embed['settings'] ?? null ) ? $embed['settings'] : array();
+		foreach ( $settings as $key => $value ) {
+			if ( 'false' === $value ) {
+				$settings[ $key ] = false;
+			}
+		}
+
+		$poster_id  = (int) ( $embed['poster_id'] ?? 0 );
+		$poster_url = is_string( $embed['poster_url'] ?? null ) ? $embed['poster_url'] : '';
+		if ( $poster_id > 0 && 'attachment' !== get_post_type( $poster_id ) ) {
+			$poster_id = 0;
+			if ( '' === $poster_url && is_string( $embed['poster_src'] ?? null ) ) {
+				$poster_url = $embed['poster_src'];
+			}
+		}
+
+		return array(
+			'id'            => $old_id,
+			'item_type'     => $item_type,
+			'video_id'      => sanitize_text_field( is_scalar( $embed['video_id'] ?? null ) ? (string) $embed['video_id'] : '' ),
+			'url'           => $url,
+			'caption'       => sanitize_text_field( is_scalar( $embed['caption'] ?? null ) ? (string) $embed['caption'] : '' ),
+			'thumbnail_url' => esc_url_raw( is_string( $embed['thumbnail_url'] ?? null ) ? $embed['thumbnail_url'] : '' ),
+			'settings'      => Embed_Data::sanitize_embed_settings( $settings, $item_type ),
+			'poster_id'     => $poster_id,
+			'poster_url'    => esc_url_raw( $poster_url ),
+		);
+	}
+
+	/**
+	 * Whether an embed on this site is the exported embed, already owned by the gallery.
+	 *
+	 * @since 1.3.0
+	 * @param int                  $item_id    Item ID from the gallery's list.
+	 * @param int                  $gallery_id Gallery post ID.
+	 * @param array<string, mixed> $exported   Sanitized exported embed.
+	 * @return bool
+	 */
+	private static function is_same_embed( int $item_id, int $gallery_id, array $exported ): bool {
+		$existing = Embed_Store::get( $item_id );
+		if ( null === $existing || $existing['item_type'] !== $exported['item_type'] || $existing['video_id'] !== $exported['video_id'] ) {
+			return false;
+		}
+
+		return array() === array_diff( Gallery_Repository::find_galleries_for_item( $item_id ), array( $gallery_id ) );
 	}
 
 	/**
@@ -1025,19 +1300,42 @@ class Import_Export_Data {
 		}
 	}
 
-	/** Import plugin settings. */
+	/**
+	 * Import plugin settings through the sanitizers their settings screens use.
+	 * The usage-data sharing choice is never imported.
+	 */
 	private static function import_settings( array $settings ): void {
-		$map = array(
-			'media'                      => 'fotogrids_media_settings',
-			'gallery_defaults'           => 'fotogrids_gallery_defaults',
+		if ( isset( $settings['media'] ) && is_array( $settings['media'] ) ) {
+			\FotoGrids\Image_Size_Manager::save_plugin_size_settings( $settings['media'] );
+		}
+
+		if ( isset( $settings['collection_defaults'] ) && is_array( $settings['collection_defaults'] ) ) {
+			foreach ( Collection_Defaults_Store::TYPES as $type ) {
+				if ( isset( $settings['collection_defaults'][ $type ] ) && is_array( $settings['collection_defaults'][ $type ] ) ) {
+					Collection_Defaults_Store::replace(
+						$type,
+						Plugin_Settings_Store::sanitize_collection_defaults( $settings['collection_defaults'][ $type ], $type )
+					);
+				}
+			}
+		} elseif ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
+			// Files exported before 1.3.0 hold one map for both types.
+			foreach ( Collection_Defaults_Store::TYPES as $type ) {
+				Collection_Defaults_Store::replace(
+					$type,
+					Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'], $type )
+				);
+			}
+		}
+
+		$flags = array(
 			'autosave'                   => 'fotogrids_autosave',
-			'share_statistics'           => 'fotogrids_share_statistics',
 			'preserve_data_on_uninstall' => 'fotogrids_preserve_data_on_uninstall',
 		);
 
-		foreach ( $map as $export_key => $option_key ) {
+		foreach ( $flags as $export_key => $option_key ) {
 			if ( array_key_exists( $export_key, $settings ) ) {
-				update_option( $option_key, $settings[ $export_key ] );
+				Plugin_Settings_Store::save_bool( $option_key, Plugin_Settings_Store::truthy( $settings[ $export_key ] ) );
 			}
 		}
 	}

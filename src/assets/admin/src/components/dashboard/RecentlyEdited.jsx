@@ -10,6 +10,7 @@ import LockedReason from './LockedReason';
 import { DASHBOARD_ACCESS } from './access';
 import { userCan } from '../../utils/capabilities';
 import { fetchRecentlyEdited } from '../../utils/api';
+import { ALBUM_POST_TYPE, GALLERY_POST_TYPE } from '../../utils/post-types';
 
 const ROW_LIMIT = 5;
 
@@ -155,7 +156,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 			{body}
 			<div className="fg-abc-recently-edited-actions">
 				<Button
-					href="edit.php?post_type=fotogrids_gallery"
+					href={`edit.php?post_type=${GALLERY_POST_TYPE}`}
 					disabled={!canOpenGalleries}
 					variant="primary"
 					style="outline"
@@ -166,7 +167,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
 				</Button>
 				{hasAlbums && (
 					<Button
-						href="edit.php?post_type=fotogrids_album"
+						href={`edit.php?post_type=${ALBUM_POST_TYPE}`}
 						disabled={!canOpenAlbums}
 						variant="primary"
 						style="outline"

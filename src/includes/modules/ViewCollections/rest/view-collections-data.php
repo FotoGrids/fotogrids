@@ -10,6 +10,7 @@ namespace FotoGrids\Modules\ViewCollections\REST;
 
 use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Modules\ViewCollections\Settings;
+use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -33,7 +34,7 @@ class View_Collections_Data {
 		$post_id = absint( $request['id'] );
 		$post    = get_post( $post_id );
 
-		if ( ! $post || ! in_array( $post->post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+		if ( ! $post || ! in_array( $post->post_type, Post_Types::COLLECTION_TYPES, true ) ) {
 			return new \WP_Error(
 				'fotogrids_not_found',
 				__( 'Collection not found.', 'fotogrids' ),

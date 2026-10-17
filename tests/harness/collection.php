@@ -26,6 +26,7 @@
 use FotoGrids\Collection_Defaults;
 use FotoGrids\FotoGrids_Cache;
 use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\Setting_Value_Codec;
 
 /** Marks a post as this script's to delete; distinct from the seeder's. */
@@ -58,9 +59,11 @@ function fg_col_arg( array $args, string $name, string $default = '' ): string {
  *
  * The cache flush is not optional: the render cache is keyed on the gallery,
  * not on its settings, so without it the next render replays the HTML built
- * before the change and a render assertion reads a stale layout.
+ * before the change and a render assertion reads a stale layout. An album's
+ * settings reach its galleries' renders (the breadcrumb), so an album flushes
+ * every gallery in it.
  *
- * @param int   $gallery_id Gallery to write to.
+ * @param int   $gallery_id Gallery or album to write to.
  * @param array $settings   Catalog key to value.
  * @return void
  * @throws Exception When a key is not in the catalog.
@@ -86,7 +89,23 @@ function fg_col_settings( int $gallery_id, array $settings ): void {
 		);
 	}
 
+	if ( Post_Types::ALBUM === get_post_type( $gallery_id ) ) {
+		FotoGrids_Cache::flush_for_album( $gallery_id );
+		return;
+	}
+
 	FotoGrids_Cache::flush_for_gallery( $gallery_id );
+}
+
+/**
+ * A slug no other scoped collection has, so parallel workers creating the same
+ * title never share a view page URL.
+ *
+ * @param string $title Post title.
+ * @return string
+ */
+function fg_col_slug( string $title ): string {
+	return sanitize_title( $title ) . '-' . strtolower( wp_generate_password( 8, false ) );
 }
 
 /**
@@ -156,6 +175,7 @@ if ( 'render' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_gallery',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped gallery' ),
+			'post_name'   => fg_col_slug( fg_col_arg( $args, 'title', 'Scoped gallery' ) ),
 			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
 			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
@@ -206,6 +226,7 @@ if ( 'album' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_album',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped album' ),
+			'post_name'   => fg_col_slug( fg_col_arg( $args, 'title', 'Scoped album' ) ),
 			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
 			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
@@ -297,7 +318,7 @@ if ( 'adopt' === $op ) {
 if ( 'purge' === $op ) {
 	$owned = get_posts(
 		array(
-			'post_type'        => array( 'post', 'fotogrids_gallery', 'fotogrids_album' ),
+			'post_type'        => array( 'post', 'page', 'fotogrids_gallery', 'fotogrids_album' ),
 			'post_status'      => 'any',
 			'posts_per_page'   => -1,
 			'fields'           => 'ids',

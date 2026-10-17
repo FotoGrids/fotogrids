@@ -6,7 +6,7 @@
  */
 
 use FotoGrids\Galleries\Gallery_Repository;
-use FotoGrids\Settings\Collection_Defaults_Seeder;
+use FotoGrids\Settings\Collection_Defaults_Store;
 use FotoGrids\Migrations\List_Setting_Repair;
 
 class ListSettingRepairTest extends WP_UnitTestCase {
@@ -62,12 +62,16 @@ class ListSettingRepairTest extends WP_UnitTestCase {
 	}
 
 	public function test_saved_defaults_hold_lists_as_arrays(): void {
+		$saved = array(
+			'sharing_networks_override' => '["x","email"]',
+			'exif_fields'               => 'camera',
+			'caption_alignment'         => 'center',
+		);
 		update_option(
-			Collection_Defaults_Seeder::OPTION,
+			Collection_Defaults_Store::OPTION,
 			array(
-				'sharing_networks_override' => '["x","email"]',
-				'exif_fields'               => 'camera',
-				'caption_alignment'         => 'center',
+				'gallery' => $saved,
+				'album'   => array( 'sharing_networks_override' => '["email"]' ),
 			)
 		);
 
@@ -78,12 +82,16 @@ class ListSettingRepairTest extends WP_UnitTestCase {
 				'sharing_networks_override' => array( 'x', 'email' ),
 				'caption_alignment'         => 'center',
 			),
-			get_option( Collection_Defaults_Seeder::OPTION )
+			Collection_Defaults_Store::get( 'gallery' )
 		);
+		$this->assertSame( array( 'sharing_networks_override' => array( 'email' ) ), Collection_Defaults_Store::get( 'album' ) );
 	}
 
 	public function test_a_new_gallery_receives_a_saved_default_list(): void {
-		update_option( Collection_Defaults_Seeder::OPTION, array( 'sharing_networks_override' => '["x","email"]' ) );
+		update_option(
+			Collection_Defaults_Store::OPTION,
+			array( 'gallery' => array( 'sharing_networks_override' => '["x","email"]' ) )
+		);
 		List_Setting_Repair::run();
 
 		$gallery = $this->gallery();
