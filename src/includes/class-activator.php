@@ -240,11 +240,12 @@ class Activator {
 		dbDelta( $sql );
 
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
+		\FotoGrids\Migrations\Collection_Defaults_Split::run();
 		\FotoGrids\Migrations\List_Setting_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.6' );
+		update_option( 'fotogrids_db_version', '1.7' );
 	}
 
 	/**
@@ -259,7 +260,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.6', '<' ) ) {
+		if ( version_compare( $current, '1.7', '<' ) ) {
 			self::create_tables();
 		}
 

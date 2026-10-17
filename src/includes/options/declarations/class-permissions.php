@@ -34,7 +34,6 @@ final class Permissions extends Abstract_Option_Declaration {
 	 */
 	public static function options(): array {
 		return array(
-			'fotogrids_permission_settings'              => self::RESET,
 			'fotogrids_unauthorised_settings_visibility' => self::KEEP,
 		);
 	}

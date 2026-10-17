@@ -165,8 +165,10 @@ const WatermarkTab = () => {
 			setStatus('saved');
 			setRegenRefresh((n) => n + 1);
 			setTimeout(() => setStatus(null), 3000);
+			return true;
 		} catch (err) {
 			setStatus('error');
+			return false;
 		} finally {
 			setSaving(false);
 		}
