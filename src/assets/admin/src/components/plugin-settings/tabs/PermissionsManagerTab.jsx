@@ -295,7 +295,7 @@ const PermissionsManagerTab = () => {
 				<PanelRow
 					title={__('Unauthorised settings panels', 'fotogrids')}
 					description={__(
-						'How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings.',
+						'How to show the Settings and Templates metaboxes to users who can edit a gallery or album but cannot change its settings.',
 						'fotogrids'
 					)}
 					largerLabels

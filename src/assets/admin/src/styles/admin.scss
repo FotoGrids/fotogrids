@@ -11,6 +11,7 @@
 @use "./fg-modal/fg-modal.scss" as *;
 @use "./SearchBar/SearchBar.scss" as *;
 @use "./item-edit/item-edit.scss" as *;
+@use "../../../../shared/text-editor/styles" as *;
 @use "./pro-notice/pro-notice.scss" as *;
 @use "./media-preview/media-preview.scss" as *;
 @use "./video-embed/video-embed.scss" as *;

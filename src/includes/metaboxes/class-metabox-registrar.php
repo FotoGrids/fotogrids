@@ -393,6 +393,7 @@ final class Metabox_Registrar {
 				'restNonce'    => wp_create_nonce( 'wp_rest' ),
 				'postId'       => $post->ID,
 				'strings'      => Metabox_Strings::all(),
+				'textEditor'   => \FotoGrids\Formatted_Text\Formatted_Text::editor_config( (int) $post->ID ),
 			)
 		);
 

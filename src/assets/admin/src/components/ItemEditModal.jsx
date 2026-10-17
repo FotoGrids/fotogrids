@@ -4,6 +4,7 @@ import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import { buildRestUrl } from '../utils/rest-url';
 import useMetadataSuggestions from './item-edit-modal/useMetadataSuggestions';
+import '../text-editor-api';
 
 /**
  * Metadata type registry.
@@ -47,6 +48,17 @@ window.FotoGridsAdmin.registerMetadataType = (registration) => {
 	}
 	_metadataTypeRegistry.push(registration);
 };
+
+/**
+ * Fields stored on the attachment post. Only the ones that changed are sent,
+ * so a save never rewrites text the user did not touch.
+ */
+const POST_TEXT_FIELDS = ['title', 'alt', 'caption', 'description'];
+
+const normalizeText = (value) =>
+	String(value ?? '')
+		.replace(/\r\n?/g, '\n')
+		.replace(/[ \t\n]+$/, '');
 
 const ItemEditModal = ({
 	itemId,
@@ -151,8 +163,11 @@ const ItemEditModal = ({
 			return;
 		}
 
-		const formDataChanged = Object.keys(originalData).some(
-			(key) => originalData[key] !== formData[key]
+		const formDataChanged = Object.keys(originalData).some((key) =>
+			POST_TEXT_FIELDS.includes(key)
+				? normalizeText(originalData[key]) !==
+					normalizeText(formData[key])
+				: originalData[key] !== formData[key]
 		);
 
 		const metadataChanged =
@@ -303,8 +318,22 @@ const ItemEditModal = ({
 		setSaving(true);
 
 		try {
-			const payload = {
-				...formData,
+			const payload = { ...formData };
+			POST_TEXT_FIELDS.forEach((key) => {
+				if (
+					originalData &&
+					normalizeText(originalData[key]) ===
+						normalizeText(formData[key])
+				) {
+					delete payload[key];
+				} else {
+					payload[key] = String(formData[key] ?? '').replace(
+						/\r\n?/g,
+						'\n'
+					);
+				}
+			});
+			Object.assign(payload, {
 				tags: metadata.tags.map((tag) => tag.id),
 				people: metadata.people.map((person) => ({
 					id: person.id,
@@ -317,7 +346,7 @@ const ItemEditModal = ({
 					latitude: loc.latitude ?? null,
 					longitude: loc.longitude ?? null,
 				})),
-			};
+			});
 
 			// Allow registered extension types to append their own payload fields.
 			_metadataTypeRegistry.forEach(({ key, serialize }) => {
@@ -354,7 +383,17 @@ const ItemEditModal = ({
 			const data = await response.json();
 
 			if (response.ok && data.success) {
-				setOriginalData({ ...formData });
+				const stored = { ...formData };
+				['caption', 'description'].forEach((key) => {
+					if (
+						key in payload &&
+						typeof data.item?.[key] === 'string'
+					) {
+						stored[key] = data.item[key];
+					}
+				});
+				setFormData(stored);
+				setOriginalData(stored);
 				setOriginalMetadata({
 					tags: [...metadata.tags],
 					people: [...metadata.people],
@@ -365,7 +404,10 @@ const ItemEditModal = ({
 				setHasChanges(false);
 				setSaving(false);
 				if (data.item) {
-					onSaved?.(itemId, data.item);
+					onSaved?.(itemId, {
+						title: data.item.title,
+						alt: data.item.alt,
+					});
 				}
 
 				if (window.fotogridsToast) {

@@ -162,7 +162,7 @@ final class Lightbox_Grid implements Feature {
 				'thumb'       => $thumb,
 				'alt'         => $item_view->alt,
 				'title'       => $item_view->title,
-				'caption'     => '' !== $item_view->caption_title ? $item_view->caption_title : $item_view->caption,
+				'caption'     => '' !== $item_view->caption_title ? \FotoGrids\Formatted_Text\Entities::escape_text( $item_view->caption_title ) : $item_view->caption,
 				'description' => $item_view->description ?? '',
 				'video'       => $is_video,
 				'w'           => $item_view->full_width ?? $item_view->width,
@@ -173,10 +173,10 @@ final class Lightbox_Grid implements Feature {
 		$is_featured = 'featured-item' === $render_context->layout->layout_id;
 
 		$attrs = array(
-			'data-fg-grid-items'  => wp_json_encode( $items ),
+			'data-fg-grid-items'  => \FotoGrids\Sanitization\Attribute_Value::json( $items ),
 			// The gallery's click behaviour, so grid tiles replay it.
 			'data-fg-grid-click'  => (string) $render_context->behavior->click_behavior,
-			'data-fg-grid-labels' => (string) wp_json_encode( self::client_labels() ),
+			'data-fg-grid-labels' => \FotoGrids\Sanitization\Attribute_Value::json( self::client_labels() ),
 		);
 
 		// On Featured Item the grid opens from the "Show all" button; on the
@@ -243,7 +243,7 @@ final class Lightbox_Grid implements Feature {
 		// Sharing: the grid JS reads data-fg-sharing, which the Sharing decorator
 		// already stamps when sharing is on.
 
-		return $attrs;
+		return array_merge( $attrs, \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::wrapper_attrs( 'lightbox_grid', $render_context ) );
 	}
 
 	/**
@@ -303,11 +303,11 @@ final class Lightbox_Grid implements Feature {
 		return new Module_Assets(
 			array(
 				'fotogrids-lightbox-grid' => new Asset_Decl( 'lightbox/grid/lightbox-grid.css' ),
-			),
-			array(
+			) + \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::css(),
+			\FotoGrids\Render\Formatted_Text\Formatted_Text_Client::js() + array(
 				'fotogrids-lightbox-grid' => new Asset_Decl(
 					'../../assets/js/lightbox-grid.js',
-					array( 'fotogrids-runtime' ),
+					array( 'fotogrids-runtime', \FotoGrids\Render\Formatted_Text\Formatted_Text_Client::HANDLE ),
 					true,
 				),
 			)

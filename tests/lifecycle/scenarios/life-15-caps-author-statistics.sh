@@ -26,7 +26,7 @@ assert_eq no "$( role_has author $CAP )" "the author starts as a 1.3 install lef
 $WP option update fotogrids_caps_version 1.3 --quiet
 load
 
-assert_eq 1.4 "$( $WP option get fotogrids_caps_version )" "the stored version moved to 1.4"
+assert_eq 1.5 "$( $WP option get fotogrids_caps_version )" "the stored version moved to the current one"
 assert_eq yes "$( role_has author $CAP )" "the author was granted Statistics"
 assert_eq yes "$( role_has editor $CAP )" "the editor kept Statistics"
 
@@ -34,9 +34,9 @@ for role in contributor subscriber; do
 	assert_eq no "$( role_has $role $CAP )" "$role was not granted Statistics"
 done
 
-# The step runs once: at 1.4 a removed capability stays removed.
+# The step runs once: at the current version a removed capability stays removed.
 $WP eval "get_role( 'author' )->remove_cap( '$CAP' );"
 load
-assert_eq no "$( role_has author $CAP )" "a load at 1.4 does not run the step again"
+assert_eq no "$( role_has author $CAP )" "a load at the current version does not run the step again"
 
 scratch_teardown

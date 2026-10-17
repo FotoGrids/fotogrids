@@ -284,8 +284,8 @@ test( 'importing on a site without the text puts it back where the Item Edit mod
 	await editor.editItem( edited ).click();
 	await expect( page.locator( '#fotogrids-item-title' ) ).toHaveValue( TEXT.edited.title );
 	await expect( page.locator( '#fotogrids-item-alt' ) ).toHaveValue( TEXT.edited.alt );
-	await expect( page.locator( '#fotogrids-item-caption' ) ).toHaveValue( TEXT.edited.caption );
-	await expect( page.locator( '#fotogrids-item-description' ) ).toHaveValue( TEXT.edited.description );
+	await expect( page.locator( '#fotogrids-item-caption' ) ).toHaveText( TEXT.edited.caption, { useInnerText: true } );
+	await expect( page.locator( '#fotogrids-item-description' ) ).toHaveText( TEXT.edited.description, { useInnerText: true } );
 	await expect( page.locator( '#fotogrids-item-credit' ) ).toHaveValue( CREDIT );
 
 	setSettings( gallery, { lightbox_info_blocks: JSON.stringify( [ 'caption', 'description', 'credit' ] ) } );

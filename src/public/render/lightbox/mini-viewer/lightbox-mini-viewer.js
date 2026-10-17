@@ -108,10 +108,21 @@ function render() {
 
 	const cap = overlay.querySelector('.fg-lb-mv-caption');
 	if (cap) {
-		const text = config.captions
+		const raw = config.captions
 			? captionTextFor(it, config.captionSource)
 			: '';
-		cap.textContent = text;
+		const formatter = window.FotoGrids?.modules?.formattedText;
+		const text = formatter ? formatter.toPlainText(raw).trim() : raw;
+		if (formatter && config.captionSource !== 'title') {
+			formatter.render(cap, raw, {
+				surface: 'lightbox_mini',
+				field: config.captionSource,
+				itemId: it.id,
+				galleryEl: config.galleryEl,
+			});
+		} else {
+			cap.textContent = text.replace(/\s*\n\s*/g, ' ');
+		}
 		cap.style.display = text ? '' : 'none';
 	}
 

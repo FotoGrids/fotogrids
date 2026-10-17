@@ -425,6 +425,18 @@
         transform var( --fg-lb-grid-swap ) ease 0.08s;
 }
 
+.fg-lb-grid-zoom-caption a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.fg-lb-grid-zoom-caption a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
 .fg-lb-grid-zoom-figure.fg-is-swapping .fg-lb-grid-zoom-caption {
     transform: translateY( 4px );
     transition: opacity var( --fg-lb-grid-swap ) ease,
