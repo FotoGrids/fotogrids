@@ -4,6 +4,8 @@ import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { Lightbox } from './support/lightbox';
 import { execFileSync } from 'child_process';
+import { mkdirSync, rmSync, writeFileSync } from 'fs';
+import path from 'path';
 import { storageStateFor, wpCli, wpEval } from './support/roles';
 
 /**
@@ -190,3 +192,69 @@ test.describe('signed in as an administrator', () => {
 		}
 	);
 });
+
+/** A must-use plugin for one row, removed afterwards. */
+function withMuPlugin(code: string): () => void {
+	const file = path.join(
+		process.env.WP_PATH ?? '',
+		'wp-content',
+		'mu-plugins',
+		`fg-e2e-ins21-${process.pid}.php`
+	);
+	mkdirSync(path.dirname(file), { recursive: true });
+	writeFileSync(file, `<?php\n${code}\n`);
+	return () => rmSync(file, { force: true });
+}
+
+/**
+ * INS-21. WordPress does not run shortcodes in a term description; a site that
+ * turns them on gets a working gallery on the category archive.
+ */
+test(
+	'INS-21: a gallery in a category description works on the archive once the site runs shortcodes there',
+	{ tag: '@layout' },
+	async ({ page }) => {
+		const id = lightboxGallery();
+		const term = JSON.parse(
+			wpEval(
+				`$t = wp_insert_term( 'Gallery category ' . wp_generate_password( 6, false ), 'category', array( 'description' => '<p>Before.</p>[fotogrids_gallery id="${id}"]<p>After.</p>' ) );
+				$p = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'In the category', 'post_content' => '<p>Text.</p>', 'post_category' => array( $t['term_id'] ) ) );
+				echo wp_json_encode( array( 'id' => $t['term_id'], 'post' => $p, 'url' => get_term_link( $t['term_id'] ) ) );`
+			).trim()
+		);
+		adopt(term.post);
+		const remove = withMuPlugin(
+			"add_filter( 'term_description', 'do_shortcode' );"
+		);
+
+		try {
+			await worksOn(page, term.url, id);
+			await expect(page.getByText('Before.')).toBeVisible();
+		} finally {
+			remove();
+			wpEval(`wp_delete_term( ${term.id}, 'category' );`);
+		}
+	}
+);
+
+/**
+ * INS-21. A post whose content is a gallery leaves neither the shortcode nor
+ * any gallery markup in its automatic excerpt.
+ */
+test(
+	'INS-21: the automatic excerpt of a gallery post carries no shortcode and no gallery',
+	{ tag: '@layout' },
+	async () => {
+		const id = lightboxGallery();
+		const excerpt = wpEval(
+			`$p = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Gallery post', 'post_content' => '<p>Words before.</p>[fotogrids_gallery id="${id}"]<p>Words after.</p>' ) );
+			update_post_meta( $p, '_fg_scoped', 1 );
+			echo get_the_excerpt( $p );`
+		).trim();
+
+		expect(excerpt).toContain('Words before.');
+		expect(excerpt).toContain('Words after.');
+		expect(excerpt).not.toContain('fotogrids_gallery');
+		expect(excerpt).not.toMatch(/fotogrids-collection|data-fg-/);
+	}
+);
