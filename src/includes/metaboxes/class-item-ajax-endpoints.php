@@ -141,7 +141,7 @@ final class Item_Ajax_Endpoints {
 		wp_send_json_success(
 			array(
 				'id'            => $item_id,
-				'title'         => $attachment->post_title,
+				'title'         => html_entity_decode( $attachment->post_title, ENT_QUOTES, 'UTF-8' ),
 				'alt'           => get_post_meta( $item_id, '_wp_attachment_image_alt', true ),
 				'caption'       => $attachment->post_excerpt,
 				'description'   => $attachment->post_content,

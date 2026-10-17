@@ -8,7 +8,8 @@ import { restoreRoles, snapshotRoles } from './support/site';
 
 /**
  * The caption and description editor in the Item Edit modal: typing, line
- * breaks, formatting, links, HTML mode, undo and the permission.
+ * breaks, formatting, links, HTML mode, undo and the permission. Also the
+ * title field beside it, for titles stored with entities.
  *
  * Serial: creates attachments of its own and changes role capabilities. Runs in
  * Chromium with the suite, and in Firefox and WebKit in the editor browsers job.
@@ -230,5 +231,60 @@ test.describe( 'as an author without the permission', () => {
 		await page.keyboard.type( ' too' );
 		await saveItem( page, itemId );
 		expect( stored( itemId ).caption ).toBe( 'By the admin too' );
+	} );
+} );
+
+test.describe( 'the title field', () => {
+	function storeTitle( id: number, title: string ): void {
+		wpEval(
+			`global $wpdb; $wpdb->update( $wpdb->posts, array( 'post_title' => base64_decode( '${ Buffer.from( title ).toString( 'base64' ) }' ) ), array( 'ID' => ${ id } ) ); clean_post_cache( ${ id } );`
+		);
+	}
+
+	test.describe( 'as an administrator', () => {
+		test.use( { storageState: storageStateFor( 'administrator' ) } );
+
+		test( 'a title stored with entities shows its characters and is not rewritten', { tag: [ '@admin' ] }, async ( { page } ) => {
+			const itemId = attachment( 'admin', 'Before' );
+			storeTitle( itemId, 'Tom &amp; Jerry &quot;live&quot;' );
+			const { id } = galleryPage( {}, [ itemId ] );
+			await openItem( page, id, itemId );
+
+			const title = page.locator( '#fotogrids-item-title' );
+			await expect( title ).toHaveValue( 'Tom & Jerry "live"' );
+			await expect( page.getByRole( 'button', { name: 'Save Changes' } ) ).toBeDisabled();
+
+			const caption = page.locator( '#fotogrids-item-caption' );
+			await caption.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' after' );
+			await saveItem( page, itemId );
+			expect( stored( itemId ) ).toMatchObject( { title: 'Tom &amp; Jerry &quot;live&quot;', caption: 'Before after' } );
+
+			await title.fill( 'Tom & Jerry' );
+			await saveItem( page, itemId );
+			expect( stored( itemId ).title ).toBe( 'Tom & Jerry' );
+		} );
+	} );
+
+	test.describe( 'as an author', () => {
+		test.use( { storageState: storageStateFor( 'author' ) } );
+
+		test( 'a title the author saves reopens as typed', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
+			const itemId = attachment( 'fg-author' );
+			storeTitle( itemId, 'Fish &amp; Chips' );
+			const { id } = galleryPage( {}, [ itemId ], undefined, 'fg-author', 'draft' );
+			await openItem( page, id, itemId );
+
+			const title = page.locator( '#fotogrids-item-title' );
+			await expect( title ).toHaveValue( 'Fish & Chips' );
+
+			await title.fill( 'Fish & Chips again' );
+			await saveItem( page, itemId );
+			expect( stored( itemId ).title ).toBe( 'Fish &amp; Chips again' );
+
+			await openItem( page, id, itemId );
+			await expect( page.locator( '#fotogrids-item-title' ) ).toHaveValue( 'Fish & Chips again' );
+		} );
 	} );
 } );
