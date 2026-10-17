@@ -20,9 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Collection_Defaults_Seeder
  *
- * Copies the settings saved on Settings -> Defaults into a gallery's or
- * album's own post meta at the moment the post is created, so the collection
- * owns its values from the start and the editor opens showing them.
+ * Copies the settings saved on Settings -> Defaults for the collection's type
+ * into a gallery's or album's own post meta when the post is created.
  *
  * A default applies only to collections created after it was saved: editing a
  * default never reaches a collection that already exists. Values are written
@@ -36,6 +35,13 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Collection_Defaults_Seeder {
 
+	/**
+	 * The option that held the defaults of both collection types.
+	 *
+	 * @since      1.1.3
+	 * @deprecated 1.3.0 Use Collection_Defaults_Store::OPTION. Each collection type has its own defaults there.
+	 * @var        string
+	 */
 	const OPTION = 'fotogrids_gallery_defaults';
 
 	/**
@@ -110,9 +116,9 @@ final class Collection_Defaults_Seeder {
 	 * @return void
 	 */
 	public static function seed( int $post_id, string $post_type ): void {
-		$saved = get_option( self::OPTION, array() );
+		$saved = Collection_Defaults_Store::get( $post_type );
 
-		if ( ! is_array( $saved ) || array() === $saved ) {
+		if ( array() === $saved ) {
 			return;
 		}
 

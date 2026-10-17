@@ -160,17 +160,23 @@ final class Plugin_Settings_Store {
 	/**
 	 * Sanitise a map of collection defaults.
 	 *
-	 * Unknown keys are dropped; each value is coerced to its default's type.
+	 * Keys the collection type does not have are dropped; each value is
+	 * coerced to its default's type.
 	 *
-	 * @param  mixed $input Raw map of setting key => value.
+	 * @since  1.1.2
+	 * @since  1.3.0 Added `$type`.
+	 * @param  mixed  $input Raw map of setting key => value.
+	 * @param  string $type  Collection type: `gallery` or `album`.
 	 * @return array<string, mixed>
 	 */
-	public static function sanitize_collection_defaults( $input ): array {
+	public static function sanitize_collection_defaults( $input, string $type = 'gallery' ): array {
 		if ( ! is_array( $input ) ) {
 			return array();
 		}
 
-		$defaults  = \FotoGrids\Collection_Defaults::resolve_gallery();
+		$defaults  = 'album' === Collection_Defaults_Store::type( $type )
+			? \FotoGrids\Collection_Defaults::resolve_album()
+			: \FotoGrids\Collection_Defaults::resolve_gallery();
 		$sanitized = array();
 
 		foreach ( $defaults as $key => $default_value ) {
