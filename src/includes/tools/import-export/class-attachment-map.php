@@ -18,13 +18,20 @@ if ( ! defined( 'WPINC' ) ) {
  * Builds the export's `media` table and resolves its attachment IDs on import.
  *
  * Each table entry identifies one exported attachment by its file: the stored
- * path, the original file's name and size, and the original file's SHA-1. On
+ * path, the original file's name and size, and a fingerprint of its content. On
  * import an attachment ID from the file resolves to the attachment on this site
  * that holds the same file, or to 0 when there is none.
  *
  * @since 1.3.0
  */
 class Attachment_Map {
+
+	/**
+	 * Bytes read from each end of a file for its fingerprint.
+	 *
+	 * @var int
+	 */
+	const FINGERPRINT_BYTES = 65536;
 
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Read-only postmeta lookup by file name; no core API searches attachments by stored path.
 
@@ -50,6 +57,13 @@ class Attachment_Map {
 	private $resolved = array();
 
 	/**
+	 * This site's attachments by file name, built on first use.
+	 *
+	 * @var array<string, int[]>|null
+	 */
+	private $by_name;
+
+	/**
 	 * Builds the resolver for one import.
 	 *
 	 * @since 1.3.0
@@ -72,10 +86,10 @@ class Attachment_Map {
 				continue;
 			}
 			$this->entries[ $id ] = array(
-				'file' => self::text( $entry['file'] ?? '' ),
-				'name' => wp_basename( self::text( $entry['name'] ?? '' ) ),
-				'size' => (int) ( $entry['size'] ?? 0 ),
-				'sha1' => strtolower( self::text( $entry['sha1'] ?? '' ) ),
+				'file'        => self::text( $entry['file'] ?? '' ),
+				'name'        => wp_basename( self::text( $entry['name'] ?? '' ) ),
+				'size'        => (int) ( $entry['size'] ?? 0 ),
+				'fingerprint' => strtolower( self::text( $entry['fingerprint'] ?? '' ) ),
 			);
 		}
 	}
@@ -98,11 +112,11 @@ class Attachment_Map {
 			$on_disk = '' !== $path && is_file( $path ) && is_readable( $path );
 
 			$media[] = array(
-				'id'   => $id,
-				'file' => (string) get_post_meta( $id, '_wp_attached_file', true ),
-				'name' => '' !== $path ? wp_basename( $path ) : '',
-				'size' => $on_disk ? (int) filesize( $path ) : 0,
-				'sha1' => $on_disk ? (string) sha1_file( $path ) : '',
+				'id'          => $id,
+				'file'        => (string) get_post_meta( $id, '_wp_attached_file', true ),
+				'name'        => '' !== $path ? wp_basename( $path ) : '',
+				'size'        => $on_disk ? (int) filesize( $path ) : 0,
+				'fingerprint' => $on_disk ? self::fingerprint( $path ) : '',
 			);
 		}
 
@@ -169,7 +183,7 @@ class Attachment_Map {
 			return $source_id;
 		}
 
-		if ( '' === $entry['sha1'] || '' === $entry['name'] ) {
+		if ( '' === $entry['fingerprint'] || '' === $entry['name'] ) {
 			return 0;
 		}
 
@@ -178,7 +192,7 @@ class Attachment_Map {
 			if ( '' === $path || ! is_file( $path ) || ! is_readable( $path ) ) {
 				continue;
 			}
-			if ( (int) filesize( $path ) === $entry['size'] && hash_equals( $entry['sha1'], (string) sha1_file( $path ) ) ) {
+			if ( (int) filesize( $path ) === $entry['size'] && hash_equals( $entry['fingerprint'], self::fingerprint( $path ) ) ) {
 				return $candidate;
 			}
 		}
@@ -195,25 +209,13 @@ class Attachment_Map {
 	 * @return int[]
 	 */
 	private function candidates( int $source_id, string $name ): array {
-		global $wpdb;
-
 		$extension = pathinfo( $name, PATHINFO_EXTENSION );
 		$stem      = '' === $extension ? $name : substr( $name, 0, -( strlen( $extension ) + 1 ) );
 		$pattern   = '/^' . preg_quote( $stem, '/' ) . '(-\d+)?' . ( '' === $extension ? '' : '\.' . preg_quote( $extension, '/' ) ) . '$/i';
 
-		$ids = array_map(
-			'intval',
-			(array) $wpdb->get_col(
-				$wpdb->prepare(
-					'SELECT pm.post_id FROM %i pm INNER JOIN %i p ON p.ID = pm.post_id WHERE pm.meta_key = %s AND pm.meta_value LIKE %s AND p.post_type = %s ORDER BY pm.post_id',
-					$wpdb->postmeta,
-					$wpdb->posts,
-					'_wp_attached_file',
-					'%' . $wpdb->esc_like( $stem ) . '%',
-					'attachment'
-				)
-			)
-		);
+		$names = $this->names();
+		$key   = strtolower( $stem );
+		$ids   = array_merge( $names[ $key ] ?? array(), $names[ $key . '-' ] ?? array() );
 
 		usort(
 			$ids,
@@ -232,6 +234,50 @@ class Attachment_Map {
 				}
 			)
 		);
+	}
+
+	/**
+	 * This site's attachments grouped by the name of their stored file.
+	 *
+	 * Each attachment is listed under its file's lowercase stem, without the
+	 * `-scaled` or `-rotated` WordPress adds to a resized original. A stem that
+	 * ends in a number suffix such as `-2` is also listed under the stem before
+	 * it followed by `-`, so a duplicate upload is found from the original name.
+	 * One query serves the whole import.
+	 *
+	 * @return array<string, int[]>
+	 */
+	private function names(): array {
+		global $wpdb;
+
+		if ( null !== $this->by_name ) {
+			return $this->by_name;
+		}
+
+		$this->by_name = array();
+		$rows          = (array) $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT pm.post_id, pm.meta_value FROM %i pm INNER JOIN %i p ON p.ID = pm.post_id WHERE pm.meta_key = %s AND p.post_type = %s',
+				$wpdb->postmeta,
+				$wpdb->posts,
+				'_wp_attached_file',
+				'attachment'
+			),
+			ARRAY_N
+		);
+
+		foreach ( $rows as $row ) {
+			$stem = strtolower( (string) pathinfo( (string) $row[1], PATHINFO_FILENAME ) );
+			$stem = (string) preg_replace( '/-(scaled|rotated)$/', '', $stem );
+			$id   = (int) $row[0];
+
+			$this->by_name[ $stem ][] = $id;
+			if ( preg_match( '/^(.+)-\d+$/', $stem, $match ) ) {
+				$this->by_name[ $match[1] . '-' ][] = $id;
+			}
+		}
+
+		return $this->by_name;
 	}
 
 	/**
@@ -302,6 +348,29 @@ class Attachment_Map {
 		}
 
 		return is_string( $path ) ? $path : '';
+	}
+
+	/**
+	 * SHA-1 of a file's size and its first and last FINGERPRINT_BYTES bytes.
+	 *
+	 * @param string $path Readable file path.
+	 * @return string Empty when the file cannot be read.
+	 */
+	private static function fingerprint( string $path ): string {
+		$size   = (int) filesize( $path );
+		$handle = fopen( $path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Reads two ranges of a local upload; WP_Filesystem has no ranged read.
+		if ( false === $handle ) {
+			return '';
+		}
+		$head = (string) fread( $handle, self::FINGERPRINT_BYTES ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread -- See fopen above.
+		$tail = '';
+		if ( $size > self::FINGERPRINT_BYTES ) {
+			fseek( $handle, max( self::FINGERPRINT_BYTES, $size - self::FINGERPRINT_BYTES ) );
+			$tail = (string) fread( $handle, self::FINGERPRINT_BYTES ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread -- See fopen above.
+		}
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- See fopen above.
+
+		return sha1( $size . ':' . $head . $tail );
 	}
 
 	/**

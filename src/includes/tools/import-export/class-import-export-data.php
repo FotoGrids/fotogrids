@@ -645,22 +645,22 @@ class Import_Export_Data {
 				}
 			}
 
-			$gallery_id_map    = array(); // old_id => new_id
-			$written_galleries = array();
-			$previous_lists    = array();
+			$gallery_id_map = array(); // old_id => new_id
+			$previous_lists = array();
+			$embed_slots    = array();
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
-				[ $imp, $skip, $map, $written, $previous ] = self::import_collections(
+				[ $imp, $skip, $map, $previous, $slots ] = self::import_collections(
 					$data['galleries'],
 					Post_Types::GALLERY,
 					$options['galleries'],
 					$attachments,
 					$embed_ids
 				);
-				$imported['galleries']                     = $imp;
-				$skipped['galleries']                      = $skip;
-				$gallery_id_map                            = $map;
-				$written_galleries                         = $written;
-				$previous_lists                            = $previous;
+				$imported['galleries']                   = $imp;
+				$skipped['galleries']                    = $skip;
+				$gallery_id_map                          = $map;
+				$previous_lists                          = $previous;
+				$embed_slots                             = $slots;
 			}
 
 			$album_id_map = array();
@@ -699,7 +699,7 @@ class Import_Export_Data {
 			}
 
 			if ( in_array( 'items', $include, true ) && ! empty( $data['embeds'] ) && is_array( $data['embeds'] ) ) {
-				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $written_galleries, $attachments, $previous_lists );
+				[ $imp, $skip ]    = self::import_embeds( $data['embeds'], $embed_slots, $attachments, $previous_lists );
 				$imported['items'] = ( $imported['items'] ?? 0 ) + $imp;
 				$skipped['items']  = ( $skipped['items'] ?? 0 ) + $skip;
 
@@ -860,9 +860,10 @@ class Import_Export_Data {
 	 *
 	 * $conflict_mode: 'skip' | 'overwrite' | 'duplicate'
 	 *
-	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, written_ids, previous_lists],
-	 * where written_ids lists the posts the import created or overwrote, and
-	 * previous_lists maps each overwritten post to its item list before the import.
+	 * Returns [imported_count, skipped_count, old_id_to_new_id_map, previous_lists, embed_slots],
+	 * where previous_lists maps each overwritten post to its item list before the
+	 * import, and embed_slots maps each post the import created or overwrote to the
+	 * positions in its item list that hold an exported embed (position => exported embed ID).
 	 *
 	 * @param array<int, mixed> $posts         Exported collections.
 	 * @param string            $post_type     Gallery or album post type.
@@ -874,16 +875,16 @@ class Import_Export_Data {
 		$imported = 0;
 		$skipped  = 0;
 		$id_map   = array();
-		$written  = array();
 		$previous = array();
+		$slots    = array();
 
 		foreach ( $posts as $post_data ) {
-			$old_id = (int) ( $post_data['id'] ?? 0 );
-			$slug   = is_string( $post_data['slug'] ?? null ) ? sanitize_title( $post_data['slug'] ) : '';
-			$title  = sanitize_text_field( $post_data['title'] ?? '' );
-			$status = sanitize_key( $post_data['status'] ?? '' );
-			$date   = is_string( $post_data['date'] ?? null ) ? $post_data['date'] : '';
-			$meta   = self::local_media_meta( is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array(), $attachments, $embed_ids );
+			$old_id            = (int) ( $post_data['id'] ?? 0 );
+			$slug              = is_string( $post_data['slug'] ?? null ) ? sanitize_title( $post_data['slug'] ) : '';
+			$title             = sanitize_text_field( $post_data['title'] ?? '' );
+			$status            = sanitize_key( $post_data['status'] ?? '' );
+			$date              = is_string( $post_data['date'] ?? null ) ? $post_data['date'] : '';
+			[ $meta, $embeds ] = self::local_media_meta( is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array(), $attachments, $embed_ids );
 
 			if ( ! in_array( $status, self::COLLECTION_STATUSES, true ) ) {
 				$status = 'publish';
@@ -909,8 +910,8 @@ class Import_Export_Data {
 					foreach ( $meta as $key => $value ) {
 						update_post_meta( $existing->ID, $key, $value );
 					}
-					$id_map[ $old_id ] = $existing->ID;
-					$written[]         = $existing->ID;
+					$id_map[ $old_id ]      = $existing->ID;
+					$slots[ $existing->ID ] = $embeds;
 					++$imported;
 					continue;
 				}
@@ -945,11 +946,11 @@ class Import_Export_Data {
 			}
 
 			$id_map[ $old_id ] = $new_id;
-			$written[]         = $new_id;
+			$slots[ $new_id ]  = $embeds;
 			++$imported;
 		}
 
-		return array( $imported, $skipped, $id_map, $written, $previous );
+		return array( $imported, $skipped, $id_map, $previous, $slots );
 	}
 
 	/**
@@ -964,21 +965,29 @@ class Import_Export_Data {
 	 * @param array<string, mixed> $meta        Exported `fotogrids_*` post meta.
 	 * @param Attachment_Map       $attachments The file's attachments on this site.
 	 * @param array<int, true>     $embed_ids   Exported embed IDs the import recreates.
-	 * @return array<string, mixed>
+	 * @return array{0: array<string, mixed>, 1: array<int, int>} The meta, and the
+	 *         positions in its item list that hold an exported embed (position => exported embed ID).
 	 */
 	private static function local_media_meta( array $meta, Attachment_Map $attachments, array $embed_ids ): array {
+		$slots = array();
+
 		if ( array_key_exists( 'fotogrids_gallery_items', $meta ) ) {
 			$item_ids = array();
+			$local    = array();
+			// An exported embed ID can equal the ID of an attachment on this site, so embeds are tracked by position.
 			foreach ( Attachment_Map::list_ids( $meta['fotogrids_gallery_items'] ) as $item_id ) {
 				if ( isset( $embed_ids[ $item_id ] ) ) {
-					$local = $item_id;
-				} elseif ( $attachments->lists( $item_id ) || ! $attachments->is_same_site() ) {
-					$local = $attachments->resolve( $item_id );
-				} else {
-					$local = $item_id;
+					if ( ! in_array( $item_id, $slots, true ) ) {
+						$slots[ count( $item_ids ) ] = $item_id;
+						$item_ids[]                  = $item_id;
+					}
+					continue;
 				}
-				if ( $local > 0 && ! in_array( $local, $item_ids, true ) ) {
-					$item_ids[] = $local;
+
+				$id = ( $attachments->lists( $item_id ) || ! $attachments->is_same_site() ) ? $attachments->resolve( $item_id ) : $item_id;
+				if ( $id > 0 && ! isset( $local[ $id ] ) ) {
+					$local[ $id ] = true;
+					$item_ids[]   = $id;
 				}
 			}
 			$meta['fotogrids_gallery_items'] = wp_json_encode( $item_ids );
@@ -993,7 +1002,7 @@ class Import_Export_Data {
 			}
 		}
 
-		return $meta;
+		return array( $meta, $slots );
 	}
 
 	/** Import gallery-album relationship rows, remapping IDs. */
@@ -1233,13 +1242,14 @@ class Import_Export_Data {
 	 *
 	 * @since 1.3.0
 	 * @param array<int, mixed> $embeds      Exported embed entries.
-	 * @param int[]             $gallery_ids Galleries the import created or overwrote.
+	 * @param array<int, int[]> $slots       Galleries the import created or overwrote, each with the
+	 *                                       positions in its item list that hold an exported embed.
 	 * @param Attachment_Map    $attachments The file's attachments on this site.
 	 * @param array<int, int[]> $previous    Item lists of the overwritten galleries before the import.
 	 * @return array{0: int, 1: int} Embeds created or updated, and exported embeds no
 	 *                               written gallery lists.
 	 */
-	private static function import_embeds( array $embeds, array $gallery_ids, Attachment_Map $attachments, array $previous = array() ): array {
+	private static function import_embeds( array $embeds, array $slots, Attachment_Map $attachments, array $previous = array() ): array {
 		$by_old_id = array();
 		foreach ( $embeds as $embed ) {
 			$embed = self::sanitize_embed( (array) $embed, $attachments );
@@ -1254,16 +1264,24 @@ class Import_Export_Data {
 		$used    = array();
 		$lists   = array();
 
-		foreach ( array_unique( array_map( 'intval', $gallery_ids ) ) as $gallery_id ) {
-			$item_ids = Gallery_Repository::get_item_ids( $gallery_id );
-			$placed   = array();
+		foreach ( $slots as $gallery_id => $gallery_slots ) {
+			$gallery_id = (int) $gallery_id;
+			$item_ids   = Gallery_Repository::get_item_ids( $gallery_id );
+			$placed     = array();
 
-			foreach ( $item_ids as $index => $item_id ) {
+			foreach ( $gallery_slots as $index => $item_id ) {
+				if ( ( $item_ids[ $index ] ?? 0 ) !== $item_id ) {
+					continue;
+				}
 				if ( ! isset( $by_old_id[ $item_id ] ) ) {
+					// The exporting site's ID means nothing here.
+					if ( ! $attachments->is_same_site() ) {
+						$item_ids[ $index ] = 0;
+					}
 					continue;
 				}
 				$used[ $item_id ] = true;
-				if ( ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
+				if ( $attachments->is_same_site() && ! isset( $created[ $item_id ] ) && self::is_same_embed( $item_id, $gallery_id, $by_old_id[ $item_id ] ) ) {
 					Embed_Store::update( $item_id, $by_old_id[ $item_id ] );
 					$reused[ $item_id ] = true;
 					++$updated;

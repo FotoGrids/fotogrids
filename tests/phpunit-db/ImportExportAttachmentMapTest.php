@@ -5,6 +5,7 @@
  * @package FotoGrids
  */
 
+use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Post_Types;
@@ -191,11 +192,11 @@ class ImportExportAttachmentMapTest extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'   => $photo,
-					'file' => '2026/10/photo.jpg',
-					'name' => 'photo.jpg',
-					'size' => strlen( self::PHOTO ),
-					'sha1' => sha1( self::PHOTO ),
+					'id'          => $photo,
+					'file'        => '2026/10/photo.jpg',
+					'name'        => 'photo.jpg',
+					'size'        => strlen( self::PHOTO ),
+					'fingerprint' => sha1( strlen( self::PHOTO ) . ':' . self::PHOTO ),
 				),
 			),
 			$this->export()['media']
@@ -259,6 +260,60 @@ class ImportExportAttachmentMapTest extends WP_UnitTestCase {
 		$this->assertSame( 7, $this->item_views( $reupload ) );
 	}
 
+	/** Adds to the file a YouTube embed whose ID on the exporting site is `$id`. */
+	private static function with_embed( array $file, int $id ): array {
+		$file['embeds'] = array(
+			array(
+				'id'        => $id,
+				'item_type' => 'video_youtube',
+				'video_id'  => 'dQw4w9WgXcQ',
+				'url'       => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+				'caption'   => 'Harbour timelapse',
+			),
+		);
+
+		return $file;
+	}
+
+	public function test_a_reupload_keeps_its_place_when_its_id_equals_an_exported_embed_in_another_gallery(): void {
+		[ $file ] = $this->file_from_another_site();
+		$reupload = $this->upload( 'photo.jpg', self::PHOTO, '2026/11' );
+
+		$file                         = self::with_embed( $file, $reupload );
+		$videos                       = $file['galleries'][0];
+		$videos['id']                 = 9001;
+		$videos['slug']               = 'videos';
+		$videos['title']              = 'Videos';
+		$videos['meta']               = array( 'fotogrids_gallery_items' => wp_json_encode( array( $reupload ) ) );
+		$file['galleries'][]          = $videos;
+		$file['galleries'][0]['slug'] = 'harbour';
+
+		$this->import( $file );
+
+		$harbour = get_page_by_path( 'harbour', OBJECT, 'fotogrids_gallery' )->ID;
+		$this->assertSame( array( $reupload ), Gallery_Repository::get_item_ids( $harbour ) );
+
+		$video = Gallery_Repository::get_item_ids( get_page_by_path( 'videos', OBJECT, 'fotogrids_gallery' )->ID );
+		$this->assertCount( 1, $video );
+		$this->assertNotSame( $reupload, $video[0] );
+		$this->assertSame( 'dQw4w9WgXcQ', Embed_Store::get( $video[0] )['video_id'] );
+	}
+
+	public function test_a_reupload_and_an_exported_embed_with_the_same_id_both_stay_in_the_gallery(): void {
+		[ $file, $source ] = $this->file_from_another_site();
+		$reupload          = $this->upload( 'photo.jpg', self::PHOTO, '2026/11' );
+
+		$file = self::with_embed( $file, $reupload );
+		$file['galleries'][0]['meta']['fotogrids_gallery_items'] = wp_json_encode( array( $source, $reupload ) );
+
+		$this->import( $file );
+
+		$items = Gallery_Repository::get_item_ids( $this->imported_gallery() );
+		$this->assertCount( 2, $items );
+		$this->assertSame( $reupload, $items[0] );
+		$this->assertSame( 'dQw4w9WgXcQ', Embed_Store::get( $items[1] )['video_id'] );
+	}
+
 	public function test_a_reupload_is_matched_through_an_xml_file(): void {
 		[ $file ] = $this->file_from_another_site();
 		$reupload = $this->upload( 'photo.jpg', self::PHOTO, '2026/11' );
@@ -267,6 +322,76 @@ class ImportExportAttachmentMapTest extends WP_UnitTestCase {
 
 		$this->assertSame( array( $reupload ), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
 		$this->assertSame( 'Jane Doe', Item_Meta::get( $reupload )['credit'] );
+	}
+
+	private function large_file_from_another_site( string $bytes ): array {
+		$photo = $this->upload( 'large.jpg', $bytes );
+		$this->gallery_with( $photo );
+		$file = $this->export();
+
+		$this->forget_galleries();
+		wp_delete_attachment( $photo, true );
+		$file['meta']['site_url'] = 'https://exporting.example';
+
+		return $file;
+	}
+
+	private static function large_bytes(): string {
+		return str_repeat( 'A', 100000 ) . str_repeat( 'B', 100000 ) . str_repeat( 'C', 100000 );
+	}
+
+	public function test_a_large_reupload_is_matched(): void {
+		$file = $this->large_file_from_another_site( self::large_bytes() );
+
+		$reupload = $this->upload( 'large.jpg', self::large_bytes(), '2026/11' );
+		$this->import( $file );
+
+		$this->assertSame( array( $reupload ), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
+	}
+
+	public function test_a_large_file_of_the_same_size_that_differs_at_its_end_is_not_matched(): void {
+		$file = $this->large_file_from_another_site( self::large_bytes() );
+
+		$this->upload( 'large.jpg', substr( self::large_bytes(), 0, -1 ) . 'D', '2026/11' );
+		$this->import( $file );
+
+		$this->assertSame( array(), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
+	}
+
+	public function test_a_large_file_of_the_same_size_that_differs_at_its_start_is_not_matched(): void {
+		$file = $this->large_file_from_another_site( self::large_bytes() );
+
+		$this->upload( 'large.jpg', 'D' . substr( self::large_bytes(), 1 ), '2026/11' );
+		$this->import( $file );
+
+		$this->assertSame( array(), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
+	}
+
+	public function test_a_reupload_that_WordPress_scaled_down_is_matched(): void {
+		[ $file ] = $this->file_from_another_site();
+		$reupload = $this->upload( 'photo.jpg', self::PHOTO, '2026/11' );
+		$this->upload( 'photo-scaled.jpg', 'the scaled-down copy', '2026/11' );
+		update_attached_file( $reupload, '2026/11/photo-scaled.jpg' );
+		wp_update_attachment_metadata(
+			$reupload,
+			array(
+				'file'           => '2026/11/photo-scaled.jpg',
+				'original_image' => 'photo.jpg',
+			)
+		);
+
+		$this->import( $file );
+
+		$this->assertSame( array( $reupload ), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
+	}
+
+	public function test_a_reupload_whose_name_differs_in_case_is_matched(): void {
+		[ $file ] = $this->file_from_another_site();
+		$reupload = $this->upload( 'Photo.JPG', self::PHOTO, '2026/11' );
+
+		$this->import( $file );
+
+		$this->assertSame( array( $reupload ), Gallery_Repository::get_item_ids( $this->imported_gallery() ) );
 	}
 
 	public function test_a_reupload_renamed_for_a_duplicate_name_is_matched(): void {
