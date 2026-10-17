@@ -418,21 +418,25 @@ test.describe( 'stored values', () => {
 		}
 	} );
 
-	test( 'ticking Settings without choosing which ones is refused over REST, and nothing is imported', { tag: [ '@admin', '@settings', '@api' ] }, async ( { page, baseURL } ) => {
-		const slug = `settings-refused-${ Date.now() }`;
-		const result = await executeThroughApi(
-			page,
-			baseURL as string,
-			JSON.stringify( {
-				meta: { version: '1.3.0' },
-				galleries: [ { id: 880102, title: 'Refused', slug, status: 'draft', date: '2026-01-01 00:00:00', meta: {} } ],
-				settings: { autosave: '0' },
-			} ),
-			{ include: [ 'galleries', 'settings' ], galleries: 'duplicate' }
-		);
+	test.describe( 'refused', () => {
+		test.use( { allowConsoleErrors: 'the import request is refused with a 400 on purpose' } );
 
-		expect( result.error ).toMatchObject( { code: 'settings_keys_required', data: { status: 400 } } );
-		expect( readOption( sharedWp, 'fotogrids_autosave' ) ).toBe( '1' );
-		expect( sharedWp( 'post', 'list', '--post_type=fotogrids_gallery', '--post_status=any', `--name=${ slug }`, '--format=count' ) ).toBe( '0' );
+		test( 'ticking Settings without choosing which ones is refused over REST, and nothing is imported', { tag: [ '@admin', '@settings', '@api' ] }, async ( { page, baseURL } ) => {
+			const slug = `settings-refused-${ Date.now() }`;
+			const result = await executeThroughApi(
+				page,
+				baseURL as string,
+				JSON.stringify( {
+					meta: { version: '1.3.0' },
+					galleries: [ { id: 880102, title: 'Refused', slug, status: 'draft', date: '2026-01-01 00:00:00', meta: {} } ],
+					settings: { autosave: '0' },
+				} ),
+				{ include: [ 'galleries', 'settings' ], galleries: 'duplicate' }
+			);
+
+			expect( result.error ).toMatchObject( { code: 'settings_keys_required', data: { status: 400 } } );
+			expect( readOption( sharedWp, 'fotogrids_autosave' ) ).toBe( '1' );
+			expect( sharedWp( 'post', 'list', '--post_type=fotogrids_gallery', '--post_status=any', `--name=${ slug }`, '--format=count' ) ).toBe( '0' );
+		} );
 	} );
 } );
