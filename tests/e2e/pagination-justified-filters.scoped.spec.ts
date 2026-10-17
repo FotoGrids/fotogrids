@@ -90,8 +90,8 @@ test(
 /**
  * PAG-10. The snap resolver, called directly over a spread of item counts and
  * aspect ratios: its pages follow on from each other, each starts and ends on
- * a packed row, and every page but the last holds at least the window's
- * minimum.
+ * a packed row, every page but the last holds at least the window's minimum,
+ * and together they cover every item.
  */
 test(
 	'PAG-10: snap pages are contiguous, row-aligned and inside the window',
@@ -135,6 +135,7 @@ test(
 									if ( $p < $pages && $r['page_size'] < $min ) { $broken[] = "$case holds {$r['page_size']}, under $min"; }
 									$next = $end;
 								}
+								if ( $next !== $n ) { $broken[] = "n=$n target=$target window=$window $direction pages end at $next of $n"; }
 								++$runs;
 							}
 						}
@@ -146,6 +147,42 @@ test(
 
 		expect(report.runs).toBe(270);
 		expect(report.broken).toEqual([]);
+	}
+);
+
+/**
+ * PAG-15. Fill galleries whose item count is off a page boundary. Thirteen
+ * items at twelve a page snap to one page holding all thirteen, so Load More
+ * starts hidden; twenty-five page through Load More to the last item.
+ */
+test(
+	'PAG-15: Load More reaches every item of a justified Fill gallery',
+	{ tag: '@layout' },
+	async ({ page }) => {
+		const byId = (a: number, b: number) => a - b;
+
+		for (const count of [13, 25]) {
+			const items = sixty().slice(0, count);
+			const { id, url } = galleryPage(
+				{
+					layout: 'justified',
+					layout_justified_page_trailing_row: 'fill',
+					pagination_type: 'paginated',
+					pagination_method: 'load_more',
+					items_per_page: PER_PAGE(12),
+				},
+				items
+			);
+			const gallery = await open(page, url, id);
+			const counts = await loadAll(gallery);
+
+			if (13 === count) {
+				expect(counts, '13 items load as one page').toEqual([13]);
+			}
+			expect((await itemIds(gallery)).sort(byId)).toEqual(
+				[...items].sort(byId)
+			);
+		}
 	}
 );
 
