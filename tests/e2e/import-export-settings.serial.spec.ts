@@ -336,7 +336,7 @@ test.describe( 'stored values', () => {
 			include: [ 'settings' ],
 			settings: [ 'media', 'collection_defaults' ],
 		} );
-		expect( result.imported ).toEqual( { settings: true, settings_detail: [] } );
+		expect( result.imported, 'settings the file does not hold were imported' ).not.toHaveProperty( 'settings' );
 
 		expect( readOption( sharedWp, 'fotogrids_media_settings' ) ).toEqual( MEDIA );
 		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
