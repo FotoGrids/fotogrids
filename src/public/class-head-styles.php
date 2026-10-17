@@ -8,6 +8,7 @@
 namespace FotoGrids;
 
 use FotoGrids\Hooks\Filters_Page_Builders;
+use FotoGrids\Hooks\Filters_Render;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -46,7 +47,7 @@ final class Head_Styles {
 			return;
 		}
 
-		$embeds = self::widget_embeds();
+		$embeds = (array) apply_filters( Filters_Render::WIDGET_EMBEDS, self::widget_embeds() );
 
 		$post = is_singular() ? get_queried_object() : null;
 		if ( $post instanceof \WP_Post && ! post_password_required( $post ) ) {

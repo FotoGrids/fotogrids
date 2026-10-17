@@ -8,6 +8,7 @@
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Head_Styles;
+use FotoGrids\Modules\ViewCollections\Router;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Public_Render;
@@ -42,6 +43,8 @@ class HeadStylesTest extends WP_UnitTestCase {
 		Public_Render::set_view_page_context( false );
 		unregister_sidebar( 'fg-sidebar' );
 		$GLOBALS['_wp_sidebars_widgets'] = array();
+		delete_option( 'fotogrids_view_settings' );
+		Router::route( '' );
 		parent::tear_down();
 	}
 
@@ -253,6 +256,28 @@ class HeadStylesTest extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $head );
 		$this->assertSame( $this->rendered( $block ), $head );
+	}
+
+	/** Stylesheets the head pass enqueues on a gallery's view page in the given layout mode. */
+	private function view_page_pass( int $gallery, string $layout_mode ): array {
+		update_option( 'fotogrids_view_settings', array( 'layout_mode' => $layout_mode ) );
+		$this->reset_styles();
+		$this->go_to( get_permalink( $gallery ) );
+		Router::route( get_index_template() );
+		Head_Styles::enqueue();
+
+		return $this->queued_styles();
+	}
+
+	public function test_the_bundled_view_page_shell_enqueues_no_widget_collections(): void {
+		$gallery = $this->gallery();
+		$this->widget( 'text', 7, array( 'text' => '[fotogrids_gallery id="' . $this->gallery( array( 'layout' => 'masonry' ) ) . '"]' ) );
+
+		$this->assertContains( 'fotogrids-layout-masonry', $this->view_page_pass( $gallery, 'integrated' ) );
+
+		$standalone = $this->view_page_pass( $gallery, 'standalone' );
+		$this->assertContains( 'fotogrids-layout-grid', $standalone );
+		$this->assertNotContains( 'fotogrids-layout-masonry', $standalone );
 	}
 
 	public function test_an_embed_added_through_the_filter_enqueues_its_styles(): void {
