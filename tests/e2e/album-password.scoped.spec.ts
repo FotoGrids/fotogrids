@@ -1,6 +1,11 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from './support/test';
-import { album, galleryPage, type Settings } from './support/collections';
+import {
+	album,
+	galleryPage,
+	shortcodePage,
+	type Settings,
+} from './support/collections';
 import { wpEval } from './support/roles';
 
 /**
@@ -216,3 +221,18 @@ test.describe('the right password', () => {
 		}
 	);
 });
+
+test(
+	'an album embed keeps its template when unlocked in place',
+	{ tag: ['@gate', '@layout'] },
+	async ({ page }) => {
+		const { id } = passwordAlbum({ layout: 'grid' });
+		await page.goto(shortcodePage(id, 'template="masonry"', 'album').url);
+
+		await unlockThroughForm(page, id, PASSWORD);
+		await expect(page.locator(TILES)).toHaveCount(2, { timeout: 15000 });
+		await expect(
+			page.locator(`.fotogrids-album[data-fg-album-id="${id}"]`)
+		).toHaveAttribute('data-fg-layout', 'masonry');
+	}
+);
