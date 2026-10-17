@@ -340,7 +340,7 @@ test( 'a file from an earlier version, with empty captions and no title or alt, 
 	setText( edited, TEXT.edited );
 
 	const older = {
-		meta: { version: '1.1.4' },
+		meta: { version: '1.1.4', site_url: wpEval( 'echo get_site_url();' ).trim() },
 		items: [ { attachment_id: String( edited ), gallery_id: '0', item_type: 'image', caption: '', description: '', credit: CREDIT } ],
 	};
 	const result = await importThroughUi( page, 'fotogrids-export.json', JSON.stringify( older ) );

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-17T11:09:03+00:00\n"
+"POT-Creation-Date: 2026-10-17T13:15:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -44,32 +44,32 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:266
+#: fotogrids.php:268
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:267
-#: fotogrids.php:276
+#: fotogrids.php:269
+#: fotogrids.php:278
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:275
+#: fotogrids.php:277
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:291
-#: includes/class-admin-init.php:159
-#: includes/class-admin-init.php:160
+#: fotogrids.php:293
+#: includes/class-admin-init.php:163
+#: includes/class-admin-init.php:164
 #: includes/tools/import-export/assets/constants.js:42
 #: includes/tools/import-export/assets/constants.js:107
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:308
+#: fotogrids.php:310
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:333
+#: fotogrids.php:335
 #: assets/admin/src/components/dashboard/LearnSection.jsx:85
 msgid "Help Center"
 msgstr ""
@@ -224,8 +224,8 @@ msgid "New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:136
-#: includes/class-admin-init.php:123
-#: includes/class-admin-init.php:124
+#: includes/class-admin-init.php:125
+#: includes/class-admin-init.php:126
 #: includes/diagnostics/class-system-report.php:163
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:23
 #: assets/admin/src/components/pages/StatsPage.jsx:235
@@ -3955,8 +3955,8 @@ msgstr ""
 msgid "{postType} Password"
 msgstr ""
 
-#: includes/class-admin-init.php:132
-#: includes/class-admin-init.php:133
+#: includes/class-admin-init.php:136
+#: includes/class-admin-init.php:137
 #: includes/class-upgrade-modal.php:97
 #: includes/modules/Templates/Module.php:44
 #: includes/modules/Templates/Module.php:119
@@ -3965,34 +3965,34 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: includes/class-admin-init.php:141
-#: includes/class-admin-init.php:142
+#: includes/class-admin-init.php:145
+#: includes/class-admin-init.php:146
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:32
 msgid "Library"
 msgstr ""
 
-#: includes/class-admin-init.php:150
-#: includes/class-admin-init.php:151
+#: includes/class-admin-init.php:154
+#: includes/class-admin-init.php:155
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
 #: includes/tools/import-export/assets/constants.js:50
 msgid "Statistics"
 msgstr ""
 
-#: includes/class-admin-init.php:168
-#: includes/class-admin-init.php:169
+#: includes/class-admin-init.php:172
+#: includes/class-admin-init.php:173
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
 msgid "Tools"
 msgstr ""
 
-#: includes/class-admin-init.php:178
-#: includes/class-admin-init.php:179
+#: includes/class-admin-init.php:182
+#: includes/class-admin-init.php:183
 #: includes/metaboxes/class-metabox-strings.php:290
 #: includes/modules/Templates/Module.php:325
 #: assets/admin/plain/collection-settings.js:2541
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:576
+#: includes/class-admin-init.php:604
 #: includes/metaboxes/class-collection-save-pipeline.php:107
 #: includes/metaboxes/class-item-ajax-endpoints.php:468
 #: includes/rest/admin/admin-data.php:221
@@ -4002,37 +4002,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:602
+#: includes/class-admin-init.php:630
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:610
+#: includes/class-admin-init.php:638
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:619
-#: includes/class-admin-init.php:666
+#: includes/class-admin-init.php:647
+#: includes/class-admin-init.php:694
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:671
+#: includes/class-admin-init.php:699
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:923
+#: includes/class-admin-init.php:951
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:924
+#: includes/class-admin-init.php:952
 msgid "Remove from Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1052
+#: includes/class-admin-init.php:1080
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1058
+#: includes/class-admin-init.php:1086
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4040,8 +4040,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1071
-#: includes/class-admin-init.php:1085
+#: includes/class-admin-init.php:1099
+#: includes/class-admin-init.php:1113
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4049,7 +4049,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from albums.
-#: includes/class-admin-init.php:1104
+#: includes/class-admin-init.php:1132
 #, php-format
 msgid "%d gallery removed from its albums."
 msgid_plural "%d galleries removed from their albums."
@@ -4057,32 +4057,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1116
-#: includes/class-admin-init.php:1130
+#: includes/class-admin-init.php:1144
+#: includes/class-admin-init.php:1158
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1148
-#: includes/class-admin-init.php:1327
+#: includes/class-admin-init.php:1176
+#: includes/class-admin-init.php:1355
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1151
+#: includes/class-admin-init.php:1179
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1154
+#: includes/class-admin-init.php:1182
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1191
+#: includes/class-admin-init.php:1219
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1194
+#: includes/class-admin-init.php:1222
 msgid "Choose an album..."
 msgstr ""
 
@@ -6477,8 +6477,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:68
 #: includes/rest/gallery/gallery-data.php:38
-#: includes/rest/gallery/gallery-data.php:328
-#: includes/rest/gallery/gallery-data.php:600
+#: includes/rest/gallery/gallery-data.php:332
+#: includes/rest/gallery/gallery-data.php:604
 #: includes/rest/gallery/gallery-permissions.php:67
 #: includes/rest/gallery/lightbox-slides-data.php:52
 #: includes/rest/items/embed-data.php:134
@@ -7068,12 +7068,12 @@ msgstr ""
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:319
+#: includes/rest/gallery/gallery-data.php:323
 #: includes/rest/gallery/lightbox-slides-data.php:43
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:336
+#: includes/rest/gallery/gallery-data.php:340
 #: includes/rest/gallery/gallery-permissions.php:79
 #: includes/rest/gallery/lightbox-slides-data.php:60
 msgid "Gallery is not published."
@@ -7636,28 +7636,32 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:129
+#: includes/tools/import-export/class-import-export-data.php:131
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:164
+#: includes/tools/import-export/class-import-export-data.php:166
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:463
+#: includes/tools/import-export/class-import-export-data.php:469
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:480
+#: includes/tools/import-export/class-import-export-data.php:486
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:517
+#: includes/tools/import-export/class-import-export-data.php:523
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:524
+#: includes/tools/import-export/class-import-export-data.php:530
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
+msgstr ""
+
+#: includes/tools/import-export/class-import-export-data.php:574
+msgid "This file was exported by an earlier version of FotoGrids on another site, so it doesn't say which image files its items use. Its images will be skipped. To bring them across, update FotoGrids on the original site, export again, and import the new file."
 msgstr ""
 
 #: includes/tools/import-export/class-import-export-tool.php:30
@@ -7879,31 +7883,31 @@ msgstr ""
 msgid "Attachment is not an image."
 msgstr ""
 
-#: public/class-public-render.php:409
+#: public/class-public-render.php:442
 msgid "No gallery ID specified. Usage: [fotogrids_gallery id=\"1\"]"
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:417
-#: public/class-public-render.php:683
+#: public/class-public-render.php:450
+#: public/class-public-render.php:719
 #, php-format
 msgid "Gallery with ID %d not found."
 msgstr ""
 
 #. translators: 1: gallery ID, 2: post status.
-#: public/class-public-render.php:429
+#: public/class-public-render.php:462
 #, php-format
 msgid "Gallery with ID %1$d is not published (status: %2$s)."
 msgstr ""
 
 #. translators: %d: gallery ID.
-#: public/class-public-render.php:443
-#: public/class-public-render.php:696
+#: public/class-public-render.php:476
+#: public/class-public-render.php:732
 #, php-format
 msgid "Gallery with ID %d exists but has no items."
 msgstr ""
 
-#: public/class-public-render.php:675
+#: public/class-public-render.php:711
 msgid "No gallery ID specified."
 msgstr ""
 

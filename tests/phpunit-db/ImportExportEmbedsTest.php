@@ -7,6 +7,7 @@
 
 use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Tools\ImportExport\Attachment_Map;
 use FotoGrids\Tools\ImportExport\Import_Export_Data;
 
 class ImportExportEmbedsTest extends WP_UnitTestCase {
@@ -190,6 +191,78 @@ class ImportExportEmbedsTest extends WP_UnitTestCase {
 
 		$this->assertSame( array( $embed ), Gallery_Repository::get_item_ids( $gallery ) );
 		$this->assertSame( array( $embed ), $this->embeds() );
+	}
+
+	/**
+	 * The export as another site would write it: that site's URL, and `$source_id`
+	 * in place of the embed's ID.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function from_another_site( string $file, int $embed, int $source_id ): array {
+		$data                     = json_decode( $file, true );
+		$data['meta']['site_url'] = 'https://exporting.example';
+		foreach ( $data['galleries'] as $index => $gallery ) {
+			$ids = Attachment_Map::list_ids( $gallery['meta']['fotogrids_gallery_items'] );
+			foreach ( $ids as $position => $id ) {
+				if ( $id === $embed ) {
+					$ids[ $position ] = $source_id;
+				}
+			}
+			$data['galleries'][ $index ]['meta']['fotogrids_gallery_items'] = wp_json_encode( $ids );
+		}
+		foreach ( $data['embeds'] as $index => $entry ) {
+			if ( (int) $entry['id'] === $embed ) {
+				$data['embeds'][ $index ]['id'] = $source_id;
+			}
+		}
+
+		return $data;
+	}
+
+	public function test_overwrite_from_another_site_updates_the_gallerys_own_embed_of_the_same_video(): void {
+		$embed   = $this->embed();
+		$gallery = $this->gallery_with( $embed );
+		$file    = $this->from_another_site( $this->export(), $embed, 987654 );
+
+		$file['embeds'][0]['caption'] = 'From the other site';
+		$this->import( wp_json_encode( $file ), 'overwrite' );
+
+		$this->assertSame( array( $embed ), Gallery_Repository::get_item_ids( $gallery ) );
+		$this->assertSame( array( $embed ), $this->embeds() );
+		$this->assertSame( 'From the other site', Embed_Store::get( $embed )['caption'] );
+	}
+
+	public function test_overwrite_from_another_site_adds_an_embed_for_a_different_video(): void {
+		$embed   = $this->embed();
+		$gallery = $this->gallery_with( $embed );
+		$file    = $this->from_another_site( $this->export(), $embed, 987654 );
+
+		$file['embeds'][0]['video_id'] = 'M7lc1UVf-VE';
+		$file['embeds'][0]['url']      = 'https://www.youtube.com/embed/M7lc1UVf-VE';
+		$this->import( wp_json_encode( $file ), 'overwrite' );
+
+		$items = Gallery_Repository::get_item_ids( $gallery );
+		$this->assertCount( 1, $items );
+		$this->assertNotSame( $embed, $items[0] );
+		$this->assertSame( 'M7lc1UVf-VE', Embed_Store::get( $items[0] )['video_id'] );
+	}
+
+	public function test_overwrite_from_another_site_leaves_an_embed_another_gallery_lists(): void {
+		$embed   = $this->embed();
+		$gallery = $this->gallery_with( $embed );
+		$other   = $this->gallery_with( $embed );
+		$file    = $this->from_another_site( $this->export(), $embed, 987654 );
+
+		$file['galleries'] = array_values( array_filter( $file['galleries'], static function ( $g ) use ( $gallery ) {
+			return (int) $g['id'] === $gallery;
+		} ) );
+		$this->import( wp_json_encode( $file ), 'overwrite' );
+
+		$items = Gallery_Repository::get_item_ids( $gallery );
+		$this->assertCount( 1, $items );
+		$this->assertNotSame( $embed, $items[0] );
+		$this->assertSame( array( $embed ), Gallery_Repository::get_item_ids( $other ) );
 	}
 
 	public function test_overwrite_writes_the_files_data_onto_the_embed(): void {
