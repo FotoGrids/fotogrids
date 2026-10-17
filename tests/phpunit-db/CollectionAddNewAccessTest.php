@@ -246,7 +246,7 @@ class CollectionAddNewAccessTest extends WP_UnitTestCase {
 		$css = implode( '', (array) wp_styles()->get_data( 'fotogrids-admin-chrome', 'after' ) );
 
 		$this->assertStringContainsString( 'a[href^="post-new.php?post_type=fotogrids_"]::before', $css );
-		$this->assertStringContainsString( '"\\21B3" / ""', $css );
+		$this->assertStringContainsString( '"\\2192" / ""', $css );
 
 		wp_deregister_style( 'fotogrids-admin-chrome' );
 	}
