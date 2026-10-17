@@ -1563,8 +1563,8 @@ class Admin_Init {
 	 * @return string
 	 */
 	private static function add_new_menu_css() {
-		return '#adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\21B3";content:"\21B3" / "";margin-inline-end:6px;}'
-			. '.rtl #adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\21B2";content:"\21B2" / "";}';
+		return '#adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\2192";content:"\2192" / "";font-size:.8em;opacity:.55;margin-inline-end:6px;}'
+			. '.rtl #adminmenu .wp-submenu a[href^="post-new.php?post_type=fotogrids_"]::before{content:"\2190";content:"\2190" / "";}';
 	}
 
 	/**
