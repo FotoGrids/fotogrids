@@ -19,9 +19,8 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Retired
  *
- * A reset still keeps the licence options, and clears the settings options
- * that earlier versions registered without writing and the defaults option
- * earlier versions shared between galleries and albums.
+ * Options earlier versions stored. A reset keeps the licence options and
+ * clears the rest.
  *
  * @package FotoGrids\Options\Declarations
  * @since   1.3.0

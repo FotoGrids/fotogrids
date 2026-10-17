@@ -19,15 +19,12 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Collection_Defaults_Split
  *
- * Versions before 1.3.0 kept Gallery Defaults and Album Defaults in one map,
- * the `fotogrids_gallery_defaults` option, so each subtab showed and applied
- * the other's values. That map is copied to every collection type that has
- * no defaults of its own yet, so each type keeps what it showed and applied
- * before, and the old option is then deleted. The old option is kept when
- * the copy could not be written, so the next run can retry it.
+ * Copies the map in `fotogrids_gallery_defaults` to every collection type
+ * with no defaults of its own, then deletes that option. The option is kept
+ * when the copy cannot be written.
  *
- * Runs on upgrade, and from `Collection_Defaults_Store::all()` whenever the
- * new option does not exist yet.
+ * Runs on upgrade, and from `Collection_Defaults_Store::all()` when the new
+ * option does not exist yet.
  *
  * @package FotoGrids\Migrations
  * @since   1.3.0

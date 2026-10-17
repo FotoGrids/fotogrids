@@ -128,8 +128,7 @@ final class Collection_Defaults_Store {
 
 		update_option( self::OPTION, $all );
 
-		// update_option() also answers false when nothing changed, so the
-		// stored value decides whether the write took.
+		// update_option() also returns false when nothing changed.
 		return wp_json_encode( get_option( self::OPTION ) ) === wp_json_encode( $all );
 	}
 

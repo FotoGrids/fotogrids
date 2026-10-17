@@ -104,7 +104,7 @@ test( 'saved defaults held as JSON text become lists on upgrade and reach a new 
 
 		await runUpgrade( page );
 
-		// The map earlier versions shared between galleries and albums now belongs to each.
+		// The shared map moves to both types.
 		expect( JSON.parse( snapshotDefaults() ?? '{}' ) ).toEqual( {
 			gallery: { lightbox_info_blocks: [ 'exif', 'caption' ] },
 			album: { lightbox_info_blocks: [ 'exif', 'caption' ] },

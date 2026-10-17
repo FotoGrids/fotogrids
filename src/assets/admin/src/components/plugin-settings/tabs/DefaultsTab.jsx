@@ -8,8 +8,7 @@ import { toPostType } from '../../../utils/post-types';
 
 const ENDPOINT = '/fotogrids/v1/admin/collection-defaults';
 
-// What each subtab has saved since the page loaded, layered over its
-// localized settings when the subtab is opened again.
+// What each subtab has saved since the page loaded.
 const savedSinceLoad = { gallery: {}, album: {} };
 
 /**

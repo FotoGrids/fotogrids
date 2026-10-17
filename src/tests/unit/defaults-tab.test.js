@@ -41,7 +41,7 @@ const leave = async () => {
 	return result;
 };
 
-// What a subtab saved stays with the page, so later tests see earlier saves.
+// Saves persist across the tests in this file.
 beforeEach(() => {
 	apiFetch.mockReset();
 	apiFetch.mockImplementation(({ data }) =>

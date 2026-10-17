@@ -634,8 +634,7 @@ class Admin_Data {
 	/**
 	 * Persist one collection type's defaults.
 	 *
-	 * Merges the incoming keys over what is stored rather than replacing the
-	 * type's defaults, so a caller that sends one setting does not drop the rest.
+	 * Merges the incoming keys over the type's saved defaults.
 	 *
 	 * POST /wp-json/fotogrids/v1/admin/collection-defaults
 	 *
@@ -1068,11 +1067,9 @@ class Admin_Data {
 	/**
 	 * Whether the user has saved any of the plugin's Setup settings pages.
 	 *
-	 * Saved gallery or album defaults count. Each option below is written only
-	 * when its Settings tab is saved, so the presence of a non-empty value is
-	 * the signal. The one exception is fotogrids_media_settings, which
-	 * Activator seeds on first activation and therefore only counts once it
-	 * diverges from the seeded defaults.
+	 * Saved gallery or album defaults count, as does a non-empty value in any
+	 * option below. fotogrids_media_settings, which activation seeds, counts
+	 * only once it differs from the seeded defaults.
 	 *
 	 * @since 1.0.0
 	 * @return bool

@@ -1319,7 +1319,7 @@ class Import_Export_Data {
 				}
 			}
 		} elseif ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
-			// Files exported before 1.3.0 hold one map that applied to galleries and albums alike.
+			// Files exported before 1.3.0 hold one map for both types.
 			foreach ( Collection_Defaults_Store::TYPES as $type ) {
 				Collection_Defaults_Store::replace(
 					$type,

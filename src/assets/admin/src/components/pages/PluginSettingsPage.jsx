@@ -176,8 +176,7 @@ const PluginSettingsPage = () => {
 		resolveDefaultsSubTab(resolveActiveTab())
 	);
 
-	// The view on screen and its URL, so back/forward can return to it when
-	// the user stays to keep unsaved changes.
+	// The view on screen and its URL.
 	const shown = useRef({ tab: activeTab, subTab: activeDefaultsSubTab });
 	const shownUrl = useRef(window.location.href);
 

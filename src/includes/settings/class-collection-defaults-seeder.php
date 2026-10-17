@@ -21,9 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Collection_Defaults_Seeder
  *
  * Copies the settings saved on Settings -> Defaults for the collection's type
- * into a gallery's or album's own post meta at the moment the post is
- * created, so the collection owns its values from the start and the editor
- * opens showing them.
+ * into a gallery's or album's own post meta when the post is created.
  *
  * A default applies only to collections created after it was saved: editing a
  * default never reaches a collection that already exists. Values are written

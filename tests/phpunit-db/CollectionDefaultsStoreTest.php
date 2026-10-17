@@ -16,7 +16,7 @@ class CollectionDefaultsStoreTest extends WP_UnitTestCase {
 
 	public function set_up(): void {
 		parent::set_up();
-		// The rollback between tests leaves the options cache as the last test wrote it.
+		// The rollback between tests leaves the options cache stale.
 		wp_cache_flush();
 	}
 
@@ -158,7 +158,7 @@ class CollectionDefaultsStoreTest extends WP_UnitTestCase {
 			$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
 			$this->assertFalse( $this->legacy_row_exists() );
 		} finally {
-			// The schema upgrade commits the test transaction, so the rollback cannot undo this test.
+			// The schema upgrade commits the test transaction; clean up by hand.
 			delete_option( self::LEGACY );
 			delete_option( Collection_Defaults_Store::OPTION );
 			update_option( 'fotogrids_db_version', '1.7' );
