@@ -40,7 +40,17 @@ class HeadStylesTest extends WP_UnitTestCase {
 
 	public function tear_down(): void {
 		Public_Render::set_view_page_context( false );
+		unregister_sidebar( 'fg-sidebar' );
+		$GLOBALS['_wp_sidebars_widgets'] = array();
 		parent::tear_down();
+	}
+
+	/** Places one widget in a sidebar. wp_get_sidebars_widgets() caches the map per process. */
+	private function widget( string $base, int $number, array $instance ): void {
+		register_sidebar( array( 'id' => 'fg-sidebar' ) );
+		update_option( 'widget_' . $base, array( $number => $instance ) );
+		update_option( 'sidebars_widgets', array( 'fg-sidebar' => array( $base . '-' . $number ), 'array_version' => 3 ) );
+		$GLOBALS['_wp_sidebars_widgets'] = array();
 	}
 
 	/** Starts a fresh page view: empty style queue, resolver queues and instance counter. */
@@ -226,9 +236,7 @@ class HeadStylesTest extends WP_UnitTestCase {
 
 	public function test_a_gallery_in_a_classic_widget_enqueues_on_an_archive(): void {
 		$gallery = $this->gallery();
-		register_sidebar( array( 'id' => 'fg-sidebar' ) );
-		update_option( 'widget_text', array( 7 => array( 'text' => '[fotogrids_gallery id="' . $gallery . '"]' ) ) );
-		update_option( 'sidebars_widgets', array( 'fg-sidebar' => array( 'text-7' ), 'array_version' => 3 ) );
+		$this->widget( 'text', 7, array( 'text' => '[fotogrids_gallery id="' . $gallery . '"]' ) );
 
 		$head = $this->head_pass( home_url( '/' ) );
 
@@ -239,9 +247,7 @@ class HeadStylesTest extends WP_UnitTestCase {
 	public function test_a_gallery_block_widget_enqueues_its_styles(): void {
 		$gallery = $this->gallery( array( 'layout' => 'masonry' ) );
 		$block   = '<!-- wp:fotogrids/gallery {"galleryId":' . $gallery . '} /-->';
-		register_sidebar( array( 'id' => 'fg-sidebar' ) );
-		update_option( 'widget_block', array( 8 => array( 'content' => $block ) ) );
-		update_option( 'sidebars_widgets', array( 'fg-sidebar' => array( 'block-8' ), 'array_version' => 3 ) );
+		$this->widget( 'block', 8, array( 'content' => $block ) );
 
 		$head = $this->head_pass( home_url( '/' ) );
 
