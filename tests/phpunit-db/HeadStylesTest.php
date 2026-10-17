@@ -15,12 +15,23 @@ use FotoGrids\Render\Internal\Instance_Id_Factory;
 
 class HeadStylesTest extends WP_UnitTestCase {
 
+	/** Registers a minimal classic theme; the suite's WordPress ships only block themes. */
+	public static function set_up_before_class(): void {
+		parent::set_up_before_class();
+
+		$root = trailingslashit( get_temp_dir() ) . 'fg-head-styles-themes';
+		wp_mkdir_p( $root . '/fg-classic' );
+		file_put_contents( $root . '/fg-classic/style.css', "/*\nTheme Name: FG Classic\n*/\n" );
+		file_put_contents( $root . '/fg-classic/index.php', "<?php\n" );
+		register_theme_directory( $root );
+		wp_clean_themes_cache();
+	}
+
 	public function set_up(): void {
 		parent::set_up();
 
-		if ( wp_is_block_theme() ) {
-			$this->markTestSkipped( 'The head pass only runs on classic themes.' );
-		}
+		switch_theme( 'fg-classic' );
+		$this->assertFalse( wp_is_block_theme() );
 
 		wp_set_current_user( 0 );
 		$this->reset_styles();
@@ -202,6 +213,14 @@ class HeadStylesTest extends WP_UnitTestCase {
 		$html = do_shortcode( '[fotogrids_gallery id="' . $gallery . '"]' );
 
 		$this->assertStringContainsString( 'id="fg-' . $gallery . '-1"', $html );
+	}
+
+	public function test_a_block_theme_needs_no_head_pass(): void {
+		$page = $this->page( '[fotogrids_gallery id="' . $this->gallery() . '"]' );
+		switch_theme( 'twentytwentyfive' );
+		$this->assertTrue( wp_is_block_theme() );
+
+		$this->assertSame( array(), $this->head_pass( get_permalink( $page ) ) );
 	}
 
 	public function test_an_escaped_shortcode_enqueues_nothing(): void {
