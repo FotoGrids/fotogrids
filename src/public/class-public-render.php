@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
+use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
@@ -200,19 +201,13 @@ class Public_Render {
 	}
 
 	/**
-	 * Renders one gallery through the render controller pipeline.
+	 * Returns the settings a gallery embed's attributes override.
 	 *
-	 * @param int   $gallery_id Gallery ID.
-	 * @param array $settings Gallery settings.
-	 * @param array $item_ids Ordered gallery item IDs.
+	 * @since 1.3.0
 	 * @param array $atts Shortcode attributes.
-	 * @return string
+	 * @return array<string, mixed>
 	 */
-	private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false, $meta_overrides = array() ) {
-		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
-			return '';
-		}
-
+	private static function gallery_settings_overlay( $atts ): array {
 		$settings_overlay = array();
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
 			$settings_overlay['layout'] = sanitize_text_field( $atts['template'] );
@@ -230,6 +225,134 @@ class Public_Render {
 		}
 
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
+
+		return $settings_overlay;
+	}
+
+	/**
+	 * Enqueues the stylesheets a gallery embed will need, before it renders.
+	 *
+	 * @since 1.3.0
+	 * @param array $atts      Shortcode attributes.
+	 * @param bool  $view_page Whether the embed is the view page's own collection.
+	 * @return void
+	 */
+	public static function enqueue_gallery_styles( array $atts, bool $view_page = false ): void {
+		$atts       = shortcode_atts(
+			array(
+				'id'       => 0,
+				'template' => '',
+				'cols'     => 0,
+				'album_id' => 0,
+				'_source'  => '',
+			),
+			$atts,
+			'fotogrids_gallery'
+		);
+		$gallery_id = absint( $atts['id'] );
+		$gallery    = $gallery_id ? \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id ) : null;
+		$readable   = $gallery && ( 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) ) );
+		$item_ids   = $readable ? \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id ) : array();
+		if ( empty( $item_ids ) ) {
+			return;
+		}
+
+		$source = Request_Source::is_valid( (string) $atts['_source'] ) ? (string) $atts['_source'] : Request_Source::SHORTCODE;
+		if ( absint( $atts['album_id'] ) > 0 ) {
+			$source = Request_Source::ALBUM_AJAX;
+		}
+
+		$context = Context_Builder::for_public()->build_for_public(
+			$gallery_id,
+			array_replace_recursive( self::get_gallery_settings( $gallery_id ), self::gallery_settings_overlay( $atts ) ),
+			array(),
+			$source,
+			absint( $atts['album_id'] ) ?: null,
+			array(
+				'instance_id' => sprintf( 'fg-%d-0', $gallery_id ),
+				'view_page'   => $view_page,
+			)
+		);
+
+		Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, count( $item_ids ) ) );
+	}
+
+	/**
+	 * Enqueues the stylesheets an album embed will need, before it renders.
+	 *
+	 * @since 1.3.0
+	 * @param array $atts Shortcode attributes.
+	 * @return void
+	 */
+	public static function enqueue_album_styles( array $atts ): void {
+		$atts     = shortcode_atts(
+			array(
+				'id'       => 0,
+				'template' => '',
+			),
+			$atts,
+			'fotogrids_album'
+		);
+		$album_id = absint( $atts['id'] );
+		$album    = $album_id ? \FotoGrids\Albums\Album_Repository::get( $album_id ) : null;
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
+			return;
+		}
+
+		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
+			$album_settings['layout'] = $atts['template'];
+		}
+
+		$context = Context_Builder::for_public()->build_for_album(
+			$album_id,
+			$album_settings,
+			array(),
+			Request_Source::SHORTCODE,
+			sprintf( 'fg-%d-0', $album_id )
+		);
+
+		$count = count( Gallery_Album_Relations::get_gallery_ids_for_album( $album_id ) );
+
+		Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, $count ) );
+	}
+
+	/**
+	 * Returns an item-less context that reports the collection's item count.
+	 *
+	 * @since 1.3.0
+	 * @param Render_Context $context Item-less context.
+	 * @param int            $count   Item count.
+	 * @return Render_Context
+	 */
+	private static function with_item_count( Render_Context $context, int $count ): Render_Context {
+		return new Render_Context(
+			$context->meta->with( array( 'total_item_count' => $count ) ),
+			$context->layout,
+			$context->behavior,
+			$context->settings,
+			$context->items,
+			$context->warnings,
+			$context->via_album_id
+		);
+	}
+
+	/**
+	 * Renders one gallery through the render controller pipeline.
+	 *
+	 * @param int   $gallery_id Gallery ID.
+	 * @param array $settings Gallery settings.
+	 * @param array $item_ids Ordered gallery item IDs.
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false, $meta_overrides = array() ) {
+		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
+			return '';
+		}
+
+		$settings_overlay = self::gallery_settings_overlay( $atts );
 
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
 		if ( $is_preview ) {

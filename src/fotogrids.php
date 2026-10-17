@@ -198,7 +198,9 @@ function fotogrids_init() {
 
 	if ( ! is_admin() || wp_doing_ajax() ) {
 		require_once FOTOGRIDS_PLUGIN_DIR . 'public/class-public-render.php';
+		require_once FOTOGRIDS_PLUGIN_DIR . 'public/class-head-styles.php';
 		FotoGrids\Public_Render::init();
+		FotoGrids\Head_Styles::init();
 	}
 }
 
