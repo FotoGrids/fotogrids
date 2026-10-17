@@ -7,9 +7,10 @@ import { storageStateFor, wpCli } from './support/roles';
 import { ADMIN, ScratchSite, scratchSitesAvailable } from './support/scratch-site';
 
 /**
- * Tools > Import / Export with Settings: an import never changes the Share
- * usage data choice, and every other setting is stored the way its settings
- * screen stores it.
+ * Tools > Import / Export with Settings: an import changes only the settings
+ * ticked for it, Share usage data goes through the same consent path as the
+ * Advanced tab, and every other setting is stored the way its settings screen
+ * stores it.
  *
  * The consent tests run on a WordPress of their own, where the Freemius API is
  * answered by tests/harness/freemius-api.php and every request is recorded.
@@ -68,8 +69,8 @@ function exportFile( settings: Record< string, unknown > ): string {
 	return JSON.stringify( { meta: { version: '1.2.0' }, settings } );
 }
 
-/** Choose a file on the Import tab, import it, and return the execute response body. */
-async function importThroughUi( page: Page, base: string, name: string, body: string ): Promise< Record< string, unknown > > {
+/** Choose a file on the Import tab and wait for the route to analyse it. */
+async function chooseFile( page: Page, base: string, name: string, body: string ): Promise< void > {
 	await page.goto( `${ base }${ SCREEN }` );
 	await page.getByRole( 'tab', { name: 'Import' } ).click();
 
@@ -82,7 +83,36 @@ async function importThroughUi( page: Page, base: string, name: string, body: st
 		buffer: Buffer.from( body ),
 	} );
 	expect( ( await analysed ).status() ).toBe( 200 );
-	await expect( page.locator( '#fg-ie-import-settings' ) ).toBeVisible();
+}
+
+/**
+ * Choose a file on the Import tab, tick Settings and each of `settings`, import
+ * it, and return the execute response body. An empty `settings` leaves Settings
+ * as the screen sets it.
+ */
+async function importThroughUi(
+	page: Page,
+	base: string,
+	name: string,
+	body: string,
+	settings: string[]
+): Promise< Record< string, unknown > > {
+	await chooseFile( page, base, name, body );
+
+	const toggle = page.locator( '#fg-ie-import-settings' );
+	await expect( toggle ).toBeVisible();
+	await expect( toggle, 'Settings was ticked by default' ).toHaveAttribute( 'aria-checked', 'false' );
+
+	if ( settings.length ) {
+		await toggle.click();
+		const rows = page.locator( '[id^="fg-ie-import-setting-"]' );
+		for ( const row of await rows.all() ) {
+			await expect( row, 'a setting was ticked by default' ).toHaveAttribute( 'aria-checked', 'false' );
+		}
+		for ( const key of settings ) {
+			await page.locator( `#fg-ie-import-setting-${ key }` ).click();
+		}
+	}
 
 	const executed = page.waitForResponse(
 		( r ) => decodeURIComponent( r.url() ).includes( ROUTE ) && 'execute' === r.request().postDataJSON()?.phase
@@ -93,6 +123,22 @@ async function importThroughUi( page: Page, base: string, name: string, body: st
 	await expect( page.getByRole( 'heading', { name: 'Import complete' } ) ).toBeVisible();
 
 	return response.json();
+}
+
+/** POST an execute request from the admin screen, returning the body or the error. */
+async function executeThroughApi( page: Page, base: string, file: string, params: Record< string, unknown > ): Promise< Record< string, unknown > > {
+	await page.goto( `${ base }${ SCREEN }` );
+
+	return page.evaluate(
+		async ( { route, body, extra } ) => {
+			try {
+				return await window.wp.apiFetch( { path: route, method: 'POST', data: { phase: 'execute', file: body, ...extra } } );
+			} catch ( error ) {
+				return { error };
+			}
+		},
+		{ route: ROUTE, body: file, extra: params }
+	);
 }
 
 async function openAdvanced( page: Page, base: string ): Promise< void > {
@@ -142,16 +188,17 @@ test.describe( 'Share usage data', () => {
 		await page.waitForURL( /wp-admin/ );
 	}
 
-	test( 'a file with sharing on leaves a site that has not opted in as it is', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
+	test( 'a file with sharing on, left unticked, leaves a site that has not opted in as it is', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
 		await logIn( page );
 		const before = freemius();
 		site.wp( 'option', 'update', 'fs_test_log', '[]', '--format=json' );
 
-		const result = await importThroughUi( page, site.url, 'from-another-site.json', exportFile( { share_statistics: '1', autosave: '0' } ) );
+		const result = await importThroughUi( page, site.url, 'from-another-site.json', exportFile( { share_statistics: '1', autosave: '0' } ), [ 'autosave' ] );
 
-		expect( result.imported ).toEqual( { settings: true } );
+		expect( result.imported ).toEqual( { settings: true, settings_detail: [ 'autosave' ] } );
+		await expect( page.locator( '.fg-ie-done' ) ).toContainText( 'Autosave' );
 		expect( readOption( wp, 'fotogrids_share_statistics' ), 'the import switched usage-data sharing on' ).toBeUndefined();
-		expect( readOption( wp, 'fotogrids_autosave' ), 'the rest of the settings block was not imported' ).toBe( '0' );
+		expect( readOption( wp, 'fotogrids_autosave' ), 'the ticked setting was not imported' ).toBe( '0' );
 		expect( freemius() ).toBe( before );
 		expect( requests(), 'the import talked to Freemius' ).toEqual( [] );
 
@@ -161,8 +208,7 @@ test.describe( 'Share usage data', () => {
 		expect( site.phpErrors() ).toEqual( [] );
 	} );
 
-	test( 'a file with sharing off leaves a site that has opted in sharing', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
-		await logIn( page );
+	async function optIn( page: Page ): Promise< void > {
 		await openAdvanced( page, site.url );
 		const write = page.waitForResponse(
 			( r ) => decodeURIComponent( r.url() ).includes( '/admin/advanced-settings' ) && 'POST' === r.request().method(),
@@ -171,11 +217,16 @@ test.describe( 'Share usage data', () => {
 		await page.locator( '#fotogrids_share_statistics' ).click();
 		expect( ( await write ).status() ).toBe( 200 );
 		await expect.poll( () => JSON.parse( freemius() ).registered, { message: 'opting in did not register the site' } ).toBe( true );
+	}
+
+	test( 'a file with sharing off, left unticked, leaves a site that has opted in sharing', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
+		await logIn( page );
+		await optIn( page );
 
 		const before = freemius();
 		site.wp( 'option', 'update', 'fs_test_log', '[]', '--format=json' );
 
-		await importThroughUi( page, site.url, 'from-another-site.json', exportFile( { share_statistics: '0' } ) );
+		await importThroughUi( page, site.url, 'from-another-site.json', exportFile( { share_statistics: '0', autosave: '0' } ), [ 'autosave' ] );
 
 		expect( readOption( wp, 'fotogrids_share_statistics' ), 'the import switched usage-data sharing off' ).toBe( '1' );
 		expect( freemius() ).toBe( before );
@@ -183,6 +234,23 @@ test.describe( 'Share usage data', () => {
 
 		await openAdvanced( page, site.url );
 		await expect( page.locator( '#fotogrids_share_statistics' ) ).toHaveAttribute( 'aria-checked', 'true' );
+
+		expect( site.phpErrors() ).toEqual( [] );
+	} );
+
+	test( 'ticking Share usage data opts the site out the way the Advanced tab does', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
+		await logIn( page );
+		await optIn( page );
+		site.wp( 'option', 'update', 'fs_test_log', '[]', '--format=json' );
+
+		const result = await importThroughUi( page, site.url, 'from-another-site.json', exportFile( { share_statistics: '0' } ), [ 'share_statistics' ] );
+
+		expect( result.imported ).toEqual( { settings: true, settings_detail: [ 'share_statistics' ] } );
+		expect( readOption( wp, 'fotogrids_share_statistics' ) ).toBe( '0' );
+		expect( JSON.parse( freemius() ).tracking, 'Freemius still tracks the site' ).toBe( false );
+
+		await openAdvanced( page, site.url );
+		await expect( page.locator( '#fotogrids_share_statistics' ) ).toHaveAttribute( 'aria-checked', 'false' );
 
 		expect( site.phpErrors() ).toEqual( [] );
 	} );
@@ -236,7 +304,8 @@ test.describe( 'stored values', () => {
 					columns: { desktop: 5, tablet: 2, mobile: 1 },
 					fotogrids_not_a_setting: 'x',
 				},
-			} )
+			} ),
+			[ 'media', 'collection_defaults', 'autosave', 'preserve_data_on_uninstall' ]
 		);
 
 		expect( readOption( sharedWp, 'fotogrids_autosave' ) ).toBe( '0' );
@@ -258,8 +327,16 @@ test.describe( 'stored values', () => {
 		await expect( page.locator( '#fotogrids_delete_on_uninstall' ) ).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
-	test( 'a media or defaults block that is not a map leaves the site’s own in place', { tag: [ '@admin', '@settings' ] }, async ( { page, baseURL } ) => {
-		await importThroughUi( page, baseURL as string, 'not-a-map.json', exportFile( { media: 'not a map', gallery_defaults: 42 } ) );
+	test( 'a media or defaults block that is not a map is not offered and leaves the site’s own in place', { tag: [ '@admin', '@settings' ] }, async ( { page, baseURL } ) => {
+		const file = exportFile( { media: 'not a map', gallery_defaults: 42 } );
+		await chooseFile( page, baseURL as string, 'not-a-map.json', file );
+		await expect( page.locator( '#fg-ie-import-settings' ) ).toHaveCount( 0 );
+
+		const result = await executeThroughApi( page, baseURL as string, file, {
+			include: [ 'settings' ],
+			settings: [ 'media', 'collection_defaults' ],
+		} );
+		expect( result.imported ).toEqual( { settings: true, settings_detail: [] } );
 
 		expect( readOption( sharedWp, 'fotogrids_media_settings' ) ).toEqual( MEDIA );
 		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
@@ -271,7 +348,8 @@ test.describe( 'stored values', () => {
 			page,
 			baseURL as string,
 			'not-a-map-per-type.json',
-			exportFile( { collection_defaults: { gallery: 42, album: 'not a map' } } )
+			exportFile( { collection_defaults: { gallery: 42, album: 'not a map' } } ),
+			[ 'collection_defaults' ]
 		);
 
 		expect( readOption( sharedWp, 'fotogrids_collection_defaults' ) ).toEqual( {
@@ -296,12 +374,65 @@ test.describe( 'stored values', () => {
 		expect( xml ).toContain( '<thumbnail_crop>false</thumbnail_crop>' );
 
 		writeOption( sharedWp, 'fotogrids_media_settings', MEDIA );
-		await importThroughUi( page, baseURL as string, 'fotogrids-export.xml', xml );
+		await importThroughUi( page, baseURL as string, 'fotogrids-export.xml', xml, [ 'media' ] );
 
 		expect( readOption( sharedWp, 'fotogrids_media_settings' ) ).toEqual( { ...MEDIA, thumbnail_crop: false, thumbnail_width: 512 } );
 
 		await page.goto( `${ baseURL }/wp-admin/admin.php?page=fotogrids-settings&tab=media` );
 		const crop = page.getByRole( 'radiogroup', { name: 'Crop mode' } );
 		await expect( crop.getByRole( 'radio', { name: 'Soft crop' } ) ).toHaveAttribute( 'aria-checked', 'true' );
+	} );
+
+	test( 'a file with galleries and settings, imported with the defaults, changes no setting', { tag: [ '@admin', '@settings' ] }, async ( { page, baseURL } ) => {
+		const slug = `settings-defaults-${ Date.now() }`;
+		const before = OPTIONS.filter( ( name ) => 'fotogrids_import_export_log' !== name ).map( ( name ) => [ name, readOption( sharedWp, name ) ] );
+
+		try {
+			const result = await importThroughUi(
+				page,
+				baseURL as string,
+				'galleries-and-settings.json',
+				JSON.stringify( {
+					meta: { version: '1.3.0' },
+					galleries: [ { id: 880101, title: 'Settings defaults', slug, status: 'draft', date: '2026-01-01 00:00:00', meta: {} } ],
+					settings: {
+						media: { ...MEDIA, thumbnail_width: 999 },
+						collection_defaults: { gallery: {}, album: {} },
+						autosave: '0',
+						preserve_data_on_uninstall: '0',
+						share_statistics: '1',
+					},
+				} ),
+				[]
+			);
+
+			expect( result.imported ).toMatchObject( { galleries: 1 } );
+			expect( result.imported ).not.toHaveProperty( 'settings' );
+			for ( const [ name, value ] of before ) {
+				expect( readOption( sharedWp, name as string ), `${ name } changed` ).toEqual( value );
+			}
+		} finally {
+			for ( const id of sharedWp( 'post', 'list', '--post_type=fotogrids_gallery', '--post_status=any', `--name=${ slug }`, '--field=ID' ).split( /\s+/ ).filter( Boolean ) ) {
+				sharedWp( 'post', 'delete', id, '--force' );
+			}
+		}
+	} );
+
+	test( 'ticking Settings without choosing which ones is refused over REST, and nothing is imported', { tag: [ '@admin', '@settings', '@api' ] }, async ( { page, baseURL } ) => {
+		const slug = `settings-refused-${ Date.now() }`;
+		const result = await executeThroughApi(
+			page,
+			baseURL as string,
+			JSON.stringify( {
+				meta: { version: '1.3.0' },
+				galleries: [ { id: 880102, title: 'Refused', slug, status: 'draft', date: '2026-01-01 00:00:00', meta: {} } ],
+				settings: { autosave: '0' },
+			} ),
+			{ include: [ 'galleries', 'settings' ], galleries: 'duplicate' }
+		);
+
+		expect( result.error ).toMatchObject( { code: 'settings_keys_required', data: { status: 400 } } );
+		expect( readOption( sharedWp, 'fotogrids_autosave' ) ).toBe( '1' );
+		expect( sharedWp( 'post', 'list', '--post_type=fotogrids_gallery', '--post_status=any', `--name=${ slug }`, '--format=count' ) ).toBe( '0' );
 	} );
 } );

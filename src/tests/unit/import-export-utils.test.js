@@ -6,6 +6,7 @@ import {
 	importResultChips,
 	itemsDetail,
 	parseSummary,
+	settingsDetail,
 } from '../../includes/tools/import-export/assets/utils.js';
 
 describe( 'formatDate', () => {
@@ -123,5 +124,23 @@ describe( 'importResultChips with an items split', () => {
 		expect( importResultChips( { items: 3 } ) ).toEqual( [
 			{ key: 'items', count: 3, label: 'Items' },
 		] );
+	} );
+} );
+
+describe( 'importResultChips with changed settings', () => {
+	it( 'names the settings that changed, in screen order', () => {
+		expect(
+			importResultChips( {
+				settings: true,
+				settings_detail: [ 'autosave', 'media' ],
+			} )
+		).toEqual( [
+			{ key: 'settings', label: 'Settings', detail: '(Media sizes, Autosave)' },
+		] );
+	} );
+
+	it( 'says when no setting changed', () => {
+		expect( settingsDetail( [] ) ).toBe( '(nothing changed)' );
+		expect( settingsDetail( [ 'not_a_setting' ] ) ).toBe( '(nothing changed)' );
 	} );
 } );

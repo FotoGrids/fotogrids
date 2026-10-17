@@ -1,5 +1,9 @@
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { EXPORT_TYPES, LOG_DETAIL_LABELS } from './constants.js';
+import {
+	EXPORT_TYPES,
+	LOG_DETAIL_LABELS,
+	SETTINGS_TYPES,
+} from './constants.js';
 
 export function formatDate(iso) {
 	try {
@@ -125,6 +129,28 @@ export function itemsDetail(detail) {
 }
 
 /**
+ * Name the settings an import changed.
+ *
+ * @param {string[]} [keys] Changed setting keys.
+ * @return {string} E.g. "(Media sizes, Autosave)" or "(nothing changed)".
+ */
+export function settingsDetail(keys) {
+	const names = SETTINGS_TYPES.filter(({ key }) =>
+		(keys ?? []).includes(key)
+	).map(({ label }) => label);
+
+	if (0 === names.length) {
+		return __('(nothing changed)', 'fotogrids');
+	}
+
+	return sprintf(
+		/* translators: %s: comma-separated names of the settings an import changed, e.g. "Media sizes, Autosave". */
+		_x('(%s)', 'changed settings', 'fotogrids'),
+		names.join(', ')
+	);
+}
+
+/**
  * Turn one side of an import response into chip descriptors.
  *
  * @param {Object} counts Data type to count, or `true` for a type imported whole.
@@ -136,6 +162,14 @@ export function importResultChips(counts) {
 	).map(({ key, label }) => {
 		const count = counts[key];
 		const labels = LOG_DETAIL_LABELS[key];
+
+		if ('settings' === key && Array.isArray(counts.settings_detail)) {
+			return {
+				key,
+				label,
+				detail: settingsDetail(counts.settings_detail),
+			};
+		}
 
 		if (true === count || !labels) {
 			return { key, label };
