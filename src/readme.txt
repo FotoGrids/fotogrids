@@ -189,10 +189,6 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * New Gallery Items settings tab: show captions and descriptions with basic formatting or as plain text, and choose whether links open in a new tab or carry nofollow. Each link can make its own choice.
 * New "Format captions and descriptions" permission, given to Authors and above.
 
-**Improved**
-
-* Importing no longer changes this site's settings unless you choose to. Settings starts unticked on the Import screen, each setting in the file can be picked on its own, Share usage data included, and the result names the settings that changed.
-
 **Fixed**
 
 * Fixed the Lightbox showing HTML tags as text in captions and descriptions.
