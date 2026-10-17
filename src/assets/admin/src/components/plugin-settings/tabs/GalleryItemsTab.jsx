@@ -164,7 +164,7 @@ const GalleryItemsTab = () => {
 				title={__('Links', 'fotogrids')}
 				titleTag="h3"
 				description={__(
-					'Defaults for links in captions and descriptions. A link can override them in the item editor.',
+					'Defaults for links in captions and descriptions. A link can override them in the item editor, where you add it.',
 					'fotogrids'
 				)}
 			>
@@ -183,10 +183,7 @@ const GalleryItemsTab = () => {
 					/>
 				</PanelRow>
 				<PanelRow
-					title={__(
-						'Ask search engines not to follow links',
-						'fotogrids'
-					)}
+					title={__('Ask search engines not to follow', 'fotogrids')}
 					description={__(
 						'Adds rel="nofollow", which tells search engines you do not vouch for the linked pages.',
 						'fotogrids'
@@ -206,16 +203,6 @@ const GalleryItemsTab = () => {
 					/>
 				)}
 			</SettingsPanel>
-
-			<SettingsPanel
-				title={__('Who can add formatting', 'fotogrids')}
-				titleTag="h3"
-				noBody
-				description={__(
-					'The "Format captions and descriptions" permission in Permissions Manager decides who can add formatting in the item editor. Formatting already saved is shown for everyone.',
-					'fotogrids'
-				)}
-			/>
 
 			<SaveBar
 				dirty={dirty}

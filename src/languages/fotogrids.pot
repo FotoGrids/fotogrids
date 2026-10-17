@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-17T08:00:23+00:00\n"
+"POT-Creation-Date: 2026-10-17T11:09:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -329,7 +329,7 @@ msgstr ""
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:529
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:916
 #: includes/tools/system-info/assets/SystemInfoTool.jsx:207
-#: packages/fg-text-editor/LinkPopover.jsx:188
+#: shared/text-editor/LinkPopover.jsx:188
 msgid "Cancel"
 msgstr ""
 
@@ -5708,8 +5708,8 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:199
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:396
-#: packages/fg-text-editor/LinkPopover.jsx:102
-#: packages/fg-text-editor/registry.js:13
+#: shared/text-editor/LinkPopover.jsx:102
+#: shared/text-editor/registry.js:13
 msgid "Link"
 msgstr ""
 
@@ -6720,7 +6720,7 @@ msgstr ""
 
 #: includes/permissions/class-core-permissions.php:138
 #: includes/permissions/class-core-permissions.php:547
-msgid "Manage library (tags, people, locations)"
+msgid "Manage tags, people and locations"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:139
@@ -6838,7 +6838,7 @@ msgid "Edit and delete other users' albums, including private ones."
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:430
-msgid "Create gallery, add and edit gallery items"
+msgid "Create galleries, add and edit items"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:431
@@ -6854,7 +6854,7 @@ msgid "Lowest role that can edit and delete other users' galleries, including pr
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:489
-msgid "Create album, assign and unassign galleries"
+msgid "Create albums and assign galleries"
 msgstr ""
 
 #: includes/permissions/class-core-permissions.php:490
@@ -9619,7 +9619,7 @@ msgstr ""
 #: assets/admin/src/components/pages/TemplatesPage.jsx:105
 #: assets/admin/src/components/pages/TemplatesPage.jsx:624
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:240
-#: packages/fg-text-editor/LinkPopover.jsx:195
+#: shared/text-editor/LinkPopover.jsx:195
 msgid "Apply"
 msgstr ""
 
@@ -9850,77 +9850,70 @@ msgstr ""
 msgid "Save defaults"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:109
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:111
 msgid "Captions and descriptions show as plain text, so links show as their text only."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:120
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:122
 msgid "Captions and descriptions"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:121
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:123
 msgid "How item captions and descriptions appear in thumbnails, album tiles and Lightboxes. These settings apply site-wide."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:127
-#: packages/fg-text-editor/Editor.jsx:356
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:129
+#: shared/text-editor/Editor.jsx:356
 msgid "Formatting"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:130
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:132
 msgid "Every tag is removed and the text is shown as typed. Line breaks are kept."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:134
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:136
 msgid "Bold, italic, links and line breaks are shown. Every other tag is removed."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:141
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:143
 msgid "Formatting in captions and descriptions"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:150
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:152
 msgid "Basic formatting"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:154
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:156
 msgid "Plain text"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:162
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:164
 msgid "Links"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:164
-msgid "Defaults for links in captions and descriptions. A link can override them in the item editor."
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:166
+msgid "Defaults for links in captions and descriptions. A link can override them in the item editor, where you add it."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:170
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:172
 msgid "Open links in a new tab"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:171
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:173
 msgid "Links open in a new browser tab, and screen readers announce it."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:184
-msgid "Ask search engines not to follow links"
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:186
+#: shared/text-editor/LinkPopover.jsx:166
+msgid "Ask search engines not to follow"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:188
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:187
 msgid "Adds rel=\"nofollow\", which tells search engines you do not vouch for the linked pages."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:202
+#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:201
 msgid "Links are off"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:209
-msgid "Who can add formatting"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/GalleryItemsTab.jsx:212
-msgid "The \"Format captions and descriptions\" permission in Permissions Manager decides who can add formatting in the item editor. Formatting already saved is shown for everyone."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:79
@@ -10226,7 +10219,7 @@ msgid "Unauthorised settings panels"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:297
-msgid "How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings."
+msgid "How to show the Settings and Templates metaboxes to users who can edit a gallery or album but cannot change its settings."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:318
@@ -12181,59 +12174,55 @@ msgstr ""
 msgid "No FotoGrids JavaScript errors recorded."
 msgstr ""
 
-#: packages/fg-text-editor/Editor.jsx:325
+#: shared/text-editor/Editor.jsx:325
 msgid "This text has markup the visual editor cannot show. Remove it to switch back to Visual."
 msgstr ""
 
-#: packages/fg-text-editor/Editor.jsx:457
+#: shared/text-editor/Editor.jsx:457
 msgid "HTML"
 msgstr ""
 
-#: packages/fg-text-editor/Editor.jsx:458
+#: shared/text-editor/Editor.jsx:458
 msgid "Visual"
 msgstr ""
 
-#: packages/fg-text-editor/Editor.jsx:516
+#: shared/text-editor/Editor.jsx:516
 msgid "Changing this text saves it without its formatting."
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:59
+#: shared/text-editor/LinkPopover.jsx:59
 msgid "Enter a web address (https://…), an email address or a phone link."
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:89
+#: shared/text-editor/LinkPopover.jsx:89
 msgid "Site default: on"
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:90
+#: shared/text-editor/LinkPopover.jsx:90
 msgid "Site default: off"
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:108
+#: shared/text-editor/LinkPopover.jsx:108
 msgid "Link address"
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:145
+#: shared/text-editor/LinkPopover.jsx:145
 msgid "Open in a new tab"
 msgstr ""
 
-#: packages/fg-text-editor/LinkPopover.jsx:166
-msgid "Ask search engines not to follow"
-msgstr ""
-
-#: packages/fg-text-editor/LinkPopover.jsx:180
+#: shared/text-editor/LinkPopover.jsx:180
 msgid "Remove link"
 msgstr ""
 
-#: packages/fg-text-editor/registry.js:11
+#: shared/text-editor/registry.js:11
 msgid "Bold"
 msgstr ""
 
-#: packages/fg-text-editor/registry.js:12
+#: shared/text-editor/registry.js:12
 msgid "Italic"
 msgstr ""
 
-#: packages/fg-text-editor/registry.js:14
+#: shared/text-editor/registry.js:14
 msgid "Clear formatting"
 msgstr ""
 

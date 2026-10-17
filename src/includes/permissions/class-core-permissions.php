@@ -135,7 +135,7 @@ final class Core_Permissions {
 			new Permission_Definition(
 				array(
 					'key'                 => 'manage_fotogrids_library',
-					'label'               => __( 'Manage library (tags, people, locations)', 'fotogrids' ),
+					'label'               => __( 'Manage tags, people and locations', 'fotogrids' ),
 					'description'         => __( 'Create, rename and delete the tags, people and locations that items are filed under.', 'fotogrids' ),
 					'group'               => 'media',
 					'panel'               => 'advanced',
@@ -427,7 +427,7 @@ final class Core_Permissions {
 			new Permission_Definition(
 				array(
 					'key'                 => 'fg_manage_gallery_content',
-					'label'               => __( 'Create gallery, add and edit gallery items', 'fotogrids' ),
+					'label'               => __( 'Create galleries, add and edit items', 'fotogrids' ),
 					'description'         => __( 'Lowest role that can create galleries and add, edit, reorder or delete items inside them. Does not include changing layout, lightbox, SEO or other gallery settings.', 'fotogrids' ),
 					'group'               => 'gallery',
 					'panel'               => 'simple',
@@ -486,7 +486,7 @@ final class Core_Permissions {
 			new Permission_Definition(
 				array(
 					'key'                 => 'fg_manage_album_content',
-					'label'               => __( 'Create album, assign and unassign galleries', 'fotogrids' ),
+					'label'               => __( 'Create albums and assign galleries', 'fotogrids' ),
 					'description'         => __( 'Lowest role that can create albums and add or remove galleries from them. Does not include changing album layout or other settings.', 'fotogrids' ),
 					'group'               => 'album',
 					'panel'               => 'simple',
@@ -544,7 +544,7 @@ final class Core_Permissions {
 			new Permission_Definition(
 				array(
 					'key'                 => 'fg_manage_library',
-					'label'               => __( 'Manage library (tags, people, locations)', 'fotogrids' ),
+					'label'               => __( 'Manage tags, people and locations', 'fotogrids' ),
 					'description'         => __( 'Lowest role that can create, rename and delete the tags, people and locations that items are filed under.', 'fotogrids' ),
 					'group'               => 'media',
 					'panel'               => 'simple',
