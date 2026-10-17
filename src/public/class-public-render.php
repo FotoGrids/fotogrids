@@ -146,9 +146,12 @@ class Public_Render {
 	/**
 	 * Re-enqueues the CSS and JS assets stored with a cache entry.
 	 *
+	 * Each asset is registered with the dependencies and version the original
+	 * render gave it, so WordPress prints the cached assets in the same order.
+	 *
 	 * @since  1.0.0
-	 * @param  array<string, string>                             $css Handle → URL map.
-	 * @param  array<string, array{src: string, in_footer: bool}> $js  Handle → metadata map.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string}>                  $css Handle → registration data.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}> $js  Handle → registration data.
 	 * @return void
 	 */
 	private static function replay_cached_assets( array $css, array $js ): void {
@@ -157,11 +160,11 @@ class Public_Render {
 		$already_js      = $resolver->get_js_asset_data();
 		$new_css_handles = array();
 
-		foreach ( $css as $handle => $src ) {
+		foreach ( $css as $handle => $meta ) {
 			if ( isset( $already_css[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_style( $handle, $src, array(), FOTOGRIDS_VERSION );
+			wp_register_style( $handle, $meta['src'], $meta['deps'], $meta['version'] );
 			wp_enqueue_style( $handle );
 			$new_css_handles[] = $handle;
 		}
@@ -174,7 +177,7 @@ class Public_Render {
 			if ( isset( $already_js[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_script( $handle, $meta['src'], array(), FOTOGRIDS_VERSION, $meta['in_footer'] );
+			wp_register_script( $handle, $meta['src'], $meta['deps'], $meta['version'], $meta['in_footer'] );
 			wp_enqueue_script( $handle );
 		}
 	}

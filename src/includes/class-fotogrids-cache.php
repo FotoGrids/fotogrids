@@ -37,10 +37,10 @@ class FotoGrids_Cache {
 
 	/**
 	 * Envelope schema version. Entries below this are treated as a miss, so an
-	 * entry written without its inline payloads, its expiry or its Google
-	 * Fonts re-renders instead of being replayed.
+	 * entry written without its inline payloads, its expiry, its Google Fonts
+	 * or its asset dependencies re-renders instead of being replayed.
 	 */
-	private const ENTRY_SCHEMA = 4;
+	private const ENTRY_SCHEMA = 5;
 
 	/**
 	 * Shared object-cache (L1) primitive for the render cache.
@@ -180,8 +180,8 @@ class FotoGrids_Cache {
 	 *
 	 * The return value is an associative array with:
 	 *   - 'html'       (string)  Rendered gallery HTML.
-	 *   - 'css'        (array)   Handle → URL map (Asset_Resolver::get_css_asset_urls()).
-	 *   - 'js'         (array)   Handle → {src, in_footer} map (Asset_Resolver::get_js_asset_data()).
+	 *   - 'css'        (array)   Handle → {src, deps, version} map (Asset_Resolver::end_capture()).
+	 *   - 'js'         (array)   Handle → {src, deps, version, in_footer} map (Asset_Resolver::end_capture()).
 	 *   - 'inline_css' (string)  Per-render inline CSS (Render_Result::$inline_css).
 	 *   - 'inline_js'  (string)  Per-render inline JS (Render_Result::$inline_js).
 	 *   - 'json_ld'    (string)  Per-render JSON-LD document (Render_Result::$json_ld).
@@ -190,7 +190,7 @@ class FotoGrids_Cache {
 	 * @since  1.0.0
 	 * @param  int    $gallery_id
 	 * @param  string $cache_key  md5 key produced by make_key().
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
+	 * @return array{html: string, css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
 	 */
 	public static function get( int $gallery_id, string $cache_key ) {
 		$l1 = self::l1()->get( $cache_key );
@@ -246,8 +246,8 @@ class FotoGrids_Cache {
 	 * @param  int                                            $gallery_id
 	 * @param  string                                         $cache_key
 	 * @param  string                                         $html
-	 * @param  array<string, string>                          $css  Handle → URL map from Asset_Resolver::get_css_asset_urls().
-	 * @param  array<string, array{src: string, in_footer: bool}> $js   Handle → metadata map from Asset_Resolver::get_js_asset_data().
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string}>                  $css  Handle → registration data from Asset_Resolver::end_capture().
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}> $js   Handle → registration data from Asset_Resolver::end_capture().
 	 * @param  string                                         $inline_css Per-render inline CSS.
 	 * @param  string                                         $inline_js  Per-render inline JS.
 	 * @param  string                                         $json_ld    Per-render JSON-LD document.
@@ -567,10 +567,14 @@ class FotoGrids_Cache {
 	 * Encode the rendered HTML, the asset maps and the per-render inline
 	 * payloads into a single storable string.
 	 *
+	 * Stylesheets are stored as a handle → URL map under 'css', the shape
+	 * earlier releases read, with their dependencies and versions under
+	 * 'css_meta'.
+	 *
 	 * @since  1.0.0
 	 * @param  string                                            $html
-	 * @param  array<string, string>                             $css
-	 * @param  array<string, array{src: string, in_footer: bool}> $js
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string}>                  $css
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}> $js
 	 * @param  string                                            $inline_css
 	 * @param  string                                            $inline_js
 	 * @param  string                                            $json_ld
@@ -592,7 +596,21 @@ class FotoGrids_Cache {
 			array(
 				'schema'     => self::ENTRY_SCHEMA,
 				'html'       => $html,
-				'css'        => $css,
+				'css'        => array_map(
+					static function ( array $css_asset ): string {
+						return $css_asset['src'];
+					},
+					$css
+				),
+				'css_meta'   => array_map(
+					static function ( array $css_asset ): array {
+						return array(
+							'deps'    => $css_asset['deps'],
+							'version' => $css_asset['version'],
+						);
+					},
+					$css
+				),
 				'js'         => $js,
 				'inline_css' => $inline_css,
 				'inline_js'  => $inline_js,
@@ -614,7 +632,7 @@ class FotoGrids_Cache {
 	 *
 	 * @since  1.0.0
 	 * @param  string $stored
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
+	 * @return array{html: string, css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string, fonts: array<string>}|false
 	 */
 	private static function decode_entry( string $stored ) {
 		$decoded = json_decode( $stored, true );
@@ -630,9 +648,22 @@ class FotoGrids_Cache {
 			return false;
 		}
 
+		$css      = array();
+		$css_meta = is_array( $decoded['css_meta'] ?? null ) ? $decoded['css_meta'] : array();
+		foreach ( is_array( $decoded['css'] ?? null ) ? $decoded['css'] : array() as $handle => $src ) {
+			if ( ! isset( $css_meta[ $handle ] ) ) {
+				return false;
+			}
+			$css[ $handle ] = array(
+				'src'     => (string) $src,
+				'deps'    => array_values( (array) ( $css_meta[ $handle ]['deps'] ?? array() ) ),
+				'version' => (string) ( $css_meta[ $handle ]['version'] ?? '' ),
+			);
+		}
+
 		return array(
 			'html'       => (string) $decoded['html'],
-			'css'        => is_array( $decoded['css'] ?? null ) ? $decoded['css'] : array(),
+			'css'        => $css,
 			'js'         => is_array( $decoded['js'] ?? null ) ? $decoded['js'] : array(),
 			'inline_css' => (string) ( $decoded['inline_css'] ?? '' ),
 			'inline_js'  => (string) ( $decoded['inline_js'] ?? '' ),
