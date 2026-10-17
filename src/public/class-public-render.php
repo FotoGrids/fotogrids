@@ -532,11 +532,12 @@ class Public_Render {
 	 * Renders one gallery embed from shortcode attributes.
 	 *
 	 * @since 1.3.0
-	 * @param array|string $atts        Shortcode attributes.
-	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @param array|string $atts           Shortcode attributes.
+	 * @param string       $instance_id    Instance ID to render with. Empty takes the next one.
+	 * @param array        $meta_overrides Render_Meta field overrides, such as via_album_id.
 	 * @return string Rendered gallery HTML
 	 */
-	public static function render_gallery_embed( $atts, string $instance_id = '' ) {
+	public static function render_gallery_embed( $atts, string $instance_id = '', array $meta_overrides = array() ) {
 		$atts = shortcode_atts(
 			array(
 				'id'                => 0,
@@ -664,7 +665,7 @@ class Public_Render {
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 		$resolver->begin_capture();
 		Font_Resolver::instance()->begin_capture();
-		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
+		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array_merge( $meta_overrides, array( 'instance_id' => $instance_id ) ) );
 		$fonts  = Font_Resolver::instance()->end_capture();
 		$assets = $resolver->end_capture();
 

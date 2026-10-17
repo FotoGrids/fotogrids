@@ -81,32 +81,37 @@ class Register_Gallery_Routes {
 					'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'unlock_gallery' ),
 					'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_unlock' ),
 					'args'                => array(
-						'id'          => array(
+						'id'           => array(
 							'required'          => true,
 							'sanitize_callback' => 'absint',
 							'validate_callback' => function ( $param ) {
 								return is_numeric( $param ) && $param > 0;
 							},
 						),
-						'password'    => array(
+						'password'     => array(
 							'required'          => true,
 							'sanitize_callback' => function ( $value ) {
 								// Preserve special characters - strip_tags only.
 								return wp_strip_all_tags( (string) $value );
 							},
 						),
-						'instance_id' => self::instance_id_arg( 'id' ),
-						'cols'        => array(
+						'instance_id'  => self::instance_id_arg( 'id' ),
+						'cols'         => array(
 							'type'    => 'integer',
 							'default' => 0,
 							'minimum' => 0,
 						),
-						'template'    => array(
+						'template'     => array(
 							'type'              => 'string',
 							'default'           => '',
 							'validate_callback' => function ( $param ) {
 								return '' === $param || \FotoGrids\Public_Render::is_layout_key( $param );
 							},
+						),
+						'via_album_id' => array(
+							'type'              => 'integer',
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
 						),
 					),
 				),
