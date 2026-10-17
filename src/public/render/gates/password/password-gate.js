@@ -181,6 +181,29 @@
 	}
 
 	/**
+	 * Builds the unlock request body, including the embed attributes the lock form carries.
+	 *
+	 * @param {HTMLFormElement} form
+	 * @param {string}          password
+	 * @param {?HTMLElement}    wrapper
+	 * @return {Object} Request body.
+	 */
+	function unlockBody(form, password, wrapper) {
+		const body = {
+			password,
+			instance_id: wrapper && wrapper.id ? wrapper.id : '',
+		};
+		const cols = parseInt(form.dataset.fgEmbedCols || '0', 10);
+		if (cols > 0) {
+			body.cols = cols;
+		}
+		if (form.dataset.fgEmbedTemplate) {
+			body.template = form.dataset.fgEmbedTemplate;
+		}
+		return body;
+	}
+
+	/**
 	 * Submits the password; swaps in the rendered HTML or shows the error.
 	 *
 	 * @param {HTMLFormElement} form
@@ -219,10 +242,7 @@
 				'X-WP-Nonce': nonce,
 			},
 			credentials: 'same-origin',
-			body: JSON.stringify({
-				password,
-				instance_id: wrapper && wrapper.id ? wrapper.id : '',
-			}),
+			body: JSON.stringify(unlockBody(form, password, wrapper)),
 		})
 			.then(function (response) {
 				return response.json().then(function (data) {

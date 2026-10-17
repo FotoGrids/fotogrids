@@ -19,8 +19,8 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Retired
  *
- * Earlier versions listed these as kept by a reset, and a reset still keeps
- * them.
+ * Options earlier versions stored. A reset keeps the licence options and
+ * clears the rest.
  *
  * @package FotoGrids\Options\Declarations
  * @since   1.3.0
@@ -35,11 +35,14 @@ final class Retired extends Abstract_Option_Declaration {
 	 */
 	public static function options(): array {
 		return array(
+			'fotogrids_gallery_defaults'            => self::RESET,
+			'fotogrids_integration_settings'        => self::RESET,
 			'fotogrids_license_data'                => self::KEEP,
 			'fotogrids_license_key'                 => self::KEEP,
 			'fotogrids_license_last_check_time'     => self::KEEP,
 			'fotogrids_license_last_valid_response' => self::KEEP,
 			'fotogrids_license_secret'              => self::KEEP,
+			'fotogrids_permission_settings'         => self::RESET,
 		);
 	}
 }

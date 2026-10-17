@@ -96,6 +96,18 @@ class Register_Gallery_Routes {
 							},
 						),
 						'instance_id' => self::instance_id_arg( 'id' ),
+						'cols'        => array(
+							'type'    => 'integer',
+							'default' => 0,
+							'minimum' => 0,
+						),
+						'template'    => array(
+							'type'              => 'string',
+							'default'           => '',
+							'validate_callback' => function ( $param ) {
+								return '' === $param || \FotoGrids\Public_Render::is_layout_key( $param );
+							},
+						),
 					),
 				),
 			)

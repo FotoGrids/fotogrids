@@ -8,6 +8,7 @@ use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Post_Types;
 use FotoGrids\REST\Items\Embed_Data;
+use FotoGrids\Settings\Collection_Defaults_Store;
 use FotoGrids\Settings\Plugin_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -284,7 +285,7 @@ class Import_Export_Data {
 		if ( in_array( 'settings', $include_types, true ) ) {
 			$data['settings'] = array(
 				'media'                      => get_option( 'fotogrids_media_settings', array() ),
-				'gallery_defaults'           => get_option( 'fotogrids_gallery_defaults', array() ),
+				'collection_defaults'        => Collection_Defaults_Store::all(),
 				'autosave'                   => get_option( 'fotogrids_autosave', true ),
 				'share_statistics'           => get_option( 'fotogrids_share_statistics', false ),
 				'preserve_data_on_uninstall' => get_option( 'fotogrids_preserve_data_on_uninstall', true ),
@@ -1463,11 +1464,23 @@ class Import_Export_Data {
 			\FotoGrids\Image_Size_Manager::save_plugin_size_settings( $settings['media'] );
 		}
 
-		if ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
-			update_option(
-				'fotogrids_gallery_defaults',
-				Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'] )
-			);
+		if ( isset( $settings['collection_defaults'] ) && is_array( $settings['collection_defaults'] ) ) {
+			foreach ( Collection_Defaults_Store::TYPES as $type ) {
+				if ( isset( $settings['collection_defaults'][ $type ] ) && is_array( $settings['collection_defaults'][ $type ] ) ) {
+					Collection_Defaults_Store::replace(
+						$type,
+						Plugin_Settings_Store::sanitize_collection_defaults( $settings['collection_defaults'][ $type ], $type )
+					);
+				}
+			}
+		} elseif ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
+			// Files exported before 1.3.0 hold one map for both types.
+			foreach ( Collection_Defaults_Store::TYPES as $type ) {
+				Collection_Defaults_Store::replace(
+					$type,
+					Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'], $type )
+				);
+			}
 		}
 
 		$flags = array(

@@ -20,7 +20,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 const DEFAULT_BLOCK_IDS =
 	'caption description file_info exif share credit tags people location';
 
-const DEFAULTS_OPTION = 'fotogrids_gallery_defaults';
+const DEFAULTS_OPTION = 'fotogrids_collection_defaults';
 
 function wp( args: string[] ): string {
 	return execFileSync( wpCli(), args, { encoding: 'utf8' } ).trim();
@@ -57,7 +57,15 @@ function storedMeta( id: number, key: string ): string {
 async function runUpgrade( page: import( '@playwright/test' ).Page ): Promise< void > {
 	setOption( 'fotogrids_db_version', '1.5' );
 	await page.goto( '/' );
-	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.6' );
+	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.7' );
+}
+
+/** Store the defaults option an earlier version wrote, past the filters that keep its name working. */
+function writeLegacyDefaults( value: object ): void {
+	wp( [
+		'eval',
+		`global $wpdb; $wpdb->replace( $wpdb->options, array( 'option_name' => 'fotogrids_gallery_defaults', 'option_value' => maybe_serialize( json_decode( '${ JSON.stringify( value ) }', true ) ), 'autoload' => 'on' ) ); wp_cache_flush();`,
+	] );
 }
 
 test( 'the upgrade restores a list setting stored as one value and keeps saved lists', { tag: [ '@critical', '@settings', '@lifecycle' ] }, async ( {
@@ -91,15 +99,19 @@ test( 'saved defaults held as JSON text become lists on upgrade and reach a new 
 	const before = snapshotDefaults();
 
 	try {
-		wp( [
-			'option',
-			'update',
-			DEFAULTS_OPTION,
-			'{"lightbox_info_blocks":"[\\"exif\\",\\"caption\\"]"}',
-			'--format=json',
-		] );
+		setOption( DEFAULTS_OPTION, null );
+		writeLegacyDefaults( { lightbox_info_blocks: '["exif","caption"]' } );
 
 		await runUpgrade( page );
+
+		// The shared map moves to both types.
+		expect( JSON.parse( snapshotDefaults() ?? '{}' ) ).toEqual( {
+			gallery: { lightbox_info_blocks: [ 'exif', 'caption' ] },
+			album: { lightbox_info_blocks: [ 'exif', 'caption' ] },
+		} );
+		expect(
+			wp( [ 'eval', `global $wpdb; echo $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = 'fotogrids_gallery_defaults'" );` ] )
+		).toBe( '0' );
 
 		const editor = new GalleryEditor( page );
 		const panel = new CollectionSettings( page );
@@ -135,7 +147,7 @@ test( 'a block list saved on the Defaults page reaches a new gallery in order', 
 		await panel.moveTokenBefore( 'lightbox_info_blocks', 'Location', 'Caption' );
 		expect( await panel.tokens( 'lightbox_info_blocks' ) ).toEqual( [ 'Location', 'Caption' ] );
 
-		const write = settings.write( '/fotogrids/v1/admin/gallery-defaults' );
+		const write = settings.write( '/fotogrids/v1/admin/collection-defaults' );
 		await settings.saveButton( /save defaults/i ).click();
 		await write;
 
@@ -175,7 +187,8 @@ test( 'an import of defaults exported before this version stores their lists as 
 		expect( result.imported.settings ).toBe( true );
 
 		expect( JSON.parse( snapshotDefaults() ?? '{}' ) ).toEqual( {
-			lightbox_info_blocks: [ 'exif', 'caption' ],
+			gallery: { lightbox_info_blocks: [ 'exif', 'caption' ] },
+			album: { lightbox_info_blocks: [ 'exif', 'caption' ] },
 		} );
 	} finally {
 		restoreDefaults( before );

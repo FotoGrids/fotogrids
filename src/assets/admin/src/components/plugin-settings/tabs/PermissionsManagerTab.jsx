@@ -239,8 +239,10 @@ const PermissionsManagerTab = () => {
 			setPending({ options: {}, simple: {} });
 			setBarStatus('saved');
 			setTimeout(() => setBarStatus(null), 3000);
+			return true;
 		} catch (e) {
 			setBarStatus('error');
+			return false;
 		} finally {
 			setBarSaving(false);
 		}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import Panel from '../shared/SidebarTabs/elements/Panel';
@@ -13,6 +13,7 @@ import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
 import TabBar from '../shared/TabBar.jsx';
+import { confirmLeave } from '../shared/SidebarTabs/elements/unsaved-changes';
 
 const TAB_IDS = [
 	'media',
@@ -175,14 +176,45 @@ const PluginSettingsPage = () => {
 		resolveDefaultsSubTab(resolveActiveTab())
 	);
 
+	// The view on screen and its URL.
+	const shown = useRef({ tab: activeTab, subTab: activeDefaultsSubTab });
+	const shownUrl = useRef(window.location.href);
+
 	useEffect(() => {
-		const handlePopState = () => {
+		shown.current = { tab: activeTab, subTab: activeDefaultsSubTab };
+		shownUrl.current = window.location.href;
+	}, [activeTab, activeDefaultsSubTab]);
+
+	const viewLabel = (tabId, subTabId) =>
+		'defaults' === tabId
+			? DEFAULTS_TABS.find((tab) => tab.id === subTabId)?.label
+			: tabs.find((tab) => tab.id === tabId)?.label;
+
+	const leaveView = () =>
+		confirmLeave(viewLabel(shown.current.tab, shown.current.subTab) || '');
+
+	useEffect(() => {
+		const handlePopState = async () => {
 			if (!uiState) {
 				return;
 			}
 			const tabId = resolveActiveTab();
+			const subTabId = resolveDefaultsSubTab(tabId);
+
+			if (
+				tabId === shown.current.tab &&
+				subTabId === shown.current.subTab
+			) {
+				return;
+			}
+
+			if (!(await leaveView())) {
+				window.history.pushState({}, '', shownUrl.current);
+				return;
+			}
+
 			setActiveTab(tabId);
-			setActiveDefaultsSubTab(resolveDefaultsSubTab(tabId));
+			setActiveDefaultsSubTab(subTabId);
 		};
 
 		window.addEventListener('popstate', handlePopState);
@@ -258,7 +290,7 @@ const PluginSettingsPage = () => {
 		setTimeout(attemptScroll, 300);
 	}, [activeTab]);
 
-	const handleTabChange = (tabId) => {
+	const handleTabChange = async (tabId) => {
 		// The Setup Wizard tab is a launcher, not a tab panel. Add the
 		// wizard query param to the current URL so the wizard opens *on
 		// top of* the Settings page, then dispatch a popstate so the
@@ -268,6 +300,10 @@ const PluginSettingsPage = () => {
 		if (tabId === 'setup_wizard') {
 			window.history.pushState({}, '', getSetupWizardUrl());
 			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		if (tabId !== activeTab && !(await leaveView())) {
 			return;
 		}
 
@@ -301,7 +337,11 @@ const PluginSettingsPage = () => {
 		} catch (_e) {}
 	};
 
-	const handleSubTabChange = (subTabId) => {
+	const handleSubTabChange = async (subTabId) => {
+		if (subTabId === activeDefaultsSubTab || !(await leaveView())) {
+			return;
+		}
+
 		setActiveDefaultsSubTab(subTabId);
 
 		if (uiState) {

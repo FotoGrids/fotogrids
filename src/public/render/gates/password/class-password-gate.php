@@ -174,12 +174,13 @@ final class Password_Gate implements Gate {
 		// Per-collection username for password managers, which ignore type="hidden".
 		$credential_user = esc_attr( ( $is_album ? 'fotogrids-album-' : 'fotogrids-gallery-' ) . $collection_id );
 		$id_attribute    = $is_album ? 'data-album-id' : 'data-gallery-id';
+		$embed_atts      = self::embed_atts_html( $render_context );
 
 		$body_html = sprintf(
 			'<form class="fg-lock-form" method="post"'
 			. ' %8$s="%1$d"'
 			. ' data-unlock-url="%2$s"'
-			. ' data-nonce="%3$s">'
+			. ' data-nonce="%3$s"%9$s>'
 			. '<input class="fg-lock-user" type="text" name="fg_gallery_user"'
 			. ' value="%7$s" autocomplete="username" readonly tabindex="-1"'
 			. ' aria-hidden="true" />'
@@ -196,7 +197,8 @@ final class Password_Gate implements Gate {
 			$submit_label,
 			$error_text,
 			$credential_user,
-			$id_attribute
+			$id_attribute,
+			$embed_atts
 		);
 
 		$card = new Gate_Card(
@@ -208,6 +210,30 @@ final class Password_Gate implements Gate {
 		);
 
 		return Gate_Renderer::render( $render_context, $card );
+	}
+
+	/**
+	 * Builds the lock form attributes that carry embed attributes to the unlock request.
+	 *
+	 * @since  1.3.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	private static function embed_atts_html( Render_Context $render_context ): string {
+		$embed_atts = $render_context->settings['_embed_atts'] ?? array();
+		if ( ! is_array( $embed_atts ) ) {
+			return '';
+		}
+
+		$html = '';
+		if ( ! empty( $embed_atts['cols'] ) ) {
+			$html .= ' data-fg-embed-cols="' . absint( $embed_atts['cols'] ) . '"';
+		}
+		if ( ! empty( $embed_atts['template'] ) && is_string( $embed_atts['template'] ) ) {
+			$html .= ' data-fg-embed-template="' . esc_attr( $embed_atts['template'] ) . '"';
+		}
+
+		return $html;
 	}
 
 	/**

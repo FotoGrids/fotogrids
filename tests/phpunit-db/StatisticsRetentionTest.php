@@ -7,7 +7,7 @@
 
 use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Filters_Settings;
-use FotoGrids\Settings\Collection_Defaults_Seeder;
+use FotoGrids\Settings\Collection_Defaults_Store;
 use FotoGrids\Statistics;
 
 class StatisticsRetentionTest extends WP_UnitTestCase {
@@ -165,7 +165,7 @@ class StatisticsRetentionTest extends WP_UnitTestCase {
 	}
 
 	public function test_a_period_saved_on_the_defaults_page_applies_to_new_collections(): void {
-		update_option( Collection_Defaults_Seeder::OPTION, array( 'retain_statistics' => '30' ) );
+		Collection_Defaults_Store::replace( 'gallery', array( 'retain_statistics' => '30' ) );
 		$gallery = $this->collection();
 		$this->totals( 'gallery', $gallery, 40, 40 );
 
