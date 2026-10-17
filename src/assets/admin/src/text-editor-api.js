@@ -15,7 +15,7 @@ import {
 	Editor,
 	getFeatures,
 	registerFeature,
-} from '@packages/fg-text-editor';
+} from '@shared/text-editor';
 
 window.FotoGridsAdmin = window.FotoGridsAdmin || {};
 if (!window.FotoGridsAdmin.textEditor) {

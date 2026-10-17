@@ -3,7 +3,7 @@ import {
 	parse,
 	toPlainText,
 	type Profile,
-} from '../fg-formatted-text';
+} from '../formatted-text';
 import {
 	hasMark,
 	insertBreak,

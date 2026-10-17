@@ -5,7 +5,7 @@
  * loaded into the modal, so the SEO tab never issues its own request.
  */
 
-import { toPlainText } from '@packages/fg-formatted-text';
+import { toPlainText } from '@shared/formatted-text';
 
 export const CHECK_PASS = 'pass';
 export const CHECK_WARN = 'warn';

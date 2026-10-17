@@ -39,7 +39,7 @@ final class Schema {
 	 *
 	 * @since 1.3.0
 	 */
-	const FILE = 'packages/fg-formatted-text/schema.json';
+	const FILE = 'shared/formatted-text/schema.json';
 
 	private const NAME_PATTERN = '/^[a-z][a-z0-9-]*$/';
 

@@ -1,4 +1,4 @@
-import { bundledProfile, validateProfile } from '../../fg-formatted-text';
+import { bundledProfile, validateProfile } from '../../formatted-text';
 import {
 	clearFormatting,
 	hasMark,

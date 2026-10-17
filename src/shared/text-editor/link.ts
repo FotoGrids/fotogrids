@@ -1,4 +1,4 @@
-import { parse, type Profile } from '../fg-formatted-text';
+import { parse, type Profile } from '../formatted-text';
 import type { Attributes } from './model';
 
 export interface LinkDefaults {

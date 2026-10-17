@@ -24,7 +24,7 @@
   "paths": {
     "@/*": ["src/assets/*"],
     "@modules/*": ["src/includes/modules/*"],
-    "@packages/*": ["src/packages/*"]
+    "@shared/*": ["src/shared/*"]
   },
     "declaration": true,
     "declarationMap": true,
@@ -34,7 +34,7 @@
     "src/assets/admin/src/**/*",
     "src/assets/admin/plain/**/*",
     "src/assets/frontend/src/**/*",
-    "src/packages/**/*",
+    "src/shared/**/*",
     "tests/**/*.ts",
     "playwright.config.ts",
     "**/*.d.ts"
@@ -44,6 +44,6 @@
     "build",
     "dist",
     "vendor",
-    "src/packages/*/tests"
+    "src/shared/*/tests"
   ]
 }

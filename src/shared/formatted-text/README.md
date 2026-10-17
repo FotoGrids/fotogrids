@@ -1,4 +1,4 @@
-# fg-formatted-text
+# formatted-text
 
 Formats stored captions and descriptions as safe HTML or plain text. It has no dependencies and runs on visitor pages, in the admin and in tests.
 

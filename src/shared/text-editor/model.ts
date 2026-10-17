@@ -5,7 +5,7 @@ import {
 	parse,
 	type FormatNode,
 	type Profile,
-} from '../fg-formatted-text';
+} from '../formatted-text';
 
 /**
  * Editor document model.

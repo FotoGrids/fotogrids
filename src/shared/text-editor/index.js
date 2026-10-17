@@ -1,5 +1,5 @@
 /**
- * fg-text-editor: a small visual editor for formatted captions and
+ * text-editor: a small visual editor for formatted captions and
  * descriptions. See README.md for the public API.
  */
 export { default as Editor, CHANGE_EVENT } from './Editor';

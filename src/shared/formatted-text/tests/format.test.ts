@@ -22,7 +22,7 @@ interface Fixture {
 
 const cases = fixtures as Fixture[];
 
-describe('fg-formatted-text fixtures', () => {
+describe('formatted-text fixtures', () => {
 	describe.each(cases.map((fixture) => [fixture.name, fixture] as const))(
 		'%s',
 		(_name, fixture) => {

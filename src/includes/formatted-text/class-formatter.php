@@ -18,7 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Turns stored caption and description markup into a sanitized node tree,
  * and the tree into HTML or plain text.
  *
- * Mirrors packages/fg-formatted-text/document.ts and serialize.ts; the shared
+ * Mirrors shared/formatted-text/document.ts and serialize.ts; the shared
  * fixtures keep the two in step. Output is always rebuilt from the tree, so
  * every tag is one the profile allows and every text run is escaped.
  *

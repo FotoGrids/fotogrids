@@ -1,4 +1,4 @@
-import { bundledProfile } from '../../fg-formatted-text';
+import { bundledProfile } from '../../formatted-text';
 import { TextEngine } from '../engine';
 import {
 	offsetOf,

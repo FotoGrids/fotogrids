@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Splits markup into text, start, end and dropped tokens.
  *
- * Mirrors packages/fg-formatted-text/tokenize.ts; the shared fixtures keep
+ * Mirrors shared/formatted-text/tokenize.ts; the shared fixtures keep
  * the two in step. Anything that cannot be read as a tag becomes text,
  * comments and declarations become dropped tokens, and raw-text element
  * content is skipped. Text and attribute values are returned decoded.

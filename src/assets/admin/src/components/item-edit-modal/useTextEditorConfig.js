@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { bundledProfile, validateProfile } from '@packages/fg-formatted-text';
+import { bundledProfile, validateProfile } from '@shared/formatted-text';
 
 /**
  * Caption and description editor settings for the current user, from the

@@ -1,6 +1,6 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { Editor } from '@packages/fg-text-editor';
+import { Editor } from '@shared/text-editor';
 import FormField from '../../shared/FormField/FormField.jsx';
 import FormFields from '../../shared/FormField/FormFields.jsx';
 import useTextEditorConfig from '../useTextEditorConfig';

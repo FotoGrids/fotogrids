@@ -1,4 +1,4 @@
-import type { Profile } from '../fg-formatted-text';
+import type { Profile } from '../formatted-text';
 import {
 	fromUnits,
 	sameMark,

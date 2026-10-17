@@ -114,7 +114,7 @@ export default [
         },
     },
     {
-        files: ['src/packages/*/tests/**'],
+        files: ['src/shared/*/tests/**'],
         languageOptions: {
             globals: {
                 ...globals.jest,
@@ -122,25 +122,25 @@ export default [
         },
     },
     {
-        // Packages are self-contained: they import nothing from the app.
-        files: ['src/packages/**'],
+        // Shared code is self-contained: it imports nothing from the rest of the plugin.
+        files: ['src/shared/**'],
         rules: {
             'no-restricted-imports': [
                 'error',
                 {
-                    patterns: ['@/*', '@modules/*', '@packages/*', '../../../*'],
+                    patterns: ['@/*', '@modules/*', '@shared/*', '../../../*'],
                 },
             ],
         },
     },
     {
-        // The format package also runs on visitor pages: no framework imports.
-        files: ['src/packages/fg-formatted-text/**'],
+        // formatted-text also runs on visitor pages: no framework imports.
+        files: ['src/shared/formatted-text/**'],
         rules: {
             'no-restricted-imports': [
                 'error',
                 {
-                    patterns: ['@/*', '@modules/*', '@packages/*', '@wordpress/*', 'react', 'react-dom', '../../*'],
+                    patterns: ['@/*', '@modules/*', '@shared/*', '@wordpress/*', 'react', 'react-dom', '../../*'],
                 },
             ],
         },

@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Decodes character references and escapes output.
  *
- * Mirrors packages/fg-formatted-text/entities.ts.
+ * Mirrors shared/formatted-text/entities.ts.
  *
  * @since 1.3.0
  */

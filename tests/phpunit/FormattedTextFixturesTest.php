@@ -25,7 +25,7 @@ final class FormattedTextFixturesTest extends TestCase {
 	 * @return array<string, array{0: array<string, mixed>}>
 	 */
 	public function fixtures(): array {
-		$path  = dirname( __DIR__, 2 ) . '/src/packages/fg-formatted-text/fixtures/format.json';
+		$path  = dirname( __DIR__, 2 ) . '/src/shared/formatted-text/fixtures/format.json';
 		$cases = json_decode( (string) file_get_contents( $path ), true );
 		$out   = array();
 		foreach ( $cases as $case ) {

@@ -13,7 +13,7 @@ import {
 	render as renderFormatted,
 	toPlainText as formatPlainText,
 	validateProfile,
-} from '@packages/fg-formatted-text';
+} from '@shared/formatted-text';
 
 const RENDERED_EVENT = 'fotogrids:formatted_text:rendered';
 const PROFILE = 'item_text';

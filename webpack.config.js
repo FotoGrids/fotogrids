@@ -252,7 +252,7 @@ const mainConfig = {
         alias: {
             '@': path.resolve(__dirname, 'src/assets'),
             '@modules': path.resolve(__dirname, 'src/includes/modules'),
-            '@packages': path.resolve(__dirname, 'src/packages'),
+            '@shared': path.resolve(__dirname, 'src/shared'),
         },
     },
     module: {
@@ -377,8 +377,8 @@ const mainConfig = {
                 },
                 {
                     // Formatting rules shared by the PHP and browser formatters.
-                    from: 'src/packages/fg-formatted-text/schema.json',
-                    to: 'packages/fg-formatted-text/schema.json',
+                    from: 'src/shared/formatted-text/schema.json',
+                    to: 'shared/formatted-text/schema.json',
                 },
                 {
                     from: 'src/includes/rest/templates/templates/**/*.json',

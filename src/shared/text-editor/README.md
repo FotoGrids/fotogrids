@@ -1,6 +1,6 @@
-# fg-text-editor
+# text-editor
 
-A small visual editor for formatted captions and descriptions. It builds on `fg-formatted-text`, so it can only produce markup the formatter accepts.
+A small visual editor for formatted captions and descriptions. It builds on `formatted-text`, so it can only produce markup the formatter accepts.
 
 ## Editor
 
