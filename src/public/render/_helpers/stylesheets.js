@@ -31,7 +31,8 @@ function findAnchor() {
 }
 
 /**
- * Links each stylesheet the page lacks, after the printed FotoGrids styles.
+ * Links each stylesheet the page lacks, after the printed FotoGrids styles or
+ * ahead of the head's first stylesheet.
  *
  * @param {Record<string, string>} cssUrls Handle → URL map.
  */
@@ -60,7 +61,10 @@ export function injectMissingStyles(cssUrls) {
 		if (anchor) {
 			anchor.parentNode.insertBefore(link, anchor.nextSibling);
 		} else {
-			document.head.appendChild(link);
+			document.head.insertBefore(
+				link,
+				document.head.querySelector('link[rel="stylesheet"], style')
+			);
 		}
 		anchor = link;
 	});

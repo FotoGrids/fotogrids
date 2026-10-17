@@ -10,10 +10,12 @@ declare(strict_types=1);
 
 namespace FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder;
 
+use FotoGrids\Head_Styles;
 use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Album_Module;
 use FotoGrids\Modules\PageBuilders\Builders\BeaverBuilder\Modules\Gallery_Module;
 use FotoGrids\Post_Types;
+use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -103,6 +105,7 @@ final class Module {
 		add_action( 'fl_builder_ui_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
 		add_filter( 'fl_builder_ajax_layout_response', array( self::class, 'add_ajax_inline_css' ) );
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_beaver_builder' ), 10, 2 );
+		add_filter( Filters_Page_Builders::EMBEDS, array( self::class, 'embeds_in_beaver_builder' ), 10, 3 );
 	}
 
 	/**
@@ -220,6 +223,106 @@ final class Module {
 		$status = \FLBuilderModel::is_builder_active() ? 'draft' : 'published';
 
 		return self::layout_has_fotogrids_content( \FLBuilderModel::get_layout_data( $status, $post->ID ) );
+	}
+
+	/**
+	 * Adds the gallery and album modules in a post's layout and in the layouts it inserts.
+	 *
+	 * @since 1.3.0
+	 * @param array         $embeds  Embeds found so far.
+	 * @param string        $content Post or widget content.
+	 * @param \WP_Post|null $post    Post the content belongs to.
+	 * @return array
+	 */
+	public static function embeds_in_beaver_builder( $embeds, $content, $post ): array {
+		$embeds = is_array( $embeds ) ? $embeds : array();
+
+		if ( $post instanceof \WP_Post && get_post_meta( $post->ID, '_fl_builder_enabled', true ) ) {
+			$status = \FLBuilderModel::is_builder_active() ? 'draft' : 'published';
+
+			return array_merge( $embeds, self::layout_embeds( \FLBuilderModel::get_layout_data( $status, $post->ID ), 0 ) );
+		}
+
+		return array_merge( $embeds, self::inserted_layout_embeds( (string) $content, 0 ) );
+	}
+
+	/**
+	 * Returns the gallery and album modules, and shortcodes in module text, in a layout.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $layout_data Layout nodes.
+	 * @param int   $depth       Levels of inserted layouts above this one.
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function layout_embeds( $layout_data, int $depth ): array {
+		$nodes = json_decode( (string) wp_json_encode( $layout_data ), true );
+		if ( ! is_array( $nodes ) ) {
+			return array();
+		}
+
+		$embeds = array();
+		$texts  = array();
+		foreach ( $nodes as $node ) {
+			$settings = is_array( $node['settings'] ?? null ) ? $node['settings'] : array();
+			$type     = $settings['type'] ?? '';
+
+			if ( self::GALLERY_MODULE === $type && ! empty( $settings[ Gallery_Module::SETTING_ID ] ) ) {
+				$embeds[] = array(
+					'type' => 'gallery',
+					'atts' => array(
+						'id'      => absint( $settings[ Gallery_Module::SETTING_ID ] ),
+						'_source' => Request_Source::BEAVER_BUILDER,
+					),
+				);
+			} elseif ( self::ALBUM_MODULE === $type && ! empty( $settings[ Album_Module::SETTING_ID ] ) ) {
+				$embeds[] = array(
+					'type' => 'album',
+					'atts' => array( 'id' => absint( $settings[ Album_Module::SETTING_ID ] ) ),
+				);
+			}
+
+			array_walk_recursive(
+				$settings,
+				static function ( $value ) use ( &$texts ) {
+					if ( is_string( $value ) && false !== strpos( $value, '[' ) ) {
+						$texts[] = $value;
+					}
+				}
+			);
+		}
+
+		foreach ( $texts as $text ) {
+			$embeds = array_merge( $embeds, Head_Styles::shortcode_embeds( $text ), self::inserted_layout_embeds( $text, $depth ) );
+		}
+
+		return $embeds;
+	}
+
+	/**
+	 * Returns the embeds in the layouts a piece of content inserts.
+	 *
+	 * @since 1.3.0
+	 * @param string $content Content that may hold insert-layout shortcodes.
+	 * @param int    $depth   Levels of inserted layouts above the content.
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function inserted_layout_embeds( string $content, int $depth ): array {
+		if ( $depth >= self::MAX_INSERT_DEPTH ) {
+			return array();
+		}
+
+		$embeds = array();
+		foreach ( self::inserted_layout_ids( $content ) as $layout_id ) {
+			if ( get_post_meta( $layout_id, '_fl_builder_enabled', true ) ) {
+				$embeds = array_merge( $embeds, self::layout_embeds( \FLBuilderModel::get_layout_data( 'published', $layout_id ), $depth + 1 ) );
+				continue;
+			}
+
+			$inserted = (string) get_post_field( 'post_content', $layout_id );
+			$embeds   = array_merge( $embeds, Head_Styles::shortcode_embeds( $inserted ), self::inserted_layout_embeds( $inserted, $depth + 1 ) );
+		}
+
+		return $embeds;
 	}
 
 	/**

@@ -89,17 +89,29 @@ describe('injectMissingStyles', () => {
 		);
 	});
 
-	it('appends to <head> when the page has no FotoGrids stylesheet', () => {
+	it('goes ahead of the head stylesheets when the page has no FotoGrids stylesheet', () => {
 		addLink('theme-style-css', 'https://example.com/theme.css');
+		addStyle('wp-custom-css');
 
+		injectMissingStyles({
+			'fotogrids-lightbox': 'https://example.com/lightbox.css',
+			'fotogrids-sharing': 'https://example.com/sharing.css',
+		});
+
+		expect(headIds()).toEqual([
+			'fotogrids-css-fotogrids-lightbox',
+			'fotogrids-css-fotogrids-sharing',
+			'theme-style-css',
+			'wp-custom-css',
+		]);
+	});
+
+	it('appends to an empty head', () => {
 		injectMissingStyles({
 			'fotogrids-lightbox': 'https://example.com/lightbox.css',
 		});
 
-		expect(headIds()).toEqual([
-			'theme-style-css',
-			'fotogrids-css-fotogrids-lightbox',
-		]);
+		expect(headIds()).toEqual(['fotogrids-css-fotogrids-lightbox']);
 	});
 
 	it('skips handles already linked under either id', () => {

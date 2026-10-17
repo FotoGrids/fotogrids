@@ -8,6 +8,7 @@
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Head_Styles;
+use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Public_Render;
 use FotoGrids\Render\Internal\Asset_Resolver;
@@ -221,6 +222,87 @@ class HeadStylesTest extends WP_UnitTestCase {
 		$this->assertTrue( wp_is_block_theme() );
 
 		$this->assertSame( array(), $this->head_pass( get_permalink( $page ) ) );
+	}
+
+	public function test_a_gallery_in_a_classic_widget_enqueues_on_an_archive(): void {
+		$gallery = $this->gallery();
+		register_sidebar( array( 'id' => 'fg-sidebar' ) );
+		update_option( 'widget_text', array( 7 => array( 'text' => '[fotogrids_gallery id="' . $gallery . '"]' ) ) );
+		update_option( 'sidebars_widgets', array( 'fg-sidebar' => array( 'text-7' ), 'array_version' => 3 ) );
+
+		$head = $this->head_pass( home_url( '/' ) );
+
+		$this->assertNotEmpty( $head );
+		$this->assertSame( $this->rendered( '[fotogrids_gallery id="' . $gallery . '"]' ), $head );
+	}
+
+	public function test_a_gallery_block_widget_enqueues_its_styles(): void {
+		$gallery = $this->gallery( array( 'layout' => 'masonry' ) );
+		$block   = '<!-- wp:fotogrids/gallery {"galleryId":' . $gallery . '} /-->';
+		register_sidebar( array( 'id' => 'fg-sidebar' ) );
+		update_option( 'widget_block', array( 8 => array( 'content' => $block ) ) );
+		update_option( 'sidebars_widgets', array( 'fg-sidebar' => array( 'block-8' ), 'array_version' => 3 ) );
+
+		$head = $this->head_pass( home_url( '/' ) );
+
+		$this->assertNotEmpty( $head );
+		$this->assertSame( $this->rendered( $block ), $head );
+	}
+
+	public function test_an_embed_added_through_the_filter_enqueues_its_styles(): void {
+		$gallery = $this->gallery( array( 'layout' => 'justified' ) );
+		$page    = $this->page( 'No embed in the content.' );
+		$add     = static function ( $embeds, $content, $post ) use ( $gallery, $page ) {
+			unset( $content );
+			if ( $post instanceof WP_Post && $page === $post->ID ) {
+				$embeds[] = array(
+					'type' => 'gallery',
+					'atts' => array( 'id' => $gallery ),
+				);
+			}
+			return $embeds;
+		};
+		add_filter( Filters_Page_Builders::EMBEDS, $add, 10, 3 );
+
+		$head = $this->head_pass( get_permalink( $page ) );
+		remove_filter( Filters_Page_Builders::EMBEDS, $add, 10 );
+
+		$this->assertNotEmpty( $head );
+		$this->assertSame( $this->rendered( '[fotogrids_gallery id="' . $gallery . '"]' ), $head );
+	}
+
+	public function test_a_cached_gallery_replays_its_styles_from_one_cache_entry(): void {
+		global $wpdb;
+		$gallery = $this->gallery( array( 'enable_cache' => '1' ) );
+		$url     = get_permalink( $this->page( '[fotogrids_gallery id="' . $gallery . '"]' ) );
+		$entries = static fn () => (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE object_id = %d', $wpdb->prefix . 'fotogrids_render_cache', $gallery )
+		);
+
+		$first = $this->head_pass( $url );
+		$this->assertSame( 1, $entries() );
+
+		$second = $this->head_pass( $url );
+
+		$this->assertNotEmpty( $first );
+		$this->assertSame( $first, $second );
+		$this->assertSame( 1, $entries() );
+	}
+
+	public function test_styles_printed_after_the_head_move_into_it_on_a_page_view(): void {
+		ob_start();
+		do_action( 'wp_head' );
+		ob_end_clean();
+		$GLOBALS['wp_styles'] = new WP_Styles();
+		wp_register_style( 'fotogrids-late', 'https://example.com/late.css', array(), '1' );
+
+		ob_start();
+		Asset_Resolver::instance()->print_late_styles( array( 'fotogrids-late' ) );
+		$output = (string) ob_get_clean();
+
+		$this->assertStringContainsString( "id='fotogrids-late-css'", $output );
+		$this->assertStringContainsString( '<script', $output );
+		$this->assertStringContainsString( '["fotogrids-late"]', $output );
 	}
 
 	public function test_an_escaped_shortcode_enqueues_nothing(): void {

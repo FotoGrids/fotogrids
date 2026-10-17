@@ -335,16 +335,15 @@ final class Render_Controller {
 	 *
 	 * @since 1.3.0
 	 * @param Render_Context $render Render context; items may be empty.
-	 * @return void
+	 * @return array<string, string> The context's stylesheets, handle → URL.
 	 */
-	public function enqueue_styles( Render_Context $render ): void {
+	public function enqueue_styles( Render_Context $render ): array {
 		$render = Hooks::apply_filter( 'render_settings', $render, $render );
 
 		foreach ( Module_Registry::active_modules( 'gates', $render ) as $gate_module ) {
 			$this->collect_styles( $gate_module->assets( $render ), $gate_module->origin() );
 			if ( ! $gate_module->evaluate( $render )->passed ) {
-				$this->asset_resolver->flush();
-				return;
+				return $this->flush_styles();
 			}
 		}
 
@@ -359,8 +358,7 @@ final class Render_Controller {
 
 		$layout_module = $this->select_layout( $render );
 		if ( null === $layout_module ) {
-			$this->asset_resolver->flush();
-			return;
+			return $this->flush_styles();
 		}
 		$this->collect_styles( $layout_module->assets( $render ), $layout_module->origin() );
 
@@ -370,7 +368,7 @@ final class Render_Controller {
 			}
 		}
 
-		$this->asset_resolver->flush();
+		return $this->flush_styles();
 	}
 
 	/**
@@ -383,6 +381,19 @@ final class Render_Controller {
 	 */
 	private function collect_styles( Module_Assets $module_assets, string $origin ): void {
 		$this->asset_resolver->collect( new Module_Assets( $module_assets->css ), $origin );
+	}
+
+	/**
+	 * Enqueues the queued stylesheets and returns them.
+	 *
+	 * @since 1.3.0
+	 * @return array<string, string> Handle → URL.
+	 */
+	private function flush_styles(): array {
+		$styles = $this->asset_resolver->queued_css();
+		$this->asset_resolver->flush();
+
+		return $styles;
 	}
 
 	/**

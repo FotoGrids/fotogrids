@@ -7,14 +7,17 @@
 
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Filters_Page_Builders;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
 /**
- * Finds the galleries and albums a singular page embeds and enqueues their
+ * Finds the galleries and albums a page embeds - in its content, its
+ * builder layout and the active widget areas - and enqueues their
  * stylesheets on `wp_enqueue_scripts`, so they print in the head ahead of
- * theme and Additional CSS instead of inline where the content renders.
+ * theme and Additional CSS instead of where the collection renders.
  *
  * @since 1.3.0
  */
@@ -39,100 +42,121 @@ final class Head_Styles {
 	 * @return void
 	 */
 	public static function enqueue(): void {
-		if ( wp_is_block_theme() || ! is_singular() ) {
+		if ( wp_is_block_theme() ) {
 			return;
 		}
 
-		$post = get_queried_object();
-		if ( ! $post instanceof \WP_Post || post_password_required( $post ) ) {
-			return;
-		}
+		$embeds = self::widget_embeds();
 
-		$embeds = self::embeds( (string) $post->post_content );
-		if ( Post_Types::GALLERY === $post->post_type ) {
-			$embeds[] = array( 'gallery', array( 'id' => $post->ID ), true );
-		} elseif ( Post_Types::ALBUM === $post->post_type ) {
-			$embeds[] = array( 'album', array( 'id' => $post->ID ), false );
+		$post = is_singular() ? get_queried_object() : null;
+		if ( $post instanceof \WP_Post && ! post_password_required( $post ) ) {
+			$embeds = array_merge( $embeds, self::content_embeds( (string) $post->post_content, $post ) );
+			if ( Post_Types::GALLERY === $post->post_type ) {
+				$embeds[] = array(
+					'type'      => 'gallery',
+					'atts'      => array( 'id' => $post->ID ),
+					'view_page' => true,
+				);
+			} elseif ( Post_Types::ALBUM === $post->post_type ) {
+				$embeds[] = array(
+					'type' => 'album',
+					'atts' => array( 'id' => $post->ID ),
+				);
+			}
 		}
 
 		$seen = array();
 		foreach ( $embeds as $embed ) {
+			if ( ! is_array( $embed ) || empty( $embed['atts'] ) || ! is_array( $embed['atts'] ) ) {
+				continue;
+			}
 			$key = wp_json_encode( $embed );
 			if ( isset( $seen[ $key ] ) ) {
 				continue;
 			}
 			$seen[ $key ] = true;
 
-			if ( 'gallery' === $embed[0] ) {
-				Public_Render::enqueue_gallery_styles( $embed[1], $embed[2] );
-			} else {
-				Public_Render::enqueue_album_styles( $embed[1] );
+			if ( 'gallery' === ( $embed['type'] ?? '' ) ) {
+				Public_Render::enqueue_gallery_styles( $embed['atts'], ! empty( $embed['view_page'] ) );
+			} elseif ( 'album' === ( $embed['type'] ?? '' ) ) {
+				Public_Render::enqueue_album_styles( $embed['atts'] );
 			}
 		}
 	}
 
 	/**
-	 * Returns the gallery and album embeds in post content.
+	 * Returns the FotoGrids shortcodes in a piece of content as embeds.
 	 *
 	 * @since 1.3.0
-	 * @param string $content Post content.
-	 * @return array<int, array{0: string, 1: array, 2: bool}> Type, shortcode attributes, view-page flag.
+	 * @param string $content Content to scan.
+	 * @return array<int, array{type: string, atts: array}>
 	 */
-	private static function embeds( string $content ): array {
-		$embeds = array();
-
-		if ( false !== strpos( $content, '[fotogrids_' ) ) {
-			$pattern = '/' . get_shortcode_regex( array( 'fotogrids_gallery', 'fotogrids_album' ) ) . '/';
-			if ( preg_match_all( $pattern, $content, $matches, PREG_SET_ORDER ) ) {
-				foreach ( $matches as $match ) {
-					// [[fotogrids_gallery]] is an escaped shortcode and prints as text.
-					if ( '[' === $match[1] && ']' === $match[6] ) {
-						continue;
-					}
-					$atts     = shortcode_parse_atts( $match[3] );
-					$embeds[] = array(
-						'fotogrids_gallery' === $match[2] ? 'gallery' : 'album',
-						is_array( $atts ) ? $atts : array(),
-						false,
-					);
-				}
-			}
+	public static function shortcode_embeds( string $content ): array {
+		if ( false === strpos( $content, '[fotogrids_' ) ) {
+			return array();
 		}
 
-		if ( false !== strpos( $content, '<!-- wp:fotogrids/' ) ) {
-			$embeds = array_merge( $embeds, self::block_embeds( parse_blocks( $content ) ) );
+		$pattern = '/' . get_shortcode_regex( array( 'fotogrids_gallery', 'fotogrids_album' ) ) . '/';
+		if ( ! preg_match_all( $pattern, $content, $matches, PREG_SET_ORDER ) ) {
+			return array();
+		}
+
+		$embeds = array();
+		foreach ( $matches as $match ) {
+			// [[fotogrids_gallery]] is an escaped shortcode and prints as text.
+			if ( '[' === $match[1] && ']' === $match[6] ) {
+				continue;
+			}
+			$atts     = shortcode_parse_atts( $match[3] );
+			$embeds[] = array(
+				'type' => 'fotogrids_gallery' === $match[2] ? 'gallery' : 'album',
+				'atts' => is_array( $atts ) ? $atts : array(),
+			);
 		}
 
 		return $embeds;
 	}
 
 	/**
-	 * Returns the gallery and album blocks in a parsed block tree.
+	 * Returns the embeds in post or widget content, including builder ones.
 	 *
 	 * @since 1.3.0
-	 * @param array<int, array> $blocks Parsed blocks.
-	 * @return array<int, array{0: string, 1: array, 2: bool}>
+	 * @param string        $content Content to scan.
+	 * @param \WP_Post|null $post    Post the content belongs to.
+	 * @return array<int, array{type: string, atts: array}>
 	 */
-	private static function block_embeds( array $blocks ): array {
+	private static function content_embeds( string $content, ?\WP_Post $post ): array {
+		return (array) apply_filters( Filters_Page_Builders::EMBEDS, self::shortcode_embeds( $content ), $content, $post );
+	}
+
+	/**
+	 * Returns the embeds in the widgets of every active widget area.
+	 *
+	 * @since 1.3.0
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function widget_embeds(): array {
 		$embeds = array();
 
-		foreach ( $blocks as $block ) {
-			$attrs = $block['attrs'] ?? array();
-			if ( 'fotogrids/gallery' === $block['blockName'] && ! empty( $attrs['galleryId'] ) ) {
-				$embeds[] = array(
-					'gallery',
-					array(
-						'id'      => absint( $attrs['galleryId'] ),
-						'_source' => 'block',
-					),
-					false,
-				);
-			} elseif ( 'fotogrids/album' === $block['blockName'] && ! empty( $attrs['albumId'] ) ) {
-				$embeds[] = array( 'album', array( 'id' => absint( $attrs['albumId'] ) ), false );
+		foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
+			if ( 'wp_inactive_widgets' === $sidebar_id || ! is_array( $widget_ids ) || ! is_active_sidebar( $sidebar_id ) ) {
+				continue;
 			}
 
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$embeds = array_merge( $embeds, self::block_embeds( $block['innerBlocks'] ) );
+			foreach ( $widget_ids as $widget_id ) {
+				if ( ! preg_match( '/^(.+)-(\d+)$/', (string) $widget_id, $parts ) ) {
+					continue;
+				}
+				$instances = get_option( 'widget_' . $parts[1] );
+				$instance  = is_array( $instances ) ? ( $instances[ (int) $parts[2] ] ?? null ) : null;
+				if ( ! is_array( $instance ) ) {
+					continue;
+				}
+
+				$content = (string) ( $instance['content'] ?? $instance['text'] ?? '' );
+				if ( '' !== $content ) {
+					$embeds = array_merge( $embeds, self::content_embeds( $content, null ) );
+				}
 			}
 		}
 

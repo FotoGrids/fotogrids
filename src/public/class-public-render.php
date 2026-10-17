@@ -167,7 +167,7 @@ class Public_Render {
 		}
 
 		if ( ! empty( $new_css_handles ) && ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) ) {
-			wp_print_styles( $new_css_handles );
+			$resolver->print_late_styles( $new_css_handles );
 		}
 
 		foreach ( $js as $handle => $meta ) {
@@ -263,9 +263,20 @@ class Public_Render {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 
+		$settings  = array_replace_recursive( self::get_gallery_settings( $gallery_id ), self::gallery_settings_overlay( $atts ) );
+		$cache_key = null;
+		if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {
+			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts + array( 'view_page' => $view_page ), 'head-styles' );
+			$cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
+			if ( false !== $cached ) {
+				Asset_Resolver::instance()->replay_styles( $cached['css'] );
+				return;
+			}
+		}
+
 		$context = Context_Builder::for_public()->build_for_public(
 			$gallery_id,
-			array_replace_recursive( self::get_gallery_settings( $gallery_id ), self::gallery_settings_overlay( $atts ) ),
+			$settings,
 			array(),
 			$source,
 			absint( $atts['album_id'] ) ?: null,
@@ -275,7 +286,11 @@ class Public_Render {
 			)
 		);
 
-		Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, count( $item_ids ) ) );
+		$styles = Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, count( $item_ids ) ) );
+
+		if ( null !== $cache_key ) {
+			\FotoGrids\FotoGrids_Cache::put( $gallery_id, $cache_key, '', $styles, array(), '', '', '', max( 1, absint( $settings['cache_duration'] ?? 24 ) ), array() );
+		}
 	}
 
 	/**
