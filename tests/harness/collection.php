@@ -26,6 +26,7 @@
 use FotoGrids\Collection_Defaults;
 use FotoGrids\FotoGrids_Cache;
 use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Post_Types;
 use FotoGrids\Settings\Setting_Value_Codec;
 
 /** Marks a post as this script's to delete; distinct from the seeder's. */
@@ -58,9 +59,11 @@ function fg_col_arg( array $args, string $name, string $default = '' ): string {
  *
  * The cache flush is not optional: the render cache is keyed on the gallery,
  * not on its settings, so without it the next render replays the HTML built
- * before the change and a render assertion reads a stale layout.
+ * before the change and a render assertion reads a stale layout. An album's
+ * settings reach its galleries' renders (the breadcrumb), so an album flushes
+ * every gallery in it.
  *
- * @param int   $gallery_id Gallery to write to.
+ * @param int   $gallery_id Gallery or album to write to.
  * @param array $settings   Catalog key to value.
  * @return void
  * @throws Exception When a key is not in the catalog.
@@ -84,6 +87,11 @@ function fg_col_settings( int $gallery_id, array $settings ): void {
 			$defaults[ $key ],
 			Setting_Value_Codec::catalog_field_type( $key )
 		);
+	}
+
+	if ( Post_Types::ALBUM === get_post_type( $gallery_id ) ) {
+		FotoGrids_Cache::flush_for_album( $gallery_id );
+		return;
 	}
 
 	FotoGrids_Cache::flush_for_gallery( $gallery_id );
