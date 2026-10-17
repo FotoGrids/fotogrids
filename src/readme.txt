@@ -196,7 +196,6 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * Fixed the Mini and Grid Lightboxes not opening when a caption or description holds a quote mark entity.
 * Fixed tags showing in share text, page titles, link previews and the SEO checks.
 * Fixed line breaks in captions and descriptions not showing in thumbnails.
-* Fixed captions placed Top or Bottom showing white text that could not be seen on light themes. They now use your theme's text colour unless you pick one.
 
 = 1.2.0 =
 
