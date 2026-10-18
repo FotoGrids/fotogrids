@@ -335,7 +335,7 @@ final class Render_Controller {
 	 *
 	 * @since 1.3.0
 	 * @param Render_Context $render Render context; items may be empty.
-	 * @return array<string, string> The context's stylesheets, handle → URL.
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}> The context's stylesheets, handle → registration data.
 	 */
 	public function enqueue_styles( Render_Context $render ): array {
 		$render = Hooks::apply_filter( 'render_settings', $render, $render );
@@ -387,7 +387,7 @@ final class Render_Controller {
 	 * Enqueues the queued stylesheets and returns them.
 	 *
 	 * @since 1.3.0
-	 * @return array<string, string> Handle → URL.
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}> Handle → registration data.
 	 */
 	private function flush_styles(): array {
 		$styles = $this->asset_resolver->queued_css();

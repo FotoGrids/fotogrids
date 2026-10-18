@@ -23,6 +23,7 @@ tests=(
     "${plugin_root}/tests/integration/HookFiringOrderTest.php"
     "${plugin_root}/tests/integration/LocationCoordinatesTest.php"
     "${plugin_root}/tests/integration/PublicRenderParityTest.php"
+    "${plugin_root}/tests/integration/RenderCacheAssetDepsTest.php"
     "${plugin_root}/tests/integration/RenderCacheExpiryTest.php"
     "${plugin_root}/tests/integration/RenderCacheInlineAssetsTest.php"
     "${plugin_root}/tests/integration/RandomSortModeTest.php"
