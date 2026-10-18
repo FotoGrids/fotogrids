@@ -218,8 +218,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 *
 	 * @param {Element} collectionEl
 	 * @param {Element} root
+	 * @param {boolean} [inlineHold] Hold with an inline style, for a gallery
+	 *        rendered without the hold stylesheet.
 	 */
-	function fetchFreshSet(collectionEl, root) {
+	function fetchFreshSet(collectionEl, root, inlineHold) {
 		const url = collectionEl.dataset.fgRenderUrl || '';
 		const galleryId = parseInt(collectionEl.dataset.fgGalleryId || '0', 10);
 
@@ -235,6 +237,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 				: 'desktop';
 
 		root.classList.add(PENDING_CLASS);
+		if (inlineHold) {
+			root.style.visibility = 'hidden';
+		}
 
 		let settled = false;
 		const release = function () {
@@ -243,6 +248,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			}
 			settled = true;
 			root.classList.remove(PENDING_CLASS);
+			if (inlineHold) {
+				root.style.visibility = '';
+			}
 		};
 
 		// The fresh set is dropped once the visitor filters or pages the server
@@ -409,7 +417,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			// The server already applied a fresh permutation for the minted
 			// seed, so no client shuffle runs on top - that would desync the
 			// sequence indices the Lightbox navigates by.
-			fetchFreshSet(collectionEl, root);
+			fetchFreshSet(collectionEl, root, MODE_REFETCH !== mode);
 			return;
 		}
 

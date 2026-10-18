@@ -8,7 +8,6 @@ use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Sorter;
-use FotoGrids\Render\Internal\Context_Builder;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -195,9 +194,7 @@ final class Random_Sorter implements Sorter {
 		}
 
 		$css = array();
-		if ( self::MODE_REFETCH === self::mode( $render_context->settings )
-			|| Context_Builder::is_slice_planned( $render_context->settings, $render_context->meta )
-		) {
+		if ( self::MODE_REFETCH === self::mode( $render_context->settings ) ) {
 			$css['fotogrids-random-sort'] = new Asset_Decl( 'sorters/random/random-sort.css' );
 		}
 
