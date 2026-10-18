@@ -17,6 +17,7 @@ import type { Locator, Page } from '@playwright/test';
 const WHITE = 'rgb(255, 255, 255)';
 const WHITE_70 = 'rgba(255, 255, 255, 0.7)';
 const CAPTION_EFFECTS = [ 'caption-fade', 'caption-rise', 'caption-slide', 'caption-split', 'spotlight' ];
+const HOVER_ONLY: Array< Record< string, string > > = [ { caption_visibility: 'show_on_hover' }, ...CAPTION_EFFECTS.map( ( effect ) => ( { hover_effect: effect } ) ) ];
 
 type Box = { x: number; y: number; width: number; height: number };
 
@@ -330,7 +331,7 @@ test.describe( 'when the caption shows', () => {
 		expect( duration ).toBe( '0s' );
 	} );
 
-	for ( const settings of [ { caption_visibility: 'show_on_hover' }, ...CAPTION_EFFECTS.map( ( effect ) => ( { hover_effect: effect } ) ) ] ) {
+	for ( const settings of HOVER_ONLY ) {
 		const name = settings.hover_effect ?? 'Show on Hover';
 		test( `CAP-38: keyboard focus on an item shows its caption (${ name })`, { tag: [ '@critical', '@layout' ] }, async ( { page } ) => {
 			const gallery = await open( page, { ...settings, item_click_behavior: 'lightbox' } );
@@ -358,7 +359,7 @@ test.describe( 'when the caption shows', () => {
 test.describe( 'when the caption shows, on touch', () => {
 	test.use( { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } );
 
-	for ( const settings of [ { caption_visibility: 'show_on_hover' }, ...CAPTION_EFFECTS.map( ( effect ) => ( { hover_effect: effect } ) ) ] ) {
+	for ( const settings of HOVER_ONLY ) {
 		const name = settings.hover_effect ?? 'Show on Hover';
 		test( `CAP-39: the first tap shows the caption and the second opens the item (${ name })`, { tag: [ '@critical', '@layout' ] }, async ( { page } ) => {
 			const gallery = await open( page, { ...settings, item_click_behavior: 'lightbox' } );
