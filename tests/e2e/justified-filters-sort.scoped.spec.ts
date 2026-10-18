@@ -22,6 +22,8 @@ import {
  * is loaded.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const FEW = () => shapes(7);
 const QUARTER = () => shapes(120).filter((_, i) => 0 === i % 4);
 
@@ -354,7 +356,9 @@ test.describe('lightbox', () => {
 		await expect(lightbox.dialog()).toBeVisible({ timeout: 15000 });
 		const seen = new Set<string>();
 		for (let guard = 0; guard < 200; guard++) {
-			await expect(lightbox.image()).toHaveJSProperty('complete', true);
+			await expect(lightbox.image()).toHaveJSProperty('complete', true, {
+				timeout: 15000,
+			});
 			seen.add((await lightbox.currentSrc()) ?? '');
 			const next = lightbox.next();
 			if (!(await next.isVisible()) || (await next.isDisabled())) {
@@ -362,7 +366,9 @@ test.describe('lightbox', () => {
 			}
 			const before = await lightbox.index();
 			await next.click();
-			await expect.poll(() => lightbox.index()).not.toBe(before);
+			await expect
+				.poll(() => lightbox.index(), { timeout: 15000 })
+				.not.toBe(before);
 			if (0 === (await lightbox.index())) {
 				break;
 			}

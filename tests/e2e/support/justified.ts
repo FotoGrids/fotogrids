@@ -75,33 +75,44 @@ export async function rows(
 	gallery: GalleryRender
 ): Promise<{ track: number; gap: number; rows: Row[] }> {
 	return gallery.root.evaluate((root) => {
+		// Layout boxes, not client rects: a hover transform must not move an item between rows.
+		const box = (el: HTMLElement) => {
+			let left = 0;
+			let top = 0;
+			for (
+				let n: HTMLElement | null = el;
+				n;
+				n = n.offsetParent as HTMLElement | null
+			) {
+				left += n.offsetLeft;
+				top += n.offsetTop;
+			}
+			return { left, top, width: el.offsetWidth };
+		};
 		const track = root.querySelector('.fg-justified-track') as HTMLElement;
 		const gap =
 			parseFloat(
 				getComputedStyle(track).columnGap || getComputedStyle(track).gap
 			) || 0;
-		const trackBox = track.getBoundingClientRect();
-		const byTop = new Map<number, DOMRect[]>();
+		const trackBox = box(track);
+		const byTop = new Map<number, Array<{ left: number; width: number }>>();
 		track.querySelectorAll(':scope > .fg-item').forEach((n) => {
 			const el = n as HTMLElement;
 			if (
 				el.hasAttribute('data-fg-overflow') ||
-				'none' === getComputedStyle(el).display
+				'none' === getComputedStyle(el).display ||
+				el.offsetWidth <= 0
 			) {
 				return;
 			}
-			const box = el.getBoundingClientRect();
-			if (box.width <= 0) {
-				return;
-			}
-			const key = Math.round(box.top);
-			byTop.set(key, [...(byTop.get(key) ?? []), box]);
+			const b = box(el);
+			byTop.set(b.top, [...(byTop.get(b.top) ?? []), b]);
 		});
 		const out = [...byTop.entries()]
 			.sort((a, b) => a[0] - b[0])
 			.map(([top, boxes]) => {
 				const left = Math.min(...boxes.map((b) => b.left));
-				const right = Math.max(...boxes.map((b) => b.right));
+				const right = Math.max(...boxes.map((b) => b.left + b.width));
 				return {
 					top,
 					items: boxes.length,
@@ -109,7 +120,7 @@ export async function rows(
 					left: left - trackBox.left,
 				};
 			});
-		return { track: trackBox.width, gap, rows: out };
+		return { track: track.clientWidth, gap, rows: out };
 	});
 }
 

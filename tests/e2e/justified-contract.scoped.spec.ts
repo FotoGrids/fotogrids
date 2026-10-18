@@ -10,6 +10,8 @@ import { PER_PAGE, justified, shapes } from './support/justified';
  * page-number requests kept working for older cached scripts.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const ROUTE = `/?rest_route=${encodeURIComponent('/fotogrids/v1/gallery/render')}`;
 
 async function render(

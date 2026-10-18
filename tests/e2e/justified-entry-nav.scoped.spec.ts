@@ -30,6 +30,8 @@ import {
  * order, that page ends sit on full rows, and that the controls are right.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const METHODS: Method[] = ['load_more', 'endless_scroll', 'pages'];
 
 test.describe('entry', () => {

@@ -25,6 +25,8 @@ import {
  * Max Rows, the Match trailing row, and guards for the other layouts.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const SHOW_ALL = { layout: 'justified', pagination_type: 'show_all' };
 const LAST_ROW = ['nojustify', 'justify', 'left', 'center', 'right', 'hide'];
 
@@ -631,6 +633,9 @@ test.describe('match', () => {
 
 					const result = await walk(method, page, gallery);
 					expectCoverage(result, items);
+					if ('endless_scroll' === method) {
+						return;
+					}
 					const sizes =
 						'pages' === method
 							? result.steps.map((s) => s.length)

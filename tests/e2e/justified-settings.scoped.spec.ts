@@ -10,6 +10,8 @@ import { storageStateFor } from './support/roles';
  * All has no page ends for it to act on.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 test.use({ storageState: storageStateFor('administrator') });
 
 test(

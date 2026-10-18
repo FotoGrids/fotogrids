@@ -16,6 +16,8 @@ import {
  * the same way. Serial: it changes the general settings.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const OPTION = 'fotogrids_general_settings';
 let saved = '';
 

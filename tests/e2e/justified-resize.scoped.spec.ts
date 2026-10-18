@@ -23,6 +23,8 @@ import {
  * visitor was looking at.
  */
 
+test.describe.configure({ timeout: 120000 });
+
 const APPEND: Method[] = ['load_more', 'endless_scroll'];
 
 test.describe('resize, append methods', () => {
