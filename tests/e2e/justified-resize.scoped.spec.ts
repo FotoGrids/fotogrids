@@ -6,13 +6,14 @@ import {
 	expectCoverage,
 	expectFullRows,
 	justified,
+	type Method,
 	open,
 	resize,
+	settle,
 	shapes,
 	shownIds,
 	walk,
 	walkPages,
-	type Method,
 } from './support/justified';
 
 /**
@@ -264,7 +265,7 @@ test.describe('resize, Page Buttons', () => {
 			await gallery.root
 				.locator('[data-fg-pagination-trigger="next"]')
 				.click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			await page.waitForTimeout(250);
 		}
 	}
@@ -289,6 +290,7 @@ test.describe('resize, Page Buttons', () => {
 				await page.waitForTimeout(500);
 			});
 			expect(renders).toHaveLength(1);
+			await settle(page);
 			expect(await shownIds(gallery)).toContain(first);
 			await expectFullRows(gallery, 0);
 			const chips = await gallery.root
@@ -373,14 +375,13 @@ test.describe('resize, Page Buttons', () => {
 			await toPage(page, gallery, 3);
 
 			const renders = await countRenders(page, async () => {
-				for (let w = 640; w >= 360; w -= 14) {
-					await gallery.root.evaluate(
-						(el, px) =>
-							((el as HTMLElement).style.maxWidth = `${px}px`),
-						w
-					);
-					await page.waitForTimeout(50);
-				}
+				// Driven in the page so each step is 50ms apart however busy the runner is.
+				await gallery.root.evaluate(async (el) => {
+					for (let w = 640; w >= 360; w -= 14) {
+						(el as HTMLElement).style.maxWidth = `${w}px`;
+						await new Promise((r) => setTimeout(r, 50));
+					}
+				});
 				await page.waitForTimeout(500);
 			});
 			expect(renders.length).toBeLessThanOrEqual(1);

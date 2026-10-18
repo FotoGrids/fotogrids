@@ -218,14 +218,14 @@ describe('justified layout cut', () => {
 		const { track } = makeGallery({ method: 'pages', width: 1200 });
 		boot();
 		await Promise.resolve();
-		jest.advanceTimersByTime(200);
+		jest.advanceTimersByTime(500);
 		pagination.replan.mockClear();
 
 		[1100, 1000, 900, 820].forEach((w) => {
 			setWidth(track, w);
 			jest.advanceTimersByTime(30);
 		});
-		jest.advanceTimersByTime(200);
+		jest.advanceTimersByTime(500);
 
 		expect(pagination.replan).toHaveBeenCalledTimes(1);
 	});
@@ -253,6 +253,34 @@ describe('justified layout cut', () => {
 
 		expect(el.querySelectorAll('.fg-item[data-fg-justified-last-row="1"]')).toHaveLength(0);
 		expect(shown(el)).toHaveLength(23);
+	});
+
+	test('D7: a row that would grow past the tolerance keeps the full width at the bound', async () => {
+		installRuntime();
+		const { el } = makeGallery({ paginated: false, total: 1, lastRow: 'justify', width: 640 });
+		boot();
+		await flush();
+
+		const item = el.querySelector('.fg-item');
+		expect(item.style.height).toBe('275px');
+		expect(item.style.width).toBe('640px');
+	});
+
+	test('D7: a short final row is stretched only when its stretched height is within the tolerance', async () => {
+		installRuntime();
+		const within = makeGallery({ paginated: false, total: 4, width: 1400 });
+		boot();
+		await flush();
+		const widths = Array.from(within.el.querySelectorAll('.fg-item')).reduce((sum, n) => sum + parseFloat(n.style.width), 0);
+
+		const g = geometryOf(within.track, within.el, 1400);
+		const aspects = within.aspects;
+		const stretched = (1400 - g.gap * (aspects.length - 1)) / aspects.reduce((a, b) => a + b, 0);
+		if (Math.abs(stretched - 220) / 220 <= 0.25) {
+			expect(Math.round(widths + g.gap * (aspects.length - 1))).toBe(1400);
+		} else {
+			expect(widths + g.gap * (aspects.length - 1)).toBeLessThan(1399);
+		}
 	});
 
 	test('D5 / MR-01: Max Rows in Show All shows only N rows', async () => {

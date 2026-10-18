@@ -3,17 +3,18 @@ import { galleryPage } from './support/collections';
 import { fixture } from './support/fixtures';
 import { Lightbox } from './support/lightbox';
 import {
-	PER_PAGE,
 	expectCoverage,
 	expectFullRows,
 	justified,
+	type Method,
 	open,
+	PER_PAGE,
 	resize,
+	settle,
 	shapes,
 	shownIds,
 	shownSequence,
 	walk,
-	type Method,
 } from './support/justified';
 
 /**
@@ -40,7 +41,7 @@ async function choose(
 		})
 		.first()
 		.click();
-	await page.waitForLoadState('networkidle');
+	await settle(page);
 	await page.waitForTimeout(400);
 }
 
@@ -49,7 +50,7 @@ async function reset(
 	gallery: import('./support/gallery-render').GalleryRender
 ): Promise<void> {
 	await gallery.root.locator('[data-fg-filter-all="true"]').first().click();
-	await page.waitForLoadState('networkidle');
+	await settle(page);
 	await page.waitForTimeout(400);
 }
 
@@ -180,7 +181,7 @@ test.describe('filters', () => {
 						.first()
 						.click();
 				}
-				await page.waitForLoadState('networkidle');
+				await settle(page);
 				await page.waitForTimeout(400);
 
 				expectCoverage(
@@ -225,7 +226,7 @@ test.describe('filters', () => {
 			await gallery.root
 				.locator('[data-fg-pagination-trigger="load-more"]')
 				.click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			await reset(page, gallery);
 			await resize(page, 800);
 			await choose(page, gallery, /^Shape quarter/);
@@ -431,7 +432,7 @@ test.describe('lightbox', () => {
 				(el) => ((el as HTMLElement).style.maxWidth = '380px')
 			);
 			await page.waitForTimeout(600);
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 
 			const seen = await walkLightbox(
 				page,

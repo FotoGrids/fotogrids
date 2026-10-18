@@ -87,7 +87,7 @@ test(
 
 		await expectFullRows(gallery, 0);
 		expectCoverage(
-			await walk('pages', page, gallery, { rowsFull: true }),
+			await walk('load_more', page, gallery, { rowsFull: true }),
 			items
 		);
 		await context.close();

@@ -43,6 +43,8 @@ export async function open(
 	const gallery = new GalleryRender(page, id);
 	await gallery.waitFor();
 	await expect(gallery.root).toHaveAttribute('data-fg-justified-packed', '1');
+	// A random refetch holds the items until the fresh set lands or is dropped.
+	await expect(gallery.root.locator('.fg-random-pending')).toHaveCount(0);
 	return gallery;
 }
 
@@ -68,7 +70,13 @@ export function shownIds(gallery: GalleryRender): Promise<number[]> {
 	);
 }
 
-export type Row = { top: number; items: number; width: number; left: number };
+export type Row = {
+	top: number;
+	items: number;
+	width: number;
+	left: number;
+	height: number;
+};
 
 /** Visible rows, top to bottom, with each row's occupied width including gaps. */
 export async function rows(
@@ -87,7 +95,12 @@ export async function rows(
 				left += n.offsetLeft;
 				top += n.offsetTop;
 			}
-			return { left, top, width: el.offsetWidth };
+			return {
+				left,
+				top,
+				width: el.offsetWidth,
+				height: el.offsetHeight,
+			};
 		};
 		const track = root.querySelector('.fg-justified-track') as HTMLElement;
 		const gap =
@@ -95,7 +108,10 @@ export async function rows(
 				getComputedStyle(track).columnGap || getComputedStyle(track).gap
 			) || 0;
 		const trackBox = box(track);
-		const byTop = new Map<number, Array<{ left: number; width: number }>>();
+		const byTop = new Map<
+			number,
+			Array<{ left: number; width: number; height: number }>
+		>();
 		track.querySelectorAll(':scope > .fg-item').forEach((n) => {
 			const el = n as HTMLElement;
 			if (
@@ -118,6 +134,7 @@ export async function rows(
 					items: boxes.length,
 					width: right - left,
 					left: left - trackBox.left,
+					height: Math.max(...boxes.map((b) => b.height)),
 				};
 			});
 		return { track: track.clientWidth, gap, rows: out };
@@ -140,6 +157,25 @@ export async function expectFullRows(
 				`row ${i} is ${row.width}px of ${track}px`
 			).toBeLessThanOrEqual(1);
 		}
+	});
+}
+
+/** D7: every row's height stays within ±tolerance of the target row height. */
+export async function expectRowHeights(
+	gallery: GalleryRender,
+	target: number,
+	tolerance = 25
+): Promise<void> {
+	const { rows: list } = await rows(gallery);
+	const min = target * (1 - tolerance / 100);
+	const max = target * (1 + tolerance / 100);
+	list.forEach((row, i) => {
+		expect(row.height, `row ${i} height`).toBeGreaterThanOrEqual(
+			Math.floor(min) - 1
+		);
+		expect(row.height, `row ${i} height`).toBeLessThanOrEqual(
+			Math.ceil(max) + 1
+		);
 	});
 }
 
@@ -168,7 +204,7 @@ export async function countRenders(
 	return seen;
 }
 
-async function settle(page: Page): Promise<void> {
+export async function settle(page: Page): Promise<void> {
 	await page.waitForLoadState('networkidle');
 	await page.waitForFunction(
 		() => !document.querySelector('.fotogrids-gallery--is-paginating')
@@ -334,8 +370,23 @@ export async function resize(
 	height = 900
 ): Promise<void> {
 	await page.setViewportSize({ width, height });
-	await page.waitForTimeout(400);
-	await page.waitForLoadState('networkidle');
+	await page.waitForFunction(() =>
+		Array.from(
+			document.querySelectorAll<HTMLElement>(
+				'[data-fg-layout="justified"]'
+			)
+		).every((el) => {
+			const track = el.querySelector('.fg-justified-track');
+			return (
+				!track ||
+				0 === track.clientWidth ||
+				el.dataset.fgContainerWidth ===
+					String(Math.round(track.clientWidth))
+			);
+		})
+	);
+	// Covers the layout's resize debounce and the re-plan that follows it.
+	await page.waitForTimeout(450);
 	await page.waitForFunction(
 		() => !document.querySelector('.fotogrids-gallery--is-paginating')
 	);

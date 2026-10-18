@@ -9,19 +9,20 @@ import {
 import { GalleryRender } from './support/gallery-render';
 import { wpEval } from './support/roles';
 import {
-	PER_PAGE,
 	countRenders,
 	expectControlsDone,
 	expectCoverage,
 	expectFullRows,
 	justified,
+	type Method,
 	open,
+	PER_PAGE,
 	postWith,
+	settle,
 	shapes,
 	shownIds,
 	walk,
 	walkPages,
-	type Method,
 } from './support/justified';
 
 /**
@@ -405,7 +406,7 @@ test.describe('navigation', () => {
 			const backward = [await shownIds(gallery)];
 			while (!(await prev.isDisabled())) {
 				await prev.click();
-				await page.waitForLoadState('networkidle');
+				await settle(page);
 				await page.waitForTimeout(250);
 				backward.unshift(await shownIds(gallery));
 			}
@@ -433,13 +434,13 @@ test.describe('navigation', () => {
 			expect(last).toBe(forward.steps.length);
 
 			await chips.nth(last - 1).click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			await page.waitForTimeout(250);
 			expect(await shownIds(fresh)).toEqual(forward.steps[last - 1]);
 
 			const middle = Math.floor(last / 2);
 			await chips.nth(middle).click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			await page.waitForTimeout(250);
 			expect(await shownIds(fresh)).toEqual(forward.steps[middle]);
 		}
@@ -476,7 +477,7 @@ test.describe('navigation', () => {
 							)
 							.click();
 					}
-					await page.waitForLoadState('networkidle');
+					await settle(page);
 					await page.waitForTimeout(250);
 					seen.push(...(await shownIds(gallery)));
 				}

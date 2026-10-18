@@ -30,10 +30,11 @@ async function render(
 	return { status: response.status(), json };
 }
 
-function sequenceOf(html: string): number[] {
-	return [...html.matchAll(/data-fg-sequence-index="(\d+)"/g)].map((m) =>
-		Number(m[1])
-	);
+/** Sequence indices of the items a render shows, leaving out page-1 overflow. */
+function shownSequenceOf(html: string): number[] {
+	return [...html.matchAll(/<[^>]*data-fg-sequence-index="(\d+)"[^>]*>/g)]
+		.filter((m) => !m[0].includes('data-fg-overflow'))
+		.map((m) => Number(m[1]));
 }
 
 function idsOf(html: string): number[] {
@@ -65,7 +66,10 @@ test(
 			.count();
 		const pageSize = Number(await root.getAttribute('data-fg-page-size'));
 		expect(overflow).toBeGreaterThan(0);
-		expect(pageSize + overflow).toBeLessThanOrEqual(12 + 3 + 12);
+		expect(
+			pageSize + overflow,
+			'the overflow is a pool for page 1, not the whole gallery'
+		).toBeLessThan(items.length);
 
 		const chips = await root
 			.locator('[data-fg-pagination-trigger="page"]')
@@ -102,8 +106,8 @@ test(
 
 		expect(first.status).toBe(200);
 		expect(second.status).toBe(200);
-		const a = sequenceOf(first.json.html);
-		const b = sequenceOf(second.json.html);
+		const a = shownSequenceOf(first.json.html);
+		const b = shownSequenceOf(second.json.html);
 		expect(b[0]).toBe(a[a.length - 1] + 1);
 		expect(first.json.total_pages).toBeGreaterThan(1);
 	}

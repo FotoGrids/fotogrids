@@ -33,8 +33,9 @@ export class GalleryRender {
 		);
 	}
 
+	/** Items on screen; the hidden page-1 overflow of a justified gallery is left out. */
 	items(): Locator {
-		return this.root.locator( '.fg-item' );
+		return this.root.locator( '.fg-item:not([data-fg-overflow])' );
 	}
 
 	/** Lightbox triggers, present only when the lightbox is on. */

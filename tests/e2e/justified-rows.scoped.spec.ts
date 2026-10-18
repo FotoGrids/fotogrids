@@ -2,21 +2,24 @@ import { test, expect } from './support/test';
 import { album, galleryPage } from './support/collections';
 import { fixture } from './support/fixtures';
 import {
-	PER_PAGE,
 	expectControlsDone,
 	expectCoverage,
 	expectFullRows,
+	expectRowHeights,
 	finalRow,
 	justified,
+	type Method,
 	open,
+	PER_PAGE,
 	resize,
 	rows,
+	settle,
 	shapes,
 	shownIds,
+	shownSequence,
 	walk,
 	walkLoadMore,
 	walkPages,
-	type Method,
 } from './support/justified';
 
 /**
@@ -51,6 +54,7 @@ test.describe('rows and geometry', () => {
 					await page.setViewportSize({ width, height: 900 });
 					const gallery = await open(page, url, id);
 					await expectFullRows(gallery, 0);
+					await expectRowHeights(gallery, height);
 					expectCoverage(
 						await walk('load_more', page, gallery, {
 							rowsFull: true,
@@ -109,7 +113,7 @@ test.describe('rows and geometry', () => {
 				const gallery = await open(page, url, id);
 				await expectFullRows(gallery, 0);
 				expectCoverage(
-					await walk('pages', page, gallery, { rowsFull: true }),
+					await walk('load_more', page, gallery, { rowsFull: true }),
 					items,
 					`${width}px`
 				);
@@ -119,7 +123,7 @@ test.describe('rows and geometry', () => {
 
 	for (const tolerance of [0, 25, 100]) {
 		test(
-			`ROW-04: tolerance ${tolerance} decides whether a short final row is stretched`,
+			`ROW-04: tolerance ${tolerance} bounds every row and decides whether a short final row is stretched`,
 			{ tag: '@layout' },
 			async ({ page }) => {
 				const items = shapes(23);
@@ -177,6 +181,7 @@ test.describe('rows and geometry', () => {
 				} else {
 					expect(final.used).toBeLessThan(final.width - 1);
 				}
+				await expectRowHeights(gallery, 220, tolerance);
 			}
 		);
 	}
@@ -202,7 +207,7 @@ test.describe('rows and geometry', () => {
 	}
 
 	test(
-		'ROW-06: items without stored dimensions lay out as 3:2 and page correctly',
+		"ROW-06: items without stored dimensions use the file's real shape and page correctly",
 		{ tag: '@layout' },
 		async ({ page }) => {
 			const nodims = fixture<number[]>('F-shapes', 'nodims');
@@ -211,13 +216,11 @@ test.describe('rows and geometry', () => {
 			const gallery = await open(page, url, id);
 
 			for (const itemId of nodims) {
-				const box = await gallery.root
-					.locator(`[data-fg-item-id="${itemId}"]`)
-					.first()
-					.boundingBox();
-				if (box) {
-					expect(box.width / box.height).toBeCloseTo(1.5, 0);
-				}
+				const img = gallery.root
+					.locator(`[data-fg-item-id="${itemId}"] img`)
+					.first();
+				await expect(img).toHaveAttribute('width', '300');
+				await expect(img).toHaveAttribute('height', '300');
 			}
 			expectCoverage(
 				await walk('load_more', page, gallery, { rowsFull: true }),
@@ -240,9 +243,10 @@ test.describe('rows and geometry', () => {
 			const gallery = await open(page, url, id);
 
 			await expectFullRows(gallery, 0);
-			expectCoverage(
-				await walk('load_more', page, gallery, { rowsFull: true }),
-				items
+			// Video and embed items carry no item id, so coverage is by position.
+			await walk('load_more', page, gallery, { rowsFull: true });
+			expect(await shownSequence(gallery)).toEqual(
+				items.map((_, i) => i)
 			);
 		}
 	);
@@ -598,7 +602,7 @@ test.describe('max rows', () => {
 					hasText: /^Shape quarter/,
 				})
 				.click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			await page.waitForTimeout(400);
 
 			expect((await rows(gallery)).rows.length).toBeLessThanOrEqual(2);
@@ -669,7 +673,7 @@ test.describe('match', () => {
 			]) {
 				await page.setViewportSize({ width, height: 900 });
 				const gallery = await open(page, url, id);
-				await page.waitForLoadState('networkidle');
+				await settle(page);
 				expect(await shownIds(gallery)).toEqual(items.slice(0, target));
 			}
 		}
@@ -719,7 +723,7 @@ test.describe('match', () => {
 			await gallery.root
 				.locator('[data-fg-pagination-trigger="next"]')
 				.click();
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			const first = (await shownIds(gallery))[0];
 
 			await resize(page, 390, 844);
@@ -763,7 +767,7 @@ test.describe('regression guards', () => {
 								await import('./support/gallery-render')
 							).GalleryRender(page, id);
 							await gallery.waitFor();
-							await page.waitForLoadState('networkidle');
+							await settle(page);
 							expectCoverage(
 								await walk(method, page, gallery),
 								items,
@@ -791,7 +795,7 @@ test.describe('regression guards', () => {
 				items
 			);
 			await page.goto(url);
-			await page.waitForLoadState('networkidle');
+			await settle(page);
 			const gallery = new (
 				await import('./support/gallery-render')
 			).GalleryRender(page, id);

@@ -34,7 +34,7 @@ test(
 	{ tag: ['@admin', '@settings', '@layout'] },
 	async ({ page }) => {
 		const panel = new CollectionSettings(page);
-		const notice = page.getByText(/Hide behaves like No Justify/i);
+		const notice = page.getByText(/Hide behaves like Keep Natural/i);
 
 		const showAll = galleryPage({
 			layout: 'justified',
