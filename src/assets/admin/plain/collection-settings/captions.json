@@ -418,6 +418,7 @@
                                     "key": "caption_title_color",
                                     "type": "color",
                                     "label": "Title Color",
+                                    "description": "When not set, the title is white over the image and uses your theme's text color above or below it.",
                                     "isReference": true,
                                     "condition": {
                                         "dependsOn": "caption_hide_title",
@@ -651,6 +652,7 @@
                                     "key": "caption_description_color",
                                     "type": "color",
                                     "label": "Description Color",
+                                    "description": "When not set, the description is a softer white over the image and a softer shade of your theme's text color above or below it.",
                                     "isReference": true,
                                     "condition": {
                                         "dependsOn": "caption_hide_description",

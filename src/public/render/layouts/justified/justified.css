@@ -6,12 +6,13 @@
 
 [data-fg-layout="justified"] .fg-justified-track .fg-item {
     flex: 0 0 auto;
-    height: var(--fg-justified-row-height, 220px);
     min-width: 0;
 }
 
+/* The row height applies to the image, so a top or bottom caption adds to
+   the item's height instead of overflowing into the next row. */
 [data-fg-layout="justified"] .fg-justified-track .fg-item .fg-item-media {
-    height: 100%;
+    height: var(--fg-justified-item-height, var(--fg-justified-row-height, 220px));
     width: 100%;
     overflow: hidden;
 }

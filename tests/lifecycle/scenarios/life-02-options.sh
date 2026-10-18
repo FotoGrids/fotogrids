@@ -6,9 +6,9 @@
 scratch_install life02
 
 expected_db_version=$(
-	grep -o "update_option( 'fotogrids_db_version', '[0-9.]*' )" \
+	grep -o "const DB_VERSION = '[0-9.]*';" \
 		"$SCRATCH_DIR/wp-content/plugins/fotogrids/includes/class-activator.php" \
-		| grep -o "'[0-9.]*' )$" | tr -d "' )"
+		| grep -o "'[0-9.]*'" | tr -d "'"
 )
 [ -n "$expected_db_version" ] || fail "could not read the version the activator writes"
 

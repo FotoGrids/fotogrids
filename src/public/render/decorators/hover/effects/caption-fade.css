@@ -5,6 +5,12 @@
 	transition-property: opacity;
 }
 
-.fotogrids-collection[data-fg-hover='caption-fade'] .fg-item:hover .fg-caption {
+.fotogrids-collection[data-fg-hover='caption-fade'] .fg-item:hover .fg-caption,
+.fotogrids-collection[data-fg-hover='caption-fade']
+	.fg-item:focus-within
+	.fg-caption,
+.fotogrids-collection[data-fg-hover='caption-fade']
+	.fg-item.fg-caption-revealed
+	.fg-caption {
 	opacity: 1;
 }

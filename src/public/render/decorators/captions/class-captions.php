@@ -76,7 +76,31 @@ final class Captions implements Decorator {
 			}
 		}
 
+		if ( $this->caption_hidden_until_hover( $render_context ) ) {
+			$attrs['data-fg-caption-reveal'] = 'hover';
+		}
+
 		return $attrs;
+	}
+
+	/**
+	 * Whether the caption stays hidden until the item is hovered, either
+	 * through Show on Hover or through a hover effect that reveals it.
+	 *
+	 * @since  1.3.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	private function caption_hidden_until_hover( Render_Context $render_context ): bool {
+		if ( $this->is_image_viewer( $render_context ) ) {
+			return false;
+		}
+
+		if ( $this->hover_effect_owns_caption( $render_context ) ) {
+			return true;
+		}
+
+		return 'show_on_hover' === $this->setting_scalar( $render_context->settings['caption_visibility'] ?? null, 'always' );
 	}
 
 	/**
@@ -346,12 +370,22 @@ final class Captions implements Decorator {
 	}
 
 	public function assets( Render_Context $render_context ): Module_Assets {
+		$js = array();
+		if ( $this->caption_hidden_until_hover( $render_context ) ) {
+			$js['fotogrids-captions-tap'] = new Asset_Decl(
+				'../../assets/js/captions.js',
+				array( 'fotogrids-runtime' ),
+				true,
+			);
+		}
+
 		return new Module_Assets(
 			array(
 				'fotogrids-captions' => new Asset_Decl(
 					'decorators/captions/captions.css'
 				),
-			)
+			),
+			$js
 		);
 	}
 

@@ -142,7 +142,10 @@ function applyRow(row, containerWidth, gap, targetHeight, stretch) {
 		cumulativeInt = cumulativeRounded;
 
 		entry.item.style.width = intWidth + 'px';
-		entry.item.style.height = intHeight + 'px';
+		entry.item.style.setProperty(
+			'--fg-justified-item-height',
+			intHeight + 'px'
+		);
 		entry.item.style.flexGrow = '0';
 		entry.item.style.flexShrink = '0';
 		entry.item.style.marginLeft = '';

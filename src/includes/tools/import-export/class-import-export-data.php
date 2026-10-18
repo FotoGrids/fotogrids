@@ -766,6 +766,7 @@ class Import_Export_Data {
 
 			\FotoGrids\Cache\Metadata_Cache::forget_all();
 			\FotoGrids\Migrations\List_Setting_Repair::run();
+			\FotoGrids\Migrations\Caption_Color_Repair::run();
 
 			\FotoGrids\FotoGrids_Cache::flush_all();
 

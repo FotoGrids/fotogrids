@@ -57,7 +57,7 @@ function storedMeta( id: number, key: string ): string {
 async function runUpgrade( page: import( '@playwright/test' ).Page ): Promise< void > {
 	setOption( 'fotogrids_db_version', '1.5' );
 	await page.goto( '/' );
-	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.7' );
+	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.8' );
 }
 
 /** Store the defaults option an earlier version wrote, past the filters that keep its name working. */

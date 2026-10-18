@@ -173,6 +173,7 @@ const mainConfig = {
         'filter-ui-styles': './src/public/render/filters/features/ui/filter-ui.scss',
         'sharing': './src/public/render/decorators/sharing/sharing.js',
         'image-zoom': './src/public/render/decorators/image-zoom/image-zoom.js',
+        'captions': './src/public/render/decorators/captions/captions.js',
         'password-gate': './src/public/render/gates/password/password-gate.js',
         'lazy-load': './src/public/render/features/lazy-load/lazy-load.js',
         'random-sort': './src/public/render/sorters/random/random-sort.js',
