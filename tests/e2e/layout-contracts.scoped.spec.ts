@@ -463,8 +463,9 @@ test.describe('an unknown saved layout', () => {
 });
 
 /**
- * LAY-15. A shortcode `template` that names no registered layout is ignored,
- * and the collection renders in its saved layout for everyone.
+ * LAY-15. A shortcode `template` that names no registered layout, or a layout
+ * the collection type does not offer, is ignored, and the collection renders
+ * in its saved layout for everyone.
  */
 test.describe('an unknown shortcode template', () => {
 	const UNKNOWN = 'kaleidoscope';
@@ -515,6 +516,23 @@ test.describe('an unknown shortcode template', () => {
 				page.locator(`.fotogrids-album[data-fg-album-id="${id}"]`)
 			).toHaveAttribute('data-fg-layout', SAVED);
 			await expect(page.locator('.fotogrids-error')).toHaveCount(0);
+		}
+	);
+
+	test(
+		'LAY-15: a gallery-only layout passed as the album shortcode template, the saved layout renders',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id } = album([galleryPage().id, galleryPage().id], {
+				layout: SAVED,
+			});
+			const { url } = shortcodePage(id, 'template="slider"', 'album');
+
+			await page.goto(url);
+
+			await expect(
+				page.locator(`.fotogrids-album[data-fg-album-id="${id}"]`)
+			).toHaveAttribute('data-fg-layout', SAVED);
 		}
 	);
 });

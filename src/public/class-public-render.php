@@ -210,7 +210,7 @@ class Public_Render {
 	private static function gallery_settings_overlay( $atts ): array {
 		$settings_overlay = array();
 		$template         = is_string( $atts['template'] ?? null ) ? sanitize_text_field( $atts['template'] ) : '';
-		if ( self::is_layout_key( $template ) ) {
+		if ( self::is_layout_key( $template, 'gallery' ) ) {
 			$settings_overlay['layout'] = $template;
 		}
 
@@ -328,7 +328,7 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
-		if ( self::is_layout_key( $atts['template'] ) ) {
+		if ( self::is_layout_key( $atts['template'], 'album' ) ) {
 			$album_settings['layout'] = $atts['template'];
 		}
 
@@ -421,13 +421,15 @@ class Public_Render {
 	}
 
 	/**
-	 * Returns whether a value is the key of a registered layout.
+	 * Returns whether a value is the key of a registered layout that the
+	 * layout setting offers for the given post type.
 	 *
 	 * @since  1.3.0
-	 * @param  mixed $layout_key Value to check.
+	 * @param  mixed  $layout_key Value to check.
+	 * @param  string $post_type  `gallery` or `album`.
 	 * @return bool
 	 */
-	public static function is_layout_key( $layout_key ): bool {
+	public static function is_layout_key( $layout_key, string $post_type ): bool {
 		if ( ! is_string( $layout_key ) || '' === $layout_key ) {
 			return false;
 		}
@@ -435,11 +437,28 @@ class Public_Render {
 		foreach ( \FotoGrids\Render\Internal\Module_Registry::all_modules( 'layouts' ) as $layout_class ) {
 			$layout = new $layout_class();
 			if ( $layout->layout_key() === $layout_key ) {
-				return true;
+				return self::is_layout_offered( $layout_key, $post_type );
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns whether the layout setting offers a layout for a post type.
+	 *
+	 * A layout option without a post type list is offered for every post type.
+	 *
+	 * @since  1.3.0
+	 * @param  string $layout_key Layout key.
+	 * @param  string $post_type  `gallery` or `album`.
+	 * @return bool
+	 */
+	private static function is_layout_offered( string $layout_key, string $post_type ): bool {
+		$layout_setting = \FotoGrids\Catalog\Catalog::get( 'layout' );
+		$post_types     = $layout_setting['options'][ $layout_key ]['post_types'] ?? null;
+
+		return ! is_array( $post_types ) || in_array( $post_type, $post_types, true );
 	}
 
 	/**
@@ -763,7 +782,7 @@ class Public_Render {
 			$album_settings['enable_statistics'] = false;
 		}
 
-		if ( self::is_layout_key( $atts['template'] ) ) {
+		if ( self::is_layout_key( $atts['template'], 'album' ) ) {
 			$album_settings['layout']      = $atts['template'];
 			$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
 		}
