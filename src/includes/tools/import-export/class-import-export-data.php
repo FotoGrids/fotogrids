@@ -41,6 +41,13 @@ class Import_Export_Data {
 	const COLLECTION_STATUSES = array( 'publish', 'future', 'draft', 'pending', 'private' );
 
 	/**
+	 * Settings an import can apply, each chosen on its own.
+	 *
+	 * @since 1.3.0
+	 */
+	const SETTINGS_KEYS = array( 'media', 'collection_defaults', 'autosave', 'preserve_data_on_uninstall', 'share_statistics' );
+
+	/**
 	 * GET /fotogrids/v1/admin/tools/import-export/export
 	 *
 	 * Query params:
@@ -117,6 +124,8 @@ class Import_Export_Data {
 	 *   include[]  - data types to import
 	 *   galleries  - 'skip' | 'overwrite' | 'duplicate'
 	 *   albums     - 'skip' | 'overwrite' | 'duplicate'
+	 *   settings[] - settings to import, from SETTINGS_KEYS; required when
+	 *                include[] has 'settings'
 	 *
 	 * @param  \WP_REST_Request $request
 	 * @return \WP_REST_Response|\WP_Error
@@ -153,8 +162,20 @@ class Import_Export_Data {
 		}
 
 		if ( 'execute' === $phase ) {
+			$include  = (array) ( $request->get_param( 'include' ) ?? array_keys( $data ) );
+			$settings = $request->get_param( 'settings' );
+
+			if ( in_array( 'settings', $include, true ) && ! is_array( $settings ) ) {
+				return new \WP_Error(
+					'settings_keys_required',
+					__( 'Choose which settings to import: list them in "settings", or leave settings out of "include".', 'fotogrids' ),
+					array( 'status' => 400 )
+				);
+			}
+
 			$options = array(
-				'include'   => (array) ( $request->get_param( 'include' ) ?? array_keys( $data ) ),
+				'include'   => $include,
+				'settings'  => array_values( array_intersect( self::SETTINGS_KEYS, array_map( 'strval', (array) $settings ) ) ),
 				'galleries' => sanitize_key( $request->get_param( 'galleries' ) ?? 'skip' ),
 				'albums'    => sanitize_key( $request->get_param( 'albums' ) ?? 'skip' ),
 			);
@@ -562,7 +583,8 @@ class Import_Export_Data {
 			}
 		}
 		if ( isset( $data['settings'] ) ) {
-			$contents['settings'] = true;
+			$contents['settings']        = true;
+			$contents['settings_detail'] = is_array( $data['settings'] ) ? self::settings_in_file( $data['settings'] ) : array();
 		}
 
 		$notices  = array();
@@ -620,6 +642,11 @@ class Import_Export_Data {
 		$skipped  = array();
 		$errors   = array();
 		$known    = self::known_item_ids();
+
+		$settings_keys   = in_array( 'settings', $include, true ) && is_array( $data['settings'] ?? null )
+			? array_values( array_intersect( $options['settings'], self::settings_in_file( $data['settings'] ) ) )
+			: array();
+		$settings_before = $settings_keys ? self::settings_snapshot() : array();
 
 		$attachments = new Attachment_Map(
 			array_key_exists( 'media', $data ) ? ( $data['media'] ?? array() ) : null,
@@ -717,9 +744,8 @@ class Import_Export_Data {
 				self::import_item_metadata( $data['item_metadata'], $tag_id_map, $attachments );
 			}
 
-			if ( in_array( 'settings', $include, true ) && ! empty( $data['settings'] ) ) {
-				self::import_settings( $data['settings'] );
-				$imported['settings'] = true;
+			if ( $settings_keys ) {
+				self::import_settings( $data['settings'], $settings_keys );
 			}
 
 			if ( in_array( 'statistics', $include, true ) && ! empty( $data['statistics'] ) ) {
@@ -733,6 +759,10 @@ class Import_Export_Data {
 			}
 
 			$wpdb->query( 'COMMIT' );
+
+			if ( in_array( 'share_statistics', $settings_keys, true ) ) {
+				Plugin_Settings_Store::apply_share_statistics_consent( Plugin_Settings_Store::truthy( $data['settings']['share_statistics'] ) );
+			}
 
 			\FotoGrids\Cache\Metadata_Cache::forget_all();
 			\FotoGrids\Migrations\List_Setting_Repair::run();
@@ -749,6 +779,19 @@ class Import_Export_Data {
 					'errors'   => array( $e->getMessage() ),
 				),
 				500
+			);
+		}
+
+		if ( $settings_keys ) {
+			$settings_after              = self::settings_snapshot();
+			$imported['settings']        = true;
+			$imported['settings_detail'] = array_values(
+				array_filter(
+					$settings_keys,
+					static function ( string $key ) use ( $settings_before, $settings_after ): bool {
+						return $settings_before[ $key ] !== $settings_after[ $key ];
+					}
+				)
 			);
 		}
 
@@ -1495,30 +1538,73 @@ class Import_Export_Data {
 	}
 
 	/**
-	 * Import plugin settings through the sanitizers their settings screens use.
-	 * The usage-data sharing choice is never imported.
+	 * Settings the file holds, as keys of SETTINGS_KEYS.
+	 *
+	 * @since 1.3.0
+	 * @param  array<string, mixed> $settings The file's settings block.
+	 * @return string[]
 	 */
-	private static function import_settings( array $settings ): void {
-		if ( isset( $settings['media'] ) && is_array( $settings['media'] ) ) {
+	private static function settings_in_file( array $settings ): array {
+		$present = array(
+			'media'                      => is_array( $settings['media'] ?? null ),
+			'collection_defaults'        => is_array( $settings['collection_defaults'] ?? null ) || is_array( $settings['gallery_defaults'] ?? null ),
+			'autosave'                   => array_key_exists( 'autosave', $settings ),
+			'preserve_data_on_uninstall' => array_key_exists( 'preserve_data_on_uninstall', $settings ),
+			'share_statistics'           => array_key_exists( 'share_statistics', $settings ),
+		);
+
+		return array_keys( array_filter( $present ) );
+	}
+
+	/**
+	 * This site's current value for each of SETTINGS_KEYS.
+	 *
+	 * @since 1.3.0
+	 * @return array<string, mixed>
+	 */
+	private static function settings_snapshot(): array {
+		$advanced = Plugin_Settings_Store::get_advanced();
+
+		return array(
+			'media'                      => get_option( 'fotogrids_media_settings', array() ),
+			'collection_defaults'        => Collection_Defaults_Store::all(),
+			'autosave'                   => $advanced['autosave'],
+			'preserve_data_on_uninstall' => ! $advanced['delete_data_on_uninstall'],
+			'share_statistics'           => $advanced['share_statistics'],
+		);
+	}
+
+	/**
+	 * Import the chosen plugin settings through the sanitizers their settings
+	 * screens use. Usage-data sharing is applied by execute() after the commit.
+	 *
+	 * @param array<string, mixed> $settings The file's settings block.
+	 * @param string[]             $keys     Settings to import, from SETTINGS_KEYS.
+	 * @return void
+	 */
+	private static function import_settings( array $settings, array $keys ): void {
+		if ( in_array( 'media', $keys, true ) && is_array( $settings['media'] ?? null ) ) {
 			\FotoGrids\Image_Size_Manager::save_plugin_size_settings( $settings['media'] );
 		}
 
-		if ( isset( $settings['collection_defaults'] ) && is_array( $settings['collection_defaults'] ) ) {
-			foreach ( Collection_Defaults_Store::TYPES as $type ) {
-				if ( isset( $settings['collection_defaults'][ $type ] ) && is_array( $settings['collection_defaults'][ $type ] ) ) {
+		if ( in_array( 'collection_defaults', $keys, true ) ) {
+			if ( is_array( $settings['collection_defaults'] ?? null ) ) {
+				foreach ( Collection_Defaults_Store::TYPES as $type ) {
+					if ( isset( $settings['collection_defaults'][ $type ] ) && is_array( $settings['collection_defaults'][ $type ] ) ) {
+						Collection_Defaults_Store::replace(
+							$type,
+							Plugin_Settings_Store::sanitize_collection_defaults( $settings['collection_defaults'][ $type ], $type )
+						);
+					}
+				}
+			} elseif ( is_array( $settings['gallery_defaults'] ?? null ) ) {
+				// Files exported before 1.3.0 hold one map for both types.
+				foreach ( Collection_Defaults_Store::TYPES as $type ) {
 					Collection_Defaults_Store::replace(
 						$type,
-						Plugin_Settings_Store::sanitize_collection_defaults( $settings['collection_defaults'][ $type ], $type )
+						Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'], $type )
 					);
 				}
-			}
-		} elseif ( isset( $settings['gallery_defaults'] ) && is_array( $settings['gallery_defaults'] ) ) {
-			// Files exported before 1.3.0 hold one map for both types.
-			foreach ( Collection_Defaults_Store::TYPES as $type ) {
-				Collection_Defaults_Store::replace(
-					$type,
-					Plugin_Settings_Store::sanitize_collection_defaults( $settings['gallery_defaults'], $type )
-				);
 			}
 		}
 
@@ -1528,7 +1614,7 @@ class Import_Export_Data {
 		);
 
 		foreach ( $flags as $export_key => $option_key ) {
-			if ( array_key_exists( $export_key, $settings ) ) {
+			if ( in_array( $export_key, $keys, true ) && array_key_exists( $export_key, $settings ) ) {
 				Plugin_Settings_Store::save_bool( $option_key, Plugin_Settings_Store::truthy( $settings[ $export_key ] ) );
 			}
 		}

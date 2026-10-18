@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-17T13:15:51+00:00\n"
+"POT-Creation-Date: 2026-10-17T15:19:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -61,7 +61,7 @@ msgstr ""
 #: includes/class-admin-init.php:163
 #: includes/class-admin-init.php:164
 #: includes/tools/import-export/assets/constants.js:42
-#: includes/tools/import-export/assets/constants.js:107
+#: includes/tools/import-export/assets/constants.js:151
 msgid "Settings"
 msgstr ""
 
@@ -100,7 +100,7 @@ msgstr ""
 #: public/render/features/collection-header/class-collection-header.php:446
 #: assets/admin/src/components/pages/TemplatesPage.jsx:451
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:45
-#: includes/tools/import-export/assets/constants.js:103
+#: includes/tools/import-export/assets/constants.js:147
 msgid "Album"
 msgstr ""
 
@@ -119,7 +119,7 @@ msgstr ""
 #: assets/admin/src/components/library/LibraryTabBase.jsx:451
 #: assets/admin/src/components/pages/StatsPage.jsx:241
 #: includes/tools/import-export/assets/constants.js:21
-#: includes/tools/import-export/assets/constants.js:104
+#: includes/tools/import-export/assets/constants.js:148
 msgid "Items"
 msgstr ""
 
@@ -164,7 +164,7 @@ msgstr ""
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:349
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
 #: includes/tools/import-export/assets/constants.js:6
-#: includes/tools/import-export/assets/constants.js:102
+#: includes/tools/import-export/assets/constants.js:146
 #: includes/tools/migration/assets/MigrationTool.jsx:22
 msgid "Galleries"
 msgstr ""
@@ -231,7 +231,7 @@ msgstr ""
 #: assets/admin/src/components/pages/StatsPage.jsx:235
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:31
 #: includes/tools/import-export/assets/constants.js:15
-#: includes/tools/import-export/assets/constants.js:103
+#: includes/tools/import-export/assets/constants.js:147
 msgid "Albums"
 msgstr ""
 
@@ -262,7 +262,7 @@ msgstr ""
 #: assets/admin/src/components/pages/TemplatesPage.jsx:450
 #: assets/admin/src/utils/gallery.js:18
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:46
-#: includes/tools/import-export/assets/constants.js:102
+#: includes/tools/import-export/assets/constants.js:146
 #: includes/tools/migration/assets/MigrationTool.jsx:103
 msgid "Gallery"
 msgstr ""
@@ -3424,7 +3424,7 @@ msgstr ""
 #: public/render/filters/sources/tags/class-tags-filter-source.php:46
 #: public/render/lightbox/classic/class-lightbox.php:221
 #: includes/tools/import-export/assets/constants.js:34
-#: includes/tools/import-export/assets/constants.js:105
+#: includes/tools/import-export/assets/constants.js:149
 msgid "Tags"
 msgstr ""
 
@@ -3961,7 +3961,7 @@ msgstr ""
 #: includes/modules/Templates/Module.php:44
 #: includes/modules/Templates/Module.php:119
 #: includes/tools/import-export/assets/constants.js:58
-#: includes/tools/import-export/assets/constants.js:106
+#: includes/tools/import-export/assets/constants.js:150
 msgid "Templates"
 msgstr ""
 
@@ -5061,7 +5061,7 @@ msgid "Pattern"
 msgstr ""
 
 #: includes/exif/class-exif-formatter.php:273
-#: includes/tools/import-export/assets/constants.js:91
+#: includes/tools/import-export/assets/constants.js:135
 msgid "Partial"
 msgstr ""
 
@@ -7407,7 +7407,7 @@ msgstr ""
 
 #: includes/rest/metadata/library-data.php:51
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:63
-#: includes/tools/import-export/assets/constants.js:105
+#: includes/tools/import-export/assets/constants.js:149
 msgid "Tag"
 msgstr ""
 
@@ -7636,31 +7636,35 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:131
+#: includes/tools/import-export/class-import-export-data.php:140
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:166
+#: includes/tools/import-export/class-import-export-data.php:171
+msgid "Choose which settings to import: list them in \"settings\", or leave settings out of \"include\"."
+msgstr ""
+
+#: includes/tools/import-export/class-import-export-data.php:187
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:469
+#: includes/tools/import-export/class-import-export-data.php:490
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:486
+#: includes/tools/import-export/class-import-export-data.php:507
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:523
+#: includes/tools/import-export/class-import-export-data.php:544
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:530
+#: includes/tools/import-export/class-import-export-data.php:551
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:574
+#: includes/tools/import-export/class-import-export-data.php:596
 msgid "This file was exported by an earlier version of FotoGrids on another site, so it doesn't say which image files its items use. Its images will be skipped. To bring them across, update FotoGrids on the original site, export again, and import the new file."
 msgstr ""
 
@@ -8395,6 +8399,7 @@ msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2332
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:167
+#: includes/tools/import-export/assets/constants.js:89
 msgid "Autosave"
 msgstr ""
 
@@ -8748,7 +8753,7 @@ msgid "Regenerate this gallery"
 msgstr ""
 
 #: assets/admin/src/components/blocks/FileUpload.jsx:24
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:148
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:174
 msgid "Select file to import"
 msgstr ""
 
@@ -9779,6 +9784,7 @@ msgid "Helps us spot bugs and decide what to build next. Shares your name, email
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:213
+#: includes/tools/import-export/assets/constants.js:102
 msgid "Share usage data"
 msgstr ""
 
@@ -9831,6 +9837,7 @@ msgid "What happens to your FotoGrids data if the plugin is deleted."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:284
+#: includes/tools/import-export/assets/constants.js:94
 msgid "Delete all data on uninstall"
 msgstr ""
 
@@ -11436,7 +11443,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:114
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:132
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:311
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:98
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:121
 #: includes/tools/migration/assets/MigrationTool.jsx:209
 msgid "Import failed."
 msgstr ""
@@ -11481,7 +11488,7 @@ msgstr ""
 
 #. translators: %d: image count
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:68
-#: includes/tools/import-export/assets/utils.js:99
+#: includes/tools/import-export/assets/utils.js:103
 #, js-format
 msgid "%d image"
 msgid_plural "%d images"
@@ -11611,7 +11618,7 @@ msgid "Tags, people, and locations referenced by gallery items."
 msgstr ""
 
 #: includes/tools/import-export/assets/constants.js:43
-msgid "Plugin settings - overwrites the settings on this site."
+msgid "Plugin settings. Choose which ones replace this site’s own."
 msgstr ""
 
 #: includes/tools/import-export/assets/constants.js:51
@@ -11622,50 +11629,78 @@ msgstr ""
 msgid "Saved gallery templates included in the export file."
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:67
+#: includes/tools/import-export/assets/constants.js:73
+msgid "Media sizes"
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:74
+msgid "The image sizes on the Media settings tab."
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:81
+msgid "Gallery and album defaults"
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:82
+msgid "The settings new galleries and albums start with."
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:90
+msgid "Whether changes save as you make them."
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:95
+msgid "Whether deleting FotoGrids also removes every gallery, album, template, statistic and setting."
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:103
+msgid "Opts this site in to or out of sharing usage data, as the Advanced tab does."
+msgstr ""
+
+#: includes/tools/import-export/assets/constants.js:111
 msgid "Skip existing"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:68
+#: includes/tools/import-export/assets/constants.js:112
 msgid "Overwrite"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:69
+#: includes/tools/import-export/assets/constants.js:113
 #: includes/tools/migration/assets/MigrationTool.jsx:321
 msgid "Duplicate"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:73
-#: includes/tools/import-export/assets/constants.js:82
+#: includes/tools/import-export/assets/constants.js:117
+#: includes/tools/import-export/assets/constants.js:126
 #: includes/tools/import-export/assets/export/ExportPanel.jsx:155
 msgid "Export"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:74
-#: includes/tools/import-export/assets/constants.js:83
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:262
+#: includes/tools/import-export/assets/constants.js:118
+#: includes/tools/import-export/assets/constants.js:127
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:327
 msgid "Import"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:75
+#: includes/tools/import-export/assets/constants.js:119
 msgid "History"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:90
-#: includes/tools/import-export/assets/constants.js:94
+#: includes/tools/import-export/assets/constants.js:134
+#: includes/tools/import-export/assets/constants.js:138
 msgid "Complete"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:92
-#: includes/tools/import-export/assets/constants.js:93
+#: includes/tools/import-export/assets/constants.js:136
+#: includes/tools/import-export/assets/constants.js:137
 msgid "Failed"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:104
+#: includes/tools/import-export/assets/constants.js:148
 msgid "Item"
 msgstr ""
 
-#: includes/tools/import-export/assets/constants.js:106
+#: includes/tools/import-export/assets/constants.js:150
 msgid "Template"
 msgstr ""
 
@@ -11727,59 +11762,59 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:49
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:57
 msgid "Could not analyse the file."
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:80
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:100
 msgid "Importing - please do not close this window…"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:113
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:139
 msgid "Import result"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:127
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:153
 msgid "Select export file"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:128
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:154
 msgid "Selected export file"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:139
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:165
 msgid "Choose a different file"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:149
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:175
 msgid "Drop your .json or .xml export file here"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:153
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:179
 msgid "Supported formats: JSON, XML"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:165
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:191
 msgid "Analysing file…"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:180
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:206
 msgid "What to import"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:222
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:253
 msgid "conflict handling"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:248
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:313
 msgid "Ready to import"
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:249
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:314
 msgid "We recommend taking a database backup before importing. This action cannot be undone."
 msgstr ""
 
-#: includes/tools/import-export/assets/import/ImportPanel.jsx:261
+#: includes/tools/import-export/assets/import/ImportPanel.jsx:326
 #: includes/tools/migration/assets/MigrationTool.jsx:334
 msgid "Importing…"
 msgstr ""
@@ -11817,12 +11852,12 @@ msgstr ""
 msgid "Import another file"
 msgstr ""
 
-#: includes/tools/import-export/assets/utils.js:51
+#: includes/tools/import-export/assets/utils.js:55
 msgid "skipped"
 msgstr ""
 
 #. translators: %d: video count
-#: includes/tools/import-export/assets/utils.js:104
+#: includes/tools/import-export/assets/utils.js:108
 #, js-format
 msgid "%d video"
 msgid_plural "%d videos"
@@ -11830,16 +11865,27 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of images, e.g. "83 images". 2: number of videos, e.g. "4 videos".
-#: includes/tools/import-export/assets/utils.js:111
+#: includes/tools/import-export/assets/utils.js:115
 #, js-format
 msgctxt "import item counts"
 msgid "(%1$s, %2$s)"
 msgstr ""
 
 #. translators: %s: number of images or of videos, e.g. "4 videos".
-#: includes/tools/import-export/assets/utils.js:119
+#: includes/tools/import-export/assets/utils.js:123
 #, js-format
 msgctxt "import item counts"
+msgid "(%s)"
+msgstr ""
+
+#: includes/tools/import-export/assets/utils.js:143
+msgid "(nothing changed)"
+msgstr ""
+
+#. translators: %s: comma-separated names of the settings an import changed, e.g. "Media sizes, Autosave".
+#: includes/tools/import-export/assets/utils.js:148
+#, js-format
+msgctxt "changed settings"
 msgid "(%s)"
 msgstr ""
 

@@ -41,7 +41,7 @@ final class Asset_Resolver {
 	private static ?self $instance = null;
 
 	/**
-	 * CSS handles enqueued in any flush this request, mapped to their resolved URL.
+	 * CSS handles enqueued in any flush this request, with their registration data.
 	 *
 	 * Because the Asset_Resolver is a request-scoped singleton, multiple galleries
 	 * on the same page each call flush() after their own render. This map prevents
@@ -51,19 +51,26 @@ final class Asset_Resolver {
 	 * preview endpoint and cache replay both read after flush() has cleared the
 	 * per-render queue.
 	 *
-	 * @var array<string, string>  handle => resolved URL
+	 * @var array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private array $enqueued_css_handles = array();
 
 	/**
-	 * JS handles enqueued in any flush this request.
+	 * JS handles enqueued in any flush this request, with their registration data.
 	 *
-	 * Stored as handle => ['src' => string, 'in_footer' => bool] so the cache
-	 * replay path can re-register and re-enqueue them with correct metadata.
+	 * Carries everything wp_register_script() received, so the cache replay path
+	 * registers each script exactly as the original render did.
 	 *
-	 * @var array<string, array{src: string, in_footer: bool}>
+	 * @var array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>
 	 */
 	private array $enqueued_js_handles = array();
+
+	/**
+	 * Assets flushed since begin_capture(), or null when no capture is running.
+	 *
+	 * @var array{css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>}|null
+	 */
+	private ?array $capture = null;
 
 	/**
 	 * Returns the request-scoped singleton resolver.
@@ -155,7 +162,11 @@ final class Asset_Resolver {
 
 			wp_register_style( $handle, $css_asset['src'], $css_asset['deps'], $css_asset['version'] );
 			wp_enqueue_style( $handle );
-			$this->enqueued_css_handles[ $handle ] = $css_asset['src'];
+			$this->enqueued_css_handles[ $handle ] = array(
+				'src'     => $css_asset['src'],
+				'deps'    => array_values( $css_asset['deps'] ),
+				'version' => $css_asset['version'],
+			);
 			$new_css_handles[]                     = $handle;
 		}
 
@@ -176,6 +187,8 @@ final class Asset_Resolver {
 			wp_enqueue_script( $handle );
 			$this->enqueued_js_handles[ $handle ] = array(
 				'src'       => $js_asset['src'],
+				'deps'      => array_values( $js_asset['deps'] ),
+				'version'   => $js_asset['version'],
 				'in_footer' => $js_asset['in_footer'],
 			);
 			$new_js_handles[]                     = $handle;
@@ -186,15 +199,27 @@ final class Asset_Resolver {
 		// case - styles would otherwise never reach the page). Page-builder
 		// sub-modules can opt their preview / partial-render contexts in
 		// unconditionally via the SHOULD_INLINE_ASSETS filter.
-		$default_inline = did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0;
+		$default_inline = self::past_head_styles() || did_action( 'admin_head' ) > 0;
 		$should_inline  = (bool) apply_filters( Filters_Render::SHOULD_INLINE_ASSETS, $default_inline );
 
 		if ( $should_inline ) {
 			if ( ! empty( $new_css_handles ) ) {
-				wp_print_styles( $new_css_handles );
+				$this->print_late_styles( $new_css_handles );
 			}
 			if ( ! empty( $new_js_handles ) ) {
 				wp_print_scripts( $new_js_handles );
+			}
+		}
+
+		if ( null !== $this->capture ) {
+			$this->capture['css'] += $this->queued_css();
+			foreach ( $this->js_queue as $handle => $js_asset ) {
+				$this->capture['js'][ $handle ] = array(
+					'src'       => $js_asset['src'],
+					'deps'      => array_values( $js_asset['deps'] ),
+					'version'   => $js_asset['version'],
+					'in_footer' => $js_asset['in_footer'],
+				);
 			}
 		}
 
@@ -202,6 +227,123 @@ final class Asset_Resolver {
 		$this->css_queue = array();
 		$this->js_queue  = array();
 	}
+
+	/**
+	 * Starts recording the assets each flush asks for, already enqueued or not.
+	 *
+	 * @since 1.3.0
+	 * @return void
+	 */
+	public function begin_capture(): void {
+		$this->capture = array(
+			'css' => array(),
+			'js'  => array(),
+		);
+	}
+
+	/**
+	 * Stops recording and returns the assets flushed since begin_capture().
+	 *
+	 * @since 1.3.0
+	 * @return array{css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>}
+	 */
+	public function end_capture(): array {
+		$captured      = $this->capture ?? array(
+			'css' => array(),
+			'js'  => array(),
+		);
+		$this->capture = null;
+
+		return $captured;
+	}
+
+	/**
+	 * Returns the stylesheets queued for the current render with their registration data, keyed by handle.
+	 *
+	 * @since 1.3.0
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
+	 */
+	public function queued_css(): array {
+		return array_map(
+			static function ( array $css_asset ): array {
+				return array(
+					'src'     => $css_asset['src'],
+					'deps'    => array_values( $css_asset['deps'] ),
+					'version' => $css_asset['version'],
+				);
+			},
+			$this->css_queue
+		);
+	}
+
+	/**
+	 * Enqueues stored stylesheets with their dependencies and version, and records them as enqueued.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, array{src: string, deps: array<int, string>, version: string}> $css Handle → registration data.
+	 * @return void
+	 */
+	public function replay_styles( array $css ): void {
+		$new_css_handles = array();
+		foreach ( $css as $handle => $css_asset ) {
+			if ( isset( $this->enqueued_css_handles[ $handle ] ) ) {
+				continue;
+			}
+			wp_register_style( $handle, $css_asset['src'], $css_asset['deps'], $css_asset['version'] );
+			wp_enqueue_style( $handle );
+			$this->enqueued_css_handles[ $handle ] = $css_asset;
+			$new_css_handles[]                     = $handle;
+		}
+
+		if ( ! empty( $new_css_handles ) && self::past_head_styles() ) {
+			$this->print_late_styles( $new_css_handles );
+		}
+	}
+
+	/**
+	 * Whether the head has already printed its stylesheets, so new ones must print where they are.
+	 *
+	 * @since 1.3.0
+	 * @return bool
+	 */
+	private static function past_head_styles(): bool {
+		return did_action( 'wp_head' ) > 0 && ( ! doing_action( 'wp_head' ) || did_action( 'wp_print_styles' ) > 0 );
+	}
+
+	/**
+	 * Prints stylesheets after the head and, on a page view, moves them into it.
+	 *
+	 * Each moved stylesheet goes after the FotoGrids stylesheets already in the
+	 * head, or ahead of the head's first stylesheet, so the site's own CSS keeps
+	 * its precedence. The move waits until the stylesheets have loaded, while
+	 * they still block rendering where they were printed.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, string> $handles Stylesheet handles.
+	 * @return void
+	 */
+	public function print_late_styles( array $handles ): void {
+		wp_print_styles( $handles );
+
+		if ( did_action( 'wp_head' ) > 0 && ! doing_action( 'wp_head' ) && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			wp_print_inline_script_tag( sprintf( self::LATE_STYLES_MOVER, wp_json_encode( array_values( $handles ) ) ) );
+		}
+	}
+
+	/**
+	 * Script that moves late-printed stylesheets into the head; %s is the handle list.
+	 *
+	 * @since 1.3.0
+	 */
+	private const LATE_STYLES_MOVER = '(function(ids){var head=document.head;'
+		. 'var links=ids.map(function(id){return document.getElementById(id+"-css");}).filter(function(l){return l&&l.parentNode!==head;});'
+		. 'function anchor(){var el=head.querySelector(\'link[rel="stylesheet"][id^="fotogrids-"]\');'
+		. 'while(el&&el.nextElementSibling&&/^fotogrids-/.test(el.nextElementSibling.id)&&/^(LINK|STYLE)$/.test(el.nextElementSibling.tagName)){el=el.nextElementSibling;}return el;}'
+		. 'function moveAll(){var after=anchor();var first=head.querySelector(\'link[rel="stylesheet"],style\');'
+		. 'links.forEach(function(link){if(after){after.parentNode.insertBefore(link,after.nextSibling);}else{head.insertBefore(link,first);}after=link;});}'
+		. 'var pending=links.filter(function(l){return !l.sheet;}).length;if(!pending){moveAll();return;}'
+		. 'links.forEach(function(l){if(l.sheet){return;}var done=function(){if(--pending===0){moveAll();}};'
+		. 'l.addEventListener("load",done,{once:true});l.addEventListener("error",done,{once:true});});})(%s);';
 
 	/**
 	 * Returns CSS asset URLs keyed by handle for all assets enqueued this request.
@@ -215,18 +357,24 @@ final class Asset_Resolver {
 	 * @return  array<string, string>
 	 */
 	public function get_css_asset_urls(): array {
-		return $this->enqueued_css_handles;
+		return array_map(
+			static function ( array $css_asset ): string {
+				return $css_asset['src'];
+			},
+			$this->enqueued_css_handles
+		);
 	}
 
 	/**
 	 * Returns JS asset metadata keyed by handle for all assets enqueued this request.
 	 *
-	 * Each entry is an array with 'src' (string) and 'in_footer' (bool). Reads
-	 * from $enqueued_js_handles so the data is available after flush() has cleared
-	 * the per-render queue - the same pattern as get_css_asset_urls().
+	 * Each entry carries 'src', 'deps', 'version' and 'in_footer' - the arguments
+	 * the script was registered with. Reads from $enqueued_js_handles so the data
+	 * is available after flush() has cleared the per-render queue - the same
+	 * pattern as get_css_asset_urls().
 	 *
 	 * @since   1.0.0
-	 * @return  array<string, array{src: string, in_footer: bool}>
+	 * @return  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>
 	 */
 	public function get_js_asset_data(): array {
 		return $this->enqueued_js_handles;

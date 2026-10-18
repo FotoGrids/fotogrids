@@ -8,7 +8,11 @@ import Segmented from '@/admin/src/components/shared/Segmented.jsx';
 import DangerZone from '@/admin/src/components/shared/DangerZone.jsx';
 import Toggle from '@/admin/src/components/shared/Toggle.jsx';
 import { Button } from '@/admin/src/components/shared/Button';
-import { CONFLICT_OPTIONS, EXPORT_TYPES } from '../constants.js';
+import {
+	CONFLICT_OPTIONS,
+	EXPORT_TYPES,
+	SETTINGS_TYPES,
+} from '../constants.js';
 import FileSummary from './FileSummary.jsx';
 import ImportResult from './ImportResult.jsx';
 
@@ -19,6 +23,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const [analyseError, setAnalyseError] = useState(null);
 	const [importError, setImportError] = useState(null);
 	const [include, setInclude] = useState(new Set());
+	const [settingsInclude, setSettingsInclude] = useState(new Set());
 	const [conflictMode, setConflictMode] = useState({}); // { [key]: 'skip'|'overwrite'|'duplicate' }
 	const [result, setResult] = useState(null);
 
@@ -39,10 +44,13 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 				data: { phase: 'analyse', file: fileObj.text },
 			});
 			setSummary(response);
-			const availableKeys = EXPORT_TYPES.filter(({ hidden }) => !hidden)
+			const availableKeys = EXPORT_TYPES.filter(
+				({ key, hidden }) => !hidden && 'settings' !== key
+			)
 				.map(({ key }) => key)
 				.filter((k) => (response?.contents ?? {})[k] > 0);
 			setInclude(new Set(availableKeys));
+			setSettingsInclude(new Set());
 			setPhase('ready');
 		} catch (err) {
 			setAnalyseError(
@@ -61,8 +69,8 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 		setImportError(null);
 	};
 
-	const toggleInclude = (key) => {
-		setInclude((prev) => {
+	const toggleSet = (setter) => (key) => {
+		setter((prev) => {
 			const next = new Set(prev);
 			if (next.has(key)) {
 				next.delete(key);
@@ -72,6 +80,18 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 			return next;
 		});
 	};
+	const toggleInclude = toggleSet(setInclude);
+	const toggleSetting = toggleSet(setSettingsInclude);
+
+	const settingsInFile = SETTINGS_TYPES.filter(({ key }) =>
+		(summary?.contents?.settings_detail ?? []).includes(key)
+	);
+	const chosenSettings = settingsInFile
+		.map(({ key }) => key)
+		.filter((key) => settingsInclude.has(key));
+	const effectiveInclude = [...include].filter(
+		(key) => 'settings' !== key || chosenSettings.length > 0
+	);
 
 	const handleImport = async () => {
 		setPhase('importing');
@@ -87,7 +107,10 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 				data: {
 					phase: 'execute',
 					file: file.text,
-					include: [...include],
+					include: effectiveInclude,
+					settings: effectiveInclude.includes('settings')
+						? chosenSettings
+						: [],
 					galleries: getConflictMode('galleries'),
 					albums: getConflictMode('albums'),
 				},
@@ -104,7 +127,10 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 
 	const counts = summary?.contents ?? {};
 	const availableTypes = EXPORT_TYPES.filter(
-		({ key, hidden }) => !hidden && counts[key] > 0
+		({ key, hidden }) =>
+			!hidden &&
+			counts[key] > 0 &&
+			('settings' !== key || settingsInFile.length > 0)
 	);
 
 	if (phase === 'done') {
@@ -200,40 +226,79 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 							);
 
 							return (
-								<PanelRow
-									key={key}
-									title={title}
-									description={description}
-									splitColumns
-									className="fg-ie-import-row"
-								>
-									<div className="fg-ie-import-row-control">
-										{conflict && checked && (
-											<Segmented
-												options={CONFLICT_OPTIONS}
-												value={getConflictMode(key)}
-												onChange={(v) =>
-													setTypeConflictMode(key, v)
+								<React.Fragment key={key}>
+									<PanelRow
+										title={title}
+										description={description}
+										splitColumns
+										className="fg-ie-import-row"
+									>
+										<div className="fg-ie-import-row-control">
+											{conflict && checked && (
+												<Segmented
+													options={CONFLICT_OPTIONS}
+													value={getConflictMode(key)}
+													onChange={(v) =>
+														setTypeConflictMode(
+															key,
+															v
+														)
+													}
+													disabled={
+														phase === 'importing'
+													}
+													ariaLabel={
+														label +
+														' ' +
+														__(
+															'conflict handling',
+															'fotogrids'
+														)
+													}
+												/>
+											)}
+											<Toggle
+												id={`fg-ie-import-${key}`}
+												checked={checked}
+												onChange={() =>
+													toggleInclude(key)
 												}
 												disabled={phase === 'importing'}
-												ariaLabel={
-													label +
-													' ' +
-													__(
-														'conflict handling',
-														'fotogrids'
-													)
-												}
 											/>
-										)}
-										<Toggle
-											id={`fg-ie-import-${key}`}
-											checked={checked}
-											onChange={() => toggleInclude(key)}
-											disabled={phase === 'importing'}
-										/>
-									</div>
-								</PanelRow>
+										</div>
+									</PanelRow>
+									{'settings' === key &&
+										checked &&
+										settingsInFile.map((setting) => (
+											<PanelRow
+												key={setting.key}
+												title={setting.label}
+												description={
+													setting.description
+												}
+												splitColumns
+												className="fg-ie-import-row fg-ie-import-row--setting"
+											>
+												<div className="fg-ie-import-row-control">
+													<Toggle
+														id={`fg-ie-import-setting-${setting.key}`}
+														checked={settingsInclude.has(
+															setting.key
+														)}
+														onChange={() =>
+															toggleSetting(
+																setting.key
+															)
+														}
+														disabled={
+															phase ===
+															'importing'
+														}
+													/>
+												</div>
+											</PanelRow>
+										))}
+								</React.Fragment>
 							);
 						}
 					)}
@@ -253,7 +318,7 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 					>
 						<Button
 							variant="primary"
-							disabled={include.size === 0}
+							disabled={effectiveInclude.length === 0}
 							busy={phase === 'importing'}
 							onClick={handleImport}
 						>

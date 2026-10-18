@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
+use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
@@ -145,9 +146,12 @@ class Public_Render {
 	/**
 	 * Re-enqueues the CSS and JS assets stored with a cache entry.
 	 *
+	 * Each asset is registered with the dependencies and version the original
+	 * render gave it, so WordPress prints the cached assets in the same order.
+	 *
 	 * @since  1.0.0
-	 * @param  array<string, string>                             $css Handle → URL map.
-	 * @param  array<string, array{src: string, in_footer: bool}> $js  Handle → metadata map.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string}>                  $css Handle → registration data.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}> $js  Handle → registration data.
 	 * @return void
 	 */
 	private static function replay_cached_assets( array $css, array $js ): void {
@@ -156,24 +160,24 @@ class Public_Render {
 		$already_js      = $resolver->get_js_asset_data();
 		$new_css_handles = array();
 
-		foreach ( $css as $handle => $src ) {
+		foreach ( $css as $handle => $meta ) {
 			if ( isset( $already_css[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_style( $handle, $src, array(), FOTOGRIDS_VERSION );
+			wp_register_style( $handle, $meta['src'], $meta['deps'], $meta['version'] );
 			wp_enqueue_style( $handle );
 			$new_css_handles[] = $handle;
 		}
 
 		if ( ! empty( $new_css_handles ) && ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) ) {
-			wp_print_styles( $new_css_handles );
+			$resolver->print_late_styles( $new_css_handles );
 		}
 
 		foreach ( $js as $handle => $meta ) {
 			if ( isset( $already_js[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_script( $handle, $meta['src'], array(), FOTOGRIDS_VERSION, $meta['in_footer'] );
+			wp_register_script( $handle, $meta['src'], $meta['deps'], $meta['version'], $meta['in_footer'] );
 			wp_enqueue_script( $handle );
 		}
 	}
@@ -200,19 +204,13 @@ class Public_Render {
 	}
 
 	/**
-	 * Renders one gallery through the render controller pipeline.
+	 * Returns the settings a gallery embed's attributes override.
 	 *
-	 * @param int   $gallery_id Gallery ID.
-	 * @param array $settings Gallery settings.
-	 * @param array $item_ids Ordered gallery item IDs.
+	 * @since 1.3.0
 	 * @param array $atts Shortcode attributes.
-	 * @return string
+	 * @return array<string, mixed>
 	 */
-	private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false, $meta_overrides = array() ) {
-		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
-			return '';
-		}
-
+	private static function gallery_settings_overlay( $atts ): array {
 		$settings_overlay = array();
 		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
 			$settings_overlay['layout'] = sanitize_text_field( $atts['template'] );
@@ -241,6 +239,149 @@ class Public_Render {
 		}
 
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
+
+		return $settings_overlay;
+	}
+
+	/**
+	 * Enqueues the stylesheets a gallery embed will need, before it renders.
+	 *
+	 * @since 1.3.0
+	 * @param array $atts      Shortcode attributes.
+	 * @param bool  $view_page Whether the embed is the view page's own collection.
+	 * @return void
+	 */
+	public static function enqueue_gallery_styles( array $atts, bool $view_page = false ): void {
+		$atts       = shortcode_atts(
+			array(
+				'id'       => 0,
+				'template' => '',
+				'cols'     => 0,
+				'album_id' => 0,
+				'_source'  => '',
+			),
+			$atts,
+			'fotogrids_gallery'
+		);
+		$gallery_id = absint( $atts['id'] );
+		$gallery    = $gallery_id ? \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id ) : null;
+		$readable   = $gallery && ( 'publish' === $gallery->post_status
+			|| ( 'private' === $gallery->post_status && current_user_can( 'read_post', $gallery_id ) ) );
+		$item_ids   = $readable ? \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id ) : array();
+		if ( empty( $item_ids ) ) {
+			return;
+		}
+
+		$source = Request_Source::is_valid( (string) $atts['_source'] ) ? (string) $atts['_source'] : Request_Source::SHORTCODE;
+		if ( absint( $atts['album_id'] ) > 0 ) {
+			$source = Request_Source::ALBUM_AJAX;
+		}
+
+		$settings  = array_replace_recursive( self::get_gallery_settings( $gallery_id ), self::gallery_settings_overlay( $atts ) );
+		$cache_key = null;
+		if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {
+			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts + array( 'view_page' => $view_page ), 'head-styles' );
+			$cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
+			if ( false !== $cached ) {
+				Asset_Resolver::instance()->replay_styles( $cached['css'] );
+				return;
+			}
+		}
+
+		$context = Context_Builder::for_public()->build_for_public(
+			$gallery_id,
+			$settings,
+			array(),
+			$source,
+			absint( $atts['album_id'] ) ?: null,
+			array(
+				'instance_id' => sprintf( 'fg-%d-0', $gallery_id ),
+				'view_page'   => $view_page,
+			)
+		);
+
+		$styles = Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, count( $item_ids ) ) );
+
+		if ( null !== $cache_key ) {
+			\FotoGrids\FotoGrids_Cache::put( $gallery_id, $cache_key, '', $styles, array(), '', '', '', max( 1, absint( $settings['cache_duration'] ?? 24 ) ), array() );
+		}
+	}
+
+	/**
+	 * Enqueues the stylesheets an album embed will need, before it renders.
+	 *
+	 * @since 1.3.0
+	 * @param array $atts Shortcode attributes.
+	 * @return void
+	 */
+	public static function enqueue_album_styles( array $atts ): void {
+		$atts     = shortcode_atts(
+			array(
+				'id'       => 0,
+				'template' => '',
+			),
+			$atts,
+			'fotogrids_album'
+		);
+		$album_id = absint( $atts['id'] );
+		$album    = $album_id ? \FotoGrids\Albums\Album_Repository::get( $album_id ) : null;
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
+			return;
+		}
+
+		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+		if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
+			$album_settings['layout'] = $atts['template'];
+		}
+
+		$context = Context_Builder::for_public()->build_for_album(
+			$album_id,
+			$album_settings,
+			array(),
+			Request_Source::SHORTCODE,
+			sprintf( 'fg-%d-0', $album_id )
+		);
+
+		$count = count( Gallery_Album_Relations::get_gallery_ids_for_album( $album_id ) );
+
+		Render_Controller::factory()->enqueue_styles( self::with_item_count( $context, $count ) );
+	}
+
+	/**
+	 * Returns an item-less context that reports the collection's item count.
+	 *
+	 * @since 1.3.0
+	 * @param Render_Context $context Item-less context.
+	 * @param int            $count   Item count.
+	 * @return Render_Context
+	 */
+	private static function with_item_count( Render_Context $context, int $count ): Render_Context {
+		return new Render_Context(
+			$context->meta->with( array( 'total_item_count' => $count ) ),
+			$context->layout,
+			$context->behavior,
+			$context->settings,
+			$context->items,
+			$context->warnings,
+			$context->via_album_id
+		);
+	}
+
+	/**
+	 * Renders one gallery through the render controller pipeline.
+	 *
+	 * @param int   $gallery_id Gallery ID.
+	 * @param array $settings Gallery settings.
+	 * @param array $item_ids Ordered gallery item IDs.
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false, $meta_overrides = array() ) {
+		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
+			return '';
+		}
+
+		$settings_overlay = self::gallery_settings_overlay( $atts );
 
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
 		if ( $is_preview ) {
@@ -394,11 +535,12 @@ class Public_Render {
 	 * Renders one gallery embed from shortcode attributes.
 	 *
 	 * @since 1.3.0
-	 * @param array|string $atts        Shortcode attributes.
-	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @param array|string $atts           Shortcode attributes.
+	 * @param string       $instance_id    Instance ID to render with. Empty takes the next one.
+	 * @param array        $meta_overrides Render_Meta field overrides, such as via_album_id.
 	 * @return string Rendered gallery HTML
 	 */
-	public static function render_gallery_embed( $atts, string $instance_id = '' ) {
+	public static function render_gallery_embed( $atts, string $instance_id = '', array $meta_overrides = array() ) {
 		$atts = shortcode_atts(
 			array(
 				'id'                => 0,
@@ -523,22 +665,22 @@ class Public_Render {
 			}
 		}
 
+		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+		$resolver->begin_capture();
 		Font_Resolver::instance()->begin_capture();
-		$html  = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
-		$fonts = Font_Resolver::instance()->end_capture();
+		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array_merge( $meta_overrides, array( 'instance_id' => $instance_id ) ) );
+		$fonts  = Font_Resolver::instance()->end_capture();
+		$assets = $resolver->end_capture();
 
 		$rendered = self::$last_render_result;
 		if ( null !== $cache_key && null !== $rendered && $rendered->http_status < 400 ) {
 			$duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
-			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
-			$css      = $resolver->get_css_asset_urls();
-			$js       = $resolver->get_js_asset_data();
 			\FotoGrids\FotoGrids_Cache::put(
 				$gallery_id,
 				$cache_key,
 				$html,
-				$css,
-				$js,
+				$assets['css'],
+				$assets['js'],
 				$rendered->inline_css,
 				$rendered->inline_js,
 				$rendered->json_ld,

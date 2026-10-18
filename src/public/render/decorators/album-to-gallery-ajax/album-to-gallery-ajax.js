@@ -7,8 +7,7 @@
  *   1. POST to the render URL carried in data-fg-render-url with the
  *      gallery's ID, its instance ID and the nonce.
  *   2. Server returns { html, css: { handle: url } }.
- *   3. Inject any CSS handles that aren't already in <head> (mirrors the
- *      password-gate unlock pattern).
+ *   3. Link any CSS handles the page does not already carry.
  *   4. Swap the album wrapper's contents for the rendered gallery HTML.
  *   5. The runtime's MutationObserver picks up the inserted gallery and
  *      fires every onGallery callback against it - no manual init here.
@@ -21,6 +20,8 @@
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
+
+import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 
 (function () {
 	'use strict';
@@ -49,43 +50,13 @@
 	const boundTriggers = new WeakSet();
 
 	/**
-	 * Inject <link rel="stylesheet"> tags for any CSS handles the render
-	 * pipeline collected that aren't already in the document. Mirrors the
-	 * Password_Gate unlock flow's helper exactly.
-	 *
-	 * @param {Record<string, string>} cssUrls  handle → absolute URL map
-	 */
-	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') {
-			return;
-		}
-
-		Object.keys(cssUrls).forEach(function (handle) {
-			const url = cssUrls[handle];
-			if (!handle || !url) {
-				return;
-			}
-			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) {
-				return;
-			}
-
-			const link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.id = linkId;
-			link.href = url;
-			document.head.appendChild(link);
-		});
-	}
-
-	/**
 	 * Inject <script> tags for any JS handles the render pipeline declared
 	 * that aren't already in the document. The album page only enqueued the
 	 * modules its own render needed; a swapped-in gallery can need more.
 	 * The swap waits for them, so a module is bound before its markup is live.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
-	 *     handle → {src, in_footer} map. in_footer is ignored; scripts are
+	 * @param {Record<string, {src: string, deps: string[], version: string, in_footer: boolean}>} jsData
+	 *     handle → script data map. Only src is read; scripts are
 	 *     appended to <head> and execute in order.
 	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */

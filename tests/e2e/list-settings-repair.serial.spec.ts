@@ -180,7 +180,7 @@ test( 'an import of defaults exported before this version stores their lists as 
 			window.wp.apiFetch( {
 				path: '/fotogrids/v1/admin/tools/import-export/import',
 				method: 'POST',
-				data: { phase: 'execute', file: body, include: [ 'settings' ] },
+				data: { phase: 'execute', file: body, include: [ 'settings' ], settings: [ 'collection_defaults' ] },
 			} ),
 			file
 		);
