@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderColorPicker = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ }
+	{ updateSetting, getFieldState, defaultValue, __ }
 ) => {
 	const {
 		createElement: h,
@@ -31,6 +31,7 @@ window.FotoGridsRenderSettings.renderColorPicker = (
 		currentValue,
 		isDisabled,
 		updateSetting,
+		defaultValue,
 		showSettingBadge,
 		settingBadgeText,
 		h,
@@ -55,6 +56,7 @@ function AlphaColorPicker({
 	currentValue,
 	isDisabled,
 	updateSetting,
+	defaultValue,
 	showSettingBadge,
 	settingBadgeText,
 	h,
@@ -67,6 +69,16 @@ function AlphaColorPicker({
 }) {
 	const hasDefault = isCompleteColor(setting.default);
 	const isUnset = !isCompleteColor(currentValue) && !hasDefault;
+	let resetValue = '';
+	if (typeof setting.default === 'string') {
+		resetValue = setting.default;
+	} else if (typeof defaultValue === 'string') {
+		resetValue = defaultValue;
+	}
+	const canReset =
+		!isDisabled &&
+		isCompleteColor(currentValue) &&
+		currentValue !== resetValue;
 	const value = isCompleteColor(currentValue)
 		? currentValue
 		: hasDefault
@@ -339,8 +351,32 @@ function AlphaColorPicker({
 							cursor: isDisabled ? 'not-allowed' : 'pointer',
 						},
 					}),
-				]
+					canReset &&
+						h(
+							'button',
+							{
+								key: 'reset',
+								type: 'button',
+								className: 'fotogrids-color-picker__reset',
+								onClick: () =>
+									updateSetting(setting.key, resetValue),
+								'aria-label': __(
+									'Reset to default',
+									'fotogrids'
+								),
+								title: __('Reset to default', 'fotogrids'),
+							},
+							__('Reset', 'fotogrids')
+						),
+				].filter(Boolean)
 			),
+
+			setting.description &&
+				h('div', {
+					key: 'description',
+					className: 'fotogrids-setting__description',
+					dangerouslySetInnerHTML: { __html: setting.description },
+				}),
 
 			open &&
 				popoverPosition &&

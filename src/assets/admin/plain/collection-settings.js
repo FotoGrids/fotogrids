@@ -1771,6 +1771,8 @@ function CollectionSettings() {
 					{
 						updateSetting,
 						getFieldState,
+						defaultValue:
+							window.fotogridsSettings?.defaults?.[setting.key],
 						__,
 					}
 				);
