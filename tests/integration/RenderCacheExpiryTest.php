@@ -17,6 +17,9 @@ namespace {
     if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
         define( 'HOUR_IN_SECONDS', 3600 );
     }
+    if ( ! defined( 'MONTH_IN_SECONDS' ) ) {
+        define( 'MONTH_IN_SECONDS', 2592000 );
+    }
 
     /**
      * In-memory stand-in for the fotogrids_render_cache table that enforces
@@ -75,11 +78,17 @@ namespace {
     }
 
     $GLOBALS['wpdb']            = new Fake_Expiring_Wpdb();
-    $GLOBALS['fg_object_cache'] = array();
-    $GLOBALS['fg_now']          = 1_800_000_000;
+    $GLOBALS['fg_object_cache']     = array();
+    $GLOBALS['fg_object_cache_ttl'] = array();
+    $GLOBALS['fg_now']              = 1_800_000_000;
 
-    // A persistent object cache: entries survive across requests and the
-    // per-entry TTL argument is not relied on.
+    // A persistent object cache: entries survive across requests and do not
+    // expire on their own, so expiry is checked through the envelope.
+    if ( ! function_exists( 'wp_rand' ) ) {
+        function wp_rand(): int {
+            return mt_rand();
+        }
+    }
     if ( ! function_exists( 'wp_cache_get' ) ) {
         function wp_cache_get( string $key, string $group = '' ): mixed {
             return $GLOBALS['fg_object_cache'][ $group . ':' . $key ] ?? false;
@@ -87,8 +96,8 @@ namespace {
     }
     if ( ! function_exists( 'wp_cache_set' ) ) {
         function wp_cache_set( string $key, mixed $value, string $group = '', int $ttl = 0 ): bool {
-            unset( $ttl );
-            $GLOBALS['fg_object_cache'][ $group . ':' . $key ] = $value;
+            $GLOBALS['fg_object_cache'][ $group . ':' . $key ]     = $value;
+            $GLOBALS['fg_object_cache_ttl'][ $group . ':' . $key ] = $ttl;
             return true;
         }
     }
@@ -158,6 +167,9 @@ final class RenderCacheExpiryTest {
         self::test_expired_l1_entry_is_a_miss_and_is_evicted();
         self::test_entry_promoted_from_l2_keeps_its_expiry();
         self::test_envelope_without_expiry_is_a_miss();
+        self::test_l1_entry_expires_with_its_row();
+        self::test_l1_entry_promoted_from_l2_expires_with_its_row();
+        self::test_l1_lifetime_is_capped_at_thirty_days();
     }
 
     private static function test_fresh_entry_is_served_from_l1(): void {
@@ -188,12 +200,12 @@ final class RenderCacheExpiryTest {
         self::reset();
 
         FotoGrids_Cache::put( 5, 'key-stale', '<div>stale</div>', array(), array(), '', '', '', 1 );
-        self::assert_same( 2, count( $GLOBALS['fg_object_cache'] ), 'The entry should be in L1 alongside the version salt.' );
+        self::assert_same( 2, count( $GLOBALS['fg_object_cache'] ), 'The entry should be in L1 alongside the namespace salt.' );
 
         self::advance( HOUR_IN_SECONDS + 60 );
 
         self::assert_same( false, FotoGrids_Cache::get( 5, 'key-stale' ), 'An expired entry must not be replayed from L1.' );
-        self::assert_same( 1, count( $GLOBALS['fg_object_cache'] ), 'The expired L1 entry should be evicted, leaving only the version salt.' );
+        self::assert_same( 1, count( $GLOBALS['fg_object_cache'] ), 'The expired L1 entry should be evicted, leaving only the namespace salt.' );
 
         FotoGrids_Cache::put( 5, 'key-stale', '<div>new</div>', array(), array(), '', '', '', 1 );
         $cached = FotoGrids_Cache::get( 5, 'key-stale' );
@@ -231,16 +243,59 @@ final class RenderCacheExpiryTest {
                 'json_ld'    => '',
             )
         );
-        $GLOBALS['fg_object_cache']['fotogrids_render:fotogrids_render_version'] = 1;
-        $GLOBALS['fg_object_cache']['fotogrids_render:v1_key-legacy']           = $legacy;
+        $GLOBALS['fg_object_cache']['fotogrids_render:fotogrids_render_salt'] = 'legacy';
+        $GLOBALS['fg_object_cache']['fotogrids_render:slegacy_key-legacy']   = $legacy;
 
         self::assert_same( false, FotoGrids_Cache::get( 5, 'key-legacy' ), 'An envelope without an expiry must read as a miss.' );
     }
 
+    private static function test_l1_entry_expires_with_its_row(): void {
+        self::reset();
+
+        FotoGrids_Cache::put( 5, 'key-ttl', '<div></div>', array(), array(), '', '', '', 24 );
+
+        self::assert_same( array( 24 * HOUR_IN_SECONDS ), self::entry_ttls( 'key-ttl' ), 'The L1 entry should be stored with the cache duration as its expiry.' );
+    }
+
+    private static function test_l1_entry_promoted_from_l2_expires_with_its_row(): void {
+        self::reset();
+
+        FotoGrids_Cache::put( 5, 'key-promoted', '<div></div>', array(), array(), '', '', '', 3 );
+
+        $GLOBALS['fg_object_cache']     = array();
+        $GLOBALS['fg_object_cache_ttl'] = array();
+        self::advance( HOUR_IN_SECONDS );
+        FotoGrids_Cache::get( 5, 'key-promoted' );
+
+        self::assert_same( array( 2 * HOUR_IN_SECONDS ), self::entry_ttls( 'key-promoted' ), 'The promoted L1 copy should be stored with the row\'s remaining lifetime.' );
+    }
+
+    private static function test_l1_lifetime_is_capped_at_thirty_days(): void {
+        self::reset();
+
+        FotoGrids_Cache::put( 5, 'key-long', '<div></div>', array(), array(), '', '', '', 24 * 365 );
+
+        self::assert_same( array( MONTH_IN_SECONDS ), self::entry_ttls( 'key-long' ), 'An L1 expiry longer than 30 days should be capped.' );
+    }
+
+    /**
+     * @return array<int, int> TTLs written for render entries whose logical key is $cache_key.
+     */
+    private static function entry_ttls( string $cache_key ): array {
+        $ttls = array();
+        foreach ( $GLOBALS['fg_object_cache_ttl'] as $stored_key => $ttl ) {
+            if ( str_ends_with( $stored_key, '_' . $cache_key ) ) {
+                $ttls[] = $ttl;
+            }
+        }
+        return $ttls;
+    }
+
     private static function reset(): void {
-        $GLOBALS['wpdb']            = new \Fake_Expiring_Wpdb();
-        $GLOBALS['fg_object_cache'] = array();
-        $GLOBALS['fg_now']          = self::START;
+        $GLOBALS['wpdb']                = new \Fake_Expiring_Wpdb();
+        $GLOBALS['fg_object_cache']     = array();
+        $GLOBALS['fg_object_cache_ttl'] = array();
+        $GLOBALS['fg_now']              = self::START;
     }
 
     private static function advance( int $seconds ): void {

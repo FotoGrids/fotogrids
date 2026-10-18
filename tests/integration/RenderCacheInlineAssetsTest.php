@@ -17,6 +17,9 @@ namespace {
     if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
         define( 'HOUR_IN_SECONDS', 3600 );
     }
+    if ( ! defined( 'MONTH_IN_SECONDS' ) ) {
+        define( 'MONTH_IN_SECONDS', 2592000 );
+    }
 
     /**
      * In-memory stand-in for the fotogrids_render_cache table.
@@ -73,6 +76,11 @@ namespace {
     $GLOBALS['fg_inline_styles']     = array();
     $GLOBALS['fg_registered_styles'] = array();
 
+    if ( ! function_exists( 'wp_rand' ) ) {
+        function wp_rand(): int {
+            return mt_rand();
+        }
+    }
     if ( ! function_exists( 'wp_cache_get' ) ) {
         function wp_cache_get( string $key, string $group = '' ): mixed {
             return $GLOBALS['fg_object_cache'][ $group . ':' . $key ] ?? false;
