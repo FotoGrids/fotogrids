@@ -17,6 +17,11 @@ if ( ! defined( 'WPINC' ) ) {
 class Gallery_Data {
 
 	/**
+	 * Most items one slice request may ask for.
+	 */
+	private const MAX_SLICE_LENGTH = 500;
+
+	/**
 	 * Set or clear the gallery's featured item.
 	 *
 	 * Body: { item_id: int | null }. When null, the explicit choice is
@@ -309,6 +314,9 @@ class Gallery_Data {
 		$page            = max( 1, (int) $request->get_param( 'page' ) );
 		$items_per_page  = (int) $request->get_param( 'items_per_page' );
 		$container_width = (int) $request->get_param( 'container_width' );
+		$offset          = (int) $request->get_param( 'offset' );
+		$length          = min( self::MAX_SLICE_LENGTH, (int) $request->get_param( 'length' ) );
+		$with_aspects    = (bool) $request->get_param( 'with_aspects' );
 		$breakpoint      = (string) $request->get_param( 'breakpoint' );
 		$partial         = (string) $request->get_param( 'partial' );
 		$filters_raw     = $request->get_param( 'filters' );
@@ -344,7 +352,7 @@ class Gallery_Data {
 
 		// No pagination params (Album_To_Gallery_Ajax path) uses the shortcode
 		// path; any pagination param routes through the meta_overrides entry point.
-		$is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || '' !== $partial || 'desktop' !== $breakpoint || ! empty( $filters ) || $random_seed > 0;
+		$is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || '' !== $partial || 'desktop' !== $breakpoint || ! empty( $filters ) || $random_seed > 0 || $length > 0 || $with_aspects;
 
 		// via_album_id threads through both branches so the rendered gallery's
 		// Collection_Header can build a Back / Breadcrumb to the originating album.
@@ -402,6 +410,13 @@ class Gallery_Data {
 		if ( $random_seed > 0 ) {
 			$meta_overrides['random_seed'] = $random_seed;
 		}
+		if ( $length > 0 ) {
+			$meta_overrides['requested_offset'] = $offset;
+			$meta_overrides['requested_length'] = $length;
+		}
+		if ( $with_aspects ) {
+			$meta_overrides['with_aspects'] = true;
+		}
 		$meta_overrides = array_merge( $meta_overrides, $shared_meta_overrides );
 
 		$html     = \FotoGrids\Public_Render::render_gallery_for_rest( $gallery_id, $meta_overrides );
@@ -436,19 +451,33 @@ class Gallery_Data {
 
 		$fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
 
-		return rest_ensure_response(
-			array(
-				'success'     => true,
-				'html'        => $html,
-				'css'         => $css_urls,
-				'js'          => $js_data,
-				'fonts'       => $fonts_url,
-				'page'        => $page,
-				'page_size'   => $page_size,
-				'total_pages' => $total_pages,
-				'has_more'    => $has_more,
-			)
+		$response = array(
+			'success'     => true,
+			'html'        => $html,
+			'css'         => $css_urls,
+			'js'          => $js_data,
+			'fonts'       => $fonts_url,
+			'page'        => $page,
+			'page_size'   => $page_size,
+			'total_pages' => $total_pages,
+			'has_more'    => $has_more,
 		);
+
+		if ( null !== $meta && null !== $meta->total_item_count ) {
+			$response['total_items'] = (int) $meta->total_item_count;
+		}
+		if ( $length > 0 && null !== $meta ) {
+			$slice_offset            = (int) ( $meta->requested_offset ?? 0 );
+			$slice_count             = (int) ( $meta->pagination_page_size ?? 0 );
+			$response['offset']   = $slice_offset;
+			$response['length']   = $slice_count;
+			$response['has_more'] = $slice_offset + $slice_count < (int) ( $meta->total_item_count ?? 0 );
+		}
+		if ( $with_aspects && null !== $meta ) {
+			$response['aspects'] = $meta->sequence_aspects;
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**

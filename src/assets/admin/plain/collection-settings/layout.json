@@ -1026,7 +1026,7 @@
                                     "key": "layout_justified_last_row",
                                     "type": "button_group",
                                     "label": "Last Row Behavior",
-                                    "description": "How to handle the {postType}'s final row when it does not fill the full width. With pagination on, this only applies to the very last page; trailing rows on intermediate pages are controlled by the Pagination tab.",
+                                    "description": "How to handle the {postType}'s final row when it does not fill the full width. With pagination on, this only applies to the very last page; trailing rows on intermediate pages are controlled by the Pagination tab. Hide never hides the final row itself, which stays at its natural width.",
                                     "options": [
                                         {
                                             "label": "Keep Natural",
@@ -1071,10 +1071,34 @@
                                     "visible_when_uninstalled": true
                                 },
                                 {
+                                    "key": "layout_justified_last_row_hide_info",
+                                    "type": "info_block",
+                                    "subtitle": "Hide behaves like Keep Natural",
+                                    "message": "With Show All, the final row is never hidden, so Hide keeps it at its natural width. Hide removes incomplete rows only at the end of a page, when pagination is on and Page Trailing Row is Same as {postType}'s Last Row.",
+                                    "icon": "bulb",
+                                    "full_width": true,
+                                    "condition": {
+                                        "all": [
+                                            {
+                                                "dependsOn": "pagination_type",
+                                                "values": ["show_all"]
+                                            },
+                                            {
+                                                "dependsOn": "layout_justified_last_row",
+                                                "values": ["hide"]
+                                            }
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
                                     "key": "layout_justified_max_rows",
                                     "type": "range",
                                     "label": "Max Rows",
-                                    "description": "Limit the number of rows. 0 means unlimited.",
+                                    "description": "Limit the number of rows. 0 means unlimited. With pagination on, this is the number of rows per page and the next page starts where it stops. With Show All, rows past the limit are hidden but stay in the Lightbox.",
                                     "min": 0,
                                     "max": 50,
                                     "default": 0,

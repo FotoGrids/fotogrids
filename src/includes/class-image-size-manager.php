@@ -237,6 +237,38 @@ final class Image_Size_Manager {
 	}
 
 	/**
+	 * Fills an image attachment's missing width and height from its file and stores them.
+	 *
+	 * @since  1.3.0
+	 * @param  int $attachment_id WP attachment post ID.
+	 * @return void
+	 */
+	public static function ensure_dimensions( int $attachment_id ): void {
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+		if ( is_array( $metadata ) && ! empty( $metadata['width'] ) && ! empty( $metadata['height'] ) ) {
+			return;
+		}
+		if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			return;
+		}
+
+		$file = get_attached_file( $attachment_id );
+		if ( ! is_string( $file ) || '' === $file || ! file_exists( $file ) ) {
+			return;
+		}
+
+		$size = wp_getimagesize( $file );
+		if ( ! is_array( $size ) || empty( $size[0] ) || empty( $size[1] ) ) {
+			return;
+		}
+
+		$metadata           = is_array( $metadata ) ? $metadata : array();
+		$metadata['width']  = (int) $size[0];
+		$metadata['height'] = (int) $size[1];
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+	}
+
+	/**
 	 * Whether a width × height box fits within a size's bounds, where a bound of 0 is unlimited.
 	 *
 	 * @since  1.1.3

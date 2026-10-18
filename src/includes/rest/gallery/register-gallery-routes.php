@@ -154,6 +154,18 @@ class Register_Gallery_Routes {
 							'default'           => 0,
 							'sanitize_callback' => 'absint',
 						),
+						'offset'          => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+						),
+						'length'          => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+						),
+						'with_aspects'    => array(
+							'default'           => false,
+							'sanitize_callback' => 'rest_sanitize_boolean',
+						),
 						'breakpoint'      => array(
 							'default'           => 'desktop',
 							'sanitize_callback' => 'sanitize_key',

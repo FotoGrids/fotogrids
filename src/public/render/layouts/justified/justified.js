@@ -22,6 +22,12 @@ import {
 	createLayoutAttach,
 	bootLayout,
 } from '../_helpers/layout-helpers.js';
+import { cutPages, packRows, pageContaining } from './page-cutter.js';
+
+const PAGE_SIZE_ORDER = ['desktop', 'tablet', 'mobile'];
+
+/** Quiet time after the last cut change before the pagination core re-plans. */
+const REPLAN_DELAY_MS = 250;
 
 function readTolerance(collectionEl) {
 	const raw = collectionEl.getAttribute('data-fg-justified-tolerance');
@@ -44,6 +50,11 @@ function readMaxRows(collectionEl) {
 	return isNaN(parsed) || parsed < 0 ? 0 : parsed;
 }
 
+function readNumberAttr(collectionEl, name, fallback) {
+	const parsed = parseFloat(collectionEl.getAttribute(name));
+	return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function readPageTrailingRow(collectionEl) {
 	const raw =
 		collectionEl.getAttribute('data-fg-justified-page-trailing-row') ||
@@ -58,9 +69,16 @@ function readPageTrailingRow(collectionEl) {
  * @param {number} containerWidth
  * @param {number} gap
  * @param {number} targetHeight
+ * @param {(item: HTMLElement) => number} [aspectOf] Defaults to the image's own shape.
  * @return {Array<Array<{ item: HTMLElement, aspect: number }>>}
  */
-function buildRows(items, containerWidth, gap, targetHeight) {
+function buildRows(
+	items,
+	containerWidth,
+	gap,
+	targetHeight,
+	aspectOf = aspectRatioFor
+) {
 	const rows = [];
 	let current = [];
 	let currentAspectSum = 0;
@@ -76,7 +94,7 @@ function buildRows(items, containerWidth, gap, targetHeight) {
 
 	for (let i = 0; i < items.length; i++) {
 		const item = items[i];
-		const aspect = aspectRatioFor(item);
+		const aspect = aspectOf(item);
 
 		const withCount = current.length + 1;
 		const withAspect = currentAspectSum + aspect;
@@ -119,9 +137,27 @@ function buildRows(items, containerWidth, gap, targetHeight) {
  * floor-rounding error across the row so the rightmost item lands at
  * exactly containerWidth - totalGap.
  *
- * @return {number} The applied row height.
+ * A full-width row whose height would leave [minHeight, maxHeight] keeps the
+ * full width at the bound; its images crop to fit.
+ *
+ * @param {Array<{item:HTMLElement,aspect:number}>} row
+ * @param {number}  containerWidth
+ * @param {number}  gap
+ * @param {number}  targetHeight
+ * @param {boolean} stretch   Fill the container width.
+ * @param {number}  minHeight
+ * @param {number}  maxHeight
+ * @return {void}
  */
-function applyRow(row, containerWidth, gap, targetHeight, stretch) {
+function applyRow(
+	row,
+	containerWidth,
+	gap,
+	targetHeight,
+	stretch,
+	minHeight,
+	maxHeight
+) {
 	const totalGap = Math.max(0, row.length - 1) * gap;
 	const availableWidth = containerWidth - totalGap;
 	let totalAspect = row.reduce((sum, entry) => sum + entry.aspect, 0);
@@ -129,14 +165,18 @@ function applyRow(row, containerWidth, gap, targetHeight, stretch) {
 		totalAspect = 1;
 	}
 
-	const rowHeight = stretch ? availableWidth / totalAspect : targetHeight;
+	const natural = availableWidth / totalAspect;
+	const rowHeight = stretch
+		? Math.min(maxHeight, Math.max(minHeight, natural))
+		: targetHeight;
+	const widthScale = stretch ? natural : targetHeight;
 	const intHeight = Math.round(rowHeight);
 
 	let cumulativeFloat = 0;
 	let cumulativeInt = 0;
 	for (let i = 0; i < row.length; i++) {
 		const entry = row[i];
-		cumulativeFloat += entry.aspect * rowHeight;
+		cumulativeFloat += entry.aspect * widthScale;
 		const cumulativeRounded = Math.round(cumulativeFloat);
 		const intWidth = cumulativeRounded - cumulativeInt;
 		cumulativeInt = cumulativeRounded;
@@ -147,28 +187,311 @@ function applyRow(row, containerWidth, gap, targetHeight, stretch) {
 		entry.item.style.flexShrink = '0';
 		entry.item.style.marginLeft = '';
 		entry.item.style.marginRight = '';
-		entry.item.removeAttribute('data-fg-justified-last-row');
-		entry.item.removeAttribute('data-fg-justified-last-row-first');
-		entry.item.removeAttribute('data-fg-justified-last-row-last');
 	}
+}
 
-	return rowHeight;
+/**
+ * Height a row would take if stretched to the container width.
+ *
+ * @return {number}
+ */
+function stretchedHeight(row, containerWidth, gap) {
+	const totalAspect = row.reduce((sum, entry) => sum + entry.aspect, 0);
+	if (totalAspect <= 0) {
+		return 0;
+	}
+	return (containerWidth - Math.max(0, row.length - 1) * gap) / totalAspect;
 }
 
 function applyMaxRowsCutoff(rows, cutoffRow) {
-	if (cutoffRow <= 0) {
-		return;
-	}
 	for (let i = 0; i < rows.length; i++) {
-		const hidden = i >= cutoffRow;
+		const hidden = cutoffRow > 0 && i >= cutoffRow;
 		for (let j = 0; j < rows[i].length; j++) {
 			rows[i][j].item.style.display = hidden ? 'none' : '';
 		}
 	}
 }
 
+function clearRowMarkers(trackEl) {
+	trackEl.querySelectorAll(':scope > .fg-item').forEach((item) => {
+		item.removeAttribute('data-fg-justified-last-row');
+		item.removeAttribute('data-fg-justified-last-row-first');
+		item.removeAttribute('data-fg-justified-last-row-last');
+	});
+}
+
 function getCollectionEl(trackEl) {
 	return trackEl.closest('[data-fg-layout="justified"]');
+}
+
+function paginationModule() {
+	return window.FotoGrids &&
+		window.FotoGrids.modules &&
+		window.FotoGrids.modules.pagination
+		? window.FotoGrids.modules.pagination
+		: null;
+}
+
+function sequenceIndexOf(item) {
+	const parsed = parseInt(
+		item.getAttribute('data-fg-sequence-index') || '',
+		10
+	);
+	return Number.isFinite(parsed) ? parsed : -1;
+}
+
+function readAspects(collectionEl) {
+	const raw = collectionEl.dataset.fgAspects || '';
+	if (!raw) {
+		return [];
+	}
+	return raw.split(',').map((value) => parseFloat(value));
+}
+
+/**
+ * Items per page at the visitor's breakpoint.
+ *
+ * @param {HTMLElement} collectionEl
+ * @return {number}
+ */
+function readTargetPageSize(collectionEl) {
+	const parts = (collectionEl.dataset.fgPageSizes || '')
+		.trim()
+		.split(/\s+/)
+		.map((n) => parseInt(n, 10));
+	const breakpoint =
+		window.FotoGrids &&
+		typeof window.FotoGrids.activeBreakpoint === 'function'
+			? window.FotoGrids.activeBreakpoint()
+			: 'desktop';
+	const index = PAGE_SIZE_ORDER.indexOf(breakpoint);
+	if (parts.length === 3 && index >= 0 && parts[index] > 0) {
+		return parts[index];
+	}
+	const fallback = parseInt(collectionEl.dataset.fgPageSize || '0', 10);
+	return fallback > 0 ? fallback : 12;
+}
+
+/** @type {WeakMap<HTMLElement, object>} */
+const plans = new WeakMap();
+
+/**
+ * Per-gallery cut state for a gallery whose pages the browser cuts.
+ *
+ * @param {HTMLElement} collectionEl
+ * @return {object}
+ */
+function planFor(collectionEl) {
+	let plan = plans.get(collectionEl);
+	if (plan) {
+		return plan;
+	}
+
+	const firstItem = collectionEl.querySelector('.fg-item');
+	plan = {
+		aspects: readAspects(collectionEl),
+		geometry: null,
+		rules: null,
+		rowEnds: null,
+		replanTimer: null,
+		trimmed: [],
+		signature: '',
+		cache: new Map(),
+		registered: false,
+		poolActive:
+			parseInt(collectionEl.dataset.fgPageCurrent || '1', 10) <= 1 &&
+			(!firstItem || sequenceIndexOf(firstItem) <= 0),
+	};
+	plans.set(collectionEl, plan);
+
+	plan.cut = (start) => {
+		const key = plan.signature + '@' + start;
+		if (!plan.cache.has(key)) {
+			plan.cache.set(
+				key,
+				cutPages(plan.aspects, plan.geometry, plan.rules, start)
+			);
+		}
+		return plan.cache.get(key);
+	};
+
+	const asSlice = (page) =>
+		page ? { offset: page.offset, length: page.size } : null;
+	plan.planner = {
+		next: (loaded) => asSlice(plan.cut(Math.max(0, loaded))[0]),
+		page: (n) => asSlice(plan.cut(0)[n - 1]),
+		pageContaining: (index) => pageContaining(plan.cut(0), index),
+		total: () => Math.max(1, plan.cut(0).length),
+	};
+
+	collectionEl.addEventListener('fotogrids:sequence_changed', (event) => {
+		const aspects = event.detail && event.detail.aspects;
+		if (!Array.isArray(aspects)) {
+			return;
+		}
+		plan.aspects = aspects.map((value) => parseFloat(value));
+		plan.signature = '';
+		plan.cache.clear();
+		plan.rowEnds = null;
+		plan.poolActive = true;
+	});
+
+	collectionEl.addEventListener('fotogrids:page_changed', (event) => {
+		const mode = event.detail && event.detail.mode;
+		if (mode === 'append' || mode === 'replace') {
+			plan.poolActive = false;
+		}
+	});
+
+	return plan;
+}
+
+/**
+ * Cuts page 1 out of the pool the server sent and keeps the pagination core's
+ * planner on the live geometry.
+ *
+ * @return {object} The gallery's plan.
+ */
+function planPages(collectionEl, items, geometry, maxRows, trailing, lastRow) {
+	const plan = planFor(collectionEl);
+	const rules = {
+		mode: trailing,
+		target: readTargetPageSize(collectionEl),
+		window: readNumberAttr(
+			collectionEl,
+			'data-fg-justified-snap-window',
+			20
+		),
+		threshold: readNumberAttr(
+			collectionEl,
+			'data-fg-justified-snap-threshold',
+			85
+		),
+		direction:
+			collectionEl.getAttribute('data-fg-justified-snap-direction') ||
+			'auto',
+		maxRows,
+		pageEndHide: trailing === 'match' && lastRow === 'hide',
+	};
+	const signature = JSON.stringify([geometry, rules, plan.aspects.length]);
+	const moved = signature !== plan.signature;
+	if (moved) {
+		plan.geometry = geometry;
+		plan.rules = rules;
+		plan.signature = signature;
+		plan.cache.clear();
+		plan.rowEnds = null;
+	}
+
+	if (plan.poolActive) {
+		const first = plan.cut(0)[0];
+		const size = first ? first.size : items.length;
+		items.forEach((item, i) => {
+			if (i >= size) {
+				item.setAttribute('data-fg-overflow', '1');
+			} else {
+				item.removeAttribute('data-fg-overflow');
+			}
+		});
+	}
+
+	const pagination = paginationModule();
+	if (pagination && typeof pagination.setSlicePlanner === 'function') {
+		if (!plan.registered) {
+			plan.registered = true;
+			pagination.setSlicePlanner(collectionEl, plan.planner);
+			if (typeof pagination.replan === 'function') {
+				pagination.replan(collectionEl);
+			}
+		} else if (moved && typeof pagination.replan === 'function') {
+			if (plan.replanTimer) {
+				window.clearTimeout(plan.replanTimer);
+			}
+			plan.replanTimer = window.setTimeout(() => {
+				plan.replanTimer = null;
+				pagination.replan(collectionEl);
+			}, REPLAN_DELAY_MS);
+		}
+	}
+
+	return plan;
+}
+
+/**
+ * Row ends of the whole sequence's packing at the live geometry.
+ *
+ * @return {Set<number>}
+ */
+function sequenceRowEnds(plan) {
+	if (!plan.rowEnds) {
+		const g = plan.geometry;
+		const ends = new Set();
+		let at = 0;
+		packRows(plan.aspects, g.width, g.gap, g.rowHeight).forEach((row) => {
+			at += row.length;
+			ends.add(at);
+		});
+		plan.rowEnds = ends;
+	}
+	return plan.rowEnds;
+}
+
+/**
+ * Whether the item at sequence index `lastIndex` ends a row of the whole
+ * sequence's packing at the live geometry.
+ *
+ * @return {boolean}
+ */
+function endsSequenceRow(plan, lastIndex) {
+	return sequenceRowEnds(plan).has(lastIndex + 1);
+}
+
+/**
+ * Sequence index the row holding `index` starts at, in the whole sequence's
+ * packing at the live geometry.
+ *
+ * @return {number}
+ */
+function sequenceRowStart(plan, index) {
+	let start = 0;
+	sequenceRowEnds(plan).forEach((end) => {
+		if (end <= index && end > start) {
+			start = end;
+		}
+	});
+	return start;
+}
+
+/**
+ * Hides an append run's incomplete trailing row, left by a geometry change
+ * after its pages were cut, so the next load starts with those items.
+ *
+ * @param {object}        plan
+ * @param {HTMLElement[]} items Loaded items, in order.
+ * @return {HTMLElement[]} The items that stay shown.
+ */
+function trimTrailingRow(plan, items) {
+	const lastSeq = sequenceIndexOf(items[items.length - 1]);
+	const firstSeq = sequenceIndexOf(items[0]);
+	if (
+		lastSeq < 0 ||
+		lastSeq >= plan.aspects.length - 1 ||
+		endsSequenceRow(plan, lastSeq)
+	) {
+		return items;
+	}
+	const start = sequenceRowStart(plan, lastSeq);
+	if (start <= firstSeq) {
+		return items;
+	}
+	return items.filter((item) => {
+		if (sequenceIndexOf(item) < start) {
+			return true;
+		}
+		item.setAttribute('data-fg-overflow', '1');
+		plan.trimmed.push(item);
+		return false;
+	});
 }
 
 function layout(trackEl) {
@@ -182,7 +505,7 @@ function layout(trackEl) {
 		return;
 	}
 
-	const items = visibleItems(trackEl);
+	let items = visibleItems(trackEl);
 	if (items.length === 0) {
 		return;
 	}
@@ -197,10 +520,55 @@ function layout(trackEl) {
 	const lastRow = readLastRow(collectionEl);
 	const maxRows = readMaxRows(collectionEl);
 	const pageTrailingRow = readPageTrailingRow(collectionEl);
-	const snapTrailingRow =
-		pageTrailingRow === 'fill' && hasNextPage(collectionEl);
+	const paginated = collectionEl.dataset.fgPaginated === 'true';
+	const planned = paginated && !!collectionEl.dataset.fgAspects;
 
-	const rows = buildRows(items, containerWidth, gap, targetHeight);
+	clearRowMarkers(trackEl);
+
+	let plan = null;
+	if (planned) {
+		const known = plans.get(collectionEl);
+		if (known && known.trimmed.length) {
+			known.trimmed.forEach((item) =>
+				item.removeAttribute('data-fg-overflow')
+			);
+			known.trimmed = [];
+		}
+		plan = planPages(
+			collectionEl,
+			items,
+			{ width: containerWidth, gap, rowHeight: targetHeight },
+			maxRows,
+			pageTrailingRow,
+			lastRow
+		);
+		items = items.filter((item) => !item.hasAttribute('data-fg-overflow'));
+		const trims =
+			!plan.poolActive &&
+			collectionEl.dataset.fgPaginationMethod !== 'pages' &&
+			(pageTrailingRow === 'fill' || lastRow === 'hide');
+		if (trims && items.length > 0) {
+			items = trimTrailingRow(plan, items);
+		}
+		if (items.length === 0) {
+			return;
+		}
+	}
+
+	const sequenceAspect = (item) => {
+		const index = sequenceIndexOf(item);
+		const aspect = index >= 0 ? plan.aspects[index] : NaN;
+		return Number.isFinite(aspect) && aspect > 0
+			? aspect
+			: aspectRatioFor(item);
+	};
+	const rows = buildRows(
+		items,
+		containerWidth,
+		gap,
+		targetHeight,
+		plan ? sequenceAspect : aspectRatioFor
+	);
 	if (rows.length === 0) {
 		return;
 	}
@@ -209,54 +577,85 @@ function layout(trackEl) {
 	const minHeight = targetHeight * (1 - tolerance);
 	const maxHeight = targetHeight * (1 + tolerance);
 
-	for (let i = 0; i < rows.length; i++) {
-		const isLast = i === lastIndex;
-		const stretch =
-			!isLast || lastRow === 'justify' || (isLast && snapTrailingRow);
+	let finalRow;
+	let completeTrailingRow;
+	if (plan) {
+		const lastSeq = sequenceIndexOf(items[items.length - 1]);
+		finalRow = lastSeq < 0 || lastSeq >= plan.aspects.length - 1;
+		completeTrailingRow = !finalRow && endsSequenceRow(plan, lastSeq);
+	} else {
+		finalRow = !hasNextPage(collectionEl);
+		completeTrailingRow = !finalRow && pageTrailingRow === 'fill';
+	}
 
-		const appliedHeight = applyRow(
-			rows[i],
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		if (i < lastIndex || completeTrailingRow) {
+			applyRow(
+				row,
+				containerWidth,
+				gap,
+				targetHeight,
+				true,
+				minHeight,
+				maxHeight
+			);
+			continue;
+		}
+
+		if (lastRow === 'justify') {
+			applyRow(
+				row,
+				containerWidth,
+				gap,
+				targetHeight,
+				true,
+				minHeight,
+				maxHeight
+			);
+			continue;
+		}
+
+		if (lastRow === 'hide' && !finalRow && !planned) {
+			applyRow(
+				row,
+				containerWidth,
+				gap,
+				targetHeight,
+				false,
+				minHeight,
+				maxHeight
+			);
+			row.forEach((entry) =>
+				entry.item.setAttribute('data-fg-justified-last-row', '1')
+			);
+			continue;
+		}
+
+		const stretched = stretchedHeight(row, containerWidth, gap);
+		const fits = stretched >= minHeight && stretched <= maxHeight;
+		applyRow(
+			row,
 			containerWidth,
 			gap,
 			targetHeight,
-			stretch
+			fits,
+			minHeight,
+			maxHeight
 		);
 
-		if (
-			isLast &&
-			stretch &&
-			lastRow !== 'justify' &&
-			!snapTrailingRow &&
-			(appliedHeight < minHeight || appliedHeight > maxHeight)
-		) {
-			applyRow(rows[i], containerWidth, gap, targetHeight, false);
-		}
-
-		if (isLast && !snapTrailingRow) {
-			const lastRowEntries = rows[i];
-			if (lastRow === 'hide') {
-				for (let j = 0; j < lastRowEntries.length; j++) {
-					lastRowEntries[j].item.setAttribute(
-						'data-fg-justified-last-row',
-						'1'
-					);
-				}
-			} else if (lastRow === 'center' || lastRow === 'right') {
-				lastRowEntries[0].item.setAttribute(
-					'data-fg-justified-last-row-first',
+		if (!fits && (lastRow === 'center' || lastRow === 'right')) {
+			row[0].item.setAttribute('data-fg-justified-last-row-first', '1');
+			if (lastRow === 'center') {
+				row[row.length - 1].item.setAttribute(
+					'data-fg-justified-last-row-last',
 					'1'
 				);
-				if (lastRow === 'center') {
-					lastRowEntries[lastRowEntries.length - 1].item.setAttribute(
-						'data-fg-justified-last-row-last',
-						'1'
-					);
-				}
 			}
 		}
 	}
 
-	applyMaxRowsCutoff(rows, maxRows);
+	applyMaxRowsCutoff(rows, paginated ? 0 : maxRows);
 
 	collectionEl.dataset.fgContainerWidth = String(Math.round(containerWidth));
 	collectionEl.setAttribute('data-fg-justified-packed', '1');
@@ -267,6 +666,18 @@ const attach = createLayoutAttach({
 	trackSelector: '.fg-justified-track',
 	readyKey: 'fgJustifiedReady',
 	layoutFn: layout,
+	signatureFn: (trackEl) => {
+		const collectionEl = getCollectionEl(trackEl);
+		return collectionEl
+			? readTrackGap(trackEl) +
+					'|' +
+					readCssNumber(
+						collectionEl,
+						'--fg-justified-row-height',
+						220
+					)
+			: '';
+	},
 });
 
 bootLayout(attach, 10);
