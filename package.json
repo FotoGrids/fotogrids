@@ -21,7 +21,7 @@
     "test:ci:jest": "npm run icons:build && jest --ci --coverage --watchAll=false",
     "test:ci:source-guards": "bash tests/ci/grep-user-object-in-localize.sh && bash tests/ci/grep-rest-url-concat.sh && bash tests/ci/check-catalog-i18n.sh && bash tests/ci/grep-unguarded-test-import.sh && node tests/ci/check-asset-handles.js",
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
-    "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
+    "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh && node tests/ci/check-justified-cut-parity.js",
     "test:ci:built-strings": "node tests/ci/check-built-strings.js",
     "test:e2e": "playwright test",
     "test:e2e:gate": "node tests/ci/run-gate.js",
