@@ -213,7 +213,7 @@ final class Password_Gate implements Gate {
 	}
 
 	/**
-	 * Builds the lock form attributes that carry embed attributes to the unlock request.
+	 * Builds the lock form attributes that carry embed attributes and the visit-context album to the unlock request.
 	 *
 	 * @since  1.3.0
 	 * @param  Render_Context $render_context Render context.
@@ -222,7 +222,7 @@ final class Password_Gate implements Gate {
 	private static function embed_atts_html( Render_Context $render_context ): string {
 		$embed_atts = $render_context->settings['_embed_atts'] ?? array();
 		if ( ! is_array( $embed_atts ) ) {
-			return '';
+			$embed_atts = array();
 		}
 
 		$html = '';
@@ -231,6 +231,9 @@ final class Password_Gate implements Gate {
 		}
 		if ( ! empty( $embed_atts['template'] ) && is_string( $embed_atts['template'] ) ) {
 			$html .= ' data-fg-embed-template="' . esc_attr( $embed_atts['template'] ) . '"';
+		}
+		if ( null !== $render_context->via_album_id && $render_context->via_album_id > 0 ) {
+			$html .= ' data-fg-via-album="' . absint( $render_context->via_album_id ) . '"';
 		}
 
 		return $html;
