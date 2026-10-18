@@ -359,16 +359,30 @@ test.describe('lightbox', () => {
 			await expect(lightbox.image()).toHaveJSProperty('complete', true, {
 				timeout: 15000,
 			});
-			seen.add((await lightbox.currentSrc()) ?? '');
+			seen.add(String(await lightbox.index()));
 			const next = lightbox.next();
 			if (!(await next.isVisible()) || (await next.isDisabled())) {
 				break;
 			}
 			const before = await lightbox.index();
-			await next.click();
-			await expect
-				.poll(() => lightbox.index(), { timeout: 15000 })
-				.not.toBe(before);
+			if (before === (await lightbox.dots().count()) - 1) {
+				break;
+			}
+			// A click during the crossfade is ignored, so retry until the stage moves.
+			let moved = false;
+			for (let attempt = 0; attempt < 15 && !moved; attempt++) {
+				await next.click();
+				moved = await expect
+					.poll(() => lightbox.index(), { timeout: 1000 })
+					.not.toBe(before)
+					.then(
+						() => true,
+						() => false
+					);
+			}
+			expect(moved, `the lightbox did not move past item ${before}`).toBe(
+				true
+			);
 			if (0 === (await lightbox.index())) {
 				break;
 			}
