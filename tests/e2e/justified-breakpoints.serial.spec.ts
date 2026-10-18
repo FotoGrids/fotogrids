@@ -21,6 +21,11 @@ test.describe.configure({ timeout: 120000 });
 const OPTION = 'fotogrids_general_settings';
 let saved = '';
 
+/** Escapes a value for a single-quoted PHP string literal. */
+function phpQuoted(value: string): string {
+	return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 test.beforeAll(() => {
 	saved = wpEval(
 		`echo wp_json_encode( get_option( '${OPTION}', array() ) );`
@@ -29,13 +34,13 @@ test.beforeAll(() => {
 
 test.afterAll(() => {
 	wpEval(
-		`update_option( '${OPTION}', json_decode( '${saved.replace(/'/g, "\\'")}', true ) );`
+		`update_option( '${OPTION}', json_decode( '${phpQuoted(saved)}', true ) );`
 	);
 });
 
 function setGeneral(values: Record<string, unknown>): void {
 	wpEval(
-		`$o = get_option( '${OPTION}', array() ); if ( ! is_array( $o ) ) { $o = array(); } update_option( '${OPTION}', array_merge( $o, json_decode( '${JSON.stringify(values)}', true ) ) );`
+		`$o = get_option( '${OPTION}', array() ); if ( ! is_array( $o ) ) { $o = array(); } update_option( '${OPTION}', array_merge( $o, json_decode( '${phpQuoted(JSON.stringify(values))}', true ) ) );`
 	);
 }
 
