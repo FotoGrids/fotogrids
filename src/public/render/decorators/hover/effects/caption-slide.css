@@ -20,13 +20,31 @@
 	.fg-item:hover
 	.fg-caption-bg,
 .fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:focus-within
+	.fg-caption-bg,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item.fg-caption-revealed
+	.fg-caption-bg,
+.fotogrids-collection[data-fg-hover='caption-slide']
 	.fg-item:hover
+	.fg-caption-content,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:focus-within
+	.fg-caption-content,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item.fg-caption-revealed
 	.fg-caption-content {
 	opacity: 1;
 }
 
 .fotogrids-collection[data-fg-hover='caption-slide']
 	.fg-item:hover
+	.fg-caption-content,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:focus-within
+	.fg-caption-content,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item.fg-caption-revealed
 	.fg-caption-content {
 	transform: translateX(0);
 }
