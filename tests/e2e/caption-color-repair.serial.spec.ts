@@ -167,3 +167,35 @@ test( 'CAP-59: an import carrying the 1.2.0 white caption colours clears them', 
 		restoreOption( LOG_OPTION, log );
 	}
 } );
+
+test( 'CAP-60: a caption colour saved in Gallery Defaults reaches a new gallery, and its own colour wins', { tag: [ '@settings' ] }, async ( {
+	page,
+} ) => {
+	const before = snapshotOption( DEFAULTS_OPTION );
+
+	try {
+		wpEval( `\\FotoGrids\\Settings\\Collection_Defaults_Store::replace( 'gallery', array( 'caption_title_color' => 'rgba(200, 30, 30, 1)' ) );` );
+
+		const seeded = galleryPage( { layout: 'grid', caption_placement: 'bottom' } );
+		const own = galleryPage( { layout: 'grid', caption_placement: 'bottom', caption_title_color: 'rgba(20, 40, 160, 1)' } );
+
+		expect( storedMeta( seeded.id, 'caption_title_color' ) ).toBe( 'rgba(200, 30, 30, 1)' );
+
+		for ( const [ collection, expected ] of [
+			[ seeded, 'rgb(200, 30, 30)' ],
+			[ own, 'rgb(20, 40, 160)' ],
+		] as const ) {
+			const gallery = new GalleryRender( page, collection.id );
+			await page.goto( collection.url );
+			await gallery.waitFor();
+			expect(
+				await gallery.root
+					.locator( '.fg-caption-title' )
+					.first()
+					.evaluate( ( element ) => getComputedStyle( element ).color )
+			).toBe( expected );
+		}
+	} finally {
+		restoreOption( DEFAULTS_OPTION, before );
+	}
+} );
