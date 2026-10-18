@@ -45,6 +45,20 @@ export async function open(
 	await expect(gallery.root).toHaveAttribute('data-fg-justified-packed', '1');
 	// A random refetch holds the items until the fresh set lands or is dropped.
 	await expect(gallery.root.locator('.fg-random-pending')).toHaveCount(0);
+	// A gallery the browser pages has its totals once its planner is registered.
+	await gallery.root.evaluate((el) => {
+		const root = el as HTMLElement;
+		if ('true' !== root.dataset.fgPaginated || !root.dataset.fgAspects) {
+			return;
+		}
+		return new Promise<void>((resolve) => {
+			const check = () =>
+				'ready' === root.dataset.fgSlicePlanner
+					? resolve()
+					: setTimeout(check, 20);
+			check();
+		});
+	});
 	return gallery;
 }
 

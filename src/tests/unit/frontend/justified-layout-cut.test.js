@@ -193,6 +193,20 @@ describe('justified layout cut', () => {
 		expect(planner.next(aspects.length)).toBeNull();
 	});
 
+	test('CLI-13: a layout that ran before the pagination core registers when the core attaches', async () => {
+		installRuntime();
+		const { el } = makeGallery({ width: 640 });
+		boot();
+		await flush();
+
+		const pagination = paginationMock();
+		window.FotoGrids.modules.pagination = pagination;
+		el.dispatchEvent(new CustomEvent('fotogrids:pagination_attached'));
+
+		expect(pagination.setSlicePlanner).toHaveBeenCalledWith(el, expect.any(Object));
+		expect(pagination.replan).toHaveBeenCalledWith(el);
+	});
+
 	test('CLI-04: a container measured at 0px is not cut until it has a width', async () => {
 		jest.useFakeTimers();
 		const pagination = paginationMock();

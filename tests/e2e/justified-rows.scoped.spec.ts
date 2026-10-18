@@ -522,6 +522,16 @@ test.describe('max rows', () => {
 					const perStep: number[] = [
 						(await rows(gallery)).rows.length,
 					];
+					let loads = 0;
+					page.on('request', (request) => {
+						if (
+							/gallery%2Frender|gallery\/render/.test(
+								request.url()
+							)
+						) {
+							loads++;
+						}
+					});
 					const result = await walk(method, page, gallery, {
 						between: async () => {
 							perStep.push((await rows(gallery)).rows.length);
@@ -532,10 +542,15 @@ test.describe('max rows', () => {
 						perStep.forEach((count) =>
 							expect(count).toBeLessThanOrEqual(3)
 						);
-					} else {
+					} else if ('load_more' === method) {
 						perStep.forEach((count, i) =>
 							expect(count).toBeLessThanOrEqual(3 * (i + 1))
 						);
+					} else {
+						// One scroll step can load several pages; bound by the loads made.
+						expect(
+							(await rows(gallery)).rows.length
+						).toBeLessThanOrEqual(3 * (loads + 1));
 					}
 				}
 			);
