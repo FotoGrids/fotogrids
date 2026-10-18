@@ -153,7 +153,7 @@ class CollectionDefaultsStoreTest extends WP_UnitTestCase {
 		try {
 			Activator::maybe_upgrade();
 
-			$this->assertSame( '1.7', get_option( 'fotogrids_db_version' ) );
+			$this->assertSame( Activator::DB_VERSION, get_option( 'fotogrids_db_version' ) );
 			$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'gallery' ) );
 			$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
 			$this->assertFalse( $this->legacy_row_exists() );
@@ -161,7 +161,7 @@ class CollectionDefaultsStoreTest extends WP_UnitTestCase {
 			// The schema upgrade commits the test transaction; clean up by hand.
 			delete_option( self::LEGACY );
 			delete_option( Collection_Defaults_Store::OPTION );
-			update_option( 'fotogrids_db_version', '1.7' );
+			update_option( 'fotogrids_db_version', Activator::DB_VERSION );
 			$wpdb->query( 'COMMIT' );
 		}
 	}

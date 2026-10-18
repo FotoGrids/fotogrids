@@ -18,6 +18,15 @@ if ( ! defined( 'WPINC' ) ) {
 class Activator {
 
 	/**
+	 * Schema and data version. An install below it runs the table and
+	 * migration pass once.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const DB_VERSION = '1.8';
+
+	/**
 	 * Activate the plugin
 	 *
 	 * Performs all necessary setup tasks when the plugin is activated:
@@ -242,10 +251,11 @@ class Activator {
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
 		\FotoGrids\Migrations\Collection_Defaults_Split::run();
 		\FotoGrids\Migrations\List_Setting_Repair::run();
+		\FotoGrids\Migrations\Caption_Color_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.7' );
+		update_option( 'fotogrids_db_version', self::DB_VERSION );
 	}
 
 	/**
@@ -260,7 +270,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.7', '<' ) ) {
+		if ( version_compare( $current, self::DB_VERSION, '<' ) ) {
 			self::create_tables();
 		}
 
