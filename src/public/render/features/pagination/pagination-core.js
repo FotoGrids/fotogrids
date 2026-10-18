@@ -1023,8 +1023,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	function setSlicePlanner(galleryEl, planner) {
 		if (planner) {
 			planners.set(galleryEl, planner);
+			galleryEl.dataset.fgSlicePlanner = 'ready';
 		} else {
 			planners.delete(galleryEl);
+			delete galleryEl.dataset.fgSlicePlanner;
 		}
 	}
 
@@ -1214,6 +1216,12 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			if (strategyFor(gEl) !== 'server') {
 				snapshotCurrentView(gEl);
 			}
+			// Layouts that loaded first register their slice planner on this.
+			gEl.dispatchEvent(
+				new CustomEvent('fotogrids:pagination_attached', {
+					detail: { galleryEl: gEl },
+				})
+			);
 			const planned = gEl.dataset.fgSlicePlanned === 'true';
 			if (planned) {
 				return;

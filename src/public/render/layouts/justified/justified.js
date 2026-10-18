@@ -294,6 +294,7 @@ function planFor(collectionEl) {
 		rules: null,
 		rowEnds: null,
 		replanTimer: null,
+		justRegistered: false,
 		trimmed: [],
 		signature: '',
 		cache: new Map(),
@@ -336,6 +337,12 @@ function planFor(collectionEl) {
 		plan.poolActive = true;
 	});
 
+	collectionEl.addEventListener('fotogrids:pagination_attached', () => {
+		if (plan.geometry) {
+			registerPlanner(collectionEl, plan);
+		}
+	});
+
 	collectionEl.addEventListener('fotogrids:page_changed', (event) => {
 		const mode = event.detail && event.detail.mode;
 		if (mode === 'append' || mode === 'replace') {
@@ -344,6 +351,31 @@ function planFor(collectionEl) {
 	});
 
 	return plan;
+}
+
+/**
+ * Registers the gallery's planner with the pagination core once the core is
+ * available, re-planning on registration so totals follow the browser's cut.
+ *
+ * @param {HTMLElement} collectionEl
+ * @param {object}      plan
+ * @return {object|null} The pagination core, when available.
+ */
+function registerPlanner(collectionEl, plan) {
+	plan.justRegistered = false;
+	const pagination = paginationModule();
+	if (!pagination || typeof pagination.setSlicePlanner !== 'function') {
+		return null;
+	}
+	if (!plan.registered) {
+		plan.registered = true;
+		plan.justRegistered = true;
+		pagination.setSlicePlanner(collectionEl, plan.planner);
+		if (typeof pagination.replan === 'function') {
+			pagination.replan(collectionEl);
+		}
+	}
+	return pagination;
 }
 
 /**
@@ -395,23 +427,20 @@ function planPages(collectionEl, items, geometry, maxRows, trailing, lastRow) {
 		});
 	}
 
-	const pagination = paginationModule();
-	if (pagination && typeof pagination.setSlicePlanner === 'function') {
-		if (!plan.registered) {
-			plan.registered = true;
-			pagination.setSlicePlanner(collectionEl, plan.planner);
-			if (typeof pagination.replan === 'function') {
-				pagination.replan(collectionEl);
-			}
-		} else if (moved && typeof pagination.replan === 'function') {
-			if (plan.replanTimer) {
-				window.clearTimeout(plan.replanTimer);
-			}
-			plan.replanTimer = window.setTimeout(() => {
-				plan.replanTimer = null;
-				pagination.replan(collectionEl);
-			}, REPLAN_DELAY_MS);
+	const pagination = registerPlanner(collectionEl, plan);
+	if (
+		pagination &&
+		moved &&
+		!plan.justRegistered &&
+		typeof pagination.replan === 'function'
+	) {
+		if (plan.replanTimer) {
+			window.clearTimeout(plan.replanTimer);
 		}
+		plan.replanTimer = window.setTimeout(() => {
+			plan.replanTimer = null;
+			pagination.replan(collectionEl);
+		}, REPLAN_DELAY_MS);
 	}
 
 	return plan;
