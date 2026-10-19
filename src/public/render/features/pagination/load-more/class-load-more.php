@@ -89,6 +89,12 @@ final class Load_More implements Feature {
 			$wrapper_classes[] = 'fg-pagination--align-' . $align;
 		}
 
+		$total_pages = $render_context->meta->pagination_total_pages;
+		$current     = (int) ( $render_context->meta->requested_page ?? 1 );
+		if ( null !== $total_pages && $current >= $total_pages ) {
+			$wrapper_classes[] = 'fg-pagination--exhausted';
+		}
+
 		// Button carries both .fg-pagination__btn (base look from shared
 		// pagination.css) and .fg-pagination__load-more (structural hook for
 		// full-width + any load-more-only theming).

@@ -63,11 +63,14 @@ trait Pagination_Common {
 			return false;
 		}
 
-		// If total items <= page size, nothing to paginate.
-		return Page_Size_Resolver::should_paginate(
-			(int) ( $render_context->meta->total_item_count ?? count( $render_context->items ) ),
-			Page_Size_Resolver::resolve_page_size( $render_context->settings, $render_context )
-		);
+		$total     = (int) ( $render_context->meta->total_item_count ?? count( $render_context->items ) );
+		$page_size = Page_Size_Resolver::resolve_page_size( $render_context->settings, $render_context );
+
+		if ( Context_Builder::is_slice_planned( $render_context->settings, $render_context->meta ) ) {
+			return Context_Builder::planned_should_paginate( $total, $page_size, $render_context->settings );
+		}
+
+		return Page_Size_Resolver::should_paginate( $total, $page_size );
 	}
 
 	/**
@@ -137,18 +140,14 @@ trait Pagination_Common {
 			'data-fg-render-nonce'       => esc_attr( wp_create_nonce( 'wp_rest' ) ),
 		);
 
-		// pagination-core.js re-pages page 1 against these. Snap pagination
-		// sizes its pages from the measured width instead.
-		if ( ! Context_Builder::is_snap_pagination_active( $render_context->settings ) ) {
-			$attrs['data-fg-page-sizes'] = implode(
-				' ',
-				array(
-					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'desktop' ),
-					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'tablet' ),
-					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'mobile' ),
-				)
-			);
-		}
+		$attrs['data-fg-page-sizes'] = implode(
+			' ',
+			array(
+				Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'desktop' ),
+				Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'tablet' ),
+				Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'mobile' ),
+			)
+		);
 
 		// Random sort seed - pagination-core.js sends this back with
 		// every paginated request so paginated/filtered draws share the
