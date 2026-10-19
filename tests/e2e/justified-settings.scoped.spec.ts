@@ -55,3 +55,30 @@ test(
 		await expect(notice).toBeHidden();
 	}
 );
+
+test(
+	'SRT-03: Reorder only on a paginated justified gallery shows that it fetches a fresh order; Show All does not',
+	{ tag: ['@admin', '@settings', '@layout'] },
+	async ({ page }) => {
+		const panel = new CollectionSettings(page);
+		const notice = page.getByText(/Reorder fetches a fresh order here/i);
+		const random = {
+			layout: 'justified',
+			default_sort_order: 'random',
+			random_mode: 'reorder',
+		};
+
+		const paginated = galleryPage({
+			...random,
+			pagination_type: 'paginated',
+		});
+		await new GalleryEditor(page).open(paginated.id);
+		await panel.switchTab('sorting');
+		await expect(notice).toBeVisible();
+
+		const showAll = galleryPage({ ...random, pagination_type: 'show_all' });
+		await new GalleryEditor(page).open(showAll.id);
+		await panel.switchTab('sorting');
+		await expect(notice).toBeHidden();
+	}
+);
