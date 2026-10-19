@@ -691,7 +691,7 @@ final class Metabox_Registrar {
 				}
 			)
 		);
-		$featured_gallery_id = (int) get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
+		$featured_gallery_id = (int) get_post_meta( $post->ID, Post_Types::FEATURED_GALLERY_META_KEY, true );
 
 		wp_localize_script(
 			'fotogrids-album-galleries',

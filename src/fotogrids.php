@@ -90,6 +90,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-legacy-defaults-opt
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/options/class-option-registry.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-collection-defaults-split.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-list-setting-repair.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-featured-gallery-repair.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-entries-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-access-state.php';

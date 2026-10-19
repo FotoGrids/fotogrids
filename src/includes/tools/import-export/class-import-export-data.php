@@ -697,7 +697,8 @@ class Import_Export_Data {
 					Post_Types::ALBUM,
 					$options['albums'],
 					$attachments,
-					$embed_ids
+					$embed_ids,
+					$gallery_id_map
 				);
 				$imported['albums']   = $imp;
 				$skipped['albums']    = $skip;
@@ -766,6 +767,7 @@ class Import_Export_Data {
 
 			\FotoGrids\Cache\Metadata_Cache::forget_all();
 			\FotoGrids\Migrations\List_Setting_Repair::run();
+			\FotoGrids\Migrations\Featured_Gallery_Repair::run();
 
 			\FotoGrids\FotoGrids_Cache::flush_all();
 
@@ -913,8 +915,9 @@ class Import_Export_Data {
 	 * @param string            $conflict_mode 'skip' | 'overwrite' | 'duplicate'.
 	 * @param Attachment_Map    $attachments   The file's attachments on this site.
 	 * @param array<int, true>  $embed_ids     Exported embed IDs the import recreates.
+	 * @param array<int, int>   $gallery_map   Exported gallery ID => this site's gallery ID.
 	 */
-	private static function import_collections( array $posts, string $post_type, string $conflict_mode, Attachment_Map $attachments, array $embed_ids ): array {
+	private static function import_collections( array $posts, string $post_type, string $conflict_mode, Attachment_Map $attachments, array $embed_ids, array $gallery_map = array() ): array {
 		$imported = 0;
 		$skipped  = 0;
 		$id_map   = array();
@@ -928,6 +931,7 @@ class Import_Export_Data {
 			$status            = sanitize_key( $post_data['status'] ?? '' );
 			$date              = is_string( $post_data['date'] ?? null ) ? $post_data['date'] : '';
 			[ $meta, $embeds ] = self::local_media_meta( is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array(), $attachments, $embed_ids );
+			$meta              = self::local_featured_gallery( $meta, $gallery_map, $attachments->is_same_site() );
 
 			if ( ! in_array( $status, self::COLLECTION_STATUSES, true ) ) {
 				$status = 'publish';
@@ -994,6 +998,34 @@ class Import_Export_Data {
 		}
 
 		return array( $imported, $skipped, $id_map, $previous, $slots );
+	}
+
+	/**
+	 * Point an album's exported featured gallery at this site's gallery.
+	 *
+	 * An imported gallery takes its new ID. Any other ID is kept only in a file
+	 * exported from this site. `Featured_Gallery_Repair` then drops a pick that
+	 * is not one of the album's galleries.
+	 *
+	 * @since 1.3.0
+	 * @param array<string, mixed> $meta        Exported `fotogrids_*` post meta.
+	 * @param array<int, int>      $gallery_map Exported gallery ID => this site's gallery ID.
+	 * @param bool                 $same_site   Whether the file was exported from this site.
+	 * @return array<string, mixed>
+	 */
+	private static function local_featured_gallery( array $meta, array $gallery_map, bool $same_site ): array {
+		if ( ! array_key_exists( Post_Types::FEATURED_GALLERY_META_KEY, $meta ) ) {
+			return $meta;
+		}
+
+		$picked = is_scalar( $meta[ Post_Types::FEATURED_GALLERY_META_KEY ] ) ? (int) $meta[ Post_Types::FEATURED_GALLERY_META_KEY ] : 0;
+		if ( isset( $gallery_map[ $picked ] ) ) {
+			$meta[ Post_Types::FEATURED_GALLERY_META_KEY ] = $gallery_map[ $picked ];
+		} elseif ( ! $same_site || $picked <= 0 ) {
+			unset( $meta[ Post_Types::FEATURED_GALLERY_META_KEY ] );
+		}
+
+		return $meta;
 	}
 
 	/**

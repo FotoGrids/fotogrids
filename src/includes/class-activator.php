@@ -242,6 +242,7 @@ class Activator {
 		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
 		\FotoGrids\Migrations\Collection_Defaults_Split::run();
 		\FotoGrids\Migrations\List_Setting_Repair::run();
+		\FotoGrids\Migrations\Featured_Gallery_Repair::run();
 
 		do_action( Actions_System::ACTIVATE );
 
