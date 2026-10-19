@@ -135,6 +135,13 @@ class Import_Export_Tool extends Abstract_Tool {
 							'type' => 'string',
 							'enum' => array( 'skip', 'overwrite', 'duplicate' ),
 						),
+						'settings'  => array(
+							'type'  => 'array',
+							'items' => array(
+								'type' => 'string',
+								'enum' => Import_Export_Data::SETTINGS_KEYS,
+							),
+						),
 					),
 				),
 			)

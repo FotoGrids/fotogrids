@@ -146,9 +146,12 @@ class Public_Render {
 	/**
 	 * Re-enqueues the CSS and JS assets stored with a cache entry.
 	 *
+	 * Each asset is registered with the dependencies and version the original
+	 * render gave it, so WordPress prints the cached assets in the same order.
+	 *
 	 * @since  1.0.0
-	 * @param  array<string, string>                             $css Handle → URL map.
-	 * @param  array<string, array{src: string, in_footer: bool}> $js  Handle → metadata map.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string}>                  $css Handle → registration data.
+	 * @param  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}> $js  Handle → registration data.
 	 * @return void
 	 */
 	private static function replay_cached_assets( array $css, array $js ): void {
@@ -157,11 +160,11 @@ class Public_Render {
 		$already_js      = $resolver->get_js_asset_data();
 		$new_css_handles = array();
 
-		foreach ( $css as $handle => $src ) {
+		foreach ( $css as $handle => $meta ) {
 			if ( isset( $already_css[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_style( $handle, $src, array(), FOTOGRIDS_VERSION );
+			wp_register_style( $handle, $meta['src'], $meta['deps'], $meta['version'] );
 			wp_enqueue_style( $handle );
 			$new_css_handles[] = $handle;
 		}
@@ -174,7 +177,7 @@ class Public_Render {
 			if ( isset( $already_js[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_script( $handle, $meta['src'], array(), FOTOGRIDS_VERSION, $meta['in_footer'] );
+			wp_register_script( $handle, $meta['src'], $meta['deps'], $meta['version'], $meta['in_footer'] );
 			wp_enqueue_script( $handle );
 		}
 	}
@@ -532,11 +535,12 @@ class Public_Render {
 	 * Renders one gallery embed from shortcode attributes.
 	 *
 	 * @since 1.3.0
-	 * @param array|string $atts        Shortcode attributes.
-	 * @param string       $instance_id Instance ID to render with. Empty takes the next one.
+	 * @param array|string $atts           Shortcode attributes.
+	 * @param string       $instance_id    Instance ID to render with. Empty takes the next one.
+	 * @param array        $meta_overrides Render_Meta field overrides, such as via_album_id.
 	 * @return string Rendered gallery HTML
 	 */
-	public static function render_gallery_embed( $atts, string $instance_id = '' ) {
+	public static function render_gallery_embed( $atts, string $instance_id = '', array $meta_overrides = array() ) {
 		$atts = shortcode_atts(
 			array(
 				'id'                => 0,
@@ -664,7 +668,7 @@ class Public_Render {
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 		$resolver->begin_capture();
 		Font_Resolver::instance()->begin_capture();
-		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array( 'instance_id' => $instance_id ) );
+		$html   = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false, array_merge( $meta_overrides, array( 'instance_id' => $instance_id ) ) );
 		$fonts  = Font_Resolver::instance()->end_capture();
 		$assets = $resolver->end_capture();
 

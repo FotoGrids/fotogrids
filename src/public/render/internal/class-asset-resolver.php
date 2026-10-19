@@ -41,7 +41,7 @@ final class Asset_Resolver {
 	private static ?self $instance = null;
 
 	/**
-	 * CSS handles enqueued in any flush this request, mapped to their resolved URL.
+	 * CSS handles enqueued in any flush this request, with their registration data.
 	 *
 	 * Because the Asset_Resolver is a request-scoped singleton, multiple galleries
 	 * on the same page each call flush() after their own render. This map prevents
@@ -51,24 +51,24 @@ final class Asset_Resolver {
 	 * preview endpoint and cache replay both read after flush() has cleared the
 	 * per-render queue.
 	 *
-	 * @var array<string, string>  handle => resolved URL
+	 * @var array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private array $enqueued_css_handles = array();
 
 	/**
-	 * JS handles enqueued in any flush this request.
+	 * JS handles enqueued in any flush this request, with their registration data.
 	 *
-	 * Stored as handle => ['src' => string, 'in_footer' => bool] so the cache
-	 * replay path can re-register and re-enqueue them with correct metadata.
+	 * Carries everything wp_register_script() received, so the cache replay path
+	 * registers each script exactly as the original render did.
 	 *
-	 * @var array<string, array{src: string, in_footer: bool}>
+	 * @var array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>
 	 */
 	private array $enqueued_js_handles = array();
 
 	/**
 	 * Assets flushed since begin_capture(), or null when no capture is running.
 	 *
-	 * @var array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}|null
+	 * @var array{css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>}|null
 	 */
 	private ?array $capture = null;
 
@@ -162,7 +162,11 @@ final class Asset_Resolver {
 
 			wp_register_style( $handle, $css_asset['src'], $css_asset['deps'], $css_asset['version'] );
 			wp_enqueue_style( $handle );
-			$this->enqueued_css_handles[ $handle ] = $css_asset['src'];
+			$this->enqueued_css_handles[ $handle ] = array(
+				'src'     => $css_asset['src'],
+				'deps'    => array_values( $css_asset['deps'] ),
+				'version' => $css_asset['version'],
+			);
 			$new_css_handles[]                     = $handle;
 		}
 
@@ -183,6 +187,8 @@ final class Asset_Resolver {
 			wp_enqueue_script( $handle );
 			$this->enqueued_js_handles[ $handle ] = array(
 				'src'       => $js_asset['src'],
+				'deps'      => array_values( $js_asset['deps'] ),
+				'version'   => $js_asset['version'],
 				'in_footer' => $js_asset['in_footer'],
 			);
 			$new_js_handles[]                     = $handle;
@@ -210,6 +216,8 @@ final class Asset_Resolver {
 			foreach ( $this->js_queue as $handle => $js_asset ) {
 				$this->capture['js'][ $handle ] = array(
 					'src'       => $js_asset['src'],
+					'deps'      => array_values( $js_asset['deps'] ),
+					'version'   => $js_asset['version'],
 					'in_footer' => $js_asset['in_footer'],
 				);
 			}
@@ -237,7 +245,7 @@ final class Asset_Resolver {
 	 * Stops recording and returns the assets flushed since begin_capture().
 	 *
 	 * @since 1.3.0
-	 * @return array{css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}
+	 * @return array{css: array<string, array{src: string, deps: array<int, string>, version: string}>, js: array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>}
 	 */
 	public function end_capture(): array {
 		$captured      = $this->capture ?? array(
@@ -250,31 +258,40 @@ final class Asset_Resolver {
 	}
 
 	/**
-	 * Returns the stylesheets queued for the current render, keyed by handle.
+	 * Returns the stylesheets queued for the current render with their registration data, keyed by handle.
 	 *
 	 * @since 1.3.0
-	 * @return array<string, string> Handle → URL.
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	public function queued_css(): array {
-		return wp_list_pluck( $this->css_queue, 'src', 'handle' );
+		return array_map(
+			static function ( array $css_asset ): array {
+				return array(
+					'src'     => $css_asset['src'],
+					'deps'    => array_values( $css_asset['deps'] ),
+					'version' => $css_asset['version'],
+				);
+			},
+			$this->css_queue
+		);
 	}
 
 	/**
-	 * Enqueues stylesheets from a stored handle → URL map and records them as enqueued.
+	 * Enqueues stored stylesheets with their dependencies and version, and records them as enqueued.
 	 *
 	 * @since 1.3.0
-	 * @param array<string, string> $css Handle → URL.
+	 * @param array<string, array{src: string, deps: array<int, string>, version: string}> $css Handle → registration data.
 	 * @return void
 	 */
 	public function replay_styles( array $css ): void {
 		$new_css_handles = array();
-		foreach ( $css as $handle => $src ) {
+		foreach ( $css as $handle => $css_asset ) {
 			if ( isset( $this->enqueued_css_handles[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_style( $handle, $src, array(), FOTOGRIDS_VERSION );
+			wp_register_style( $handle, $css_asset['src'], $css_asset['deps'], $css_asset['version'] );
 			wp_enqueue_style( $handle );
-			$this->enqueued_css_handles[ $handle ] = $src;
+			$this->enqueued_css_handles[ $handle ] = $css_asset;
 			$new_css_handles[]                     = $handle;
 		}
 
@@ -340,18 +357,24 @@ final class Asset_Resolver {
 	 * @return  array<string, string>
 	 */
 	public function get_css_asset_urls(): array {
-		return $this->enqueued_css_handles;
+		return array_map(
+			static function ( array $css_asset ): string {
+				return $css_asset['src'];
+			},
+			$this->enqueued_css_handles
+		);
 	}
 
 	/**
 	 * Returns JS asset metadata keyed by handle for all assets enqueued this request.
 	 *
-	 * Each entry is an array with 'src' (string) and 'in_footer' (bool). Reads
-	 * from $enqueued_js_handles so the data is available after flush() has cleared
-	 * the per-render queue - the same pattern as get_css_asset_urls().
+	 * Each entry carries 'src', 'deps', 'version' and 'in_footer' - the arguments
+	 * the script was registered with. Reads from $enqueued_js_handles so the data
+	 * is available after flush() has cleared the per-render queue - the same
+	 * pattern as get_css_asset_urls().
 	 *
 	 * @since   1.0.0
-	 * @return  array<string, array{src: string, in_footer: bool}>
+	 * @return  array<string, array{src: string, deps: array<int, string>, version: string, in_footer: bool}>
 	 */
 	public function get_js_asset_data(): array {
 		return $this->enqueued_js_handles;

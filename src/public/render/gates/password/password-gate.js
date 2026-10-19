@@ -11,7 +11,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	/**
 	 * Adds a <script> for each handle not already in the document.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+	 * @param {Record<string, {src: string, deps: string[], version: string, in_footer: boolean}>} jsData
 	 * @return {Promise} Settles once every added script has loaded or failed.
 	 */
 	function injectMissingScripts(jsData) {
@@ -154,7 +154,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
-	 * Builds the unlock request body, including the embed attributes the lock form carries.
+	 * Builds the unlock request body, including the embed attributes and visit-context album the lock form carries.
 	 *
 	 * @param {HTMLFormElement} form
 	 * @param {string}          password
@@ -172,6 +172,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 		if (form.dataset.fgEmbedTemplate) {
 			body.template = form.dataset.fgEmbedTemplate;
+		}
+		const viaAlbumId = parseInt(form.dataset.fgViaAlbum || '0', 10);
+		if (viaAlbumId > 0) {
+			body.via_album_id = viaAlbumId;
 		}
 		return body;
 	}
