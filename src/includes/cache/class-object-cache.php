@@ -10,18 +10,14 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Generic object-cache primitive.
  *
- * A thin, reusable wrapper around the WordPress object cache (wp_cache_*),
- * scoped to a single cache group, with a version-salt namespacing scheme for
- * cheap, backend-agnostic group invalidation.
- *
- * Why the version salt instead of wp_cache_flush_group(): flush_group() is not
- * implemented by every persistent object-cache backend, and is a no-op without
- * one. Instead, every key is namespaced by an integer "version" stored in the
- * cache itself. Bumping that version orphans every previously written key in a
- * single write, which works identically on all backends.
+ * A thin wrapper around the WordPress object cache (wp_cache_*), scoped to a
+ * single cache group. Every key is namespaced by a salt stored in the group, so
+ * replacing the salt invalidates the whole group in one write on any backend.
+ * A missing salt is replaced with a fresh one, never a previous value, so keys
+ * written before the salt was lost stay unreachable.
  *
  * Without a persistent object cache, wp_cache_* is per-request only, so this
- * still safely de-duplicates repeated reads within a single request.
+ * still de-duplicates repeated reads within a single request.
  *
  * Compose this (do not extend it) from a domain cache class - see
  * Metadata_Cache for the canonical example.
@@ -46,11 +42,11 @@ class Object_Cache {
 	private int $ttl;
 
 	/**
-	 * Cache key (within the group) that holds the current version salt.
+	 * Cache key (within the group) that holds the current namespace salt.
 	 *
 	 * @var string
 	 */
-	private string $version_key;
+	private string $salt_key;
 
 	/**
 	 * @since 1.0.0
@@ -58,9 +54,9 @@ class Object_Cache {
 	 * @param int    $ttl   Default entry TTL in seconds. 0 = persist until invalidated.
 	 */
 	public function __construct( string $group, int $ttl = 0 ) {
-		$this->group       = $group;
-		$this->ttl         = $ttl;
-		$this->version_key = $group . '_version';
+		$this->group    = $group;
+		$this->ttl      = $ttl;
+		$this->salt_key = $group . '_salt';
 	}
 
 	/**
@@ -125,42 +121,57 @@ class Object_Cache {
 	}
 
 	/**
-	 * Invalidate every key in this group by bumping the version salt.
+	 * Invalidate every key in this group by replacing the namespace salt.
 	 *
-	 * Cheap (one write) and backend-agnostic. Previously written keys become
-	 * unreachable rather than being individually deleted.
+	 * Previously written keys become unreachable rather than being
+	 * individually deleted, and expire on their own TTL.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	public function flush_namespace(): void {
-		$version = $this->version() + 1;
-		wp_cache_set( $this->version_key, $version, $this->group, 0 );
+		wp_cache_set( $this->salt_key, self::new_salt(), $this->group, 0 );
 	}
 
 	/**
-	 * Current namespace version salt, lazily initialised to 1.
+	 * Current namespace salt, created on first use and whenever the stored
+	 * one is missing.
 	 *
-	 * @since 1.0.0
-	 * @return int
+	 * Backends differ in the type they return for a stored scalar, so any
+	 * non-empty scalar is accepted and compared as a string.
+	 *
+	 * @since 1.3.0
+	 * @return string
 	 */
-	private function version(): int {
-		$version = wp_cache_get( $this->version_key, $this->group );
-		if ( ! is_int( $version ) ) {
-			$version = 1;
-			wp_cache_set( $this->version_key, $version, $this->group, 0 );
+	private function salt(): string {
+		$salt = wp_cache_get( $this->salt_key, $this->group );
+		if ( is_scalar( $salt ) && '' !== (string) $salt ) {
+			return (string) $salt;
 		}
-		return $version;
+
+		$salt = self::new_salt();
+		wp_cache_set( $this->salt_key, $salt, $this->group, 0 );
+		return $salt;
 	}
 
 	/**
-	 * Build the version-namespaced storage key for a logical key.
+	 * Generate a namespace salt that does not repeat an earlier one.
+	 *
+	 * @since 1.3.0
+	 * @return string
+	 */
+	private static function new_salt(): string {
+		return substr( md5( microtime() . wp_rand() ), 0, 12 );
+	}
+
+	/**
+	 * Build the salt-namespaced storage key for a logical key.
 	 *
 	 * @since 1.0.0
 	 * @param string $key Logical key.
 	 * @return string
 	 */
 	private function namespaced_key( string $key ): string {
-		return 'v' . $this->version() . '_' . $key;
+		return 's' . $this->salt() . '_' . $key;
 	}
 }
