@@ -133,19 +133,20 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 
 	/**
 	 * Replaces the collection's items with the ones in an items_only
-	 * response and announces them.
+	 * response.
 	 *
-	 * @param {Element} collectionEl
 	 * @param {Element} root
 	 * @param {{html: string, css: Record<string,string>}} payload
+	 * @return {Element[]|null} The inserted items, or null when the response
+	 *         holds no items and the current ones stay.
 	 */
-	function applyItems(collectionEl, root, payload) {
+	function applyItems(root, payload) {
 		if (
 			!payload ||
 			typeof payload.html !== 'string' ||
 			'' === payload.html
 		) {
-			return;
+			return null;
 		}
 
 		injectMissingStyles(payload.css || {});
@@ -168,7 +169,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			0 === incoming.length ||
 			!template.content.querySelector('.fg-item')
 		) {
-			return;
+			return null;
 		}
 
 		root.innerHTML = '';
@@ -178,10 +179,20 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			inserted.push(node);
 		});
 
+		return inserted;
+	}
+
+	/**
+	 * Announces swapped-in items so per-item modules re-bind.
+	 *
+	 * @param {Element}   collectionEl
+	 * @param {Element[]} items
+	 */
+	function announceItems(collectionEl, items) {
 		collectionEl.dispatchEvent(
 			new CustomEvent('fotogrids:items_inserted', {
 				bubbles: true,
-				detail: { items: inserted, galleryEl: collectionEl },
+				detail: { items, galleryEl: collectionEl },
 			})
 		);
 	}
@@ -213,8 +224,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * Requests a fresh random selection and swaps it in, holding the items
 	 * hidden until it lands.
 	 *
-	 * The minted seed is written back onto the wrapper so pagination and the
-	 * Lightbox draw their later requests from the same permutation.
+	 * The minted seed is written onto the wrapper once its items are on
+	 * screen, so pagination and the Lightbox draw later requests from the
+	 * order the visitor sees. A late, failed or itemless response leaves the
+	 * server's seed with the server's order.
 	 *
 	 * @param {Element} collectionEl
 	 * @param {Element} root
@@ -228,7 +241,6 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 
 		const seed = mintSeed();
-		collectionEl.dataset.fgRandomSeed = String(seed);
 
 		const breakpoint =
 			window.FotoGrids && window.FotoGrids.activeBreakpoint
@@ -285,10 +297,16 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			.then(function (payload) {
 				// A response that arrives after the hold expired is dropped:
 				// the visitor is already looking at the server order.
-				if (!settled) {
-					applyItems(collectionEl, root, payload);
-					adoptIntoPagination(collectionEl, payload, breakpoint);
+				if (settled) {
+					return;
 				}
+				const inserted = applyItems(root, payload);
+				if (!inserted) {
+					return;
+				}
+				collectionEl.dataset.fgRandomSeed = String(seed);
+				announceItems(collectionEl, inserted);
+				adoptIntoPagination(collectionEl, payload, breakpoint);
 			})
 			.catch(function () {
 				/* Server order stands. */

@@ -307,14 +307,15 @@ describe('random-sort', () => {
 			).toBe('');
 		});
 
-		it('mints a fresh seed and sends it so later requests share the permutation', () => {
+		it('mints a fresh seed, sends it, and writes it once its items are shown', async () => {
 			const { collection } = makeCollection(['a', 'b', 'c'], {
 				mode: 'refetch',
 			});
-			stubFetch({ html: itemsMarkup(['x']) });
+			const server = stubFetch({ html: itemsMarkup(['x']) });
 
 			loadModule();
 			window.FotoGrids.boot();
+			await server.settle();
 
 			const body = JSON.parse(window.fetch.mock.calls[0][1].body);
 
