@@ -50,6 +50,41 @@ async function alterRefetch(page: Page, outcome: Refetch): Promise<void> {
 	});
 }
 
+/** The browser logs the altered refetch's 403 or network error. */
+const LOGS_ERROR: Refetch[] = ['http 403', 'network error'];
+
+/**
+ * Declares a test for one refetch outcome. Outcomes that make the browser log
+ * the failed request opt out of the console guard, and assert instead that
+ * the page threw no exception.
+ */
+function outcomeTest(
+	outcome: Refetch,
+	title: string,
+	tag: string[],
+	body: (page: Page) => Promise<void>
+): void {
+	const declare = () =>
+		test(title, { tag }, async ({ page }) => {
+			const thrown: string[] = [];
+			page.on('pageerror', (error) => thrown.push(error.message));
+			await body(page);
+			expect(thrown).toEqual([]);
+		});
+
+	if (!LOGS_ERROR.includes(outcome)) {
+		declare();
+		return;
+	}
+	test.describe(() => {
+		test.use({
+			allowConsoleErrors:
+				'the refetch is answered with an error, which the browser logs',
+		});
+		declare();
+	});
+}
+
 function randomGallery(settings: Record<string, unknown>) {
 	return galleryPage(
 		{
@@ -98,10 +133,11 @@ function repeatsAndMissing(seen: number[]) {
 
 test.describe('random refetch: Load More', () => {
 	for (const outcome of OUTCOMES) {
-		test(
+		outcomeTest(
+			outcome,
 			`RND-01: refetch ${outcome} - loading every page shows each item once`,
-			{ tag: ['@layout', ...('late' === outcome ? ['@critical'] : [])] },
-			async ({ page }) => {
+			['@layout', ...('late' === outcome ? ['@critical'] : [])],
+			async (page) => {
 				const { id, url } = randomGallery({
 					pagination_method: 'load_more',
 				});
@@ -129,10 +165,11 @@ test.describe('random refetch: Load More', () => {
 
 test.describe('random refetch: page buttons', () => {
 	for (const outcome of ['late', 'http 403'] as Refetch[]) {
-		test(
+		outcomeTest(
+			outcome,
 			`RND-02: refetch ${outcome} - the five pages together hold each item once`,
-			{ tag: '@layout' },
-			async ({ page }) => {
+			['@layout'],
+			async (page) => {
 				const { id, url } = randomGallery({
 					pagination_method: 'pages',
 					pages_truncate: false,
