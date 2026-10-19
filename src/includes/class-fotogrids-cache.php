@@ -33,7 +33,6 @@ class FotoGrids_Cache {
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	private const OBJECT_CACHE_GROUP = 'fotogrids_render';
-	private const OBJECT_CACHE_TTL   = 0;
 
 	/**
 	 * Envelope schema version. Entries below this are treated as a miss, so an
@@ -57,7 +56,7 @@ class FotoGrids_Cache {
 	 */
 	private static function l1(): \FotoGrids\Cache\Object_Cache {
 		if ( null === self::$l1 ) {
-			self::$l1 = new \FotoGrids\Cache\Object_Cache( self::OBJECT_CACHE_GROUP, self::OBJECT_CACHE_TTL );
+			self::$l1 = new \FotoGrids\Cache\Object_Cache( self::OBJECT_CACHE_GROUP );
 		}
 		return self::$l1;
 	}
@@ -226,7 +225,7 @@ class FotoGrids_Cache {
 			return false;
 		}
 
-		self::l1()->set( $cache_key, $row->html );
+		self::l1()->set( $cache_key, $row->html, self::l1_ttl( self::entry_expiry( (string) $row->html ) ) );
 
 		return $decoded;
 	}
@@ -291,7 +290,7 @@ class FotoGrids_Cache {
 		);
 
 		if ( false !== $result ) {
-			self::l1()->set( $cache_key, $payload );
+			self::l1()->set( $cache_key, $payload, self::l1_ttl( $expires_ts ) );
 		}
 
 		return false !== $result;
@@ -620,6 +619,32 @@ class FotoGrids_Cache {
 			),
 			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 		);
+	}
+
+	/**
+	 * Expiry timestamp stored in an encoded entry, in the local frame put() writes.
+	 *
+	 * @since  1.3.0
+	 * @param  string $stored Encoded entry.
+	 * @return int 0 when the entry carries no expiry.
+	 */
+	private static function entry_expiry( string $stored ): int {
+		$decoded = json_decode( $stored, true );
+		return is_array( $decoded ) ? (int) ( $decoded['expires_at'] ?? 0 ) : 0;
+	}
+
+	/**
+	 * Object-cache lifetime in seconds for an entry expiring at $expires_ts.
+	 *
+	 * Capped at 30 days: Memcached reads a longer expiry as a Unix timestamp.
+	 *
+	 * @since  1.3.0
+	 * @param  int $expires_ts Expiry timestamp in the local frame put() writes.
+	 * @return int
+	 */
+	private static function l1_ttl( int $expires_ts ): int {
+		$remaining = $expires_ts - current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- same local frame as the expiry written by put().
+		return min( max( 1, $remaining ), MONTH_IN_SECONDS );
 	}
 
 	/**

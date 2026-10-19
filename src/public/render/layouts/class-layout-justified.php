@@ -8,6 +8,7 @@ use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
+use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Item_Renderer;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -99,12 +100,22 @@ final class Layout_Justified implements Layout {
 			$page_trailing_row = 'fill';
 		}
 
-		return array(
+		$attrs = array(
 			'data-fg-justified-tolerance'         => (string) $tolerance,
 			'data-fg-justified-last-row'          => (string) $last_row,
 			'data-fg-justified-max-rows'          => (string) $max_rows,
 			'data-fg-justified-page-trailing-row' => (string) $page_trailing_row,
 		);
+
+		if ( Context_Builder::is_slice_planned( $settings, $render_context->meta ) ) {
+			$attrs['data-fg-slice-planned']            = 'true';
+			$attrs['data-fg-aspects']                  = implode( ',', $render_context->meta->sequence_aspects );
+			$attrs['data-fg-justified-snap-window']    = (string) (float) ( $settings['layout_justified_snap_window'] ?? 20 );
+			$attrs['data-fg-justified-snap-threshold'] = (string) (float) ( $settings['layout_justified_snap_fill_threshold'] ?? 85 );
+			$attrs['data-fg-justified-snap-direction'] = (string) ( $settings['layout_justified_snap_direction'] ?? 'auto' );
+		}
+
+		return $attrs;
 	}
 
 	/**

@@ -137,17 +137,35 @@ test.describe( 'library stat cards', () => {
 				return chart ? chart.data.labels : [];
 			} );
 
-		await page.goto( LIBRARY );
-		await page.getByRole( 'button', { name: 'Add Tag' } ).click();
-		await page.fill( '#fg-library-create-name', before );
-		await page.getByRole( 'button', { name: 'Create', exact: true } ).click();
-		await expect.poll( chartLabels ).toContain( before );
+		// The chart lists the most-used tags, so the tag is put on every F-large item
+		// to rank first however many tags the fixtures seed.
+		const items = fixture< number[] >( 'F-large', 'items' );
+		wpEval( `
+			foreach ( array( ${ items.join( ', ' ) } ) as $id ) {
+				FotoGrids\\Metadata_Manager::add_tag_to_item( $id, '${ before }' );
+			}
+		` );
 
-		await row( page, before ).locator( '.fotogrids-library-name-button' ).click();
-		await page.locator( '.fotogrids-library-table tbody input[type=text]' ).first().fill( after );
-		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
-		await expect.poll( chartLabels ).toContain( after );
-		expect( await chartLabels() ).not.toContain( before );
+		try {
+			await page.goto( LIBRARY );
+			await expect.poll( chartLabels ).toContain( before );
+
+			await row( page, before ).locator( '.fotogrids-library-name-button' ).click();
+			await page.locator( '.fotogrids-library-table tbody input[type=text]' ).first().fill( after );
+			await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+			await expect.poll( chartLabels ).toContain( after );
+			expect( await chartLabels() ).not.toContain( before );
+		} finally {
+			wpEval( `
+				global $wpdb;
+				$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}fotogrids_tags WHERE name IN ( %s, %s )", '${ before }', '${ after }' ) );
+				foreach ( $ids as $tag_id ) {
+					foreach ( array( ${ items.join( ', ' ) } ) as $id ) {
+						FotoGrids\\Metadata_Manager::remove_metadata_from_item( $id, 'tag', (int) $tag_id );
+					}
+				}
+			` );
+		}
 	} );
 } );
 

@@ -48,7 +48,7 @@ class Metadata_Cache {
 	 */
 	private static function store(): Object_Cache {
 		if ( null === self::$store ) {
-			self::$store = new Object_Cache( self::GROUP, 0 );
+			self::$store = new Object_Cache( self::GROUP, DAY_IN_SECONDS );
 		}
 		return self::$store;
 	}
