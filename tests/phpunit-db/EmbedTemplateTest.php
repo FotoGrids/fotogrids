@@ -143,10 +143,16 @@ class EmbedTemplateTest extends WP_UnitTestCase {
 
 	/** The non-empty string cases; the route schema rejects the rest before validation. */
 	public static function route_cases(): array {
-		return array_filter(
+		$cases = array_filter(
 			self::value_cases(),
 			static fn ( array $case ) => is_string( $case[0] ) && '' !== $case[0]
 		);
+
+		$cases['mixed case']               = array( 'Masonry', true, true );
+		$cases['upper case, gallery only'] = array( 'SLIDER', true, false );
+		$cases['padded']                   = array( ' grid ', true, true );
+
+		return $cases;
 	}
 
 	/**
@@ -167,6 +173,8 @@ class EmbedTemplateTest extends WP_UnitTestCase {
 		}
 		$cases['unregistered'] = array( 'kaleidoscope', 'justified' );
 		$cases['padded']       = array( ' masonry ', 'masonry' );
+		$cases['mixed case']   = array( 'Masonry', 'masonry' );
+		$cases['upper case']   = array( 'SLIDER', 'slider' );
 		$cases['empty']        = array( '', 'justified' );
 
 		return $cases;
@@ -198,9 +206,11 @@ class EmbedTemplateTest extends WP_UnitTestCase {
 		foreach ( self::PRO_ONLY as $layout ) {
 			$cases[ $layout . ' (Pro)' ] = array( $layout, 'justified' );
 		}
-		$cases['unregistered'] = array( 'kaleidoscope', 'justified' );
-		$cases['padded']       = array( ' masonry ', 'masonry' );
-		$cases['empty']        = array( '', 'justified' );
+		$cases['unregistered']             = array( 'kaleidoscope', 'justified' );
+		$cases['padded']                   = array( ' masonry ', 'masonry' );
+		$cases['upper case']               = array( 'MASONRY', 'masonry' );
+		$cases['mixed case, gallery only'] = array( 'Slider', 'justified' );
+		$cases['empty']                    = array( '', 'justified' );
 
 		return $cases;
 	}
@@ -220,6 +230,8 @@ class EmbedTemplateTest extends WP_UnitTestCase {
 	public static function lock_form_cases(): array {
 		return array(
 			'gallery, offered'      => array( 'gallery', 'masonry', 'masonry' ),
+			'gallery, mixed case'   => array( 'gallery', 'Masonry', 'masonry' ),
+			'album, upper case'     => array( 'album', 'GRID', 'grid' ),
 			'gallery, gallery-only' => array( 'gallery', 'slider', 'slider' ),
 			'gallery, unregistered' => array( 'gallery', 'kaleidoscope', null ),
 			'gallery, Pro'          => array( 'gallery', 'carousel', null ),

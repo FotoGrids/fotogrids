@@ -212,7 +212,7 @@ class Public_Render {
 	 */
 	private static function gallery_settings_overlay( $atts ): array {
 		$settings_overlay = array();
-		$template         = is_string( $atts['template'] ?? null ) ? sanitize_text_field( $atts['template'] ) : '';
+		$template         = self::embed_template( $atts['template'] ?? null );
 		if ( self::is_layout_key( $template, 'gallery' ) ) {
 			$settings_overlay['layout'] = $template;
 		}
@@ -331,7 +331,7 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
-		$template       = is_string( $atts['template'] ) ? sanitize_text_field( $atts['template'] ) : '';
+		$template       = self::embed_template( $atts['template'] );
 		if ( self::is_layout_key( $template, 'album' ) ) {
 			$album_settings['layout'] = $template;
 		}
@@ -422,6 +422,18 @@ class Public_Render {
 		}
 
 		return (string) $render_result->html;
+	}
+
+	/**
+	 * Returns an embed's `template` attribute as a candidate layout key:
+	 * sanitized and lower-cased.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $template Attribute value.
+	 * @return string
+	 */
+	public static function embed_template( $template ): string {
+		return is_string( $template ) ? strtolower( sanitize_text_field( $template ) ) : '';
 	}
 
 	/**
@@ -787,7 +799,7 @@ class Public_Render {
 			$album_settings['enable_statistics'] = false;
 		}
 
-		$template = is_string( $atts['template'] ) ? sanitize_text_field( $atts['template'] ) : '';
+		$template = self::embed_template( $atts['template'] );
 		if ( self::is_layout_key( $template, 'album' ) ) {
 			$album_settings['layout']      = $template;
 			$album_settings['_embed_atts'] = array( 'template' => $template );

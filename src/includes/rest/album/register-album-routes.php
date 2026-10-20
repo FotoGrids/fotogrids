@@ -108,7 +108,7 @@ class Register_Album_Routes {
 							'type'              => 'string',
 							'default'           => '',
 							'validate_callback' => function ( $param ) {
-								return '' === $param || \FotoGrids\Public_Render::is_layout_key( $param, 'album' );
+								return '' === $param || \FotoGrids\Public_Render::is_layout_key( \FotoGrids\Public_Render::embed_template( $param ), 'album' );
 							},
 						),
 					),
