@@ -34,12 +34,14 @@ final class Install extends Abstract_Option_Declaration {
 	 */
 	public static function options(): array {
 		return array(
-			'fotogrids_activated_time'   => self::KEEP,
-			'fotogrids_caps_version'     => self::KEEP,
-			'fotogrids_db_version'       => self::KEEP,
-			'fotogrids_deactivated_time' => self::KEEP,
-			'fotogrids_site_id'          => self::KEEP,
-			'fotogrids_version'          => self::KEEP,
+			'fotogrids_activated_time'       => self::KEEP,
+			'fotogrids_caps_version'         => self::KEEP,
+			'fotogrids_completed_migrations' => self::KEEP,
+			'fotogrids_db_version'           => self::KEEP,
+			'fotogrids_deactivated_time'     => self::KEEP,
+			'fotogrids_migration_lock'       => self::KEEP,
+			'fotogrids_site_id'              => self::KEEP,
+			'fotogrids_version'              => self::KEEP,
 		);
 	}
 }

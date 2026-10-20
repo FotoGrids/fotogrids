@@ -88,9 +88,12 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-legacy-defaults-option.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/options/class-option-registry.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-collection-defaults-split.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-list-setting-repair.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-featured-gallery-repair.php';
+// Upgrade migrations: every class-*.php under includes/migrations/, run once each by Migration_Runner.
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/interface-migration.php';
+foreach ( glob( FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-*.php' ) ?: array() as $fotogrids_migration_file ) {
+	require_once $fotogrids_migration_file;
+}
+unset( $fotogrids_migration_file );
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-entries-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-access-state.php';
@@ -108,7 +111,6 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/assets/class-collection-settings-a
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-items.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-item-meta.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-item-meta-consolidation.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-embed-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-strings.php';

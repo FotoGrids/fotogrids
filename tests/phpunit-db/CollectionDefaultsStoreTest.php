@@ -8,6 +8,7 @@
 
 use FotoGrids\Activator;
 use FotoGrids\Migrations\Collection_Defaults_Split;
+use FotoGrids\Migrations\Migration_Runner;
 use FotoGrids\Settings\Collection_Defaults_Store;
 
 class CollectionDefaultsStoreTest extends WP_UnitTestCase {
@@ -127,43 +128,57 @@ class CollectionDefaultsStoreTest extends WP_UnitTestCase {
 		};
 		add_filter( 'pre_update_option_' . Collection_Defaults_Store::OPTION, $block, 10, 2 );
 
-		Collection_Defaults_Split::run();
-
-		remove_filter( 'pre_update_option_' . Collection_Defaults_Store::OPTION, $block, 10 );
-		$this->assertTrue( $this->legacy_row_exists() );
+		try {
+			Collection_Defaults_Split::run();
+			$this->fail( 'the split reported success without writing the copy' );
+		} catch ( RuntimeException $e ) {
+			$this->assertTrue( $this->legacy_row_exists() );
+		} finally {
+			remove_filter( 'pre_update_option_' . Collection_Defaults_Store::OPTION, $block, 10 );
+		}
 
 		Collection_Defaults_Split::run();
 		$this->assertFalse( $this->legacy_row_exists() );
 		$this->assertSame( array( 'layout' => 'justified' ), Collection_Defaults_Store::get( 'gallery' ) );
 	}
 
-	public function test_reading_the_defaults_moves_a_shared_map_left_behind(): void {
+	public function test_reading_the_defaults_leaves_a_shared_map_for_the_upgrade(): void {
 		$this->plant_legacy( array( 'layout' => 'slider' ) );
 
-		$this->assertSame( array( 'layout' => 'slider' ), Collection_Defaults_Store::get( 'album' ) );
-		$this->assertFalse( $this->legacy_row_exists() );
+		$this->assertSame( array(), Collection_Defaults_Store::get( 'album' ) );
+		$this->assertTrue( $this->legacy_row_exists() );
 	}
 
-	public function test_the_upgrade_moves_the_shared_map(): void {
-		global $wpdb;
-
+	public function test_the_upgrade_moves_the_shared_map_once(): void {
 		$this->plant_legacy( array( 'layout' => 'masonry' ) );
-		update_option( 'fotogrids_db_version', '1.6' );
+		update_option( Migration_Runner::RECORD_OPTION, array_values( array_diff( Migration_Runner::completed(), array( Collection_Defaults_Split::id() ) ) ) );
 
-		try {
-			Activator::maybe_upgrade();
+		Activator::maybe_upgrade();
 
-			$this->assertSame( '1.7', get_option( 'fotogrids_db_version' ) );
-			$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'gallery' ) );
-			$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
-			$this->assertFalse( $this->legacy_row_exists() );
-		} finally {
-			// The schema upgrade commits the test transaction; clean up by hand.
-			delete_option( self::LEGACY );
-			delete_option( Collection_Defaults_Store::OPTION );
-			update_option( 'fotogrids_db_version', '1.7' );
-			$wpdb->query( 'COMMIT' );
-		}
+		$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'gallery' ) );
+		$this->assertSame( array( 'layout' => 'masonry' ), Collection_Defaults_Store::get( 'album' ) );
+		$this->assertFalse( $this->legacy_row_exists() );
+		$this->assertContains( Collection_Defaults_Split::id(), Migration_Runner::completed() );
+	}
+
+	public function test_an_upgrade_that_cannot_write_the_copy_leaves_the_move_pending(): void {
+		$this->plant_legacy( array( 'layout' => 'masonry' ) );
+		update_option( Migration_Runner::RECORD_OPTION, array_values( array_diff( Migration_Runner::completed(), array( Collection_Defaults_Split::id() ) ) ) );
+		$block = static function ( $value, $old_value ) {
+			return $old_value;
+		};
+		add_filter( 'pre_update_option_' . Collection_Defaults_Store::OPTION, $block, 10, 2 );
+
+		Activator::maybe_upgrade();
+		remove_filter( 'pre_update_option_' . Collection_Defaults_Store::OPTION, $block, 10 );
+
+		$this->assertTrue( $this->legacy_row_exists() );
+		$this->assertNotContains( Collection_Defaults_Split::id(), Migration_Runner::completed() );
+
+		Activator::maybe_upgrade();
+
+		$this->assertFalse( $this->legacy_row_exists() );
+		$this->assertContains( Collection_Defaults_Split::id(), Migration_Runner::completed() );
 	}
 
 	public function test_the_old_option_name_reads_the_gallery_defaults(): void {

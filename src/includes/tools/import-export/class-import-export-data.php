@@ -4,7 +4,7 @@ namespace FotoGrids\Tools\ImportExport;
 use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
-use FotoGrids\Galleries\Item_Meta_Consolidation;
+use FotoGrids\Migrations\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Post_Types;
 use FotoGrids\REST\Items\Embed_Data;
@@ -766,8 +766,8 @@ class Import_Export_Data {
 			}
 
 			\FotoGrids\Cache\Metadata_Cache::forget_all();
-			\FotoGrids\Migrations\List_Setting_Repair::run();
-			\FotoGrids\Migrations\Featured_Gallery_Repair::run();
+			\FotoGrids\Migrations\List_Setting_Repair::repair_imported( array_merge( array_values( $gallery_id_map ), array_values( $album_id_map ) ) );
+			\FotoGrids\Migrations\Featured_Gallery_Repair::repair_albums( array_values( $album_id_map ) );
 
 			\FotoGrids\FotoGrids_Cache::flush_all();
 
@@ -1004,8 +1004,8 @@ class Import_Export_Data {
 	 * Point an album's exported featured gallery at this site's gallery.
 	 *
 	 * An imported gallery takes its new ID. Any other ID is kept only in a file
-	 * exported from this site. `Featured_Gallery_Repair` then drops a pick that
-	 * is not one of the album's galleries.
+	 * exported from this site. `Featured_Gallery_Repair::repair_albums()` then
+	 * drops a pick that is not one of the album's galleries.
 	 *
 	 * @since 1.3.0
 	 * @param array<string, mixed> $meta        Exported `fotogrids_*` post meta.
