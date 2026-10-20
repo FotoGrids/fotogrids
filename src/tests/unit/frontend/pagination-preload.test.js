@@ -539,6 +539,9 @@ describe('timing (§5)', () => {
 
 		await loadMore(gallery);
 		expect(requestedPages()).toEqual([2]);
+
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		expect(requestedPages()).toEqual([2, 3]);
 	});
 
 	it('TIM-07: a click on an in-flight preload that then fails falls back to one fresh request', async () => {
