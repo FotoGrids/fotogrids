@@ -176,21 +176,25 @@ final class Layout_Wrapper_Composer {
 	/**
 	 * `enforces_item_box` capability.
 	 *
-	 * Stamps the aspect-ratio + object-fit variables that drive the
-	 * fixed item-box behaviour in base CSS. When the aspect ratio
-	 * resolves to empty (the user chose "None"), stamps
-	 * data-fg-natural-ratio so base CSS opts the wrapper out of the
-	 * fixed-box rules entirely.
+	 * Stamps the aspect-ratio + object-fit variables. When the aspect
+	 * ratio resolves to empty (the user chose "None"), stamps
+	 * data-fg-natural-ratio instead of the ratio.
 	 *
-	 * Consumed by: base/collection-base.css (uses --fg-item-aspect-ratio
-	 * and --fg-item-fit on the :where(...) grouping; checks
-	 * [data-fg-natural-ratio="1"] for the natural-ratio escape hatch).
+	 * Stamps data-fg-item-box with the layout's `base_item_box`
+	 * capability ('box' or 'fill') so base/collection-base.css applies
+	 * the shared item box. Layouts that do not declare it size their
+	 * own items.
 	 *
 	 * @return array{style_vars: array<string, string>, wrapper_data_attrs: array<string, string>}
 	 */
 	private static function item_box_adapter( Layout $layout, Render_Context $render_context ): array {
 		$style_vars         = array();
 		$wrapper_data_attrs = array();
+
+		$base_item_box = Layout_Capabilities::for_layout( $layout, $render_context )['base_item_box'] ?? null;
+		if ( in_array( $base_item_box, array( 'box', 'fill' ), true ) ) {
+			$wrapper_data_attrs['data-fg-item-box'] = $base_item_box;
+		}
 
 		$aspect_ratio = $render_context->layout->item_aspect_ratio;
 		if ( '' !== $aspect_ratio ) {

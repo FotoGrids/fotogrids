@@ -69,7 +69,7 @@ final class Layout_Capabilities {
 	 * @since   1.0.0
 	 * @param   Layout         $layout
 	 * @param   Render_Context $render_context
-	 * @return  array<string, bool>
+	 * @return  array<string, bool|string>
 	 */
 	public static function for_layout( Layout $layout, Render_Context $render_context ): array {
 		return self::resolve_capabilities( $layout, $render_context );
@@ -100,11 +100,11 @@ final class Layout_Capabilities {
 	 * Filter contract:
 	 *   apply_filters(
 	 *       'fotogrids/render/layout/capabilities',
-	 *       array<string, bool> $capabilities,   // The layout's own map.
-	 *       string              $layout_id,       // e.g. 'fotogrids/grid'.
-	 *       Render_Context      $render_context,
-	 *       Layout              $layout           // The layout module.
-	 *   ): array<string, bool>
+	 *       array<string, bool|string> $capabilities,   // The layout's own map.
+	 *       string                     $layout_id,      // e.g. 'fotogrids/grid'.
+	 *       Render_Context             $render_context,
+	 *       Layout                     $layout          // The layout module.
+	 *   ): array<string, bool|string>
 	 *
 	 * Callbacks must return an array; a non-array return value is
 	 * discarded and the original layout map is used (defensive - we
@@ -113,7 +113,7 @@ final class Layout_Capabilities {
 	 * @since   1.0.0
 	 * @param   Layout         $layout
 	 * @param   Render_Context $render_context
-	 * @return  array<string, bool>
+	 * @return  array<string, bool|string>
 	 */
 	private static function resolve_capabilities( Layout $layout, Render_Context $render_context ): array {
 		$capabilities = $layout->capabilities();
@@ -122,10 +122,10 @@ final class Layout_Capabilities {
 		 * Filter the active layout's capability map.
 		 *
 		 * @since 1.0.0
-		 * @param array<string, bool> $capabilities
-		 * @param string              $layout_id
-		 * @param Render_Context      $render_context
-		 * @param Layout              $layout
+		 * @param array<string, bool|string> $capabilities
+		 * @param string                     $layout_id
+		 * @param Render_Context             $render_context
+		 * @param Layout                     $layout
 		 */
 		$filtered = apply_filters(
 			Filters_Render::LAYOUT_CAPABILITIES,

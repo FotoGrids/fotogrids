@@ -37,6 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Opt-in capabilities:
  *   - enforces_item_box : --fg-item-aspect-ratio / --fg-item-fit /
  *                         data-fg-natural-ratio (when ratio = None)
+ *   - base_item_box     : box (data-fg-item-box="box")
  *   - lightbox_extends  : data-fg-lightbox-extended + total-items +
  *                         render-url + nonce, when click=lightbox and
  *                         the user picked lightbox_scope=gallery
@@ -190,6 +191,7 @@ final class Layout_Single_Item implements Layout {
 	public function capabilities(): array {
 		return array(
 			'enforces_item_box' => true,
+			'base_item_box'     => 'box',
 			'lightbox_extends'  => true,
 			'paginates'         => false,
 			'filters'           => false,

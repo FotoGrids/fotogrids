@@ -204,6 +204,7 @@ final class RenderCacheAssetDepsTest {
         self::test_cache_hit_registers_assets_as_the_miss_did();
         self::test_head_style_replay_registers_styles_as_the_miss_did();
         self::test_schema_4_envelope_is_treated_as_a_miss();
+        self::test_schema_5_envelope_is_treated_as_a_miss();
     }
 
     private static function test_capture_records_registration_data(): void {
@@ -342,6 +343,26 @@ final class RenderCacheAssetDepsTest {
         );
 
         self::assert_same( false, FotoGrids_Cache::get( 9, 'key-v4' ), 'An envelope written without asset dependencies must read as a miss.' );
+    }
+
+    private static function test_schema_5_envelope_is_treated_as_a_miss(): void {
+        self::reset();
+
+        $GLOBALS['wpdb']->rows['key-v5'] = (string) json_encode(
+            array(
+                'schema'     => 5,
+                'html'       => '<div class="fotogrids-gallery" data-fg-layout="grid"></div>',
+                'css'        => array(),
+                'js'         => array(),
+                'inline_css' => '',
+                'inline_js'  => '',
+                'json_ld'    => '',
+                'expires_at' => time() + HOUR_IN_SECONDS,
+                'fonts'      => array(),
+            )
+        );
+
+        self::assert_same( false, FotoGrids_Cache::get( 9, 'key-v5' ), 'An envelope written without the item-box marker must read as a miss.' );
     }
 
     /**

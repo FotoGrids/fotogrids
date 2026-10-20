@@ -163,6 +163,12 @@ interface Layout {
 	 *  - filters           : bool - Filter_Ui should render the filter bar.
 	 *  - enforces_item_box : bool - Layout_Wrapper_Composer contributes the
 	 *                        item-box CSS variables (aspect ratio, fit).
+	 *  - base_item_box     : 'box' | 'fill' - Opts into the shared item box
+	 *                        in base CSS: 'box' sizes the media box from the
+	 *                        aspect ratio and fills it, 'fill' only fills a
+	 *                        box the layout sizes itself. No default: a
+	 *                        layout that leaves it out sizes its own items.
+	 *                        Applied only alongside enforces_item_box.
 	 *  - uses_columns      : bool - Composer contributes the responsive
 	 *                        column-count variables.
 	 *  - uses_item_spacing : bool - Composer contributes the gap variables.
@@ -173,7 +179,7 @@ interface Layout {
 	 *                        Opt out when the layout owns its item order.
 	 *
 	 * @since   1.0.0
-	 * @return  array<string, bool>
+	 * @return  array<string, bool|string>
 	 */
 	public function capabilities(): array;
 }

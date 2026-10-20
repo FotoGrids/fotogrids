@@ -432,6 +432,7 @@ test.describe( 'a Load More click as soon as the gallery appears', () => {
 		await page.locator( '[data-fg-album-ajax-trigger]' ).first().click();
 		await loadMoreAtOnce( gallery );
 		await expect( gallery.items() ).toHaveCount( 12 );
+		expect( await gallery.attr( 'item-box' ) ).toBe( 'box' );
 	} );
 
 	test( 'pages a password gallery unlocked inside an album', { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
@@ -459,6 +460,7 @@ test.describe( 'an embed with shortcode attributes', () => {
 
 		expect( await gallery.layout() ).toBe( 'masonry' );
 		expect( await gallery.cssVar( 'cols' ) ).toBe( '2' );
+		expect( await gallery.attr( 'item-box' ) ).toBeNull();
 	} );
 
 	test( 'unlocks with the saved cols and layout when the embed sets none', { tag: [ '@gate', '@layout' ] }, async ( {
@@ -472,6 +474,7 @@ test.describe( 'an embed with shortcode attributes', () => {
 
 		expect( await gallery.layout() ).toBe( 'grid' );
 		expect( await gallery.cssVar( 'cols' ) ).toBe( '3' );
+		expect( await gallery.attr( 'item-box' ) ).toBe( 'box' );
 	} );
 
 	test( 'the unlock route accepts only a registered layout and a positive column count', { tag: [ '@gate', '@api' ] }, async ( {
