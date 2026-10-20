@@ -6,6 +6,8 @@
  *   - goToPage(galleryEl, page, opts)
  *   - prefetch(galleryEl, page)
  *   - onChange(galleryEl, cb)     - subscribe to page changes
+ *   - setSlicePlanner(galleryEl, planner) - request exact slices for a gallery
+ *   - replan(galleryEl)           - re-read the planner after its cuts moved
  *
  * The per-method modules (endless-scroll, load-more, page-buttons) read
  * `FotoGrids.modules.pagination` and wire their own UI to it. Cross-method
@@ -60,6 +62,94 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	const inflightToken = new WeakMap();
 
 	/**
+	 * Per-gallery slice planners. A layout that cuts its own pages registers one;
+	 * requests for that gallery then ask for an exact slice (offset + length)
+	 * instead of a page number.
+	 *
+	 *   next(loaded)          - { offset, length } after `loaded` items, or null
+	 *   page(n)               - { offset, length } of 1-based page n, or null
+	 *   pageContaining(index) - 1-based page holding sequence index `index`
+	 *   total()               - page count
+	 *
+	 * @type {WeakMap<Element, object>}
+	 */
+	const planners = new WeakMap();
+
+	/**
+	 * @param {Element} galleryEl
+	 * @returns {object|null}
+	 */
+	function plannerFor(galleryEl) {
+		return planners.get(galleryEl) || null;
+	}
+
+	/**
+	 * Items on screen that belong to the loaded run, in order.
+	 *
+	 * @param {Element} galleryEl
+	 * @returns {Element[]}
+	 */
+	function loadedItems(galleryEl) {
+		const root = resolveItemsRoot(galleryEl);
+		if (!root) {
+			return [];
+		}
+		return Array.prototype.filter.call(
+			root.querySelectorAll('.fg-item'),
+			function (node) {
+				return !node.hasAttribute('data-fg-overflow');
+			}
+		);
+	}
+
+	/**
+	 * Settles the overflow pool before an append: items before the appended
+	 * slice belong to the loaded run and show; the rest are replaced by it.
+	 *
+	 * @param {Element} galleryEl
+	 * @param {number}  from Sequence index the appended slice starts at, or -1.
+	 */
+	function dropOverflow(galleryEl, from) {
+		const root = resolveItemsRoot(galleryEl);
+		if (!root) {
+			return;
+		}
+		root.querySelectorAll('[data-fg-overflow]').forEach(function (node) {
+			const index = parseInt(
+				node.getAttribute('data-fg-sequence-index') || '',
+				10
+			);
+			if (from >= 0 && Number.isFinite(index) && index < from) {
+				node.removeAttribute('data-fg-overflow');
+			} else {
+				node.remove();
+			}
+		});
+	}
+
+	/**
+	 * Sequence index of the first item on screen.
+	 *
+	 * @param {Element} galleryEl
+	 * @returns {number}
+	 */
+	function firstSequenceIndex(galleryEl) {
+		const first = loadedItems(galleryEl)[0];
+		const index = first
+			? parseInt(first.getAttribute('data-fg-sequence-index') || '', 10)
+			: NaN;
+		return Number.isFinite(index) ? index : 0;
+	}
+
+	/**
+	 * @param {string} method
+	 * @returns {boolean}
+	 */
+	function isAppendMethod(method) {
+		return method !== 'pages';
+	}
+
+	/**
 	 * Per-gallery preloaded page: the response promise of a prefetch(), keyed by
 	 * its exact request. A gallery holds one, and goToPage() uses it once.
 	 *
@@ -102,6 +192,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	let defaultFilterStrategy = 'server';
 
 	function strategyFor(galleryEl) {
+		if (planners.has(galleryEl)) {
+			return 'server';
+		}
 		const attr =
 			galleryEl &&
 			galleryEl.dataset &&
@@ -125,12 +218,28 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		const page = parseInt(ds.fgPageCurrent || '1', 10);
 		const totalPages = parseInt(ds.fgPageTotal || '1', 10);
 		const pageSize = parseInt(ds.fgPageSize || '0', 10);
+		const method = ds.fgPaginationMethod || 'load_more';
+		const planner = plannerFor(galleryEl);
+
+		if (planner) {
+			const plannedTotal = Math.max(1, planner.total());
+			return {
+				page: Math.min(page, plannedTotal),
+				totalPages: plannedTotal,
+				pageSize,
+				method,
+				preload: ds.fgPaginationPreload === 'true',
+				hasMore: isAppendMethod(method)
+					? planner.next(loadedItems(galleryEl).length) !== null
+					: page < plannedTotal,
+			};
+		}
 
 		return {
 			page,
 			totalPages,
 			pageSize,
-			method: ds.fgPaginationMethod || 'load_more',
+			method,
 			preload: ds.fgPaginationPreload === 'true',
 			hasMore: page < totalPages,
 		};
@@ -272,10 +381,13 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * @param {Element} galleryEl
 	 * @param {number}  page
 	 * @param {string}  [breakpoint] Defaults to the breakpoint of the current view.
+	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
+	 *        An exact slice to request, and whether to return the sequence's
+	 *        aspect ratios.
 	 * @returns {{url:string, options:object, key:string}|null} Null when the
 	 *          gallery has no render context.
 	 */
-	function buildRequest(galleryEl, page, breakpoint) {
+	function buildRequest(galleryEl, page, breakpoint, extra) {
 		const url =
 			galleryEl.dataset.fgRenderUrl ||
 			(window.fotogrids && window.fotogrids.renderUrl) ||
@@ -327,7 +439,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			headers['X-FotoGrids-Unlock'] = galleryEl.dataset.fgUnlockToken;
 		}
 
-		const body = JSON.stringify({
+		const requestBody = {
 			gallery_id: galleryId,
 			page,
 			breakpoint: requestBreakpoint,
@@ -338,7 +450,16 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			instance_id: instanceIdPattern.test(galleryEl.id)
 				? galleryEl.id
 				: '',
-		});
+		};
+		if (extra && extra.length > 0) {
+			requestBody.offset = Math.max(0, extra.offset || 0);
+			requestBody.length = extra.length;
+		}
+		if (extra && extra.withAspects) {
+			requestBody.with_aspects = true;
+		}
+
+		const body = JSON.stringify(requestBody);
 
 		return {
 			url,
@@ -432,6 +553,18 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 
 		if (mode === 'append') {
+			const firstIncoming = sourceChildren[0]
+				? parseInt(
+						sourceChildren[0].getAttribute(
+							'data-fg-sequence-index'
+						) || '',
+						10
+					)
+				: NaN;
+			dropOverflow(
+				galleryEl,
+				Number.isFinite(firstIncoming) ? firstIncoming : -1
+			);
 			sourceChildren.forEach(function (node) {
 				root.appendChild(node);
 				inserted.push(node);
@@ -482,9 +615,28 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		});
 
 		// Kick off preload for the next page if enabled and there is one.
-		if (payload.has_more && readState(galleryEl).preload) {
+		if (
+			payload.has_more &&
+			galleryEl.dataset.fgPaginationPreload === 'true'
+		) {
 			schedulePreload(galleryEl, payload.page + 1);
 		}
+	}
+
+	/**
+	 * The slice a planned gallery requests for a page change, or null when the
+	 * planner has nothing there.
+	 *
+	 * @param {Element} galleryEl
+	 * @param {object}  planner
+	 * @param {number}  page
+	 * @param {'replace'|'append'} mode
+	 * @returns {{offset:number,length:number}|null}
+	 */
+	function plannedSlice(galleryEl, planner, page, mode) {
+		return 'append' === mode
+			? planner.next(loadedItems(galleryEl).length)
+			: planner.page(page);
 	}
 
 	/**
@@ -495,12 +647,31 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * @param {number}  page
 	 */
 	function schedulePreload(galleryEl, page) {
+		const planner = plannerFor(galleryEl);
+		const slice = planner
+			? plannedSlice(
+					galleryEl,
+					planner,
+					page,
+					isAppendMethod(readState(galleryEl).method)
+						? 'append'
+						: 'replace'
+				)
+			: null;
+		if (planner && !slice) {
+			return;
+		}
 		const run = function () {
 			const s = readState(galleryEl);
 			if (s.page + 1 !== page || page > s.totalPages) {
 				return;
 			}
-			prefetch(galleryEl, page).catch(function () {
+			prefetch(
+				galleryEl,
+				page,
+				planner ? activeBreakpoint() : undefined,
+				slice || undefined
+			).catch(function () {
 				/* preload errors are silent */
 			});
 		};
@@ -653,7 +824,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			})
 		);
 
-		if (snap.hasMore && readState(galleryEl).preload) {
+		if (snap.hasMore && galleryEl.dataset.fgPaginationPreload === 'true') {
 			schedulePreload(galleryEl, snap.page + 1);
 		}
 
@@ -691,6 +862,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			return goToPage(galleryEl, 1, {
 				mode: 'replace',
 				fingerprint: newFp,
+				newSequence: true,
 			}).then(function (result) {
 				return {
 					page: result.page,
@@ -722,6 +894,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		return goToPage(galleryEl, 1, {
 			mode: 'replace',
 			fingerprint: newFp,
+			newSequence: true,
 		}).then(function (result) {
 			return {
 				page: result.page,
@@ -745,11 +918,23 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 *
 	 * @param {Element} galleryEl
 	 * @param {number}  page
-	 * @param {{mode?:'replace'|'append',fingerprint?:string,reflow?:boolean}} opts
+	 * @param {{mode?:'replace'|'append',fingerprint?:string,reflow?:boolean,newSequence?:boolean}} opts
+	 *        `newSequence` asks a planned gallery for a fresh page 1 cut by the
+	 *        server, with the new sequence's aspect ratios.
 	 * @returns {Promise<{page:number,hasMore:boolean}>}
 	 */
 	function goToPage(galleryEl, page, opts) {
 		const mode = (opts && opts.mode) || 'replace';
+		const planner = plannerFor(galleryEl);
+		const newSequence = !!(opts && opts.newSequence);
+		let slice = null;
+		if (planner && !newSequence) {
+			slice = plannedSlice(galleryEl, planner, page, mode);
+			if (!slice) {
+				const s = readState(galleryEl);
+				return Promise.resolve({ page: s.page, hasMore: false });
+			}
+		}
 
 		// Capture the fingerprint and a fresh request token; a response superseded
 		// by a later request is not applied.
@@ -764,10 +949,15 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		// A replace repaints everything, so it can move breakpoint; an append
 		// extends the current view and keeps its own.
 		const breakpoint =
-			'replace' === mode ? activeBreakpoint() : viewBreakpoint(galleryEl);
+			'replace' === mode || planner
+				? activeBreakpoint()
+				: viewBreakpoint(galleryEl);
 		const reflow = !!(opts && opts.reflow);
+		const extra = slice
+			? { offset: slice.offset, length: slice.length }
+			: { withAspects: !!planner && newSequence };
 
-		return requestPage(galleryEl, page, breakpoint)
+		return requestPage(galleryEl, page, breakpoint, extra)
 			.then(function (payload) {
 				if (!isCurrentToken(galleryEl, capturedToken)) {
 					// Superseded by a newer request: resolve callers with the payload but
@@ -778,6 +968,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 						stale: true,
 					};
 				}
+				if (slice) {
+					payload = withPlannedTotals(galleryEl, payload, page, mode);
+				}
 				applyPage(
 					galleryEl,
 					payload,
@@ -786,7 +979,19 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 					breakpoint,
 					reflow
 				);
-				return { page: payload.page, hasMore: payload.has_more };
+				if (Array.isArray(payload.aspects)) {
+					galleryEl.dispatchEvent(
+						new CustomEvent('fotogrids:sequence_changed', {
+							bubbles: true,
+							detail: { galleryEl, aspects: payload.aspects },
+						})
+					);
+				}
+				if (planner && newSequence) {
+					const now = readState(galleryEl);
+					return { page: now.page, hasMore: now.hasMore };
+				}
+				return { page: payload.page, hasMore: !!payload.has_more };
 			})
 			.catch(function (err) {
 				console.warn('[fotogrids] pagination failed:', err);
@@ -809,6 +1014,125 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
+	 * Rewrites a planned slice response's page numbers from the planner, which
+	 * cut it.
+	 *
+	 * @param {Element} galleryEl
+	 * @param {object}  payload
+	 * @param {number}  page
+	 * @param {'replace'|'append'} mode
+	 * @returns {object}
+	 */
+	function withPlannedTotals(galleryEl, payload, page, mode) {
+		const planner = plannerFor(galleryEl);
+		const total = Math.max(1, planner.total());
+		if ('append' === mode) {
+			const count =
+				loadedItems(galleryEl).length + countItems(payload.html);
+			return Object.assign({}, payload, {
+				page: Math.min(planner.pageContaining(count - 1), total),
+				total_pages: total,
+				page_size: payload.length || payload.page_size,
+				has_more: !!payload.has_more,
+			});
+		}
+		const current = Math.min(Math.max(1, page), total);
+		return Object.assign({}, payload, {
+			page: current,
+			total_pages: total,
+			page_size: payload.length || payload.page_size,
+			has_more: current < total,
+		});
+	}
+
+	/**
+	 * @param {string} html
+	 * @returns {number}
+	 */
+	function countItems(html) {
+		const template = document.createElement('template');
+		template.innerHTML = html || '';
+		return template.content.querySelectorAll(
+			'.fg-item:not([data-fg-overflow])'
+		).length;
+	}
+
+	/**
+	 * Registers the slice planner a layout cuts a gallery's pages with.
+	 *
+	 * @param {Element}     galleryEl
+	 * @param {object|null} planner
+	 */
+	function setSlicePlanner(galleryEl, planner) {
+		if (planner) {
+			planners.set(galleryEl, planner);
+			galleryEl.dataset.fgSlicePlanner = 'ready';
+		} else {
+			planners.delete(galleryEl);
+			delete galleryEl.dataset.fgSlicePlanner;
+		}
+	}
+
+	/**
+	 * Re-reads a gallery's planner after its cuts moved. Append methods keep the
+	 * items on screen and only refresh totals; Page Buttons moves to the page
+	 * holding the first item on screen, fetching only when that page's slice
+	 * differs from what is shown.
+	 *
+	 * @param {Element} galleryEl
+	 */
+	function replan(galleryEl) {
+		const planner = plannerFor(galleryEl);
+		if (!planner) {
+			return;
+		}
+		const s = readState(galleryEl);
+
+		if (isAppendMethod(s.method)) {
+			const loaded = loadedItems(galleryEl).length;
+			const page = Math.min(
+				planner.pageContaining(Math.max(0, loaded - 1)),
+				s.totalPages
+			);
+			writeState(galleryEl, { page, totalPages: s.totalPages });
+			notify(galleryEl, {
+				galleryEl,
+				page,
+				mode: 'replan',
+				hasMore: s.hasMore,
+				reflow: true,
+			});
+			return;
+		}
+
+		const first = firstSequenceIndex(galleryEl);
+		const target = planner.pageContaining(first);
+		const slice = planner.page(target);
+		const shown = loadedItems(galleryEl).length;
+
+		if (slice && slice.offset === first && slice.length === shown) {
+			writeState(galleryEl, {
+				page: target,
+				totalPages: s.totalPages,
+			});
+			notify(galleryEl, {
+				galleryEl,
+				page: target,
+				mode: 'replan',
+				hasMore: target < s.totalPages,
+				reflow: true,
+			});
+			return;
+		}
+
+		goToPage(galleryEl, target, { mode: 'replace', reflow: true }).catch(
+			function () {
+				/* the current view stands */
+			}
+		);
+	}
+
+	/**
 	 * Request a page for goToPage(): the held page when it matches the request,
 	 * otherwise a fresh request. A held page that fails falls back to a fresh
 	 * request. Any held page is dropped, used or not.
@@ -816,10 +1140,11 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * @param {Element} galleryEl
 	 * @param {number}  page
 	 * @param {string}  breakpoint
+	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
 	 * @returns {Promise<object>}
 	 */
-	function requestPage(galleryEl, page, breakpoint) {
-		const request = buildRequest(galleryEl, page, breakpoint);
+	function requestPage(galleryEl, page, breakpoint, extra) {
+		const request = buildRequest(galleryEl, page, breakpoint, extra);
 		const held = heldPages.get(galleryEl);
 		heldPages.delete(galleryEl);
 
@@ -847,20 +1172,23 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
-	 * Prefetch a page at the current view's breakpoint and hold the response
-	 * for the next goToPage() with the same request. Used by preload_next_page.
-	 * Reuses a held or in-flight request for the same page instead of sending
-	 * another; a newer prefetch replaces the held one.
+	 * Prefetch a page and hold the response for the next goToPage() with the
+	 * same request. Used by preload_next_page. Reuses a held or in-flight
+	 * request for the same page instead of sending another; a newer prefetch
+	 * replaces the held one.
 	 *
 	 * @param {Element} galleryEl
 	 * @param {number}  page
+	 * @param {string}  [breakpoint] Defaults to the breakpoint of the current view.
+	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
 	 * @returns {Promise<object>}
 	 */
-	function prefetch(galleryEl, page) {
+	function prefetch(galleryEl, page, breakpoint, extra) {
 		const request = buildRequest(
 			galleryEl,
 			page,
-			viewBreakpoint(galleryEl)
+			breakpoint || viewBreakpoint(galleryEl),
+			extra
 		);
 		if (!request) {
 			return Promise.reject(new Error('pagination/no-render-context'));
@@ -940,7 +1268,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			reflow: true,
 		});
 
-		if (payload.has_more && readState(galleryEl).preload) {
+		if (
+			payload.has_more &&
+			galleryEl.dataset.fgPaginationPreload === 'true'
+		) {
 			schedulePreload(galleryEl, (payload.page || 1) + 1);
 		}
 	}
@@ -960,6 +1291,8 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			onChange,
 			swapToFilterState,
 			adopt,
+			setSlicePlanner,
+			replan,
 			/**
 			 * Set the global filter strategy. Per-gallery overrides via
 			 * data-fg-filter-strategy still win.
@@ -1004,6 +1337,16 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			}
 			if (strategyFor(gEl) !== 'server') {
 				snapshotCurrentView(gEl);
+			}
+			// Layouts that loaded first register their slice planner on this.
+			gEl.dispatchEvent(
+				new CustomEvent('fotogrids:pagination_attached', {
+					detail: { galleryEl: gEl },
+				})
+			);
+			const planned = gEl.dataset.fgSlicePlanned === 'true';
+			if (planned) {
+				return;
 			}
 			if (gEl.getAttribute('data-fg-random-mode') === 'refetch') {
 				return;

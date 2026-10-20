@@ -226,13 +226,15 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 *
 	 * The minted seed is written onto the wrapper once its items are on
 	 * screen, so pagination and the Lightbox draw later requests from the
-	 * order the visitor sees. A late, failed or itemless response leaves the
-	 * server's seed with the server's order.
+	 * order the visitor sees. A late, failed, superseded or itemless response
+	 * leaves the server's seed with the server's order.
 	 *
 	 * @param {Element} collectionEl
 	 * @param {Element} root
+	 * @param {boolean} [inlineHold] Hold with an inline style, for a gallery
+	 *        rendered without the hold stylesheet.
 	 */
-	function fetchFreshSet(collectionEl, root) {
+	function fetchFreshSet(collectionEl, root, inlineHold) {
 		const url = collectionEl.dataset.fgRenderUrl || '';
 		const galleryId = parseInt(collectionEl.dataset.fgGalleryId || '0', 10);
 
@@ -248,6 +250,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 				: 'desktop';
 
 		root.classList.add(PENDING_CLASS);
+		if (inlineHold) {
+			root.style.visibility = 'hidden';
+		}
 
 		let settled = false;
 		const release = function () {
@@ -256,7 +261,39 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			}
 			settled = true;
 			root.classList.remove(PENDING_CLASS);
+			if (inlineHold) {
+				root.style.visibility = '';
+			}
 		};
+
+		// The fresh set is dropped once the visitor filters or pages the server
+		// order: those requests use the seed of the order on screen.
+		let superseded = false;
+		const markSuperseded = function (event) {
+			const mode = event.detail && event.detail.mode;
+			if (
+				'fotogrids:filters_changed' === event.type ||
+				'append' === mode ||
+				'replace' === mode
+			) {
+				superseded = true;
+			}
+		};
+		const unlisten = function () {
+			collectionEl.removeEventListener(
+				'fotogrids:filters_changed',
+				markSuperseded
+			);
+			collectionEl.removeEventListener(
+				'fotogrids:page_changed',
+				markSuperseded
+			);
+		};
+		collectionEl.addEventListener(
+			'fotogrids:filters_changed',
+			markSuperseded
+		);
+		collectionEl.addEventListener('fotogrids:page_changed', markSuperseded);
 
 		const timer = window.setTimeout(release, HOLD_TIMEOUT_MS);
 
@@ -272,21 +309,40 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			headers['X-FotoGrids-Unlock'] = collectionEl.dataset.fgUnlockToken;
 		}
 
+		const filters =
+			window.FotoGrids &&
+			window.FotoGrids.modules &&
+			window.FotoGrids.modules.filters &&
+			typeof window.FotoGrids.modules.filters.getActive === 'function'
+				? window.FotoGrids.modules.filters.getActive(collectionEl)
+				: {};
+		const containerWidth = parseInt(
+			collectionEl.dataset.fgContainerWidth || '0',
+			10
+		);
+		const planned = 'true' === collectionEl.dataset.fgSlicePlanned;
+		const requestBody = {
+			gallery_id: galleryId,
+			page: 1,
+			breakpoint,
+			partial: 'items_only',
+			random_seed: seed,
+			filters,
+			container_width: containerWidth > 0 ? containerWidth : 0,
+			instance_id: instanceIdPattern.test(collectionEl.id)
+				? collectionEl.id
+				: '',
+		};
+		if (planned) {
+			requestBody.with_aspects = true;
+		}
+
 		window
 			.fetch(url, {
 				method: 'POST',
 				headers,
 				credentials: 'same-origin',
-				body: JSON.stringify({
-					gallery_id: galleryId,
-					page: 1,
-					breakpoint,
-					partial: 'items_only',
-					random_seed: seed,
-					instance_id: instanceIdPattern.test(collectionEl.id)
-						? collectionEl.id
-						: '',
-				}),
+				body: JSON.stringify(requestBody),
 			})
 			.then(function (response) {
 				if (!response.ok) {
@@ -295,24 +351,38 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 				return response.json();
 			})
 			.then(function (payload) {
-				// A response that arrives after the hold expired is dropped:
-				// the visitor is already looking at the server order.
-				if (settled) {
+				// A response that arrives after the hold expired, or after the
+				// visitor moved on, is dropped: they keep the server order.
+				const busy = collectionEl.classList.contains(
+					'fotogrids-gallery--is-paginating'
+				);
+				if (settled || superseded || busy) {
 					return;
 				}
 				const inserted = applyItems(root, payload);
-				if (!inserted) {
-					return;
+				if (inserted) {
+					collectionEl.dataset.fgRandomSeed = String(seed);
+					announceItems(collectionEl, inserted);
+					adoptIntoPagination(collectionEl, payload, breakpoint);
+					if (Array.isArray(payload.aspects)) {
+						collectionEl.dispatchEvent(
+							new CustomEvent('fotogrids:sequence_changed', {
+								bubbles: true,
+								detail: {
+									galleryEl: collectionEl,
+									aspects: payload.aspects,
+								},
+							})
+						);
+					}
 				}
-				collectionEl.dataset.fgRandomSeed = String(seed);
-				announceItems(collectionEl, inserted);
-				adoptIntoPagination(collectionEl, payload, breakpoint);
 			})
 			.catch(function () {
 				/* Server order stands. */
 			})
 			.then(function () {
 				window.clearTimeout(timer);
+				unlisten();
 				release();
 			});
 	}
@@ -355,11 +425,16 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			return;
 		}
 
-		if (MODE_REFETCH === mode) {
+		// A gallery whose pages the browser cuts on row ends cannot be shuffled
+		// in place without breaking those rows, so it fetches a fresh order.
+		if (
+			MODE_REFETCH === mode ||
+			'true' === collectionEl.dataset.fgSlicePlanned
+		) {
 			// The server already applied a fresh permutation for the minted
 			// seed, so no client shuffle runs on top - that would desync the
 			// sequence indices the Lightbox navigates by.
-			fetchFreshSet(collectionEl, root);
+			fetchFreshSet(collectionEl, root, MODE_REFETCH !== mode);
 			return;
 		}
 

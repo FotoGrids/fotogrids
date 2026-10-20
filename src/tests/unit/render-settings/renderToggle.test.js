@@ -99,4 +99,29 @@ describe('renderToggle', () => {
 				.textContent
 		).toBe('hi');
 	});
+
+	it('shows escaped markup in the description as visible text', () => {
+		const { container } = renderElement(
+			build(
+				{
+					key: 'k',
+					label: 'L',
+					description:
+						'Emits <code>&lt;meta name="robots" content="noindex"&gt;</code> here.',
+				},
+				'0',
+				false
+			)
+		);
+		const description = container.querySelector(
+			'.fotogrids-setting__description'
+		);
+		expect(description.querySelector('meta')).toBeNull();
+		expect(description.querySelector('code').textContent).toBe(
+			'<meta name="robots" content="noindex">'
+		);
+		expect(description.textContent).toBe(
+			'Emits <meta name="robots" content="noindex"> here.'
+		);
+	});
 });
