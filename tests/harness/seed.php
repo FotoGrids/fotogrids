@@ -885,6 +885,57 @@ function fg_seed_catalogue(): array {
 			);
 		},
 
+		'F-shapes' => function () {
+			$ratios = array( 1.5, 0.66, 1.0, 2.4, 0.75, 1.33, 1.78, 0.5, 3.2, 1.5, 0.33, 1.0 );
+			$items  = array();
+			foreach ( range( 0, 119 ) as $n ) {
+				$ratio   = $ratios[ ( $n * 7 + intdiv( $n, 12 ) ) % count( $ratios ) ];
+				$items[] = fg_seed_attachment(
+					fg_seed_draw( (int) round( 240 * $ratio ), 240, 'jpeg', array( 'seed' => 1200 + $n ) ),
+					'F-shapes',
+					array( 'alt' => 'Shape ' . ( $n + 1 ) . ', ratio ' . $ratio )
+				);
+			}
+
+			// Every fourth item spans three pages at twelve a page; the first seven fit one page.
+			foreach ( $items as $n => $item ) {
+				if ( 0 === $n % 4 ) {
+					\FotoGrids\Metadata_Manager::add_tag_to_item( $item, 'Shape quarter' );
+				}
+				if ( $n < 7 ) {
+					\FotoGrids\Metadata_Manager::add_tag_to_item( $item, 'Shape few' );
+				}
+			}
+
+			// Items whose stored dimensions are missing: the layout falls back to 3:2.
+			$nodims = array();
+			foreach ( range( 1, 4 ) as $n ) {
+				$id       = fg_seed_attachment(
+					fg_seed_draw( 300, 300, 'jpeg', array( 'seed' => 1400 + $n ) ),
+					'F-shapes',
+					array( 'alt' => 'No dimensions ' . $n )
+				);
+				$meta     = wp_get_attachment_metadata( $id );
+				$meta     = is_array( $meta ) ? $meta : array();
+				unset( $meta['width'], $meta['height'] );
+				$meta['sizes'] = array();
+				wp_update_attachment_metadata( $id, $meta );
+				$nodims[] = $id;
+			}
+
+			return array(
+				'gallery' => fg_seed_gallery( 'F-shapes', 'Fixture shapes', $items ),
+				'items'   => $items,
+				'nodims'  => $nodims,
+				'ratios'  => array_map(
+					static function ( int $n ) use ( $ratios ): float {
+						return $ratios[ ( $n * 7 + intdiv( $n, 12 ) ) % count( $ratios ) ];
+					},
+					range( 0, 119 )
+				),
+			);
+		},
+
 		'F-tagged' => function () {
 			$tags      = array( 'Architecture', 'Sunset', 'Portrait', 'Street' );
 			$people    = array( 'Ada Lovelace', 'Grace Hopper', 'Alan Turing' );

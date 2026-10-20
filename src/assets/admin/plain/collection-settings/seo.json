@@ -123,7 +123,7 @@
                     "key": "fotogrids_noindex",
                     "type": "toggle",
                     "label": "Hide from search engines",
-                    "description": "When on, emits <meta name=\"robots\" content=\"noindex, nofollow\"> so search engines skip this page. Use for drafts, private clients, or one-off {postType.plural.lower} you don't want indexed.",
+                    "description": "When on, emits <code>&lt;meta name=\"robots\" content=\"noindex, nofollow\"&gt;</code> so search engines skip this page. Use for drafts, private clients, or one-off {postType.plural.lower} you don't want indexed.",
                     "default": false,
                     "tier_required": "free",
                     "render_when_unlicensed": true,

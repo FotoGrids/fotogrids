@@ -35,6 +35,11 @@ final class Render_Meta {
 	public ?int $container_width;
 	public ?int $pagination_page_size;
 	public ?int $pagination_total_pages;
+	public ?int $requested_offset;
+	public ?int $requested_length;
+	public bool $with_aspects;
+	public array $sequence_aspects;
+	public ?int $overflow_from;
 
 	/**
 	 * @since   1.0.0
@@ -58,6 +63,11 @@ final class Render_Meta {
 	 * @param   int|null        $container_width Measured gallery container width in CSS pixels, sent by the client on later renders. Used by the justified snap-pagination resolver. Null = no measurement; the resolver falls back to a per-breakpoint assumed width.
 	 * @param   int|null        $pagination_page_size Authoritative page size for THIS page, set after Context_Builder runs pagination (including snap). Null = no pagination ran.
 	 * @param   int|null        $pagination_total_pages Authoritative total page count, set after Context_Builder runs pagination. Null = no pagination ran.
+	 * @param   int|null        $requested_offset First sequence index of an exact slice requested by the client. Null = page-number request.
+	 * @param   int|null        $requested_length Length of an exact slice requested by the client. Null or 0 = page-number request.
+	 * @param   bool            $with_aspects Whether the caller asked for the sequence's aspect ratios.
+	 * @param   array<int, float> $sequence_aspects Aspect ratios of the whole filtered, sorted sequence, for layouts that cut their own pages.
+	 * @param   int|null        $overflow_from Sequence index from which rendered items are overflow, hidden until the layout cuts the page. Null = no overflow.
 	 * @return  void
 	 */
 	public function __construct(
@@ -80,7 +90,12 @@ final class Render_Meta {
 		bool $is_ajax_swap = false,
 		?int $container_width = null,
 		?int $pagination_page_size = null,
-		?int $pagination_total_pages = null
+		?int $pagination_total_pages = null,
+		?int $requested_offset = null,
+		?int $requested_length = null,
+		bool $with_aspects = false,
+		array $sequence_aspects = array(),
+		?int $overflow_from = null
 	) {
 		$this->gallery_id             = $gallery_id;
 		$this->album_id               = $album_id;
@@ -102,6 +117,11 @@ final class Render_Meta {
 		$this->container_width        = $container_width;
 		$this->pagination_page_size   = $pagination_page_size;
 		$this->pagination_total_pages = $pagination_total_pages;
+		$this->requested_offset       = $requested_offset;
+		$this->requested_length       = $requested_length;
+		$this->with_aspects           = $with_aspects;
+		$this->sequence_aspects       = $sequence_aspects;
+		$this->overflow_from          = $overflow_from;
 	}
 
 	/**
@@ -137,6 +157,11 @@ final class Render_Meta {
 			array_key_exists( 'container_width', $changes ) ? $changes['container_width'] : $this->container_width,
 			array_key_exists( 'pagination_page_size', $changes ) ? $changes['pagination_page_size'] : $this->pagination_page_size,
 			array_key_exists( 'pagination_total_pages', $changes ) ? $changes['pagination_total_pages'] : $this->pagination_total_pages,
+			array_key_exists( 'requested_offset', $changes ) ? $changes['requested_offset'] : $this->requested_offset,
+			array_key_exists( 'requested_length', $changes ) ? $changes['requested_length'] : $this->requested_length,
+			array_key_exists( 'with_aspects', $changes ) ? $changes['with_aspects'] : $this->with_aspects,
+			array_key_exists( 'sequence_aspects', $changes ) ? $changes['sequence_aspects'] : $this->sequence_aspects,
+			array_key_exists( 'overflow_from', $changes ) ? $changes['overflow_from'] : $this->overflow_from,
 		);
 	}
 }
