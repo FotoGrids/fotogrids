@@ -373,3 +373,117 @@ describe('later requests draw from the order on screen', () => {
 		expect(g.dataset.fgViewBreakpoint).toBeUndefined();
 	});
 });
+
+describe('the visitor acts while the refetch is in flight', () => {
+	/**
+	 * The refetch answers after `refetchMs`; every other request after
+	 * `pageMs`. Pages are named after the seed and filter they were drawn with.
+	 */
+	function stubTimedFetch(refetchMs, pageMs) {
+		let first = true;
+		window.fetch = jest.fn((url, init) => {
+			const body = JSON.parse(init.body);
+			const filter =
+				body.filters && body.filters.tag ? body.filters.tag : 'all';
+			const payload = pagePayload(body.page, [
+				'p' + body.page + '-seed' + body.random_seed + '-' + filter,
+			]);
+			const delay = first ? refetchMs : pageMs;
+			first = false;
+			return new Promise((resolve) =>
+				setTimeout(() => resolve(ok(payload)), delay)
+			);
+		});
+	}
+
+	async function boot(refetchMs, pageMs) {
+		installRuntime();
+		const g = makeGallery({ paginated: true });
+		stubTimedFetch(refetchMs, pageMs);
+		load(RANDOM, PAGINATION);
+		window.FotoGrids.boot();
+		await settle(100);
+		return g;
+	}
+
+	function pagination() {
+		return window.FotoGrids.modules.pagination;
+	}
+
+	function seedsUsed() {
+		return bodies()
+			.slice(1)
+			.map((b) => b.random_seed);
+	}
+
+	it('RACE-01: a filter change keeps the server order and seed for every later page', async () => {
+		const g = await boot(300, 400);
+		window.FotoGrids.modules.filters = {
+			getActive: () => ({ tag: 'red' }),
+			fingerprint: () => 'tag=red',
+		};
+		g.dispatchEvent(new CustomEvent('fotogrids:filters_changed'));
+		const swap = pagination().swapToFilterState(g);
+		await settle(1000);
+		await swap;
+		const more = pagination().goToPage(g, 2, { mode: 'append' });
+		await settle(1000);
+		await more;
+
+		expect(g.dataset.fgRandomSeed).toBe(SERVER_SEED);
+		expect(seedsUsed()).toEqual([Number(SERVER_SEED), Number(SERVER_SEED)]);
+		expect(shown(g)).toEqual([
+			'p1-seed' + SERVER_SEED + '-red',
+			'p2-seed' + SERVER_SEED + '-red',
+		]);
+	});
+
+	it('RACE-02: Load More keeps the loaded pages and the server seed', async () => {
+		const g = await boot(300, 50);
+		const first = pagination().goToPage(g, 2, { mode: 'append' });
+		await settle(1000);
+		await first;
+		const more = pagination().goToPage(g, 3, { mode: 'append' });
+		await settle(100);
+		await more;
+
+		expect(g.dataset.fgRandomSeed).toBe(SERVER_SEED);
+		expect(shown(g)).toEqual([
+			'a',
+			'b',
+			'c',
+			'p2-seed' + SERVER_SEED + '-all',
+			'p3-seed' + SERVER_SEED + '-all',
+		]);
+	});
+
+	it('RACE-03: a refetch landing while a Load More request is in flight is dropped', async () => {
+		const g = await boot(300, 500);
+		const more = pagination().goToPage(g, 2, { mode: 'append' });
+		await settle(1000);
+		await more;
+
+		expect(g.dataset.fgRandomSeed).toBe(SERVER_SEED);
+		expect(shown(g)).toEqual([
+			'a',
+			'b',
+			'c',
+			'p2-seed' + SERVER_SEED + '-all',
+		]);
+	});
+
+	it('RACE-04: Page Buttons keeps the chosen page and the server seed', async () => {
+		const g = await boot(300, 50);
+		const jump = pagination().goToPage(g, 3, { mode: 'replace' });
+		await settle(1000);
+		await jump;
+		const next = pagination().goToPage(g, 4, { mode: 'replace' });
+		await settle(100);
+		await next;
+
+		expect(g.dataset.fgRandomSeed).toBe(SERVER_SEED);
+		expect(g.dataset.fgPageCurrent).toBe('4');
+		expect(shown(g)).toEqual(['p4-seed' + SERVER_SEED + '-all']);
+		expect(seedsUsed()).toEqual([Number(SERVER_SEED), Number(SERVER_SEED)]);
+	});
+});

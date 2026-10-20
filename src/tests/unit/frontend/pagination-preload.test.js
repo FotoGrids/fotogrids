@@ -966,3 +966,73 @@ describe('decisions (§10)', () => {
 		expect(requestedPages()).toEqual([1]);
 	});
 });
+
+describe('galleries paged by a slice planner', () => {
+	/** Cuts the sequence into slices of `size`, starting after the loaded items. */
+	function planner(size, total = 15) {
+		return {
+			size,
+			next(loaded) {
+				return loaded < total
+					? { offset: loaded, length: this.size }
+					: null;
+			},
+			page(n) {
+				return { offset: (n - 1) * this.size, length: this.size };
+			},
+			pageContaining(index) {
+				return Math.floor(index / this.size) + 1;
+			},
+			total() {
+				return Math.ceil(total / this.size);
+			},
+		};
+	}
+
+	function bootPlanned(cuts, method = 'load_more') {
+		installRuntime();
+		const gallery = makeGallery();
+		gallery.dataset.fgPaginationMethod = method;
+		stubFetch();
+		loadModule();
+		api().setSlicePlanner(gallery, cuts);
+		window.FotoGrids.boot();
+		return gallery;
+	}
+
+	it('PLAN-01: Load More uses the preloaded slice, sent with its offset and length', async () => {
+		const cuts = planner(3);
+		const gallery = bootPlanned(cuts);
+		await runIdle();
+		await loadMore(gallery);
+
+		expect(bodies().map((b) => [b.page, b.offset, b.length])).toEqual([
+			[2, 1, 3],
+		]);
+		expect(shownPages(gallery)).toEqual(['1', '2']);
+	});
+
+	it('PLAN-02: when the cuts move between preload and click, the click requests the new slice', async () => {
+		const cuts = planner(3);
+		const gallery = bootPlanned(cuts);
+		await runIdle();
+		cuts.size = 4;
+		await loadMore(gallery);
+
+		expect(bodies().map((b) => [b.page, b.offset, b.length])).toEqual([
+			[2, 1, 3],
+			[2, 1, 4],
+		]);
+	});
+
+	it('PLAN-03: Page Buttons uses the preloaded slice of the next page', async () => {
+		const cuts = planner(3);
+		const gallery = bootPlanned(cuts, 'pages');
+		await runIdle();
+		await showPage(gallery, 2);
+
+		expect(bodies().map((b) => [b.page, b.offset, b.length])).toEqual([
+			[2, 3, 3],
+		]);
+	});
+});
