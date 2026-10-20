@@ -290,6 +290,16 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		$this->assertSame( array( '9999-from-a-newer-version', '9001-first' ), Migration_Runner::completed() );
 	}
 
+	public function test_a_record_that_is_not_a_list_runs_nothing_and_is_left_as_stored(): void {
+		update_option( Migration_Runner::RECORD_OPTION, 'not-a-list', true );
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_First::class ) );
+
+		$this->assertSame( array(), Fg_Test_Migration_Log::$ran );
+		$this->assertSame( 'not-a-list', get_option( Migration_Runner::RECORD_OPTION ) );
+		$this->assertNull( $this->lock_row() );
+	}
+
 	public function test_discovery_finds_exactly_the_migrations_in_the_folder(): void {
 		$found = Migration_Runner::discover();
 		sort( $found );

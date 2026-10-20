@@ -47,6 +47,7 @@ final class Migration_Runner {
 	 * Run every pending migration.
 	 *
 	 * Stops at a migration that throws; it and the ones after it run on a later call.
+	 * Runs nothing while the record holds a value that is not a list.
 	 *
 	 * @since  1.3.0
 	 * @param  array<int, class-string<Migration>>|null $migrations Migrations to consider; defaults to the ones in `includes/migrations/`.
@@ -62,8 +63,8 @@ final class Migration_Runner {
 		try {
 			wp_cache_delete( self::RECORD_OPTION, 'options' );
 			wp_cache_delete( 'alloptions', 'options' );
-			$completed = self::completed();
-			foreach ( self::pending( $migrations ) as $migration ) {
+			$completed = self::record();
+			foreach ( null === $completed ? array() : self::pending( $migrations ) as $migration ) {
 				try {
 					$migration::run();
 				} catch ( \Throwable $e ) {
@@ -109,9 +110,19 @@ final class Migration_Runner {
 	 * @return array<int, string>
 	 */
 	public static function completed(): array {
-		$completed = get_option( self::RECORD_OPTION, array() );
+		return self::record() ?? array();
+	}
 
-		return is_array( $completed ) ? array_values( array_filter( $completed, 'is_string' ) ) : array();
+	/**
+	 * The stored record.
+	 *
+	 * @since  1.3.0
+	 * @return array<int, string>|null The IDs, an empty list when there is no record, or null when the stored value is not a list.
+	 */
+	private static function record(): ?array {
+		$record = get_option( self::RECORD_OPTION, array() );
+
+		return is_array( $record ) ? array_values( array_filter( $record, 'is_string' ) ) : null;
 	}
 
 	/**
@@ -122,7 +133,12 @@ final class Migration_Runner {
 	 * @return array<int, class-string<Migration>>
 	 */
 	private static function pending( array $migrations ): array {
-		$completed = array_flip( self::completed() );
+		$record = self::record();
+		if ( null === $record ) {
+			return array();
+		}
+
+		$completed = array_flip( $record );
 
 		$pending = array_values(
 			array_filter(
