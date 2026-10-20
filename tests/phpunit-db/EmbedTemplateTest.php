@@ -272,7 +272,7 @@ class EmbedTemplateTest extends WP_UnitTestCase {
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 		$editor = $this->render( $shortcode );
-		$this->assertStringContainsString( "No layout supports id 'kaleidoscope'", $editor );
+		$this->assertStringContainsString( esc_html( "No layout supports id 'kaleidoscope'" ), $editor );
 	}
 
 	public function test_a_cached_embed_with_a_rejected_template_replays_the_saved_layout(): void {
