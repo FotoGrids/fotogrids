@@ -243,6 +243,26 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		$this->assertSame( array( '9001-first', '9002-second', '9003-third' ), Migration_Runner::completed() );
 	}
 
+	public function test_a_failing_migration_is_added_to_the_error_log_and_counted_when_it_fails_again(): void {
+		$buffer = new ReflectionProperty( \FotoGrids\Diagnostics\Error_Store::class, 'buffer' );
+		$buffer->setAccessible( true );
+		$buffer->setValue( null, array() );
+		$this->record( array() );
+		Fg_Test_Migration_Log::$failing['9002-second'] = true;
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_Second::class ) );
+		Migration_Runner::run_pending( array( Fg_Test_Migration_Second::class ) );
+
+		$entries = array_values( $buffer->getValue() );
+		$buffer->setValue( null, array() );
+
+		$this->assertCount( 1, $entries );
+		$this->assertSame( 'Migration 9002-second failed and will be retried: 9002-second failed', $entries[0]['message'] );
+		$this->assertSame( 'error', $entries[0]['level'] );
+		$this->assertSame( array( 'migration' => '9002-second' ), $entries[0]['context'] );
+		$this->assertSame( 2, $entries[0]['times'] );
+	}
+
 	public function test_a_held_lock_stops_a_second_run(): void {
 		global $wpdb;
 

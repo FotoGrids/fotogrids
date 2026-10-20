@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Migrations;
 
+use FotoGrids\Diagnostics\Error_Store;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -46,7 +48,8 @@ final class Migration_Runner {
 	/**
 	 * Run every pending migration.
 	 *
-	 * Stops at a migration that throws; it and the ones after it run on a later call.
+	 * Stops at a migration that throws and adds it to the error log; it and the
+	 * ones after it run on a later call.
 	 * Runs nothing while the record holds a value that is not a list.
 	 *
 	 * @since  1.3.0
@@ -68,6 +71,7 @@ final class Migration_Runner {
 				try {
 					$migration::run();
 				} catch ( \Throwable $e ) {
+					self::record_failure( $migration::id(), $e );
 					break;
 				}
 
@@ -157,6 +161,29 @@ final class Migration_Runner {
 		);
 
 		return $pending;
+	}
+
+	/**
+	 * Add a failed migration to the error log on the System Info screen.
+	 *
+	 * The log counts a repeat of the same failure instead of adding a row.
+	 *
+	 * @since  1.3.0
+	 * @param  string     $id    Migration ID.
+	 * @param  \Throwable $error What the migration threw.
+	 * @return void
+	 */
+	private static function record_failure( string $id, \Throwable $error ): void {
+		Error_Store::record(
+			array(
+				'type'    => 'php',
+				'level'   => 'error',
+				'message' => sprintf( 'Migration %s failed and will be retried: %s', $id, $error->getMessage() ),
+				'file'    => Error_Store::relative_path( $error->getFile() ),
+				'line'    => $error->getLine(),
+				'context' => array( 'migration' => $id ),
+			)
+		);
 	}
 
 	/**
