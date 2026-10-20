@@ -331,8 +331,9 @@ class Public_Render {
 		}
 
 		$album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
-		if ( self::is_layout_key( $atts['template'], 'album' ) ) {
-			$album_settings['layout'] = $atts['template'];
+		$template       = is_string( $atts['template'] ) ? sanitize_text_field( $atts['template'] ) : '';
+		if ( self::is_layout_key( $template, 'album' ) ) {
+			$album_settings['layout'] = $template;
 		}
 
 		$context = Context_Builder::for_public()->build_for_album(
@@ -786,9 +787,10 @@ class Public_Render {
 			$album_settings['enable_statistics'] = false;
 		}
 
-		if ( self::is_layout_key( $atts['template'], 'album' ) ) {
-			$album_settings['layout']      = $atts['template'];
-			$album_settings['_embed_atts'] = array( 'template' => $atts['template'] );
+		$template = is_string( $atts['template'] ) ? sanitize_text_field( $atts['template'] ) : '';
+		if ( self::is_layout_key( $template, 'album' ) ) {
+			$album_settings['layout']      = $template;
+			$album_settings['_embed_atts'] = array( 'template' => $template );
 		}
 
 		if ( ! Instance_Id_Factory::matches( $album_id, $instance_id ) ) {

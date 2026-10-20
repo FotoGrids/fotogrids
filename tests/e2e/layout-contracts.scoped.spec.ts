@@ -491,6 +491,10 @@ test.describe('an unknown shortcode template', () => {
 					const gallery = new GalleryRender(page, id);
 					await gallery.waitFor();
 					expect(await gallery.layout()).toBe(SAVED);
+					await expect(
+						gallery.items().first(),
+						"the saved layout's script did not run"
+					).toBeVisible();
 					await expect(page.locator('.fotogrids-error')).toHaveCount(
 						0
 					);
