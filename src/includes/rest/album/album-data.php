@@ -40,7 +40,7 @@ class Album_Data {
 		$clearing      = ( null === $gallery_param || '' === $gallery_param || (int) 0 === $gallery_param );
 
 		if ( $clearing ) {
-			delete_post_meta( $album_id, 'fotogrids_featured_gallery' );
+			delete_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY );
 			return rest_ensure_response(
 				array(
 					'album_id'   => $album_id,
@@ -76,7 +76,7 @@ class Album_Data {
 			);
 		}
 
-		update_post_meta( $album_id, 'fotogrids_featured_gallery', $gallery_id );
+		update_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, $gallery_id );
 
 		return rest_ensure_response(
 			array(
@@ -107,7 +107,7 @@ class Album_Data {
 
 		$meta = array(
 			'layout'           => get_post_meta( $album_id, 'fotogrids_layout', true ) ?: 'grid',
-			'featured_gallery' => (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true ) ?: null,
+			'featured_gallery' => (int) get_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, true ) ?: null,
 		);
 
 		$galleries = \FotoGrids\Gallery_Album_Relations::get_visible_galleries_for_album(

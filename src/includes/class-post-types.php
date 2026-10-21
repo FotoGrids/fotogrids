@@ -84,6 +84,16 @@ class Post_Types {
 	const FEATURED_IMAGE_META_KEY = 'fotogrids_featured_image_id';
 
 	/**
+	 * Album meta key holding the ID of the gallery picked as the album's cover.
+	 *
+	 * Always empty or one of the album's galleries.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const FEATURED_GALLERY_META_KEY = 'fotogrids_featured_gallery';
+
+	/**
 	 * Register the custom Featured / Share Image meta on both collection CPTs.
 	 *
 	 * @since 1.0.0

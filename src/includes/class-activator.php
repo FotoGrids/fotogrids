@@ -32,6 +32,7 @@ class Activator {
 		$is_fresh_install = self::is_fresh_install();
 
 		self::create_tables();
+		\FotoGrids\Migrations\Migration_Runner::run_pending();
 
 		Post_Types::register_cpts();
 
@@ -239,10 +240,6 @@ class Activator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
-		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
-		\FotoGrids\Migrations\Collection_Defaults_Split::run();
-		\FotoGrids\Migrations\List_Setting_Repair::run();
-
 		do_action( Actions_System::ACTIVATE );
 
 		update_option( 'fotogrids_db_version', '1.7' );
@@ -255,6 +252,7 @@ class Activator {
 	 * The version check uses the options cache (no DB hit on the fast path),
 	 * so this is safe to call on every plugins_loaded without measurable overhead.
 	 * upgrade.php and dbDelta are only loaded when an upgrade is actually needed.
+	 * Then runs any migration not yet recorded.
 	 *
 	 * @since 1.0.0
 	 */
@@ -263,6 +261,8 @@ class Activator {
 		if ( version_compare( $current, '1.7', '<' ) ) {
 			self::create_tables();
 		}
+
+		\FotoGrids\Migrations\Migration_Runner::run_pending();
 
 		// Cap resync runs on 'init' priority 8 - after Permission_Registry::boot
 		// (priority 7) and after Pro's listeners are attached, so module / tool
