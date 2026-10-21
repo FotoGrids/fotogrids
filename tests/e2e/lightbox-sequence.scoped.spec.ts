@@ -162,7 +162,7 @@ test(
 		await video.locator('.fg-video').click();
 		await expect(video.locator('iframe')).toHaveAttribute(
 			'src',
-			/youtube(-nocookie)?\.com\/embed\//
+			/^https:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\//
 		);
 		await expect(lightbox.dialog()).toHaveCount(0);
 

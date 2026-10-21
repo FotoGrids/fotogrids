@@ -641,9 +641,6 @@ test.describe('MED-19', () => {
 			const { id } = galleryPage({}, [item]);
 			const editor = new GalleryEditor(page);
 
-			const total = Number(
-				wpEval('echo count( wp_get_registered_image_subsizes() ) + 1;')
-			);
 			const generated = Number(
 				wpEval(`
 				$m = wp_get_attachment_metadata( ${item} );
@@ -694,6 +691,11 @@ test.describe('MED-19', () => {
 					'.fotogrids-item-edit-media-size__badge'
 				)
 			).toHaveText('File missing');
+			// The total follows the modal's own rows, since other specs may
+			// register a size meanwhile.
+			const total = await page
+				.locator('.fotogrids-item-edit-media-size')
+				.count();
 			await expect(
 				page.locator('.fotogrids-item-edit-media-sizes__summary')
 			).toHaveText(`${generated} of ${total} sizes available`);

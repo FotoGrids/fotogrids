@@ -21,6 +21,13 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Decorators\Captions\Captions;
 use PHPUnit\Framework\TestCase;
 
+// WordPress polyfills this for PHP 7.4; this suite runs without WordPress.
+if ( ! function_exists( 'str_ends_with' ) ) {
+	function str_ends_with( string $haystack, string $needle ): bool {
+		return '' === $needle || substr( $haystack, -strlen( $needle ) ) === $needle;
+	}
+}
+
 $fotogrids_render_api = dirname( __DIR__, 2 ) . '/src/public/render/';
 require_once dirname( __DIR__, 2 ) . '/src/includes/hooks/filters/class-filters-render.php';
 require_once $fotogrids_render_api . 'api/class-collection-kind.php';

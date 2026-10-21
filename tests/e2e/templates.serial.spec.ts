@@ -430,7 +430,7 @@ test(
 		} finally {
 			if (previous.trim()) {
 				wpEval(
-					`update_user_meta( ${adminId}, 'fotogrids_user_templates', wp_unslash( '${previous.trim().replace(/'/g, "\\'")}' ) );`
+					`update_user_meta( ${adminId}, 'fotogrids_user_templates', wp_slash( base64_decode( '${Buffer.from(previous.trim()).toString('base64')}' ) ) );`
 				);
 			} else {
 				wpEval(

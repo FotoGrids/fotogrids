@@ -277,7 +277,7 @@ test(
 	'PSET-07: thumbnail size, crop alignment and the mobile companion hint',
 	{ tag: ['@settings', '@admin'] },
 	async ({ page }) => {
-		let settings = await openTab(page, 'media', MEDIA_REST);
+		const settings = await openTab(page, 'media', MEDIA_REST);
 		const companion = page
 			.locator('.fotogrids-sidebar-layout__panel__row')
 			.filter({ hasText: 'Mobile companion:' });
@@ -306,7 +306,7 @@ test(
 		);
 		expect(stored('fotogrids_media_settings', 'full_width')).toBe(640);
 
-		settings = await openTab(page, 'media', MEDIA_REST);
+		await openTab(page, 'media', MEDIA_REST);
 		await expect(page.locator('#fg-thumb-width')).toHaveValue('432');
 		await expect(page.locator('#fg-thumb-height')).toHaveValue('321');
 		await expect(
