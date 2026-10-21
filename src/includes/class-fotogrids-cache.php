@@ -36,10 +36,11 @@ class FotoGrids_Cache {
 
 	/**
 	 * Envelope schema version. Entries below this are treated as a miss, so an
-	 * entry written without its inline payloads, its expiry, its Google Fonts
-	 * or its asset dependencies re-renders instead of being replayed.
+	 * entry written without its inline payloads, its expiry, its Google Fonts,
+	 * its asset dependencies or its data-fg-item-box marker re-renders instead
+	 * of being replayed.
 	 */
-	private const ENTRY_SCHEMA = 5;
+	private const ENTRY_SCHEMA = 6;
 
 	/**
 	 * Shared object-cache (L1) primitive for the render cache.

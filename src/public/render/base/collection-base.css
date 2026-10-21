@@ -112,27 +112,18 @@
     background: rgba(0, 0, 0, 0.75);
 }
 
-/* Fixed-box layouts: the media box takes the aspect ratio and the media fills
-   it. Featured Item sets its own ratio in featured-item.css. */
-.fotogrids-collection:where([data-fg-layout="grid"], [data-fg-layout="single-item"], [data-fg-layout="image-viewer"]) .fg-item-media {
+/* Shared item box, for layouts whose base_item_box capability stamps
+   data-fg-item-box: "box" sizes the media box from the aspect ratio, and
+   both values make the media fill it. */
+.fotogrids-collection:where([data-fg-item-box="box"]) .fg-item-media {
     aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
 }
 
-.fotogrids-collection:where([data-fg-layout="grid"], [data-fg-layout="single-item"], [data-fg-layout="image-viewer"], [data-fg-layout="featured-item"]) .fg-item-media :is(picture, img),
-.fotogrids-collection:where([data-fg-layout="grid"], [data-fg-layout="single-item"], [data-fg-layout="image-viewer"], [data-fg-layout="featured-item"]) .fg-item-media :is(.fg-video, .fg-video-poster) {
+.fotogrids-collection:where([data-fg-item-box]) .fg-item-media :is(picture, img),
+.fotogrids-collection:where([data-fg-item-box]) .fg-item-media :is(.fg-video, .fg-video-poster) {
     width: 100%;
     height: 100%;
     object-fit: var(--fg-item-fit, cover);
-}
-
-/* Single Item with the "None" aspect ratio keeps the image's own shape. */
-.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media {
-    aspect-ratio: auto;
-}
-
-.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media :is(picture, img) {
-    height: auto;
-    object-fit: initial;
 }
 
 .fotogrids-collection[data-fg-border] .fg-item-media {
