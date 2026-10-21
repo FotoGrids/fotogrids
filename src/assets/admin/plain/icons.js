@@ -755,6 +755,11 @@ const FotoGridsIcons = {
 		<path d="M19.8,18.9h-10.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
 
+	item_align_center: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M21,5.1v.8c0,1.12,0,6.48-.22,6.91-.19.38-.5.68-.87.87-.43.22-.99.22-2.11.22H6.2c-1.12,0-1.68,0-2.11-.22-.38-.19-.68-.5-.87-.87-.22-.43-.22-5.79-.22-6.91v-.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M17.3,18.9H6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+	</svg>`,
+
 	dots_grid_full: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 		<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1099,6 +1104,102 @@ const FotoGridsIcons = {
 
 	briefcase: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M16 7C16 6.07003 16 5.60504 15.8978 5.22354C15.6204 4.18827 14.8117 3.37962 13.7765 3.10222C13.395 3 12.93 3 12 3C11.07 3 10.605 3 10.2235 3.10222C9.18827 3.37962 8.37962 4.18827 8.10222 5.22354C8 5.60504 8 6.07003 8 7M5.2 21H18.8C19.9201 21 20.4802 21 20.908 20.782C21.2843 20.5903 21.5903 20.2843 21.782 19.908C22 19.4802 22 18.9201 22 17.8V10.2C22 9.07989 22 8.51984 21.782 8.09202C21.5903 7.71569 21.2843 7.40973 20.908 7.21799C20.4802 7 19.9201 7 18.8 7H5.2C4.07989 7 3.51984 7 3.09202 7.21799C2.71569 7.40973 2.40973 7.71569 2.21799 8.09202C2 8.51984 2 9.07989 2 10.2V17.8C2 18.9201 2 19.4802 2.21799 19.908C2.40973 20.2843 2.71569 20.5903 3.09202 20.782C3.51984 21 4.0799 21 5.2 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+	</svg>`,
+
+	spacing_none: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="12" y="2" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="2" y="12" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="12" y="12" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	spacing_small: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="8.5" height="8.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="13.5" y="2" width="8.5" height="8.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="2" y="13.5" width="8.5" height="8.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="13.5" y="13.5" width="8.5" height="8.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	spacing_medium: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="14.5" y="2" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="2" y="14.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="14.5" y="14.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	spacing_large: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="15.5" y="2" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="2" y="15.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="15.5" y="15.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	corners_square: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<path d="M3 21V3H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="miter" />
+		<path d="M21 9V21H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.01 4" />
+	</svg>`,
+
+	corners_soft: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<path d="M3 21V9C3 5.68629 5.68629 3 9 3H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M21 9V21H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.01 4" />
+	</svg>`,
+
+	corners_rounded: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<path d="M3 21V15C3 8.37258 8.37258 3 15 3H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M21 9V21H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.01 4" />
+	</svg>`,
+
+	shadow_none: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="3" y="3" width="15" height="15" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	shadow_soft: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="3" y="3" width="15" height="15" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M21 7V19C21 20.1046 20.1046 21 19 21H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.01 3.5" />
+	</svg>`,
+
+	shadow_strong: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="3" y="3" width="15" height="15" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M21 7V19C21 20.1046 20.1046 21 19 21H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	lightbox_full: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="6" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M7 18H8M11.5 18H12.5M16 18H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	lightbox_mini: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="7" y="5" width="10" height="14" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M4 9.5L2 12L4 14.5M20 9.5L22 12L20 14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	lightbox_grid: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="6" y="6" width="5" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="13" y="6" width="5" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="6" y="13" width="5" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<rect x="13" y="13" width="5" height="5" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	caption_below: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="3" y="2" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M3 19H21M3 22H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	caption_hover: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M6 15H18M6 18H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.01 3" />
+		<path d="M10 5L17 7.5L14 8.5L13 11.5L10 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	caption_always: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		<path d="M6 15H18M6 18H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>`,
+
+	sharing_site: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+		<path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49M21 5C21 6.65685 19.6569 8 18 8C16.3431 8 15 6.65685 15 5C15 3.34315 16.3431 2 18 2C19.6569 2 21 3.34315 21 5ZM9 12C9 13.6569 7.65685 15 6 15C4.34315 15 3 13.6569 3 12C3 10.3431 4.34315 9 6 9C7.65685 9 9 10.3431 9 12ZM21 19C21 20.6569 19.6569 22 18 22C16.3431 22 15 20.6569 15 19C15 17.3431 16.3431 16 18 16C19.6569 16 21 17.3431 21 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 	</svg>`,
 };
 

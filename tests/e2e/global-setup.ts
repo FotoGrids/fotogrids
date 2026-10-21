@@ -176,6 +176,12 @@ async function globalSetup(): Promise< void > {
 	// every run begins from the documented ladder.
 	resetRoleCapabilities();
 
+	// Specs address every catalog key, so they run in Advanced with no upgrade
+	// tip. The Easy mode specs set the state they need and put this back.
+	wpEval(
+		"update_option( 'fotogrids_settings_mode', 'advanced' ); delete_metadata( 'user', 0, 'fotogrids_settings_mode', '', true ); delete_option( 'fotogrids_settings_mode_tip' );"
+	);
+
 	mkdirSync( authDir(), { recursive: true } );
 
 	const adminUser = process.env.WP_ADMIN_USER ?? 'admin';

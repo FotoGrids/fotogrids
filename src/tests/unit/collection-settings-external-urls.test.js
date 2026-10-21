@@ -16,6 +16,7 @@ import '@/admin/plain/render-settings/renderConditionalMessage';
 import '@/admin/plain/render-settings/renderExternalUrlManager';
 import '@/admin/src/collection-state-manager';
 import '@/admin/src/utils/ui-state-manager';
+import '@/admin/plain/render-settings/utils/settings-mode';
 import '@/admin/plain/collection-settings';
 import { renderElement, click, act } from '@tests/helpers/render-component';
 
@@ -77,7 +78,7 @@ describe('CollectionSettings external-URL flow', () => {
 			field_states: {},
 			field_states_by_option: {},
 		};
-		window.fotogridsAdmin = {};
+		window.fotogridsAdmin = { settingsMode: 'advanced' };
 		window.FotoGridsIcons = {};
 		window.FotoGridsSettings = {
 			loadSettingsGroups: jest.fn(() => Promise.resolve(CATALOG)),

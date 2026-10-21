@@ -40,6 +40,7 @@
                 },
                 {
                     "key": "fotogrids_og_image_source",
+                    "modes": ["easy", "advanced"],
                     "type": "button_group",
                     "label": "OG Image Source",
                     "description": "Choose which image appears in social previews for this {postType}.",
@@ -66,6 +67,7 @@
                 },
                 {
                     "key": "fotogrids_og_image_source",
+                    "modes": ["easy", "advanced"],
                     "type": "button_group",
                     "label": "OG Image Source",
                     "description": "Choose which image appears in social previews for this album.",
@@ -92,6 +94,7 @@
                 },
                 {
                     "key": "fotogrids_og_image_custom_id",
+                    "modes": ["easy", "advanced"],
                     "type": "image_picker",
                     "label": "Custom OG Image",
                     "description": "Recommended size: 1200×630px.",
@@ -121,6 +124,7 @@
             "settings": [
                 {
                     "key": "fotogrids_noindex",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Hide from search engines",
                     "description": "When on, emits <code>&lt;meta name=\"robots\" content=\"noindex, nofollow\"&gt;</code> so search engines skip this page. Use for drafts, private clients, or one-off {postType.plural.lower} you don't want indexed.",

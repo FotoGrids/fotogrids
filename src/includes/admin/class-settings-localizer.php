@@ -62,7 +62,8 @@ final class Settings_Localizer {
 	 *     @type bool         $is_defaults    Whether this is the global defaults page.
 	 *     @type array        $gallery_items  Pre-loaded gallery items (default: read from post meta).
 	 *     @type array|null   $settings       Pre-built settings array (default: read from post meta).
-	 *     @type array|null   $defaults       Pre-built defaults array (default: from Collection_Defaults).
+	 *     @type array|null   $defaults       Pre-built defaults array (default: from Collection_Defaults,
+	 *                                        merged with the site's saved defaults outside the defaults page).
 	 * }
 	 * @return array<string, mixed> Localised script data.
 	 */
@@ -81,6 +82,8 @@ final class Settings_Localizer {
 
 		$args['post_type'] = self::resolve_post_type( $args['post_type'], (int) $args['post_id'] );
 
+		$effective_defaults = null === $args['defaults'] && ! $args['is_defaults'];
+
 		if ( null === $args['defaults'] ) {
 			$args['defaults'] = self::resolve_defaults( $args['post_type'], (bool) $args['is_defaults'] );
 		}
@@ -94,10 +97,21 @@ final class Settings_Localizer {
 			);
 		}
 
+		// On the edit screen, `defaults` is what a new collection of this kind starts with.
+		if ( $effective_defaults ) {
+			$args['defaults'] = self::merge_saved_defaults(
+				(array) $args['defaults'],
+				\FotoGrids\Settings\Collection_Defaults_Store::get( (string) $args['post_type'] )
+			);
+		}
+
 		// Hard guarantee: the encrypted password ciphertext must NEVER reach
 		// the browser, regardless of how $args['settings'] was built.
 		if ( isset( $args['settings']['password'] ) && '' !== $args['settings']['password'] ) {
 			$args['settings']['password'] = '';
+		}
+		if ( isset( $args['defaults']['password'] ) && '' !== $args['defaults']['password'] ) {
+			$args['defaults']['password'] = '';
 		}
 
 		$gallery_items = self::resolve_gallery_items(
@@ -181,33 +195,7 @@ final class Settings_Localizer {
 		$settings = array();
 
 		if ( $is_defaults ) {
-			$saved_defaults = \FotoGrids\Settings\Collection_Defaults_Store::get( $post_type );
-			foreach ( $defaults as $key => $default_value ) {
-				if ( ! isset( $saved_defaults[ $key ] ) ) {
-					$settings[ $key ] = $default_value;
-					continue;
-				}
-
-				$saved_value = $saved_defaults[ $key ];
-				if ( is_bool( $default_value ) ) {
-					$settings[ $key ] = $saved_value;
-					continue;
-				}
-				if ( is_string( $saved_value ) ) {
-					$decoded = json_decode( $saved_value, true );
-					if ( is_array( $decoded ) ) {
-						$settings[ $key ] = $decoded;
-					} elseif ( json_last_error() === JSON_ERROR_NONE && null !== $decoded ) {
-						$settings[ $key ] = $decoded;
-					} else {
-						$settings[ $key ] = $saved_value;
-					}
-					continue;
-				}
-				$settings[ $key ] = $saved_value;
-			}
-
-			return $settings;
+			return self::merge_saved_defaults( $defaults, \FotoGrids\Settings\Collection_Defaults_Store::get( $post_type ) );
 		}
 
 		foreach ( $defaults as $key => $default_value ) {
@@ -250,6 +238,46 @@ final class Settings_Localizer {
 				continue;
 			}
 
+			$settings[ $key ] = $saved_value;
+		}
+
+		return $settings;
+	}
+
+	/**
+	 * Shipped defaults overlaid with the site's saved defaults, decoded to
+	 * the payload shape.
+	 *
+	 * @since  1.3.0
+	 * @param  array<string, mixed> $defaults Shipped defaults (drives the key list + type coercion).
+	 * @param  array<string, mixed> $saved    Saved defaults for the collection type.
+	 * @return array<string, mixed>
+	 */
+	public static function merge_saved_defaults( array $defaults, array $saved ): array {
+		$settings = array();
+
+		foreach ( $defaults as $key => $default_value ) {
+			if ( ! isset( $saved[ $key ] ) ) {
+				$settings[ $key ] = $default_value;
+				continue;
+			}
+
+			$saved_value = $saved[ $key ];
+			if ( is_bool( $default_value ) ) {
+				$settings[ $key ] = $saved_value;
+				continue;
+			}
+			if ( is_string( $saved_value ) ) {
+				$decoded = json_decode( $saved_value, true );
+				if ( is_array( $decoded ) ) {
+					$settings[ $key ] = $decoded;
+				} elseif ( json_last_error() === JSON_ERROR_NONE && null !== $decoded ) {
+					$settings[ $key ] = $decoded;
+				} else {
+					$settings[ $key ] = $saved_value;
+				}
+				continue;
+			}
 			$settings[ $key ] = $saved_value;
 		}
 

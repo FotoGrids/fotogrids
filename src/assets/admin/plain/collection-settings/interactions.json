@@ -17,6 +17,7 @@
                     "settings": [
                         {
                             "key": "item_click_behavior",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Item Click Behavior",
                             "options": [
@@ -52,23 +53,28 @@
                         },
                         {
                             "key": "lightbox_variant",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
+                            "bigIcons": true,
                             "label": "Lightbox Style",
                             "description": "<strong>Full Lightbox:</strong> an immersive viewer with whole-gallery navigation, thumbnails, and an info panel.<br><strong>Lightbox Mini:</strong> a single image in a lightweight overlay with previous / next arrows and a close button.<br><strong>Lightbox Grid:</strong> every image in a scrollable grid with minimal chrome.",
                             "options": [
                                 {
                                     "label": "Full Lightbox",
                                     "value": "full",
+                                    "icon": "lightbox_full",
                                     "tier_required": "free"
                                 },
                                 {
                                     "label": "Lightbox Mini",
                                     "value": "mini",
+                                    "icon": "lightbox_mini",
                                     "tier_required": "free"
                                 },
                                 {
                                     "label": "Lightbox Grid",
                                     "value": "grid",
+                                    "icon": "lightbox_grid",
                                     "tier_required": "free",
                                     "condition": {
                                         "dependsOn": "layout",
@@ -111,6 +117,7 @@
                         },
                         {
                             "key": "item_click_zoom_conflict_notice",
+                            "modes": ["easy", "advanced"],
                             "type": "info_block",
                             "variant": "danger",
                             "subtitle": "Conflicts with Image Zoom",
@@ -169,6 +176,7 @@
                         },
                         {
                             "key": "external_url_manager",
+                            "modes": ["easy", "advanced"],
                             "type": "external_url_manager",
                             "label": "Item URLs",
                             "condition": {
@@ -191,6 +199,7 @@
                     "settings": [
                         {
                             "key": "interactions_zoom",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Enable Zoom",
                             "description": "Allow visitors to zoom into the image on hover or click.",
@@ -202,6 +211,7 @@
                         },
                         {
                             "key": "interactions_zoom_style",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Zoom Style",
                             "description": "Inline zooms inside the item. Popover opens a lightweight overlay above the page.",
@@ -234,6 +244,7 @@
                         },
                         {
                             "key": "interactions_zoom_mode",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Zoom Mode",
                             "description": "How the popover zoom is triggered. Click mode replaces Item Click Behavior.",
@@ -308,6 +319,7 @@
                         },
                         {
                             "key": "zoom_item_click_conflict_notice",
+                            "modes": ["easy", "advanced"],
                             "type": "info_block",
                             "variant": "danger",
                             "subtitle": "Conflicts with Item Click Behavior",
@@ -365,6 +377,7 @@
                                         {
                                             "use": "lightbox-mini",
                                             "key_prefix": "lightbox_mini_",
+                                            "overrides": { "show_close": { "modes": ["easy", "advanced"] }, "show_arrows": { "modes": ["easy", "advanced"] }, "show_bullets": { "modes": ["easy", "advanced"] } },
                                             "include": [
                                                 "show_close",
                                                 "show_arrows",
@@ -382,6 +395,7 @@
                                         {
                                             "use": "lightbox-mini",
                                             "key_prefix": "lightbox_mini_",
+                                            "overrides": { "show_overlay": { "modes": ["easy", "advanced"] }, "theme": { "modes": ["easy", "advanced"] } },
                                             "include": [
                                                 "show_overlay",
                                                 "overlay_blur",

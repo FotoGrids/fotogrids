@@ -5,6 +5,7 @@
     "settings": [
         {
             "key": "default_sort_order",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Default Sort Order",
             "description": "How items are sorted when the {postType.lower} is loaded.",
@@ -77,6 +78,7 @@
         },
         {
             "key": "date_sort_direction",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Sort Direction",
             "options": [
@@ -105,6 +107,7 @@
         },
         {
             "key": "title_sort_direction",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Title Sort Direction",
             "options": [
@@ -204,6 +207,7 @@
         },
         {
             "key": "random_sort_caching_notice",
+            "modes": ["easy", "advanced"],
             "type": "info_block",
             "postTypes": [
                 "gallery"
@@ -251,6 +255,7 @@
         },
         {
             "key": "advanced_sorting_promo",
+            "modes": ["easy", "advanced"],
             "type": "promo",
             "messages": [
                 {

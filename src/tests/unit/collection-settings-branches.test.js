@@ -31,6 +31,7 @@ import '@/admin/plain/render-settings/renderSideBySide';
 import '@/admin/plain/render-settings/renderSettingSubTabs';
 import '@/admin/src/collection-state-manager';
 import '@/admin/src/utils/ui-state-manager';
+import '@/admin/plain/render-settings/utils/settings-mode';
 import '@/admin/plain/collection-settings';
 import { renderElement, act } from '@tests/helpers/render-component';
 
@@ -168,7 +169,7 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 				'driver.pro_opt': 'teaser',
 			},
 		};
-		window.fotogridsAdmin = {};
+		window.fotogridsAdmin = { settingsMode: 'advanced' };
 		window.FotoGridsIcons = {};
 		window.wpApiSettings = { root: 'https://x/wp-json/', nonce: 'rn' };
 		window.FotoGridsSettings = {
@@ -267,8 +268,9 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 		});
 		// switch_tab:'layout' fires -> the General (layout) tab becomes active
 		expect(
-			handle.container.querySelector('.fotogrids-settings-tab.fg-is-active')
-				.textContent
+			handle.container.querySelector(
+				'.fotogrids-settings-tab.fg-is-active'
+			).textContent
 		).toContain('General');
 	});
 
@@ -289,24 +291,45 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 	const okPost = (data) =>
 		Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
 
+	const preferenceCalls = () =>
+		global.fetch.mock.calls.filter(
+			([, init]) =>
+				init?.body instanceof FormData &&
+				init.body.get('action') === 'fotogrids_update_user_preference'
+		);
+
+	const activeMode = (container) =>
+		container
+			.querySelector('.fotogrids-segmented__option[aria-checked="true"]')
+			?.textContent.trim();
+
 	it('persists a successful Easy/Advanced mode change', async () => {
 		window.fotogridsAdmin = {
 			ajaxUrl: 'https://x/admin-ajax.php',
 			nonce: 'n',
-			settingsMode: 'easy',
+			settingsMode: 'advanced',
 		};
 		global.fetch = jest.fn(() => okPost({ success: true }));
 		const handle = mount();
 		await flush();
-		const advanced = [
-			...handle.container.querySelectorAll('.fotogrids-segmented__option'),
-		].find((b) => /Advanced/.test(b.textContent));
+		const easy = [
+			...handle.container.querySelectorAll(
+				'.fotogrids-segmented__option'
+			),
+		].find((b) => /Easy/.test(b.textContent));
 		await act(async () => {
-			advanced.click();
+			easy.click();
 			for (let i = 0; i < 6; i++) await Promise.resolve();
 		});
-		expect(global.fetch).toHaveBeenCalled();
-		expect(window.fotogridsAdmin.settingsMode).toBe('advanced');
+		const calls = preferenceCalls();
+		expect(calls).toHaveLength(1);
+		const [url, init] = calls[0];
+		expect(url).toBe('https://x/admin-ajax.php');
+		expect(init.method).toBe('POST');
+		expect(init.body.get('preference')).toBe('settings_mode');
+		expect(init.body.get('value')).toBe('easy');
+		expect(init.body.get('nonce')).toBe('n');
+		expect(window.fotogridsAdmin.settingsMode).toBe('easy');
 	});
 
 	it('reverts mode and toasts on a failed mode change', async () => {
@@ -314,21 +337,30 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 		window.fotogridsAdmin = {
 			ajaxUrl: 'https://x/admin-ajax.php',
 			nonce: 'n',
-			settingsMode: 'easy',
+			settingsMode: 'advanced',
 		};
 		global.fetch = jest.fn(() =>
 			okPost({ success: false, data: { message: 'no' } })
 		);
 		const handle = mount();
 		await flush();
-		const advanced = [
-			...handle.container.querySelectorAll('.fotogrids-segmented__option'),
-		].find((b) => /Advanced/.test(b.textContent));
+		const easy = [
+			...handle.container.querySelectorAll(
+				'.fotogrids-segmented__option'
+			),
+		].find((b) => /Easy/.test(b.textContent));
 		await act(async () => {
-			advanced.click();
+			easy.click();
 			for (let i = 0; i < 6; i++) await Promise.resolve();
 		});
-		expect(window.fotogridsToast.error).toHaveBeenCalled();
+		const calls = preferenceCalls();
+		expect(calls).toHaveLength(1);
+		expect(calls[0][1].body.get('preference')).toBe('settings_mode');
+		expect(calls[0][1].body.get('value')).toBe('easy');
+		expect(calls[0][1].body.get('nonce')).toBe('n');
+		expect(window.fotogridsToast.error).toHaveBeenCalledWith('no');
+		expect(activeMode(handle.container)).toBe('Advanced');
+		expect(window.fotogridsAdmin.settingsMode).toBe('advanced');
 	});
 
 	it('persists a successful autosave toggle', async () => {
@@ -336,11 +368,14 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 			ajaxUrl: 'https://x/admin-ajax.php',
 			nonce: 'n',
 			autosave: false,
+			settingsMode: 'advanced',
 		};
 		global.fetch = jest.fn(() => okPost({ success: true }));
 		const handle = mount();
 		await flush();
-		const toggle = handle.container.querySelector('.fotogrids-toggle--green');
+		const toggle = handle.container.querySelector(
+			'.fotogrids-toggle--green'
+		);
 		await act(async () => {
 			toggle.click();
 			for (let i = 0; i < 6; i++) await Promise.resolve();
@@ -358,11 +393,14 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 			ajaxUrl: 'https://x/admin-ajax.php',
 			nonce: 'n',
 			autosave: false,
+			settingsMode: 'advanced',
 		};
 		global.fetch = jest.fn(() => Promise.reject(new Error('down')));
 		const handle = mount();
 		await flush();
-		const toggle = handle.container.querySelector('.fotogrids-toggle--green');
+		const toggle = handle.container.querySelector(
+			'.fotogrids-toggle--green'
+		);
 		await act(async () => {
 			toggle.click();
 			for (let i = 0; i < 6; i++) await Promise.resolve();

@@ -54,6 +54,10 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 		);
 	}
 
+	const resolvedTab = availableSubTabs.some((t) => t.id === activeSubTab)
+		? activeSubTab
+		: availableSubTabs[0]?.id;
+
 	return h(
 		'div',
 		{
@@ -69,7 +73,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 						{
 							key: subTab.id,
 							type: 'button',
-							className: `fotogrids-lightbox-subtab ${activeSubTab === subTab.id ? 'fg-is-active' : ''}`,
+							className: `fotogrids-lightbox-subtab ${resolvedTab === subTab.id ? 'fg-is-active' : ''}`,
 							onClick: (e) => {
 								e.preventDefault();
 								e.stopPropagation();
@@ -115,25 +119,12 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 							className:
 								'fotogrids-lightbox-subtab-content__inner',
 						},
-						(() => {
-							const visibleIds = new Set(
-								availableSubTabs.map((t) => t.id)
-							);
-							const resolvedTab = visibleIds.has(activeSubTab)
-								? activeSubTab
-								: availableSubTabs[0]?.id;
-							return (
-								setting.subTabs[resolvedTab]?.settings.map(
-									(subSetting) =>
-										renderSetting(
-											annotateChild(
-												subSetting,
-												'multi_subtab'
-											)
-										)
-								) || []
-							);
-						})()
+						setting.subTabs[resolvedTab]?.settings.map(
+							(subSetting) =>
+								renderSetting(
+									annotateChild(subSetting, 'multi_subtab')
+								)
+						) || []
 					),
 				]
 			),

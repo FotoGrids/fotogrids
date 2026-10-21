@@ -67,9 +67,7 @@ describe('renderSettingSubTabs', () => {
 
 	it('switches tab on click', () => {
 		const setActiveSubTab = jest.fn();
-		const { container } = renderElement(
-			build(MULTI, { setActiveSubTab })
-		);
+		const { container } = renderElement(build(MULTI, { setActiveSubTab }));
 		click(container.querySelectorAll('.fotogrids-lightbox-subtab')[1]);
 		expect(setActiveSubTab).toHaveBeenCalledWith('two');
 	});
@@ -80,6 +78,28 @@ describe('renderSettingSubTabs', () => {
 		);
 		// resolves to the first subtab's settings
 		expect(container.textContent).toContain('OneField');
+	});
+
+	it('highlights the fallback tab when the active subtab was filtered out', () => {
+		const filtered = {
+			subTabs: {
+				two: MULTI.subTabs.two,
+				three: {
+					id: 'three',
+					label: 'Three',
+					icon: 'i',
+					settings: [{ label: 'ThreeField' }],
+				},
+			},
+		};
+		const { container } = renderElement(
+			build(filtered, { activeSubTab: 'one' })
+		);
+		const active = container.querySelectorAll('.fg-is-active');
+		expect(active).toHaveLength(1);
+		expect(active[0].textContent).toContain('Two');
+		expect(container.textContent).toContain('TwoField');
+		expect(container.textContent).not.toContain('ThreeField');
 	});
 
 	it('filters subtabs by condition via shouldDisplaySetting', () => {

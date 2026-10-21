@@ -87,6 +87,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-seeder.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-legacy-defaults-option.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-mode.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/options/class-option-registry.php';
 // Upgrade migrations: every class-*.php under includes/migrations/, run once each by Migration_Runner.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/interface-migration.php';

@@ -18,6 +18,7 @@
             "settings": [
                 {
                     "key": "thumbnail_size",
+                    "modes": ["easy", "advanced"],
                     "type": "image_size",
                     "label": "",
                     "api_endpoint": "/wp-json/fotogrids/v1/admin/image-sizes",
@@ -73,6 +74,7 @@
                     "settings": [
                         {
                             "key": "thumbnail_custom_size_width",
+                            "modes": ["easy", "advanced"],
                             "type": "range",
                             "label": "Width",
                             "min": 50,
@@ -86,6 +88,7 @@
                         },
                         {
                             "key": "thumbnail_custom_size_height",
+                            "modes": ["easy", "advanced"],
                             "type": "range",
                             "label": "Height",
                             "min": 50,
@@ -192,6 +195,7 @@
             "settings": [
                 {
                     "key": "full_image_size",
+                    "modes": ["easy", "advanced"],
                     "type": "image_size",
                     "label": "",
                     "api_endpoint": "/wp-json/fotogrids/v1/admin/image-sizes",
@@ -241,6 +245,7 @@
                     "settings": [
                         {
                             "key": "full_image_custom_size_width",
+                            "modes": ["easy", "advanced"],
                             "type": "range",
                             "label": "Width",
                             "min": 200,
@@ -254,6 +259,7 @@
                         },
                         {
                             "key": "full_image_custom_size_height",
+                            "modes": ["easy", "advanced"],
                             "type": "range",
                             "label": "Height (0 = proportional)",
                             "min": 0,
@@ -355,6 +361,7 @@
         },
         {
             "key": "media_regen_info",
+            "modes": ["easy", "advanced"],
             "type": "info_block",
             "subtitle": "Existing images may need regenerating",
             "message": "WordPress generates image sizes at upload time. After changing these settings, use the regeneration tool to rebuild thumbnails for images already in your galleries.",

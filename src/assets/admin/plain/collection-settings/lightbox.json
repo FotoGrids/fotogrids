@@ -60,6 +60,7 @@
                     "settings": [
                         {
                             "key": "lightbox_scope",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Lightbox Contents",
                             "description": "Whether the lightbox shows just the displayed image or the full gallery.",
@@ -94,6 +95,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_img_shadow_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Shadow on Full Image",
                                     "default": false,
@@ -119,6 +121,7 @@
                         },
                         {
                             "key": "lightbox_theme",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Lightbox Theme",
                             "options": [
@@ -470,6 +473,7 @@
                         },
                         {
                             "key": "lightbox_fullscreen",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Fullscreen Button",
                             "description": "Adds a fullscreen button to the lightbox toolbar.",
@@ -521,6 +525,7 @@
                     "settings": [
                         {
                             "key": "lightbox_loop",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Loop Gallery",
                             "description": "After the last item, loop back to the first. When off, navigation stops at each end.",
@@ -570,6 +575,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_transition",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Transition Between Items",
                                     "options": [
@@ -679,6 +685,7 @@
                                 {
                                     "use": "auto-progress",
                                     "key_prefix": "lightbox_",
+                                    "overrides": { "auto_progress": { "modes": ["easy", "advanced"] } },
                                     "exclude": ["auto_progress_pause_on_hover"]
                                 }
                             ],
@@ -694,6 +701,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_show_arrows",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Show Navigation Arrows",
                                     "tier_required": "free",
@@ -819,6 +827,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_show_dots",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Show Bullets",
                                     "tier_required": "free",
@@ -850,6 +859,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_show_counter",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Show Item Counter",
                                     "tier_required": "free",
@@ -872,6 +882,7 @@
                     "settings": [
                         {
                             "key": "lightbox_thumbnail_strip_location",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Thumbnail Strip Location",
                             "options": [
@@ -1017,6 +1028,7 @@
                     "settings": [
                         {
                             "key": "lightbox_backdrop_close",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Close Lightbox on Background Click",
                             "tier_required": "free",
@@ -1031,6 +1043,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_info_panel_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Show Info Panel",
                                     "description": "Display image details (caption, description, EXIF, and more) alongside the lightbox.",
@@ -1102,6 +1115,7 @@
                                 },
                                 {
                                     "key": "lightbox_info_blocks",
+                                    "modes": ["easy", "advanced"],
                                     "type": "token_select",
                                     "label": "Info Panel Blocks",
                                     "description": "Choose which blocks appear in the info panel. Drag to reorder.",
@@ -1186,6 +1200,7 @@
                                 },
                                 {
                                     "key": "lightbox_info_blocks_empty_notice",
+                                    "modes": ["easy", "advanced"],
                                     "type": "info_block",
                                     "variant": "danger",
                                     "subtitle": "No info panel blocks selected",
@@ -1244,6 +1259,7 @@
                                 },
                                 {
                                     "key": "lightbox_share_block_off_notice",
+                                    "modes": ["easy", "advanced"],
                                     "type": "info_block",
                                     "variant": "danger",
                                     "subtitle": "Share block won't appear",
@@ -1309,6 +1325,7 @@
                             "settings": [
                                 {
                                     "key": "lightbox_zoom",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Image Zoom",
                                     "description": "Allow visitors to zoom into images in the lightbox.",

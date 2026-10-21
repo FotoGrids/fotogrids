@@ -14,6 +14,7 @@
                     "settings": [
                         {
                             "key": "loading_icon",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Loading Icon",
                             "options": [
@@ -232,6 +233,7 @@
                         },
                         {
                             "key": "loaded_effect",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Loaded Effect",
                             "options": [
@@ -330,6 +332,7 @@
                         },
                         {
                             "key": "hover_effect_info",
+                            "modes": ["easy", "advanced"],
                             "type": "info_block",
                             "subtitle": "Hover effects and your styling",
                             "message": "Some hover effects animate the image, border, or shadow on hover. When an effect controls one of these, it takes over that property on hover - so a Hover Image Filter, Border, or Shadow you set under Styling may not apply while that effect is active.",
@@ -342,6 +345,7 @@
                         },
                         {
                             "key": "hover_effect",
+                            "modes": ["easy", "advanced"],
                             "type": "hover_effects_grid",
                             "label": "Hover Effect",
                             "default": "none",
@@ -352,6 +356,7 @@
                         },
                         {
                             "key": "hover_affect_others",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Other Items on Hover",
                             "help": "When one item is hovered, apply a subtle effect to the rest of the gallery to make the hovered item stand out.",

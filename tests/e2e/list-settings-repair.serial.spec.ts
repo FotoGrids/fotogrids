@@ -59,6 +59,8 @@ async function runUpgrade( page: import( '@playwright/test' ).Page ): Promise< v
 	setOption( 'fotogrids_completed_migrations', null );
 	await page.goto( '/' );
 	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.7' );
+	// The upgrade also flags the Easy mode tip, which would cover the settings this spec clicks.
+	setOption( 'fotogrids_settings_mode_tip', null );
 }
 
 /** Store the defaults option an earlier version wrote, past the filters that keep its name working. */

@@ -34,6 +34,7 @@ import '@/admin/plain/render-settings/renderButtonGroupDynamic';
 import '@/admin/plain/render-settings/renderImageSize';
 import '@/admin/src/collection-state-manager';
 import '@/admin/src/utils/ui-state-manager';
+import '@/admin/plain/render-settings/utils/settings-mode';
 import '@/admin/plain/collection-settings';
 import { renderElement, click, changeValue, act } from '@tests/helpers/render-component';
 
@@ -263,7 +264,7 @@ describe('CollectionSettings component', () => {
 			field_states: {},
 			field_states_by_option: {},
 		};
-		window.fotogridsAdmin = {};
+		window.fotogridsAdmin = { settingsMode: 'advanced' };
 		window.FotoGridsIcons = {};
 		window.FotoGridsSettings = {
 			loadSettingsGroups: jest.fn(() => Promise.resolve(CATALOG)),

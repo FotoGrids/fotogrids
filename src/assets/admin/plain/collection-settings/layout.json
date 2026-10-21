@@ -5,6 +5,7 @@
     "settings": [
         {
             "key": "layout",
+            "modes": ["easy", "advanced"],
             "type": "layout_grid",
             "label": "Layout Type",
             "options": [
@@ -126,6 +127,74 @@
             "visible_when_uninstalled": true
         },
         {
+            "id": "easy_spacing",
+            "type": "preset_group",
+            "label": "Spacing",
+            "description": "Space between items.",
+            "modes": ["easy"],
+            "columns": 4,
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "grid",
+                    "masonry",
+                    "justified",
+                    "featured-item",
+                    "instant-photos"
+                ]
+            },
+            "options": [
+                {
+                    "value": "none",
+                    "label": "None",
+                    "icon": "spacing_none",
+                    "values": {
+                        "item_spacing": {
+                            "desktop": 0,
+                            "tablet": 0,
+                            "mobile": 0
+                        }
+                    }
+                },
+                {
+                    "value": "small",
+                    "label": "Small",
+                    "icon": "spacing_small",
+                    "values": {
+                        "item_spacing": {
+                            "desktop": 10,
+                            "tablet": 8,
+                            "mobile": 5
+                        }
+                    }
+                },
+                {
+                    "value": "medium",
+                    "label": "Medium",
+                    "icon": "spacing_medium",
+                    "values": {
+                        "item_spacing": {
+                            "desktop": 20,
+                            "tablet": 16,
+                            "mobile": 10
+                        }
+                    }
+                },
+                {
+                    "value": "large",
+                    "label": "Large",
+                    "icon": "spacing_large",
+                    "values": {
+                        "item_spacing": {
+                            "desktop": 32,
+                            "tablet": 24,
+                            "mobile": 16
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "key": "item_spacing",
             "type": "responsive_range",
             "label": "Item Spacing",
@@ -182,6 +251,7 @@
                             "settings": [
                                 {
                                     "key": "featured_image_side",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Featured Image Side",
                                     "description": "Which side the large featured image sits on. The grid fills the other half.",
@@ -207,6 +277,7 @@
                                 },
                                 {
                                     "key": "featured_thumbs_count",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Grid Items",
                                     "description": "How many items the grid shows beside the featured image.",
@@ -385,6 +456,7 @@
         {
             "use": "aspect-ratio",
             "key_prefix": "layout_item_aspect_",
+            "modes": ["easy", "advanced"],
             "overrides": {
                 "ratio": {
                     "description": "Shape of each item. Choose \"None\" to keep the image's original aspect ratio (only available for the Single Item layout).",
@@ -497,6 +569,7 @@
                 },
                 {
                     "key": "instant_photo_hover_action",
+                    "modes": ["easy", "advanced"],
                     "type": "button_group",
                     "label": "Action on Hover",
                     "description": "How each item reacts when the visitor hovers over it.",
@@ -548,6 +621,7 @@
                 },
                 {
                     "key": "instant_photo_elevation",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Elevation",
                     "description": "Soft shadow under each item, lit from above.",
@@ -562,6 +636,7 @@
                     "settings": [
                         {
                             "key": "instant_photo_sticker",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Add Sticker",
                             "description": "Decorative tape strip across the top of each item.",
@@ -684,6 +759,7 @@
                 },
                 {
                     "key": "columns",
+                    "modes": ["easy", "advanced"],
                     "type": "responsive_range",
                     "label": "Number of Columns",
                     "description": "Fixed number of columns for each device",
@@ -818,6 +894,7 @@
             "settings": [
                 {
                     "key": "layout_items_per_view",
+                    "modes": ["easy", "advanced"],
                     "type": "responsive_range",
                     "label": "Items Per View",
                     "description": "How many items are visible in the slider at once for each device.",
@@ -944,6 +1021,7 @@
                 {
                     "use": "auto-progress",
                     "key_prefix": "single_item_",
+                    "overrides": { "auto_progress": { "modes": ["easy", "advanced"] } },
                     "exclude": [
                         "auto_progress_style",
                         "auto_progress_bar_location",
@@ -982,6 +1060,7 @@
                             "settings": [
                                 {
                                     "key": "layout_justified_row_height",
+                                    "modes": ["easy", "advanced"],
                                     "type": "responsive_range",
                                     "label": "Target Row Height",
                                     "description": "Approximate height of each row. Actual row heights vary slightly so images can fill the row.",

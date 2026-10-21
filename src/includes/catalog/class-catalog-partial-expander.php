@@ -321,6 +321,7 @@ final class Catalog_Partial_Expander {
 		if ( isset( $node['label'] ) ) {
 			$child['label'] = $node['label'];
 		}
+		$child = self::apply_modes( $child, $node );
 
 		$composed_key = (string) ( $entry['use_partial'] );
 		if ( isset( $node['composed'][ $composed_key ] ) && is_array( $node['composed'][ $composed_key ] ) ) {
@@ -394,6 +395,7 @@ final class Catalog_Partial_Expander {
 			if ( isset( $node['key_map'] ) && is_array( $node['key_map'] ) ) {
 				$child_use['key_map'] = $node['key_map'];
 			}
+			$child_use = self::apply_modes( $child_use, $node );
 
 			$sub_tab = array(
 				'id'    => $state,
@@ -431,6 +433,7 @@ final class Catalog_Partial_Expander {
 		}
 
 		$subtabs_node['subTabs'] = $sub_tabs;
+		$subtabs_node            = self::apply_modes( $subtabs_node, $node );
 
 		if ( isset( $node['condition'] ) && is_array( $node['condition'] ) ) {
 			$subtabs_node['condition'] = $node['condition'];
@@ -538,7 +541,7 @@ final class Catalog_Partial_Expander {
 			$group['condition'] = $group_condition;
 		}
 
-		return $group;
+		return self::apply_modes( $group, $node );
 	}
 
 	/**
@@ -594,11 +597,29 @@ final class Catalog_Partial_Expander {
 			$field['condition'] = $node['condition'];
 		}
 
+		$field = self::apply_modes( $field, $node );
+
 		$params               = is_array( $node['params'] ?? null ) ? $node['params'] : array();
 		$params['key_prefix'] = $key_prefix;
 		$field                = self::substitute_params( $field, $params );
 
 		return $field;
+	}
+
+	/**
+	 * Copies the use node's `modes` list onto an expanded node.
+	 *
+	 * @since   1.3.0
+	 * @param   array<string, mixed> $target Expanded field, group or nested use node.
+	 * @param   array<string, mixed> $node   The use node.
+	 * @return  array<string, mixed>
+	 */
+	private static function apply_modes( array $target, array $node ): array {
+		if ( isset( $node['modes'] ) && is_array( $node['modes'] ) ) {
+			$target['modes'] = array_values( $node['modes'] );
+		}
+
+		return $target;
 	}
 
 	/**

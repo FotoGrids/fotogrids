@@ -25,6 +25,7 @@
                             "settings": [
                                 {
                                     "key": "background_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Background",
                                     "default": false,
@@ -52,6 +53,7 @@
                                             "settings": [
                                                 {
                                                     "key": "background_color",
+                                                    "modes": ["easy", "advanced"],
                                                     "type": "color",
                                                     "label": "Background Color",
                                                     "default": "rgba(0,0,0,0)",
@@ -107,6 +109,59 @@
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
+                        },
+                        {
+                            "id": "easy_corners",
+                            "type": "preset_group",
+                            "label": "Corners",
+                            "description": "How rounded each item's corners are.",
+                            "modes": ["easy"],
+                            "columns": 3,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos"
+                                ],
+                                "condition_operator": "not_in"
+                            },
+                            "options": [
+                                {
+                                    "value": "square",
+                                    "label": "Square",
+                                    "icon": "corners_square",
+                                    "values": {
+                                        "border_radius": {
+                                            "desktop": 0,
+                                            "tablet": 0,
+                                            "mobile": 0
+                                        }
+                                    }
+                                },
+                                {
+                                    "value": "soft",
+                                    "label": "Soft",
+                                    "icon": "corners_soft",
+                                    "values": {
+                                        "border_radius": {
+                                            "desktop": 6,
+                                            "tablet": 6,
+                                            "mobile": 6
+                                        }
+                                    }
+                                },
+                                {
+                                    "value": "rounded",
+                                    "label": "Rounded",
+                                    "icon": "corners_rounded",
+                                    "values": {
+                                        "border_radius": {
+                                            "desktop": 16,
+                                            "tablet": 16,
+                                            "mobile": 16
+                                        }
+                                    }
+                                }
+                            ]
                         },
                         {
                             "key": "border_radius_group",
@@ -168,6 +223,7 @@
                             "settings": [
                                 {
                                     "key": "border_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Border",
                                     "default": false,
@@ -194,6 +250,36 @@
                                             "icon": "image",
                                             "settings": [
                                                 {
+                                                    "id": "easy_border_width",
+                                                    "type": "preset_group",
+                                                    "label": "Border Width",
+                                                    "modes": ["easy"],
+                                                    "bigIcons": false,
+                                                    "options": [
+                                                        {
+                                                            "value": "thin",
+                                                            "label": "Thin",
+                                                            "values": {
+                                                                "border_width": {"desktop": 1, "tablet": 1, "mobile": 1}
+                                                            }
+                                                        },
+                                                        {
+                                                            "value": "medium",
+                                                            "label": "Medium",
+                                                            "values": {
+                                                                "border_width": {"desktop": 2, "tablet": 2, "mobile": 2}
+                                                            }
+                                                        },
+                                                        {
+                                                            "value": "thick",
+                                                            "label": "Thick",
+                                                            "values": {
+                                                                "border_width": {"desktop": 4, "tablet": 4, "mobile": 4}
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                {
                                                     "key": "border_width",
                                                     "type": "responsive_range",
                                                     "label": "Border Width",
@@ -211,6 +297,7 @@
                                                 },
                                                 {
                                                     "key": "border_color",
+                                                    "modes": ["easy", "advanced"],
                                                     "type": "color",
                                                     "label": "Border Color",
                                                     "default": "#000000",
@@ -348,6 +435,89 @@
                             "visible_when_uninstalled": true
                         },
                         {
+                            "id": "easy_shadow",
+                            "type": "preset_group",
+                            "label": "Shadow",
+                            "description": "Shadow around each item.",
+                            "modes": ["easy"],
+                            "columns": 3,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos"
+                                ],
+                                "condition_operator": "not_in"
+                            },
+                            "options": [
+                                {
+                                    "value": "none",
+                                    "label": "None",
+                                    "icon": "shadow_none",
+                                    "values": {
+                                        "shadow_enabled": false
+                                    }
+                                },
+                                {
+                                    "value": "soft",
+                                    "label": "Soft",
+                                    "icon": "shadow_soft",
+                                    "values": {
+                                        "shadow_enabled": true,
+                                        "shadow_color": "rgba(0,0,0,0.15)",
+                                        "shadow_offset_x": {
+                                            "desktop": 0,
+                                            "tablet": 0,
+                                            "mobile": 0
+                                        },
+                                        "shadow_offset_y": {
+                                            "desktop": 2,
+                                            "tablet": 2,
+                                            "mobile": 2
+                                        },
+                                        "shadow_blur": {
+                                            "desktop": 8,
+                                            "tablet": 8,
+                                            "mobile": 8
+                                        },
+                                        "shadow_spread": {
+                                            "desktop": 0,
+                                            "tablet": 0,
+                                            "mobile": 0
+                                        }
+                                    }
+                                },
+                                {
+                                    "value": "strong",
+                                    "label": "Strong",
+                                    "icon": "shadow_strong",
+                                    "values": {
+                                        "shadow_enabled": true,
+                                        "shadow_color": "rgba(0,0,0,0.35)",
+                                        "shadow_offset_x": {
+                                            "desktop": 0,
+                                            "tablet": 0,
+                                            "mobile": 0
+                                        },
+                                        "shadow_offset_y": {
+                                            "desktop": 8,
+                                            "tablet": 8,
+                                            "mobile": 8
+                                        },
+                                        "shadow_blur": {
+                                            "desktop": 24,
+                                            "tablet": 24,
+                                            "mobile": 24
+                                        },
+                                        "shadow_spread": {
+                                            "desktop": 0,
+                                            "tablet": 0,
+                                            "mobile": 0
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             "key": "shadow_group",
                             "type": "setting_group",
                             "label": "Shadow",
@@ -433,6 +603,7 @@
                             "settings": [
                                 {
                                     "key": "thumbnail_filter_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Image Filter",
                                     "default": false,
@@ -443,6 +614,7 @@
                                 },
                                 {
                                     "key": "thumbnail_filter_type",
+                                    "modes": ["easy", "advanced"],
                                     "type": "token_select",
                                     "label": "Filter Types",
                                     "sortable": true,
@@ -746,6 +918,7 @@
                             "settings": [
                                 {
                                     "key": "full_image_background_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Background",
                                     "default": false,
@@ -773,6 +946,7 @@
                                             "settings": [
                                                 {
                                                     "key": "full_image_background_color",
+                                                    "modes": ["easy", "advanced"],
                                                     "type": "color",
                                                     "label": "Background Color",
                                                     "default": "rgba(0,0,0,0)",
@@ -841,6 +1015,7 @@
                             "settings": [
                                 {
                                     "key": "full_image_border_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Border",
                                     "default": false,
@@ -867,6 +1042,36 @@
                                             "icon": "image",
                                             "settings": [
                                                 {
+                                                    "id": "easy_full_image_border_width",
+                                                    "type": "preset_group",
+                                                    "label": "Border Width",
+                                                    "modes": ["easy"],
+                                                    "bigIcons": false,
+                                                    "options": [
+                                                        {
+                                                            "value": "thin",
+                                                            "label": "Thin",
+                                                            "values": {
+                                                                "full_image_border_width": {"desktop": 1, "tablet": 1, "mobile": 1}
+                                                            }
+                                                        },
+                                                        {
+                                                            "value": "medium",
+                                                            "label": "Medium",
+                                                            "values": {
+                                                                "full_image_border_width": {"desktop": 2, "tablet": 2, "mobile": 2}
+                                                            }
+                                                        },
+                                                        {
+                                                            "value": "thick",
+                                                            "label": "Thick",
+                                                            "values": {
+                                                                "full_image_border_width": {"desktop": 4, "tablet": 4, "mobile": 4}
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                {
                                                     "key": "full_image_border_width",
                                                     "type": "responsive_range",
                                                     "label": "Border Width",
@@ -884,6 +1089,7 @@
                                                 },
                                                 {
                                                     "key": "full_image_border_color",
+                                                    "modes": ["easy", "advanced"],
                                                     "type": "color",
                                                     "label": "Border Color",
                                                     "default": "#000000",
@@ -1027,6 +1233,7 @@
                             "settings": [
                                 {
                                     "key": "full_image_filter_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Image Filter",
                                     "default": false,
@@ -1037,6 +1244,7 @@
                                 },
                                 {
                                     "key": "full_image_filter_type",
+                                    "modes": ["easy", "advanced"],
                                     "type": "token_select",
                                     "label": "Filter Types",
                                     "sortable": true,

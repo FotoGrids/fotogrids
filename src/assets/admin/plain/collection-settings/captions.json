@@ -13,7 +13,53 @@
                     "icon": "settings",
                     "settings": [
                         {
+                            "id": "easy_caption_style",
+                            "type": "preset_group",
+                            "label": "Caption Style",
+                            "description": "Where captions appear and when they show.",
+                            "modes": ["easy"],
+                            "columns": 3,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos",
+                                    "image-viewer"
+                                ],
+                                "condition_operator": "not_in"
+                            },
+                            "options": [
+                                {
+                                    "value": "below",
+                                    "label": "Below",
+                                    "icon": "caption_below",
+                                    "values": {
+                                        "caption_placement": "bottom",
+                                        "caption_visibility": "always"
+                                    }
+                                },
+                                {
+                                    "value": "overlay",
+                                    "label": "Overlay",
+                                    "icon": "caption_always",
+                                    "values": {
+                                        "caption_placement": "overlay",
+                                        "caption_visibility": "always"
+                                    }
+                                },
+                                {
+                                    "value": "hover",
+                                    "label": "On hover",
+                                    "icon": "caption_hover",
+                                    "values": {
+                                        "caption_placement": "overlay",
+                                        "caption_visibility": "show_on_hover"
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             "key": "caption_type",
+                            "modes": ["advanced"],
                             "type": "button_group",
                             "label": "Caption Type",
                             "condition": {
@@ -40,6 +86,7 @@
                         },
                         {
                             "key": "caption_type_promotion",
+                            "modes": ["advanced"],
                             "type": "promo",
                             "condition": {
                                 "dependsOn": "layout",
@@ -365,6 +412,7 @@
                             "settings": [
                                 {
                                     "key": "caption_hide_title",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Hide title",
                                     "default": false,
@@ -375,6 +423,7 @@
                                 },
                                 {
                                     "key": "caption_title_source",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Title Source",
                                     "options": [
@@ -598,6 +647,7 @@
                             "settings": [
                                 {
                                     "key": "caption_hide_description",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Hide description",
                                     "default": false,
@@ -608,6 +658,7 @@
                                 },
                                 {
                                     "key": "caption_description_source",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Description Source",
                                     "options": [
