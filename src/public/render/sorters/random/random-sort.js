@@ -133,19 +133,20 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 
 	/**
 	 * Replaces the collection's items with the ones in an items_only
-	 * response and announces them.
+	 * response.
 	 *
-	 * @param {Element} collectionEl
 	 * @param {Element} root
 	 * @param {{html: string, css: Record<string,string>}} payload
+	 * @return {Element[]|null} The inserted items, or null when the response
+	 *         holds no items and the current ones stay.
 	 */
-	function applyItems(collectionEl, root, payload) {
+	function applyItems(root, payload) {
 		if (
 			!payload ||
 			typeof payload.html !== 'string' ||
 			'' === payload.html
 		) {
-			return;
+			return null;
 		}
 
 		injectMissingStyles(payload.css || {});
@@ -168,7 +169,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			0 === incoming.length ||
 			!template.content.querySelector('.fg-item')
 		) {
-			return;
+			return null;
 		}
 
 		root.innerHTML = '';
@@ -178,10 +179,20 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			inserted.push(node);
 		});
 
+		return inserted;
+	}
+
+	/**
+	 * Announces swapped-in items so per-item modules re-bind.
+	 *
+	 * @param {Element}   collectionEl
+	 * @param {Element[]} items
+	 */
+	function announceItems(collectionEl, items) {
 		collectionEl.dispatchEvent(
 			new CustomEvent('fotogrids:items_inserted', {
 				bubbles: true,
-				detail: { items: inserted, galleryEl: collectionEl },
+				detail: { items, galleryEl: collectionEl },
 			})
 		);
 	}
@@ -210,11 +221,34 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
+	 * Tells pagination the server's page 1 stays, so it can preload page 2.
+	 *
+	 * @param {Element} collectionEl
+	 */
+	function keepServerOrder(collectionEl) {
+		const pagination =
+			window.FotoGrids &&
+			window.FotoGrids.modules &&
+			window.FotoGrids.modules.pagination;
+		if (
+			'true' !== collectionEl.dataset.fgPaginated ||
+			!pagination ||
+			typeof pagination.preloadNext !== 'function'
+		) {
+			return;
+		}
+		pagination.preloadNext(collectionEl);
+	}
+
+	/**
 	 * Requests a fresh random selection and swaps it in, holding the items
 	 * hidden until it lands.
 	 *
-	 * The minted seed is written back onto the wrapper so pagination and the
-	 * Lightbox draw their later requests from the same permutation.
+	 * The minted seed is written onto the wrapper once its items are on
+	 * screen, so pagination and the Lightbox draw later requests from the
+	 * order the visitor sees. A late, failed, superseded or itemless response
+	 * leaves the server's seed with the server's order, and pagination is told
+	 * when the hold ends.
 	 *
 	 * @param {Element} collectionEl
 	 * @param {Element} root
@@ -242,6 +276,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 
 		let settled = false;
+		let swapped = false;
 		const release = function () {
 			if (settled) {
 				return;
@@ -250,6 +285,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			root.classList.remove(PENDING_CLASS);
 			if (inlineHold) {
 				root.style.visibility = '';
+			}
+			if (!swapped) {
+				keepServerOrder(collectionEl);
 			}
 		};
 
@@ -343,11 +381,16 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 				const busy = collectionEl.classList.contains(
 					'fotogrids-gallery--is-paginating'
 				);
-				if (!settled && !superseded && !busy) {
+				if (settled || superseded || busy) {
+					return;
+				}
+				const inserted = applyItems(root, payload);
+				if (inserted) {
+					swapped = true;
 					collectionEl.dataset.fgRandomSeed = String(seed);
-					applyItems(collectionEl, root, payload);
+					announceItems(collectionEl, inserted);
 					adoptIntoPagination(collectionEl, payload, breakpoint);
-					if (payload && Array.isArray(payload.aspects)) {
+					if (Array.isArray(payload.aspects)) {
 						collectionEl.dispatchEvent(
 							new CustomEvent('fotogrids:sequence_changed', {
 								bubbles: true,

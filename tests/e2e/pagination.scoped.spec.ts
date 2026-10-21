@@ -317,3 +317,121 @@ test.describe('where pagination does not apply', () => {
 		}
 	);
 });
+
+/** Records the page number of every render request sent for one gallery. */
+function renderRequests(page: Page, galleryId: number): number[] {
+	const pages: number[] = [];
+	page.on('request', (request) => {
+		if (
+			request.method() !== 'POST' ||
+			!decodeURIComponent(request.url()).includes(
+				'/fotogrids/v1/gallery/render'
+			)
+		) {
+			return;
+		}
+		const body = request.postDataJSON() ?? {};
+		if (Number(body.gallery_id) === galleryId) {
+			pages.push(Number(body.page));
+		}
+	});
+	return pages;
+}
+
+/**
+ * Preload Next Page: with the setting on, each page is requested once, ahead
+ * of the visitor asking for it, and the items shown match the setting off.
+ */
+test.describe('Preload Next Page', () => {
+	test(
+		'PRE-01: Load More requests each page once, ahead of the click',
+		{ tag: ['@layout', '@critical'] },
+		async ({ page }) => {
+			const seen: Record<string, number[]> = {};
+
+			for (const preload of [true, false]) {
+				const { id, url } = paginated('load_more', {
+					preload_next_page: preload,
+				});
+				const pages = renderRequests(page, id);
+				const gallery = await open(page, url, id);
+				const button = gallery.root.locator(
+					'.fg-pagination__load-more'
+				);
+
+				if (preload) {
+					await expect.poll(() => [...pages]).toEqual([2]);
+				}
+				await button.click();
+				await expect(gallery.items()).toHaveCount(24);
+				if (preload) {
+					await expect.poll(() => [...pages]).toEqual([2, 3]);
+				}
+				await button.click();
+				await expect(gallery.items()).toHaveCount(36);
+
+				if (preload) {
+					await expect.poll(() => [...pages]).toEqual([2, 3, 4]);
+				} else {
+					await page.waitForTimeout(500);
+					expect(pages).toEqual([2, 3]);
+				}
+				seen[String(preload)] = await shown(gallery);
+			}
+
+			expect(seen.true).toEqual(sixty().slice(0, 36));
+			expect(seen.true).toEqual(seen.false);
+		}
+	);
+
+	test(
+		'PRE-02: endless scroll requests each page once',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id, url } = paginated('endless_scroll', {
+				columns: PER_PAGE(2),
+				preload_next_page: true,
+			});
+			await page.setViewportSize({ width: 1280, height: 600 });
+			const pages = renderRequests(page, id);
+			const gallery = await open(page, url, id);
+
+			for (const count of [24, 36, 48, 60]) {
+				await gallery.root
+					.locator('[data-fg-pagination-sentinel]')
+					.scrollIntoViewIfNeeded();
+				await expect(gallery.items()).toHaveCount(count);
+			}
+			await page.waitForTimeout(500);
+
+			expect(pages).toEqual([2, 3, 4, 5]);
+			expect(await shown(gallery)).toEqual(sixty());
+		}
+	);
+
+	test(
+		'PRE-03: page buttons request the next page once, ahead of Next',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id, url } = paginated('pages', {
+				pages_truncate: false,
+				preload_next_page: true,
+			});
+			const pages = renderRequests(page, id);
+			const gallery = await open(page, url, id);
+			const nav = gallery.root.locator('.fg-pagination--pages');
+			const next = nav.locator('.fg-pagination__next');
+			const current = nav.locator('[aria-current="page"]');
+
+			await expect.poll(() => [...pages]).toEqual([2]);
+			await next.click();
+			await expect(current).toHaveText('2');
+			await expect.poll(() => [...pages]).toEqual([2, 3]);
+			await next.click();
+			await expect(current).toHaveText('3');
+			await expect.poll(() => [...pages]).toEqual([2, 3, 4]);
+
+			expect(await shown(gallery)).toEqual(sixty().slice(24, 36));
+		}
+	);
+});
