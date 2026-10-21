@@ -293,7 +293,7 @@ final class Cover_Resolver {
 			return 0;
 		}
 
-		$picked = (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true );
+		$picked = (int) get_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, true );
 		if ( $picked > 0 && in_array( $picked, $child_ids, true ) ) {
 			$cover = self::for_gallery( $picked );
 			if ( $cover > 0 ) {
@@ -406,7 +406,7 @@ final class Cover_Resolver {
 			return $none;
 		}
 
-		$picked = (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true );
+		$picked = (int) get_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, true );
 		if ( $picked > 0 && in_array( $picked, $child_ids, true ) ) {
 			$cover = self::descriptor_for_gallery( $picked, $size );
 			if ( 'none' !== $cover['kind'] ) {

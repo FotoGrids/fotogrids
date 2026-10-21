@@ -333,11 +333,7 @@ const AlbumGalleries = () => {
 				);
 			}
 
-			// If the removed gallery was the explicit featured choice, drop
-			// it locally - server-side the cover resolver will fall back to
-			// the next valid child the next time it's read. The REST clear endpoint
-			// is not called: meta still pointing at an unassigned gallery is
-			// harmless (the resolver ignores it).
+			// The removal route clears the featured gallery on the server too.
 			if (featuredGalleryId === galleryId) {
 				setFeaturedGalleryId(null);
 			}

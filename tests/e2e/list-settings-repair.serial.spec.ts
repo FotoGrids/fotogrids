@@ -53,9 +53,10 @@ function storedMeta( id: number, key: string ): string {
 	return wp( [ 'post', 'meta', 'get', String( id ), `fotogrids_${ key }` ] );
 }
 
-/** Ask for the schema upgrade, as an update to this version does. */
+/** Load the site as an update from 1.2.x leaves it: an older schema and no migration recorded. */
 async function runUpgrade( page: import( '@playwright/test' ).Page ): Promise< void > {
 	setOption( 'fotogrids_db_version', '1.5' );
+	setOption( 'fotogrids_completed_migrations', null );
 	await page.goto( '/' );
 	expect( getOption( 'fotogrids_db_version' ) ).toBe( '1.7' );
 }

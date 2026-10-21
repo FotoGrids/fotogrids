@@ -1,5 +1,9 @@
 import { test, expect } from './support/test';
-import { galleryPage, passwordGalleryPage } from './support/collections';
+import {
+	galleryPage,
+	passwordGalleryPage,
+	shortcodePage,
+} from './support/collections';
 import { fixture } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
 import { wpEval } from './support/roles';
@@ -191,6 +195,34 @@ test.describe('remembering an unlock', () => {
 				await gallery.waitFor();
 				await expect(gallery.items()).toHaveCount(five().length);
 				await expect(page.locator(GATE)).toHaveCount(0);
+			} finally {
+				await context.close();
+			}
+		}
+	);
+
+	test(
+		'an unknown shortcode template renders the saved layout after unlock and reload',
+		{ tag: ['@gate', '@layout'] },
+		async ({ browser }) => {
+			const { id } = passwordGalleryPage(PASSWORD, {
+				password_remember: true,
+				layout: 'masonry',
+			});
+			const { url } = shortcodePage(id, 'template="kaleidoscope"');
+			const { context, page } = await unlock(browser, url);
+
+			try {
+				const gallery = new GalleryRender(page, id);
+				await gallery.waitFor();
+				expect(await gallery.layout()).toBe('masonry');
+
+				await page.reload();
+
+				await gallery.waitFor();
+				expect(await gallery.layout()).toBe('masonry');
+				await expect(page.locator(GATE)).toHaveCount(0);
+				await expect(page.locator('.fotogrids-error')).toHaveCount(0);
 			} finally {
 				await context.close();
 			}

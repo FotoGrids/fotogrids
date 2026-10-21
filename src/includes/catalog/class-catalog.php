@@ -378,6 +378,7 @@ final class Catalog {
 				'tier_required' => self::normalize_tier( $option ),
 				'icon'          => $option['icon'] ?? null,
 				'description'   => $option['description'] ?? null,
+				'post_types'    => $option['postTypes'] ?? null,
 			);
 		}
 
@@ -412,6 +413,7 @@ final class Catalog {
 					'tier_required' => self::normalize_tier( $option ),
 					'icon'          => $option['icon'] ?? null,
 					'description'   => $option['description'] ?? null,
+					'post_types'    => $option['postTypes'] ?? null,
 				);
 			}
 		}

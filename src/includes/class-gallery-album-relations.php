@@ -58,7 +58,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Add gallery to album
 	 *
-	 * Fires `Actions_Album::GALLERY_ADDED` when the gallery is added.
+	 * When the gallery is added, clears the album's featured gallery if it names
+	 * this one, then fires `Actions_Album::GALLERY_ADDED`.
 	 *
 	 * @param int $gallery_id Gallery post ID
 	 * @param int $album_id Album post ID
@@ -103,6 +104,7 @@ class Gallery_Album_Relations {
 			return false;
 		}
 
+		delete_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, $gallery_id );
 		self::clear_caches( $gallery_id, $album_id );
 
 		do_action( Actions_Album::GALLERY_ADDED, $gallery_id, $album_id );
@@ -113,7 +115,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Remove gallery from album
 	 *
-	 * Fires `Actions_Album::GALLERY_REMOVED` when the gallery was in the album.
+	 * When the gallery was in the album, clears the album's featured gallery if
+	 * it was this one, then fires `Actions_Album::GALLERY_REMOVED`.
 	 *
 	 * @param int $gallery_id Gallery post ID
 	 * @param int $album_id Album post ID
@@ -139,6 +142,10 @@ class Gallery_Album_Relations {
 			),
 			array( '%d', '%d' )
 		);
+
+		if ( $result ) {
+			delete_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, $gallery_id );
+		}
 
 		self::clear_caches( $gallery_id, $album_id );
 
@@ -596,7 +603,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Delete all relationships for a post (when post is deleted)
 	 *
-	 * Fires `Actions_Album::GALLERY_REMOVED` for every relationship removed.
+	 * A deleted gallery stops being the featured gallery of every album it was
+	 * in. Fires `Actions_Album::GALLERY_REMOVED` for every relationship removed.
 	 *
 	 * @param int $post_id Post ID
 	 */
@@ -618,6 +626,7 @@ class Gallery_Album_Relations {
 			);
 			$wpdb->delete( $table_name, array( 'gallery_id' => $post_id ), array( '%d' ) );
 			foreach ( $album_ids as $album_id ) {
+				delete_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, $post_id );
 				do_action( Actions_Album::GALLERY_REMOVED, $post_id, $album_id );
 			}
 			do_action( Actions_Gallery::DELETED, $post_id );

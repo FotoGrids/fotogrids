@@ -28,7 +28,43 @@ admin_caps_for() {
 			fn( \$cap ) => false !== strpos( \$cap, 'fotogrids' ) ) );"
 }
 
+# The migration record and lock, read the same way.
+record_for() {
+	$WP eval "global \$wpdb;
+		\$value = maybe_unserialize( \$wpdb->get_var( \"SELECT option_value FROM ${1}options WHERE option_name = 'fotogrids_completed_migrations'\" ) );
+		echo is_array( \$value ) ? implode( ' ', \$value ) : '';"
+}
+
+lock_for() {
+	$WP eval "global \$wpdb; echo (int) \$wpdb->get_var( \"SELECT COUNT(*) FROM ${1}options WHERE option_name = 'fotogrids_migration_lock'\" );"
+}
+
+# An album whose stored featured gallery is not one of its galleries, written
+# straight into a site's tables. Prints the album's ID.
+plant_stale_pick() {
+	$WP eval "global \$wpdb;
+		\$wpdb->insert( '${1}posts', array( 'post_type' => 'fotogrids_album', 'post_status' => 'publish', 'post_title' => 'life12', 'post_content' => '', 'post_excerpt' => '', 'to_ping' => '', 'pinged' => '', 'post_content_filtered' => '' ) );
+		\$album = \$wpdb->insert_id;
+		\$wpdb->insert( '${1}postmeta', array( 'post_id' => \$album, 'meta_key' => 'fotogrids_featured_gallery', 'meta_value' => '987654' ) );
+		echo \$album;"
+}
+
+pick_for() {
+	$WP eval "global \$wpdb; echo (string) \$wpdb->get_var( \"SELECT meta_value FROM ${1}postmeta WHERE post_id = ${2} AND meta_key = 'fotogrids_featured_gallery'\" );"
+}
+
+site2_album=$( plant_stale_pick wp_2_ )
+site3_album=$( plant_stale_pick wp_3_ )
+
 scratch_activate_network
+
+migrations=$( $WP eval '$ids = array_map( fn( $m ) => $m::id(), \FotoGrids\Migrations\Migration_Runner::discover() ); sort( $ids ); echo implode( " ", $ids );' )
+
+assert_contains "$migrations" "0004-featured-gallery-repair" "the plugin has its migrations"
+assert_eq "$migrations" "$( record_for wp_ )" "network activation ran and recorded every migration in site 1"
+assert_eq 0 "$( lock_for wp_ )" "and released site 1's lock"
+assert_eq "" "$( record_for wp_2_ )" "site 2 has no record before its first request"
+assert_eq 987654 "$( pick_for wp_2_ "$site2_album" )" "and keeps its stale featured gallery"
 
 assert_eq "$FG_TABLE_COUNT" "$( tables_for wp_ )" "network activation created site 1's tables"
 assert_eq 0 "$( tables_for wp_2_ )" "site 2 has none: the activation hook runs once, in site 1"
@@ -47,6 +83,11 @@ assert_eq "$FG_TABLE_COUNT" "$( tables_for wp_2_ )" "site 2's first request buil
 assert_eq "$( admin_caps_for wp_ )" "$( admin_caps_for wp_2_ )" \
 	"and granted its administrator the same capabilities site 1 has"
 assert_eq 0 "$( tables_for wp_3_ )" "site 3, still unvisited, has nothing"
+assert_eq "$migrations" "$( record_for wp_2_ )" "site 2's first request ran and recorded every migration for site 2"
+assert_eq 0 "$( lock_for wp_2_ )" "and released site 2's lock"
+assert_eq "" "$( pick_for wp_2_ "$site2_album" )" "and cleared site 2's stale featured gallery"
+assert_eq "" "$( record_for wp_3_ )" "site 3, still unvisited, has no record"
+assert_eq 987654 "$( pick_for wp_3_ "$site3_album" )" "and keeps its stale featured gallery"
 
 # The install-time options are written by the activator, which site 2 never ran.
 # Nothing on a later page load seeds them, so the site has a schema and

@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace FotoGrids\Settings;
 
-use FotoGrids\Migrations\Collection_Defaults_Split;
-
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -61,19 +59,11 @@ final class Collection_Defaults_Store {
 	/**
 	 * Every type's saved defaults.
 	 *
-	 * Moves defaults saved by an earlier version into this option first, when
-	 * this option does not exist yet.
-	 *
 	 * @since  1.3.0
 	 * @return array<string, array<string, mixed>> Type => saved defaults.
 	 */
 	public static function all(): array {
-		$stored = get_option( self::OPTION, null );
-
-		if ( null === $stored ) {
-			Collection_Defaults_Split::run();
-			$stored = get_option( self::OPTION, array() );
-		}
+		$stored = get_option( self::OPTION, array() );
 
 		$all = array();
 		foreach ( self::TYPES as $type ) {
