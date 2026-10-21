@@ -170,3 +170,53 @@ test( 'a locked gallery opened in place from an album unlocks with the ID it ope
 	).toEqual( [ `gate fg-${ id }-1`, `gallery ${ opened }` ] );
 	expect( await repeatedIds( page ) ).toEqual( [] );
 } );
+
+test( 'a locked gallery opened in place from an album keeps its Back to album header once unlocked', { tag: [ '@gate' ] }, async ( {
+	page,
+} ) => {
+	const { id: openId } = galleryPage( GRID );
+	const { id } = passwordGalleryPage( PASSWORD, LOCKED );
+	const { id: albumId } = album( [ openId, id ], { use_ajax_from_album: true } );
+	await page.goto( postWith( `[fotogrids_album id="${ albumId }"]` ) );
+
+	const albumEl = page.locator( '.fotogrids-album' );
+	const header = albumEl.locator( `.fg-collection-header[data-fg-via-album="${ albumId }"]` );
+
+	await albumEl.locator( `[data-fg-album-ajax-trigger][data-fg-gallery-id="${ openId }"]` ).click();
+	await expect( albumEl.locator( `.fotogrids-gallery[data-fg-gallery-id="${ openId }"] .fg-item` ).first() ).toBeVisible( {
+		timeout: 15000,
+	} );
+	await expect( header ).toHaveCount( 1 );
+	await header.locator( '.fg-back-button' ).click();
+
+	const opened = inAlbum( id, ( await albumEl.getAttribute( 'id' ) ) ?? '' );
+	await albumEl.locator( `[data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
+	await expect( albumEl.locator( `.fotogrids-gate[data-fg-gallery-id="${ id }"]` ) ).toBeVisible( { timeout: 15000 } );
+	await expect( page.locator( `#${ opened } .fg-lock-form` ) ).toHaveAttribute( 'data-fg-via-album', String( albumId ) );
+
+	await unlock( page, opened );
+	await expect( header ).toHaveCount( 1 );
+	await expect( header.locator( '.fg-back-button' ) ).toBeVisible();
+} );
+
+test( 'an unlock naming an album the gallery is not in renders no header for that album', { tag: [ '@gate' ] }, async ( {
+	page,
+} ) => {
+	const { id: otherId } = galleryPage( GRID );
+	const { id } = passwordGalleryPage( PASSWORD, LOCKED );
+	const { id: albumId } = album( [ id ], { use_ajax_from_album: true } );
+	const { id: foreignAlbumId } = album( [ otherId ] );
+	await page.goto( postWith( `[fotogrids_album id="${ albumId }"]` ) );
+
+	const albumEl = page.locator( '.fotogrids-album' );
+	const opened = inAlbum( id, ( await albumEl.getAttribute( 'id' ) ) ?? '' );
+	await albumEl.locator( `[data-fg-album-ajax-trigger][data-fg-gallery-id="${ id }"]` ).click();
+	const form = page.locator( `#${ opened } .fg-lock-form` );
+	await expect( form ).toBeVisible( { timeout: 15000 } );
+	await form.evaluate( ( el: HTMLFormElement, foreign ) => {
+		el.dataset.fgViaAlbum = String( foreign );
+	}, foreignAlbumId );
+
+	await unlock( page, opened );
+	await expect( page.locator( `.fg-collection-header[data-fg-via-album="${ foreignAlbumId }"]` ) ).toHaveCount( 0 );
+} );

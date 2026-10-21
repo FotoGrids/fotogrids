@@ -81,21 +81,38 @@ class Register_Gallery_Routes {
 					'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'unlock_gallery' ),
 					'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_unlock' ),
 					'args'                => array(
-						'id'          => array(
+						'id'           => array(
 							'required'          => true,
 							'sanitize_callback' => 'absint',
 							'validate_callback' => function ( $param ) {
 								return is_numeric( $param ) && $param > 0;
 							},
 						),
-						'password'    => array(
+						'password'     => array(
 							'required'          => true,
 							'sanitize_callback' => function ( $value ) {
 								// Preserve special characters - strip_tags only.
 								return wp_strip_all_tags( (string) $value );
 							},
 						),
-						'instance_id' => self::instance_id_arg( 'id' ),
+						'instance_id'  => self::instance_id_arg( 'id' ),
+						'cols'         => array(
+							'type'    => 'integer',
+							'default' => 0,
+							'minimum' => 0,
+						),
+						'template'     => array(
+							'type'              => 'string',
+							'default'           => '',
+							'validate_callback' => function ( $param ) {
+								return '' === $param || \FotoGrids\Public_Render::is_layout_key( \FotoGrids\Public_Render::embed_template( $param ), 'gallery' );
+							},
+						),
+						'via_album_id' => array(
+							'type'              => 'integer',
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+						),
 					),
 				),
 			)
@@ -141,6 +158,18 @@ class Register_Gallery_Routes {
 						'container_width' => array(
 							'default'           => 0,
 							'sanitize_callback' => 'absint',
+						),
+						'offset'          => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+						),
+						'length'          => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+						),
+						'with_aspects'    => array(
+							'default'           => false,
+							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
 						'breakpoint'      => array(
 							'default'           => 'desktop',

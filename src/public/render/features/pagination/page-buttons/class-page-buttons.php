@@ -122,14 +122,15 @@ final class Page_Buttons implements Feature {
 
 		$page_size   = self::resolve_page_size( $render_context->settings, $render_context );
 		$total       = (int) ( $render_context->meta->total_item_count ?? count( $render_context->items ) );
-		$total_pages = max( 1, (int) ceil( $total / $page_size ) );
+		$total_pages = max( 1, (int) ( $render_context->meta->pagination_total_pages ?? ceil( $total / $page_size ) ) );
 		$current     = max( 1, (int) ( $render_context->meta->requested_page ?? 1 ) );
 
 		$html = sprintf(
 			'<nav class="fg-pagination fg-pagination--pages fg-pagination--align-%s"'
-			. ' data-fg-pagination-role="pages" aria-label="%s">',
+			. ' data-fg-pagination-role="pages" aria-label="%s"%s>',
 			esc_attr( $align ),
-			esc_attr__( 'Gallery pagination', 'fotogrids' )
+			esc_attr__( 'Gallery pagination', 'fotogrids' ),
+			$total_pages <= 1 ? ' hidden' : ''
 		);
 
 		if ( $show_prev_next ) {

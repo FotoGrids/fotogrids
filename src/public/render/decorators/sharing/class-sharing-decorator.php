@@ -122,7 +122,7 @@ final class Sharing_Decorator implements Decorator {
 			'labels'       => self::client_labels(),
 		);
 
-		return array( 'data-fg-sharing' => wp_json_encode( $payload ) );
+		return array( 'data-fg-sharing' => \FotoGrids\Sanitization\Attribute_Value::json( $payload ) );
 	}
 
 	public function style_vars( Render_Context $render_context ): array {

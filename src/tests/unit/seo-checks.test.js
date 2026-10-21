@@ -413,3 +413,39 @@ describe('resolveEmittedAlt', () => {
 		expect(resolveEmittedAlt({})).toEqual({ value: '', source: 'empty' });
 	});
 });
+
+describe('formatted captions and descriptions', () => {
+	it('treats a caption holding only markup as missing', () => {
+		const checks = getItemSeoChecks(
+			{ ...goodForm, caption: '<strong> </strong><br>', description: '<em></em>' },
+			goodItem
+		);
+		expect(byId(checks, 'caption').status).toBe(CHECK_WARN);
+		expect(byId(checks, 'description').status).toBe(CHECK_WARN);
+	});
+
+	it('counts formatted text as written', () => {
+		const checks = getItemSeoChecks(
+			{
+				...goodForm,
+				caption: 'Early light on the <a href="https://example.com">east quay</a>.',
+				description: 'Shot on the <strong>first</strong> morning.',
+			},
+			goodItem
+		);
+		expect(byId(checks, 'caption').status).toBe(CHECK_PASS);
+		expect(byId(checks, 'description').status).toBe(CHECK_PASS);
+	});
+
+	it('does not read tag or attribute names as filename keywords', () => {
+		const checks = getItemSeoChecks(
+			{
+				title: '<strong>Morning</strong>',
+				alt: 'A view of <em>the</em> sea',
+				caption: '<a href="https://boats-harbour-sunrise.example">x</a>',
+			},
+			goodItem
+		);
+		expect(byId(checks, 'filename').status).toBe(CHECK_WARN);
+	});
+});

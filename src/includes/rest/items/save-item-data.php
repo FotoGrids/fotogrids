@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids\REST\Items;
 
+use FotoGrids\Formatted_Text\Formatted_Text;
 use FotoGrids\Hooks\Filters_Save;
 use FotoGrids\Metaboxes\Metabox_Registrar;
 use FotoGrids\REST\Metadata\Metadata_Data;
@@ -56,32 +57,51 @@ class Save_Item_Data {
 		}
 
 		// ── Core attachment fields ────────────────────────────────────────────
-		$title       = sanitize_text_field( $request->get_param( 'title' ) ?? '' );
-		$alt         = sanitize_text_field( $request->get_param( 'alt' ) ?? '' );
-		$caption     = sanitize_textarea_field( $request->get_param( 'caption' ) ?? '' );
-		$description = sanitize_textarea_field( $request->get_param( 'description' ) ?? '' );
+		// A field left out of the request (null) keeps its stored value.
+		$post_fields = array();
 
-		$post_result = wp_update_post(
-			wp_slash(
+		$title = $request->get_param( 'title' );
+		if ( null !== $title ) {
+			$post_fields['post_title'] = sanitize_text_field( (string) $title );
+		}
+
+		foreach ( array(
+			'caption'     => 'post_excerpt',
+			'description' => 'post_content',
+		) as $param => $column ) {
+			$value = $request->get_param( $param );
+			if ( null === $value ) {
+				continue;
+			}
+			$post_fields[ $column ] = Formatted_Text::sanitize_for_save(
+				(string) $value,
 				array(
-					'ID'           => $item_id,
-					'post_title'   => $title,
-					'post_excerpt' => $caption,
-					'post_content' => $description,
+					'field'   => $param,
+					'item_id' => $item_id,
+					'source'  => 'item_editor',
 				)
-			),
-			true
-		);
-
-		if ( is_wp_error( $post_result ) ) {
-			return new \WP_Error(
-				'fotogrids_save_failed',
-				$post_result->get_error_message(),
-				array( 'status' => 500 )
 			);
 		}
 
-		update_post_meta( $item_id, '_wp_attachment_image_alt', wp_slash( $alt ) );
+		if ( ! empty( $post_fields ) ) {
+			$post_result = wp_update_post(
+				wp_slash( array( 'ID' => $item_id ) + $post_fields ),
+				true
+			);
+
+			if ( is_wp_error( $post_result ) ) {
+				return new \WP_Error(
+					'fotogrids_save_failed',
+					$post_result->get_error_message(),
+					array( 'status' => 500 )
+				);
+			}
+		}
+
+		$alt = $request->get_param( 'alt' );
+		if ( null !== $alt ) {
+			update_post_meta( $item_id, '_wp_attachment_image_alt', wp_slash( sanitize_text_field( (string) $alt ) ) );
+		}
 
 		// ── fotogrids_item_meta row ──────────────────────────────────────────
 		$credit       = sanitize_text_field( $request->get_param( 'credit' ) ?? '' );
@@ -243,6 +263,7 @@ class Save_Item_Data {
 		$meta_results = apply_filters( Filters_Save::ITEM_METADATA, $meta_results, $item_id, $request );
 
 		$grid_item = Metabox_Registrar::build_attachment_item_data( $item_id, 0 );
+		$saved     = get_post( $item_id );
 
 		return rest_ensure_response(
 			array(
@@ -250,11 +271,47 @@ class Save_Item_Data {
 				'message'  => __( 'Item saved successfully.', 'fotogrids' ),
 				'metadata' => $meta_results,
 				'item'     => $grid_item ? array(
-					'title' => $grid_item['title'],
-					'alt'   => $grid_item['alt'],
+					'title'       => $grid_item['title'],
+					'alt'         => $grid_item['alt'],
+					'caption'     => $saved ? (string) $saved->post_excerpt : '',
+					'description' => $saved ? (string) $saved->post_content : '',
 				) : null,
 			)
 		);
+	}
+
+	/**
+	 * Accepts a string, or null for a field left out of the request.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $value Submitted value.
+	 * @return bool
+	 */
+	public static function validate_optional_text( $value ): bool {
+		return null === $value || is_string( $value ) || is_numeric( $value );
+	}
+
+	/**
+	 * Sanitizes a single-line text field, keeping null for a field left out.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $value Submitted value.
+	 * @return string|null
+	 */
+	public static function sanitize_optional_line( $value ): ?string {
+		return null === $value ? null : sanitize_text_field( (string) $value );
+	}
+
+	/**
+	 * Passes a caption or description through unchanged, keeping null for a
+	 * field left out. The save handler applies the formatting rules.
+	 *
+	 * @since 1.3.0
+	 * @param mixed $value Submitted value.
+	 * @return string|null
+	 */
+	public static function sanitize_optional_raw( $value ): ?string {
+		return null === $value ? null : (string) $value;
 	}
 
 	/**

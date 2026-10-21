@@ -7,6 +7,7 @@
 
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
+use FotoGrids\Tools\ImportExport\Attachment_Map;
 use FotoGrids\Tools\ImportExport\Import_Export_Data;
 
 class ImportExportItemTextTest extends WP_UnitTestCase {
@@ -101,7 +102,7 @@ class ImportExportItemTextTest extends WP_UnitTestCase {
 	private function import( array $items ): array {
 		$known = self::call( 'known_item_ids' );
 
-		return array_slice( self::call( 'import_items', $items, array(), $known ), 0, 2 );
+		return array_slice( self::call( 'import_items', $items, array(), $known, new Attachment_Map( null, get_site_url() ) ), 0, 2 );
 	}
 
 	public function test_export_carries_the_attachment_text_of_an_item_with_a_row(): void {

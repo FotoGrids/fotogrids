@@ -46,6 +46,10 @@
 			return;
 		}
 
+		pagination.onChange(gEl, (detail) => {
+			bar.classList.toggle('fg-pagination--exhausted', !detail.hasMore);
+		});
+
 		button.addEventListener('click', (event) => {
 			event.preventDefault();
 			if (button.disabled) {

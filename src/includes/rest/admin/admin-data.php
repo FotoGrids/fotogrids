@@ -517,6 +517,40 @@ class Admin_Data {
 	}
 
 	/**
+	 * Get the Gallery Items text formatting settings.
+	 *
+	 * GET /wp-json/fotogrids/v1/admin/text-formatting
+	 *
+	 * @since  1.3.0
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function get_text_formatting_settings( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return rest_ensure_response(
+			array(
+				'settings' => \FotoGrids\Settings\Text_Formatting_Settings_Store::get(),
+			)
+		);
+	}
+
+	/**
+	 * Save the Gallery Items text formatting settings.
+	 *
+	 * POST /wp-json/fotogrids/v1/admin/text-formatting
+	 *
+	 * @since  1.3.0
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function save_text_formatting_settings( $request ): \WP_REST_Response {
+		$input    = $request->get_json_params() ?: $request->get_params();
+		$current  = \FotoGrids\Settings\Text_Formatting_Settings_Store::get();
+		$settings = \FotoGrids\Settings\Text_Formatting_Settings_Store::save( array_merge( $current, is_array( $input ) ? $input : array() ) );
+
+		return rest_ensure_response( array( 'settings' => $settings ) );
+	}
+
+	/**
 	 * Get the global watermark settings.
 	 *
 	 * GET /wp-json/fotogrids/v1/admin/watermark-settings
@@ -1085,6 +1119,7 @@ class Admin_Data {
 			'fotogrids_view_settings',
 			'fotogrids_watermark_settings',
 			'fotogrids_seo_settings',
+			'fotogrids_text_formatting',
 		);
 
 		foreach ( $option_keys as $option_key ) {

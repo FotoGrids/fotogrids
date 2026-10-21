@@ -32,6 +32,7 @@
 
 		// Filters change the server's totalPages; rebuild the chip list to match.
 		rebuildChips(nav, s.totalPages);
+		nav.hidden = s.totalPages <= 1;
 
 		// Prev / Next disabled state.
 		const prev = nav.querySelector('[data-fg-pagination-trigger="prev"]');

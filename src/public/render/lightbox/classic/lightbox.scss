@@ -1024,6 +1024,24 @@
 	}
 }
 
+// Links inside a formatted caption or description.
+.fg-lb-info-caption a,
+.fg-lb-info-description a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+
+	&:hover {
+		text-decoration-thickness: 2px;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+		border-radius: 2px;
+	}
+}
+
 // Credit
 .fg-lb-info-credit {
 	margin: 0;

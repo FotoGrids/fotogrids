@@ -8,6 +8,7 @@ use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Gate_Result;
 use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Layout;
+use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -325,6 +326,74 @@ final class Render_Controller {
 		} finally {
 			\FotoGrids\Watermark\Watermark_Render_Filter::end();
 		}
+	}
+
+	/**
+	 * Enqueues the stylesheets a render of the context would collect, without rendering.
+	 *
+	 * Module selection follows render(): a blocking gate stops at the gate's styles.
+	 *
+	 * @since 1.3.0
+	 * @param Render_Context $render Render context; items may be empty.
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}> The context's stylesheets, handle → registration data.
+	 */
+	public function enqueue_styles( Render_Context $render ): array {
+		$render = Hooks::apply_filter( 'render_settings', $render, $render );
+
+		foreach ( Module_Registry::active_modules( 'gates', $render ) as $gate_module ) {
+			$this->collect_styles( $gate_module->assets( $render ), $gate_module->origin() );
+			if ( ! $gate_module->evaluate( $render )->passed ) {
+				return $this->flush_styles();
+			}
+		}
+
+		$sorter_module = Module_Registry::active_modules( 'sorters', $render )[0] ?? null;
+		if ( null !== $sorter_module ) {
+			$this->collect_styles( $sorter_module->assets( $render ), $sorter_module->origin() );
+		}
+
+		foreach ( Module_Registry::active_modules( 'decorators', $render ) as $decorator_module ) {
+			$this->collect_styles( $decorator_module->assets( $render ), $decorator_module->origin() );
+		}
+
+		$layout_module = $this->select_layout( $render );
+		if ( null === $layout_module ) {
+			return $this->flush_styles();
+		}
+		$this->collect_styles( $layout_module->assets( $render ), $layout_module->origin() );
+
+		foreach ( array( 'features', 'sidecars' ) as $module_type ) {
+			foreach ( Module_Registry::active_modules( $module_type, $render ) as $module ) {
+				$this->collect_styles( $module->assets( $render ), $module->origin() );
+			}
+		}
+
+		return $this->flush_styles();
+	}
+
+	/**
+	 * Queues the stylesheets of a module's assets, leaving its scripts to the render.
+	 *
+	 * @since 1.3.0
+	 * @param Module_Assets $module_assets Module assets.
+	 * @param string        $origin        Module origin.
+	 * @return void
+	 */
+	private function collect_styles( Module_Assets $module_assets, string $origin ): void {
+		$this->asset_resolver->collect( new Module_Assets( $module_assets->css ), $origin );
+	}
+
+	/**
+	 * Enqueues the queued stylesheets and returns them.
+	 *
+	 * @since 1.3.0
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}> Handle → registration data.
+	 */
+	private function flush_styles(): array {
+		$styles = $this->asset_resolver->queued_css();
+		$this->asset_resolver->flush();
+
+		return $styles;
 	}
 
 	/**

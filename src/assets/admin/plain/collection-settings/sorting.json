@@ -168,6 +168,41 @@
             "visible_when_uninstalled": true
         },
         {
+            "key": "random_reorder_justified_pages_notice",
+            "type": "info_block",
+            "postTypes": [
+                "gallery"
+            ],
+            "subtitle": "Reorder fetches a fresh order here",
+            "message": "A Justified {postType.lower} that is broken into pages ends every page on a whole row, and rearranging the items in place would break those rows. So with <strong>Reorder only</strong>, this {postType.lower} works like <strong>Fully random each visit</strong>: after the page loads, the browser asks FotoGrids for a fresh selection - one small request per visit.",
+            "icon": "bulb",
+            "full_width": true,
+            "condition": {
+                "all": [
+                    {
+                        "dependsOn": "default_sort_order",
+                        "values": ["random"]
+                    },
+                    {
+                        "dependsOn": "random_mode",
+                        "values": ["reorder"]
+                    },
+                    {
+                        "dependsOn": "pagination_type",
+                        "values": ["paginated"]
+                    },
+                    {
+                        "dependsOn": "layout",
+                        "values": ["justified"]
+                    }
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
             "key": "random_sort_caching_notice",
             "type": "info_block",
             "postTypes": [

@@ -17,6 +17,11 @@ if ( ! defined( 'WPINC' ) ) {
 class Gallery_Data {
 
 	/**
+	 * Most items one slice request may ask for.
+	 */
+	private const MAX_SLICE_LENGTH = 500;
+
+	/**
 	 * Set or clear the gallery's featured item.
 	 *
 	 * Body: { item_id: int | null }. When null, the explicit choice is
@@ -254,9 +259,20 @@ class Gallery_Data {
 
 		// Render the gallery HTML server-side so the frontend can swap it in
 		// without a full page reload.
+		$meta_overrides = array();
+		$via_album_id   = self::visible_parent_album( $gallery_id, absint( $request->get_param( 'via_album_id' ) ) );
+		if ( $via_album_id > 0 ) {
+			$meta_overrides['via_album_id'] = $via_album_id;
+		}
+
 		$html     = \FotoGrids\Public_Render::render_gallery_embed(
-			array( 'id' => $gallery_id ),
-			(string) $request->get_param( 'instance_id' )
+			array(
+				'id'       => $gallery_id,
+				'cols'     => absint( $request->get_param( 'cols' ) ),
+				'template' => (string) $request->get_param( 'template' ),
+			),
+			(string) $request->get_param( 'instance_id' ),
+			$meta_overrides
 		);
 		$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 		$css_urls = $resolver->get_css_asset_urls();
@@ -305,6 +321,9 @@ class Gallery_Data {
 		$page            = max( 1, (int) $request->get_param( 'page' ) );
 		$items_per_page  = (int) $request->get_param( 'items_per_page' );
 		$container_width = (int) $request->get_param( 'container_width' );
+		$offset          = (int) $request->get_param( 'offset' );
+		$length          = min( self::MAX_SLICE_LENGTH, (int) $request->get_param( 'length' ) );
+		$with_aspects    = (bool) $request->get_param( 'with_aspects' );
 		$breakpoint      = (string) $request->get_param( 'breakpoint' );
 		$partial         = (string) $request->get_param( 'partial' );
 		$filters_raw     = $request->get_param( 'filters' );
@@ -340,7 +359,7 @@ class Gallery_Data {
 
 		// No pagination params (Album_To_Gallery_Ajax path) uses the shortcode
 		// path; any pagination param routes through the meta_overrides entry point.
-		$is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || '' !== $partial || 'desktop' !== $breakpoint || ! empty( $filters ) || $random_seed > 0;
+		$is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || '' !== $partial || 'desktop' !== $breakpoint || ! empty( $filters ) || $random_seed > 0 || $length > 0 || $with_aspects;
 
 		// via_album_id threads through both branches so the rendered gallery's
 		// Collection_Header can build a Back / Breadcrumb to the originating album.
@@ -398,6 +417,13 @@ class Gallery_Data {
 		if ( $random_seed > 0 ) {
 			$meta_overrides['random_seed'] = $random_seed;
 		}
+		if ( $length > 0 ) {
+			$meta_overrides['requested_offset'] = $offset;
+			$meta_overrides['requested_length'] = $length;
+		}
+		if ( $with_aspects ) {
+			$meta_overrides['with_aspects'] = true;
+		}
 		$meta_overrides = array_merge( $meta_overrides, $shared_meta_overrides );
 
 		$html     = \FotoGrids\Public_Render::render_gallery_for_rest( $gallery_id, $meta_overrides );
@@ -432,19 +458,60 @@ class Gallery_Data {
 
 		$fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
 
-		return rest_ensure_response(
-			array(
-				'success'     => true,
-				'html'        => $html,
-				'css'         => $css_urls,
-				'js'          => $js_data,
-				'fonts'       => $fonts_url,
-				'page'        => $page,
-				'page_size'   => $page_size,
-				'total_pages' => $total_pages,
-				'has_more'    => $has_more,
-			)
+		$response = array(
+			'success'     => true,
+			'html'        => $html,
+			'css'         => $css_urls,
+			'js'          => $js_data,
+			'fonts'       => $fonts_url,
+			'page'        => $page,
+			'page_size'   => $page_size,
+			'total_pages' => $total_pages,
+			'has_more'    => $has_more,
 		);
+
+		if ( null !== $meta && null !== $meta->total_item_count ) {
+			$response['total_items'] = (int) $meta->total_item_count;
+		}
+		if ( $length > 0 && null !== $meta ) {
+			$slice_offset            = (int) ( $meta->requested_offset ?? 0 );
+			$slice_count             = (int) ( $meta->pagination_page_size ?? 0 );
+			$response['offset']   = $slice_offset;
+			$response['length']   = $slice_count;
+			$response['has_more'] = $slice_offset + $slice_count < (int) ( $meta->total_item_count ?? 0 );
+		}
+		if ( $with_aspects && null !== $meta ) {
+			$response['aspects'] = $meta->sequence_aspects;
+		}
+
+		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Returns the album when it is visible to the visitor and contains the gallery, else 0.
+	 *
+	 * @since 1.3.0
+	 * @param int $gallery_id Gallery post ID.
+	 * @param int $album_id   Visit-context album the client sent.
+	 * @return int
+	 */
+	private static function visible_parent_album( int $gallery_id, int $album_id ): int {
+		if ( $album_id <= 0 ) {
+			return 0;
+		}
+
+		$album = get_post( $album_id );
+		if ( ! $album || Post_Types::ALBUM !== $album->post_type ) {
+			return 0;
+		}
+
+		$visible = 'publish' === $album->post_status
+			|| ( 'private' === $album->post_status && current_user_can( 'read_post', $album_id ) );
+		if ( ! $visible ) {
+			return 0;
+		}
+
+		return in_array( $gallery_id, \FotoGrids\Gallery_Album_Relations::get_gallery_ids_for_album( $album_id ), true ) ? $album_id : 0;
 	}
 
 	/**

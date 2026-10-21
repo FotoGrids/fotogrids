@@ -114,6 +114,38 @@ export default [
         },
     },
     {
+        files: ['src/shared/*/tests/**'],
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+            },
+        },
+    },
+    {
+        // Shared code is self-contained: it imports nothing from the rest of the plugin.
+        files: ['src/shared/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: ['@/*', '@modules/*', '@shared/*', '../../../*'],
+                },
+            ],
+        },
+    },
+    {
+        // formatted-text also runs on visitor pages: no framework imports.
+        files: ['src/shared/formatted-text/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: ['@/*', '@modules/*', '@shared/*', '@wordpress/*', 'react', 'react-dom', '../../*'],
+                },
+            ],
+        },
+    },
+    {
         files: ['src/**/*.{js,jsx,ts,tsx}'],
         ignores: ['src/assets/admin/plain/**', 'src/public/assets/**'],
         rules: {
