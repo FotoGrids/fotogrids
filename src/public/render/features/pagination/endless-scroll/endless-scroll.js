@@ -198,6 +198,14 @@
 			{ passive: true }
 		);
 
+		// A re-cut can add pages after the last append; re-arm when it does.
+		pagination.onChange(gEl, function (detail) {
+			if (detail && detail.hasMore && exhausted && !inFlight) {
+				exhausted = false;
+				activateObserver();
+			}
+		});
+
 		// Filter change: swap to the new filter state and re-arm the observer, which
 		// may have stopped when has_more became false.
 		gEl.addEventListener('fotogrids:filters_changed', function () {

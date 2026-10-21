@@ -284,8 +284,8 @@ test( 'importing on a site without the text puts it back where the Item Edit mod
 	await editor.editItem( edited ).click();
 	await expect( page.locator( '#fotogrids-item-title' ) ).toHaveValue( TEXT.edited.title );
 	await expect( page.locator( '#fotogrids-item-alt' ) ).toHaveValue( TEXT.edited.alt );
-	await expect( page.locator( '#fotogrids-item-caption' ) ).toHaveValue( TEXT.edited.caption );
-	await expect( page.locator( '#fotogrids-item-description' ) ).toHaveValue( TEXT.edited.description );
+	await expect( page.locator( '#fotogrids-item-caption' ) ).toHaveText( TEXT.edited.caption, { useInnerText: true } );
+	await expect( page.locator( '#fotogrids-item-description' ) ).toHaveText( TEXT.edited.description, { useInnerText: true } );
 	await expect( page.locator( '#fotogrids-item-credit' ) ).toHaveValue( CREDIT );
 
 	setSettings( gallery, { lightbox_info_blocks: JSON.stringify( [ 'caption', 'description', 'credit' ] ) } );
@@ -340,7 +340,7 @@ test( 'a file from an earlier version, with empty captions and no title or alt, 
 	setText( edited, TEXT.edited );
 
 	const older = {
-		meta: { version: '1.1.4' },
+		meta: { version: '1.1.4', site_url: wpEval( 'echo get_site_url();' ).trim() },
 		items: [ { attachment_id: String( edited ), gallery_id: '0', item_type: 'image', caption: '', description: '', credit: CREDIT } ],
 	};
 	const result = await importThroughUi( page, 'fotogrids-export.json', JSON.stringify( older ) );

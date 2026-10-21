@@ -38,20 +38,24 @@ class Register_Items_Routes {
 							'sanitize_callback' => 'absint',
 						),
 						'title'          => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_text_field',
+							'default'           => null,
+							'validate_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'validate_optional_text' ),
+							'sanitize_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'sanitize_optional_line' ),
 						),
 						'alt'            => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_text_field',
+							'default'           => null,
+							'validate_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'validate_optional_text' ),
+							'sanitize_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'sanitize_optional_line' ),
 						),
 						'caption'        => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_textarea_field',
+							'default'           => null,
+							'validate_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'validate_optional_text' ),
+							'sanitize_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'sanitize_optional_raw' ),
 						),
 						'description'    => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_textarea_field',
+							'default'           => null,
+							'validate_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'validate_optional_text' ),
+							'sanitize_callback' => array( '\FotoGrids\REST\Items\Save_Item_Data', 'sanitize_optional_raw' ),
 						),
 						'credit'         => array(
 							'default'           => '',

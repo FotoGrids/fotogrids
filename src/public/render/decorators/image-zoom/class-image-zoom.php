@@ -137,7 +137,7 @@ final class Image_Zoom implements Decorator {
 			$attrs['data-fg-zoom-mode']          = $this->zoom_mode( $render_context );
 			$attrs['data-fg-zoom-close-button']  = $this->setting_to_bool( $settings['lightbox_mini_show_close'] ?? true ) ? '1' : '0';
 			$attrs['data-fg-zoom-click-outside'] = '1';
-			$attrs['data-fg-zoom-labels']        = (string) wp_json_encode( self::client_labels() );
+			$attrs['data-fg-zoom-labels']        = \FotoGrids\Sanitization\Attribute_Value::json( self::client_labels() );
 
 			// The mini overlay reads these to resolve the backdrop colour + blur
 			// in CSS rather than from inline styles.

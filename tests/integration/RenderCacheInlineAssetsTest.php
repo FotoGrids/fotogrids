@@ -17,6 +17,9 @@ namespace {
     if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
         define( 'HOUR_IN_SECONDS', 3600 );
     }
+    if ( ! defined( 'MONTH_IN_SECONDS' ) ) {
+        define( 'MONTH_IN_SECONDS', 2592000 );
+    }
 
     /**
      * In-memory stand-in for the fotogrids_render_cache table.
@@ -73,6 +76,11 @@ namespace {
     $GLOBALS['fg_inline_styles']     = array();
     $GLOBALS['fg_registered_styles'] = array();
 
+    if ( ! function_exists( 'wp_rand' ) ) {
+        function wp_rand(): int {
+            return mt_rand();
+        }
+    }
     if ( ! function_exists( 'wp_cache_get' ) ) {
         function wp_cache_get( string $key, string $group = '' ): mixed {
             return $GLOBALS['fg_object_cache'][ $group . ':' . $key ] ?? false;
@@ -218,7 +226,14 @@ final class RenderCacheInlineAssetsTest {
     private static function test_hit_returns_the_inline_payloads_the_miss_stored(): void {
         self::reset();
 
-        FotoGrids_Cache::put( 77, 'key-a', '<div></div>', array( 'h' => 'a.css' ), array(), self::INLINE_CSS, self::INLINE_JS, self::JSON_LD, 24 );
+        $css = array(
+            'h' => array(
+                'src'     => 'a.css',
+                'deps'    => array(),
+                'version' => '1.0.0',
+            ),
+        );
+        FotoGrids_Cache::put( 77, 'key-a', '<div></div>', $css, array(), self::INLINE_CSS, self::INLINE_JS, self::JSON_LD, 24 );
 
         $cached = FotoGrids_Cache::get( 77, 'key-a' );
 
@@ -226,7 +241,7 @@ final class RenderCacheInlineAssetsTest {
         self::assert_same( self::INLINE_CSS, $cached['inline_css'], 'Cache hit should carry the stored inline CSS.' );
         self::assert_same( self::INLINE_JS, $cached['inline_js'], 'Cache hit should carry the stored inline JS.' );
         self::assert_same( self::JSON_LD, $cached['json_ld'], 'Cache hit should carry the stored JSON-LD.' );
-        self::assert_same( array( 'h' => 'a.css' ), $cached['css'], 'Cache hit should still carry the CSS asset map.' );
+        self::assert_same( $css, $cached['css'], 'Cache hit should still carry the CSS asset map.' );
     }
 
     private static function test_hit_emits_the_same_inline_css_as_the_miss(): void {

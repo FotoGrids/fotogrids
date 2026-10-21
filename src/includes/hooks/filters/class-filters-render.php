@@ -148,4 +148,14 @@ final class Filters_Render {
 	 *                            `did_action('wp_head')` / `did_action('admin_head')`).
 	 */
 	public const SHOULD_INLINE_ASSETS = 'fotogrids/render/should_inline_assets';
+
+	/**
+	 * Filters the collections found in widget areas, whose stylesheets the head pass enqueues on classic themes.
+	 *
+	 * A template that prints no widget areas returns an empty list.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, array{type: string, atts: array}> $embeds Collections in the active sidebars.
+	 */
+	public const WIDGET_EMBEDS = 'fotogrids/render/widget_embeds';
 }

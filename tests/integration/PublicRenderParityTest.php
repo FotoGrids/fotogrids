@@ -42,7 +42,7 @@ namespace {
     }
     if ( ! function_exists( 'esc_attr' ) ) {
         function esc_attr( mixed $value ): string {
-            return (string) $value;
+            return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8', false );
         }
     }
     if ( ! function_exists( 'esc_html' ) ) {
@@ -210,7 +210,7 @@ namespace FotoGrids\Render\Internal {
     }
 
     function esc_attr( mixed $value ): string {
-        return (string) $value;
+        return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8', false );
     }
 
     function esc_html( mixed $value ): string {
@@ -264,6 +264,16 @@ require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-render-r
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-hooks.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-style-var-builder.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-asset-resolver.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/sanitization/class-attribute-value.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/hooks/filters/class-filters-formatted-text.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/settings/class-text-formatting-settings-store.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/formatted-text/class-schema.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/formatted-text/class-entities.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/formatted-text/class-tokenizer.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/formatted-text/class-formatter.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/formatted-text/class-formatted-text.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-caption-content.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-caption-content-builder.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-item-renderer.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-module-registry.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-render-controller.php';
@@ -401,9 +411,13 @@ final class PublicRenderParityTest {
 
         self::assert_contains( 'data-fg-item-type="video_file"', $render_result->html, 'A video item should declare its item type for the playback modules.' );
         self::assert_contains( 'data-fg-video-src="https://example.com/clip.mp4"', $render_result->html, 'A file video should carry its media URL.' );
-        self::assert_contains( '"mute":true', $render_result->html, 'The item playback settings should reach the markup the players read.' );
-        self::assert_contains( '"controls":false', $render_result->html, 'Hiding the player controls should reach the markup.' );
-        self::assert_contains( '"autoplay":false', $render_result->html, 'Turning autoplay off should reach the markup.' );
+        $matched = preg_match( '/data-fg-embed-settings="([^"]*)"/', $render_result->html, $match );
+        self::assert_true( 1 === $matched, 'The item playback settings should be one well-formed attribute.' );
+        $settings = json_decode( html_entity_decode( $match[1], ENT_QUOTES, 'UTF-8' ), true );
+        self::assert_true( is_array( $settings ), 'The playback settings attribute should read back as JSON.' );
+        self::assert_same( true, $settings['mute'] ?? null, 'The item playback settings should reach the markup the players read.' );
+        self::assert_same( false, $settings['controls'] ?? null, 'Hiding the player controls should reach the markup.' );
+        self::assert_same( false, $settings['autoplay'] ?? null, 'Turning autoplay off should reach the markup.' );
     }
 
     private static function test_random_sort_stamps_the_mode_attribute(): void {

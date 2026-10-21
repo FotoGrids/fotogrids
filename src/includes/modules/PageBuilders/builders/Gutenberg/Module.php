@@ -115,6 +115,7 @@ final class Module {
 		// stylesheet). Mirrors the Elementor sub-module's hook into the
 		// same filter; keeps Public_Render free of per-builder branches.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_gutenberg' ), 10, 2 );
+		add_filter( Filters_Page_Builders::EMBEDS, array( self::class, 'embeds_in_blocks' ), 10, 2 );
 	}
 
 	/**
@@ -139,6 +140,58 @@ final class Module {
 			return true;
 		}
 		return $detected;
+	}
+
+	/**
+	 * Adds the gallery and album blocks in content, at any nesting depth.
+	 *
+	 * @since 1.3.0
+	 * @param array  $embeds  Embeds found so far.
+	 * @param string $content Post or widget content.
+	 * @return array
+	 */
+	public static function embeds_in_blocks( $embeds, $content ): array {
+		$embeds = is_array( $embeds ) ? $embeds : array();
+		if ( ! is_string( $content ) || false === strpos( $content, '<!-- wp:fotogrids/' ) ) {
+			return $embeds;
+		}
+
+		return array_merge( $embeds, self::block_embeds( parse_blocks( $content ) ) );
+	}
+
+	/**
+	 * Returns the gallery and album blocks in a parsed block tree.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, array> $blocks Parsed blocks.
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function block_embeds( array $blocks ): array {
+		$embeds = array();
+
+		foreach ( $blocks as $block ) {
+			$attrs = $block['attrs'] ?? array();
+			if ( 'fotogrids/gallery' === $block['blockName'] && ! empty( $attrs['galleryId'] ) ) {
+				$embeds[] = array(
+					'type' => 'gallery',
+					'atts' => array(
+						'id'      => absint( $attrs['galleryId'] ),
+						'_source' => 'block',
+					),
+				);
+			} elseif ( 'fotogrids/album' === $block['blockName'] && ! empty( $attrs['albumId'] ) ) {
+				$embeds[] = array(
+					'type' => 'album',
+					'atts' => array( 'id' => absint( $attrs['albumId'] ) ),
+				);
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$embeds = array_merge( $embeds, self::block_embeds( $block['innerBlocks'] ) );
+			}
+		}
+
+		return $embeds;
 	}
 
 	/**

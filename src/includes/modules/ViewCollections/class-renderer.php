@@ -263,8 +263,25 @@ class Renderer {
 		$description = '';
 
 		if ( $item ) {
-			$title       = '' !== $item['title'] ? $item['title'] : $title;
-			$description = (string) $item['caption'];
+			$item_title  = '' !== $item['title']
+				? \FotoGrids\Formatted_Text\Formatted_Text::single_line(
+					(string) $item['title'],
+					array(
+						'use'     => 'title_tag',
+						'item_id' => (int) $item['id'],
+					)
+				)
+				: '';
+			$title       = '' !== $item_title ? $item_title : $title;
+			$description = $this->trim_description(
+				\FotoGrids\Formatted_Text\Formatted_Text::single_line(
+					(string) $item['caption'],
+					array(
+						'use'     => 'og',
+						'item_id' => (int) $item['id'],
+					)
+				)
+			);
 			$image       = array(
 				'id'     => (int) $item['id'],
 				'url'    => (string) $item['image'],
@@ -836,7 +853,7 @@ class Renderer {
 		$config['object_id']   = (int) $this->post->ID;
 
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
-			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
+			. esc_attr( \FotoGrids\Sanitization\Attribute_Value::json( $config ) ) . '"></div>';
 
 		/**
 		 * Filter the share controls markup.
