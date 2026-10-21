@@ -58,7 +58,8 @@ class Gallery_Album_Relations {
 	/**
 	 * Add gallery to album
 	 *
-	 * Fires `Actions_Album::GALLERY_ADDED` when the gallery is added.
+	 * When the gallery is added, clears the album's featured gallery if it names
+	 * this one, then fires `Actions_Album::GALLERY_ADDED`.
 	 *
 	 * @param int $gallery_id Gallery post ID
 	 * @param int $album_id Album post ID
@@ -103,6 +104,7 @@ class Gallery_Album_Relations {
 			return false;
 		}
 
+		delete_post_meta( $album_id, Post_Types::FEATURED_GALLERY_META_KEY, $gallery_id );
 		self::clear_caches( $gallery_id, $album_id );
 
 		do_action( Actions_Album::GALLERY_ADDED, $gallery_id, $album_id );

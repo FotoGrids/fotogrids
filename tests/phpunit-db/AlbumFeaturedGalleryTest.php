@@ -252,6 +252,83 @@ class AlbumFeaturedGalleryTest extends WP_UnitTestCase {
 		$this->assertSame( $this->covers['featured'], Cover_Resolver::for_album( $album ) );
 	}
 
+	/** A pick naming a gallery outside the album, as 1.2.x left on removal. */
+	private function stale_pick( int $album, string $gallery ): void {
+		update_post_meta( $album, Post_Types::FEATURED_GALLERY_META_KEY, (string) $this->galleries[ $gallery ] );
+	}
+
+	public function test_a_stale_pick_is_dropped_when_its_gallery_is_added_in_the_album_editor(): void {
+		$album = $this->album( array( 'first' ) );
+		$this->stale_pick( $album, 'featured' );
+
+		$this->add_in_album_editor( $album, 'featured' );
+
+		$this->assertSame( '', $this->picked( $album ) );
+		$this->assertSame( $this->covers['first'], Cover_Resolver::for_album( $album ) );
+	}
+
+	public function test_a_stale_pick_is_dropped_when_its_gallery_is_added_in_the_gallery_editor(): void {
+		$album = $this->album( array( 'first' ) );
+		$this->stale_pick( $album, 'featured' );
+
+		$this->add_in_gallery_editor( $album, 'featured' );
+
+		$this->assertSame( '', $this->picked( $album ) );
+	}
+
+	public function test_a_stale_pick_is_dropped_when_its_gallery_is_added_by_the_bulk_action(): void {
+		$album = $this->album( array( 'first' ) );
+		$this->stale_pick( $album, 'featured' );
+
+		$this->bulk( 'assign_to_album', 'featured', $album );
+
+		$this->assertSame( '', $this->picked( $album ) );
+	}
+
+	public function test_an_add_listener_already_sees_no_stale_pick(): void {
+		$album = $this->album( array( 'first' ) );
+		$this->stale_pick( $album, 'featured' );
+		$seen  = null;
+		$watch = function ( $gallery_id, $album_id ) use ( &$seen ): void {
+			$seen = $this->picked( (int) $album_id );
+		};
+		add_action( Actions_Album::GALLERY_ADDED, $watch, 10, 2 );
+
+		$this->add_in_album_editor( $album, 'featured' );
+		remove_action( Actions_Album::GALLERY_ADDED, $watch, 10 );
+
+		$this->assertSame( '', $seen );
+	}
+
+	public function test_adding_another_gallery_keeps_the_featured_one(): void {
+		$album = $this->album( array( 'first', 'featured' ), 'featured' );
+
+		$this->add_in_album_editor( $album, 'other' );
+
+		$this->assertSame( (string) $this->galleries['featured'], $this->picked( $album ) );
+	}
+
+	public function test_adding_the_featured_gallery_again_keeps_it(): void {
+		$album = $this->album( array( 'first', 'featured' ), 'featured' );
+
+		$this->assertFalse( Gallery_Album_Relations::add_gallery_to_album( $this->galleries['featured'], $album ) );
+		$this->add_in_album_editor( $album, 'featured' );
+		$this->bulk( 'assign_to_album', 'featured', $album );
+
+		$this->assertSame( (string) $this->galleries['featured'], $this->picked( $album ) );
+		$this->assertSame( array( $this->galleries['first'], $this->galleries['featured'] ), Gallery_Album_Relations::get_gallery_ids_for_album( $album ) );
+	}
+
+	public function test_adding_a_gallery_leaves_a_stale_pick_naming_another_one(): void {
+		$album = $this->album( array( 'first' ) );
+		$this->stale_pick( $album, 'featured' );
+
+		$this->add_in_album_editor( $album, 'other' );
+
+		$this->assertSame( (string) $this->galleries['featured'], $this->picked( $album ) );
+		$this->assertSame( $this->covers['first'], Cover_Resolver::for_album( $album ) );
+	}
+
 	public function test_removing_another_gallery_keeps_the_featured_one(): void {
 		$album = $this->album( array( 'first', 'featured', 'other' ), 'featured' );
 
