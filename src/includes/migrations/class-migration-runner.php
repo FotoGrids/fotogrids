@@ -59,15 +59,21 @@ final class Migration_Runner {
 	public static function run_pending( ?array $migrations = null ): void {
 		$migrations = $migrations ?? self::discover();
 
-		if ( array() === self::pending( $migrations ) || ! self::lock() ) {
+		if ( array() === self::pending( $migrations ) ) {
+			return;
+		}
+
+		$lock = self::lock();
+		if ( null === $lock ) {
 			return;
 		}
 
 		try {
 			wp_cache_delete( self::RECORD_OPTION, 'options' );
 			wp_cache_delete( 'alloptions', 'options' );
-			$completed = self::record();
-			foreach ( null === $completed ? array() : self::pending( $migrations ) as $migration ) {
+			wp_cache_delete( 'notoptions', 'options' );
+			$completed = self::stored_record();
+			foreach ( null === $completed ? array() : self::pending( $migrations, $completed ) as $migration ) {
 				try {
 					$migration::run();
 				} catch ( \Throwable $e ) {
@@ -79,7 +85,7 @@ final class Migration_Runner {
 				update_option( self::RECORD_OPTION, $completed, true );
 			}
 		} finally {
-			self::unlock();
+			self::unlock( $lock );
 		}
 	}
 
@@ -124,8 +130,32 @@ final class Migration_Runner {
 	 * @return array<int, string>|null The IDs, an empty list when there is no record, or null when the stored value is not a list.
 	 */
 	private static function record(): ?array {
-		$record = get_option( self::RECORD_OPTION, array() );
+		return self::as_record( get_option( self::RECORD_OPTION, array() ) );
+	}
 
+	/**
+	 * The record as the database holds it, whatever an object cache remembers.
+	 *
+	 * @since  1.3.0
+	 * @return array<int, string>|null As `record()`.
+	 */
+	private static function stored_record(): ?array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The cache is what this read must not trust.
+		$value = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", self::RECORD_OPTION ) );
+
+		return self::as_record( null === $value ? array() : maybe_unserialize( $value ) );
+	}
+
+	/**
+	 * A stored record value as a list of IDs.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $record Stored value.
+	 * @return array<int, string>|null The IDs, or null when the value is not a list.
+	 */
+	private static function as_record( $record ): ?array {
 		return is_array( $record ) ? array_values( array_filter( $record, 'is_string' ) ) : null;
 	}
 
@@ -134,10 +164,11 @@ final class Migration_Runner {
 	 *
 	 * @since  1.3.0
 	 * @param  array<int, class-string<Migration>> $migrations Migrations to consider.
+	 * @param  array<int, string>|null             $record     Recorded IDs; defaults to the stored record.
 	 * @return array<int, class-string<Migration>>
 	 */
-	private static function pending( array $migrations ): array {
-		$record = self::record();
+	private static function pending( array $migrations, ?array $record = null ): array {
+		$record = $record ?? self::record();
 		if ( null === $record ) {
 			return array();
 		}
@@ -190,9 +221,9 @@ final class Migration_Runner {
 	 * Take the lock, or take over one older than `LOCK_TIMEOUT`.
 	 *
 	 * @since  1.3.0
-	 * @return bool Whether this request holds the lock.
+	 * @return string|null The lock's value while this request holds it, or null.
 	 */
-	private static function lock(): bool {
+	private static function lock(): ?string {
 		global $wpdb;
 
 		$now = time();
@@ -218,16 +249,24 @@ final class Migration_Runner {
 		}
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-		return (bool) $taken;
+		return $taken ? (string) $now : null;
 	}
 
 	/**
-	 * Release the lock.
+	 * Release the lock, unless another request has taken it over.
 	 *
 	 * @since  1.3.0
+	 * @param  string $lock The value `lock()` returned.
 	 * @return void
 	 */
-	private static function unlock(): void {
-		delete_option( self::LOCK_OPTION );
+	private static function unlock( string $lock ): void {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The lock is written past the cache, so it is read the same way.
+		$held = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", self::LOCK_OPTION ) );
+
+		if ( $lock === $held ) {
+			delete_option( self::LOCK_OPTION );
+		}
 	}
 }

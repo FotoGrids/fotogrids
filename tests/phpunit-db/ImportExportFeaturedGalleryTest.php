@@ -105,6 +105,14 @@ class ImportExportFeaturedGalleryTest extends WP_UnitTestCase {
 		$this->assertSame( 200, Import_Export_Data::import( $request )->get_status() );
 	}
 
+	/** The same data as an XML export file. */
+	private function xml( string $json ): string {
+		$method = new ReflectionMethod( Import_Export_Data::class, 'serialise_xml' );
+		$method->setAccessible( true );
+
+		return (string) $method->invoke( null, json_decode( $json, true ) );
+	}
+
 	private function export(): string {
 		$method = new ReflectionMethod( Import_Export_Data::class, 'collect_export_data' );
 		$method->setAccessible( true );
@@ -278,5 +286,49 @@ class ImportExportFeaturedGalleryTest extends WP_UnitTestCase {
 		);
 
 		$this->assertFalse( metadata_exists( 'post', $this->id( Post_Types::ALBUM, 'imp-lagoon' ), Post_Types::FEATURED_GALLERY_META_KEY ) );
+	}
+
+	public function test_an_xml_file_gives_the_featured_gallery_its_id_on_this_site(): void {
+		$this->import(
+			$this->xml(
+				$this->file(
+					self::ELSEWHERE,
+					array( $this->row( 9009, 'imp-xml-harbour' ), $this->row( 9010, 'imp-xml-market' ) ),
+					array( $this->row( 9057, 'imp-xml-coast', array( Post_Types::FEATURED_GALLERY_META_KEY => 9010 ) ) ),
+					array( 9057 => array( 9009, 9010 ) )
+				)
+			),
+			'skip'
+		);
+
+		$album = $this->id( Post_Types::ALBUM, 'imp-xml-coast' );
+		$this->assertSame( (string) $this->id( Post_Types::GALLERY, 'imp-xml-market' ), $this->picked( $album ) );
+	}
+
+	public function test_an_xml_export_written_back_onto_its_own_site_keeps_the_pick(): void {
+		$gallery = $this->local( Post_Types::GALLERY, 'imp-xml-own-gallery' );
+		$album   = $this->local( Post_Types::ALBUM, 'imp-xml-own-album' );
+		Gallery_Album_Relations::add_gallery_to_album( $gallery, $album );
+		update_post_meta( $album, Post_Types::FEATURED_GALLERY_META_KEY, $gallery );
+
+		$this->import( $this->xml( $this->export() ), 'overwrite', array( 'albums' ) );
+
+		$this->assertSame( (string) $gallery, $this->picked( $album ) );
+	}
+
+	public function test_an_empty_pick_in_an_xml_file_stores_none(): void {
+		$this->import(
+			$this->xml(
+				$this->file(
+					self::ELSEWHERE,
+					array( $this->row( 9011, 'imp-xml-plain' ) ),
+					array( $this->row( 9058, 'imp-xml-lagoon', array( Post_Types::FEATURED_GALLERY_META_KEY => '' ) ) ),
+					array( 9058 => array( 9011 ) )
+				)
+			),
+			'skip'
+		);
+
+		$this->assertFalse( metadata_exists( 'post', $this->id( Post_Types::ALBUM, 'imp-xml-lagoon' ), Post_Types::FEATURED_GALLERY_META_KEY ) );
 	}
 }

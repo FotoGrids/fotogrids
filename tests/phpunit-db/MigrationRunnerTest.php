@@ -25,8 +25,14 @@ final class Fg_Test_Migration_Log {
 	/** @var array<string, bool> IDs that throw when run. */
 	public static array $failing = array();
 
+	/** @var callable|null Called as each one runs, standing in for another request. */
+	public static $during = null;
+
 	public static function record( string $id ): void {
 		self::$ran[] = $id;
+		if ( self::$during ) {
+			( self::$during )( $id );
+		}
 		if ( ! empty( self::$failing[ $id ] ) ) {
 			throw new RuntimeException( "$id failed" );
 		}
@@ -77,6 +83,7 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		wp_cache_flush();
 		Fg_Test_Migration_Log::$ran     = array();
 		Fg_Test_Migration_Log::$failing = array();
+		Fg_Test_Migration_Log::$during  = null;
 		$this->recorded_before          = Migration_Runner::completed();
 	}
 
@@ -88,6 +95,26 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		global $wpdb;
 
 		return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", Migration_Runner::LOCK_OPTION ) );
+	}
+
+	private function plant_lock( int $taken_at ): void {
+		global $wpdb;
+
+		$wpdb->insert(
+			$wpdb->options,
+			array(
+				'option_name'  => Migration_Runner::LOCK_OPTION,
+				'option_value' => (string) $taken_at,
+				'autoload'     => 'off',
+			)
+		);
+	}
+
+	/** The record as the database holds it, past any cache. */
+	private function stored_record() {
+		global $wpdb;
+
+		return maybe_unserialize( $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", Migration_Runner::RECORD_OPTION ) ) );
 	}
 
 	/** Whether the four real migrations left their marks untouched: a stale pick and a legacy defaults row. */
@@ -300,6 +327,77 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 
 		$this->assertSame( array( '9001-first' ), Fg_Test_Migration_Log::$ran );
 		$this->assertNull( $this->lock_row() );
+	}
+
+	public function test_a_cache_that_remembers_the_record_as_missing_runs_nothing_again(): void {
+		$this->record( array( '9001-first' ) );
+		wp_cache_delete( 'alloptions', 'options' );
+		wp_cache_set( 'notoptions', array( Migration_Runner::RECORD_OPTION => true ), 'options' );
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_First::class ) );
+
+		$this->assertSame( array(), Fg_Test_Migration_Log::$ran );
+		$this->assertSame( array( '9001-first' ), $this->stored_record() );
+		$this->assertNull( $this->lock_row() );
+	}
+
+	public function test_a_cache_that_remembers_a_record_not_autoloaded_as_missing_runs_nothing_again(): void {
+		global $wpdb;
+
+		$this->record( array( '9001-first' ) );
+		$wpdb->update( $wpdb->options, array( 'autoload' => 'off' ), array( 'option_name' => Migration_Runner::RECORD_OPTION ) );
+		wp_cache_flush();
+		wp_cache_set( 'notoptions', array( Migration_Runner::RECORD_OPTION => true ), 'options' );
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_First::class ) );
+
+		$this->assertSame( array(), Fg_Test_Migration_Log::$ran );
+		$this->assertSame( array( '9001-first' ), $this->stored_record() );
+	}
+
+	public function test_a_cache_holding_an_older_record_reruns_nothing_and_records_the_new_one(): void {
+		$this->record( array( '9001-first' ) );
+		$alloptions                                 = wp_load_alloptions();
+		$alloptions[ Migration_Runner::RECORD_OPTION ] = maybe_serialize( array() );
+		wp_cache_set( 'alloptions', $alloptions, 'options' );
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_First::class, Fg_Test_Migration_Second::class ) );
+
+		$this->assertSame( array( '9002-second' ), Fg_Test_Migration_Log::$ran );
+		$this->assertSame( array( '9001-first', '9002-second' ), $this->stored_record() );
+	}
+
+	public function test_a_request_that_died_mid_migration_is_resumed_once_its_lock_expires(): void {
+		$migrations = array( Fg_Test_Migration_First::class, Fg_Test_Migration_Second::class, Fg_Test_Migration_Third::class );
+		$this->record( array( '9001-first' ) );
+		$this->plant_lock( time() - 60 );
+
+		Migration_Runner::run_pending( $migrations );
+
+		$this->assertSame( array(), Fg_Test_Migration_Log::$ran, 'ran inside the ten minutes' );
+
+		global $wpdb;
+		$wpdb->update( $wpdb->options, array( 'option_value' => (string) ( time() - Migration_Runner::LOCK_TIMEOUT - 1 ) ), array( 'option_name' => Migration_Runner::LOCK_OPTION ) );
+
+		Migration_Runner::run_pending( $migrations );
+
+		$this->assertSame( array( '9002-second', '9003-third' ), Fg_Test_Migration_Log::$ran );
+		$this->assertSame( array( '9001-first', '9002-second', '9003-third' ), Migration_Runner::completed() );
+		$this->assertNull( $this->lock_row() );
+	}
+
+	public function test_a_request_that_overran_its_lock_leaves_the_lock_another_request_took(): void {
+		global $wpdb;
+
+		$this->record( array() );
+		$taken_over                     = (string) ( time() + 1 );
+		Fg_Test_Migration_Log::$during = static function () use ( $wpdb, $taken_over ): void {
+			$wpdb->update( $wpdb->options, array( 'option_value' => $taken_over ), array( 'option_name' => Migration_Runner::LOCK_OPTION ) );
+		};
+
+		Migration_Runner::run_pending( array( Fg_Test_Migration_First::class ) );
+
+		$this->assertSame( $taken_over, $this->lock_row() );
 	}
 
 	public function test_an_id_with_no_migration_is_kept_in_the_record(): void {
