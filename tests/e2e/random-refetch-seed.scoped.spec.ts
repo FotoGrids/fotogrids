@@ -269,3 +269,67 @@ test(
 		expect(await shown(gallery)).not.toEqual(gallery.served);
 	}
 );
+
+test.describe('random refetch: Preload Next Page', () => {
+	for (const outcome of ['on time', 'late'] as Refetch[]) {
+		test(
+			`RND-05: refetch ${outcome} - page 2 is preloaded before the first Load More, which sends nothing`,
+			{ tag: ['@layout', ...('late' === outcome ? ['@critical'] : [])] },
+			async ({ page }) => {
+				const { id, url } = randomGallery({
+					pagination_method: 'load_more',
+					preload_next_page: true,
+				});
+				const requests: Array<{ page: number; seed: number }> = [];
+				page.on('request', (request) => {
+					if (
+						'POST' !== request.method() ||
+						!isRender(new URL(request.url()))
+					) {
+						return;
+					}
+					const body = request.postDataJSON() ?? {};
+					if (Number(body.gallery_id) === id) {
+						requests.push({
+							page: Number(body.page),
+							seed: Number(body.random_seed),
+						});
+					}
+				});
+				await alterRefetch(page, outcome);
+				const gallery = await open(page, url, id);
+				const seed = Number(
+					await gallery.root.getAttribute('data-fg-random-seed')
+				);
+
+				await expect
+					.poll(() => requests.slice(1))
+					.toEqual([{ page: 2, seed }]);
+
+				const button = gallery.root.locator(
+					'.fg-pagination__load-more'
+				);
+				await button.click();
+				await expect(gallery.items()).toHaveCount(24);
+				expect(requests.slice(1)[0]).toEqual({ page: 2, seed });
+				expect(
+					requests.slice(1).filter((r) => 2 === r.page)
+				).toHaveLength(1);
+
+				for (const count of [36, 48, 60]) {
+					await button.click();
+					await expect(gallery.items()).toHaveCount(count);
+				}
+				expect(repeatsAndMissing(await shown(gallery))).toEqual({
+					repeated: [],
+					missing: [],
+				});
+				const pages = requests.slice(1).map((r) => r.page);
+				expect(new Set(pages).size).toBe(pages.length);
+				expect(requests.slice(1).every((r) => r.seed === seed)).toBe(
+					true
+				);
+			}
+		);
+	}
+});
