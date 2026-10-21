@@ -24,12 +24,22 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * A list setting is any setting whose default is a non-empty list. Its admin
  * control always saves a JSON array, so a stored value that is not one is
- * replaced with the default. Runs on upgrade and after an import, which can
- * carry values exported by an earlier version.
+ * replaced with the default. Runs once on upgrade; after an import,
+ * `repair_imported()` repairs what the import wrote.
  *
  * @since 1.2.0
  */
-final class List_Setting_Repair {
+final class List_Setting_Repair implements Migration {
+
+	/**
+	 * Identifier recorded once the repair has run.
+	 *
+	 * @since  1.3.0
+	 * @return string
+	 */
+	public static function id(): string {
+		return '0003-list-setting-repair';
+	}
 
 	/**
 	 * Run the repair.
@@ -38,13 +48,35 @@ final class List_Setting_Repair {
 	 * @return void
 	 */
 	public static function run(): void {
+		self::repair( null );
+	}
+
+	/**
+	 * Repair the collections an import wrote, and the saved defaults.
+	 *
+	 * @since  1.3.0
+	 * @param  array<int, int> $post_ids Gallery and album IDs the import created or matched.
+	 * @return void
+	 */
+	public static function repair_imported( array $post_ids ): void {
+		self::repair( array_values( array_unique( array_filter( array_map( 'intval', $post_ids ) ) ) ) );
+	}
+
+	/**
+	 * Repair collection post meta and the saved defaults.
+	 *
+	 * @since  1.3.0
+	 * @param  array<int, int>|null $post_ids Collections to repair; null for all of them.
+	 * @return void
+	 */
+	private static function repair( ?array $post_ids ): void {
 		$defaults = self::list_defaults();
 
 		if ( array() === $defaults ) {
 			return;
 		}
 
-		$repaired  = self::repair_collections( $defaults );
+		$repaired  = array() === $post_ids ? 0 : self::repair_collections( $defaults, $post_ids );
 		$repaired += self::repair_saved_defaults( $defaults );
 
 		if ( $repaired > 0 ) {
@@ -93,16 +125,19 @@ final class List_Setting_Repair {
 	 *
 	 * @since  1.2.0
 	 * @param  array<string, array<int, mixed>> $defaults List defaults keyed by setting.
+	 * @param  array<int, int>|null             $post_ids Collections to repair; null for all of them.
 	 * @return int Number of values replaced.
 	 */
-	private static function repair_collections( array $defaults ): int {
+	private static function repair_collections( array $defaults, ?array $post_ids ): int {
 		global $wpdb;
+
+		$only = null === $post_ids ? '' : ' AND pm.post_id IN (' . implode( ',', array_fill( 0, count( $post_ids ), '%d' ) ) . ')';
 
 		$repaired = 0;
 		foreach ( $defaults as $key => $default ) {
 			$meta_key = 'fotogrids_' . $key;
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time scan across all collections.
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Scan across collections; $only is a generated list of %d tokens, one per entry in $post_ids.
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT pm.post_id, pm.meta_value
@@ -110,12 +145,11 @@ final class List_Setting_Repair {
 					INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
 					WHERE p.post_type IN ( %s, %s )
 					AND pm.meta_key = %s
-					AND pm.meta_value <> ''",
-					Post_Types::GALLERY,
-					Post_Types::ALBUM,
-					$meta_key
+					AND pm.meta_value <> ''{$only}",
+					array_merge( array( Post_Types::GALLERY, Post_Types::ALBUM, $meta_key ), $post_ids ?? array() )
 				)
 			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 			foreach ( (array) $rows as $row ) {
 				if ( self::is_list_value( $row->meta_value ) ) {

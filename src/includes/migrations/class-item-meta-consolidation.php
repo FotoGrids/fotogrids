@@ -2,14 +2,16 @@
 /**
  * One-time consolidation of fotogrids_item_meta into one row per item.
  *
- * @package FotoGrids\Galleries
+ * @package FotoGrids\Migrations
  * @since   1.1.4
  */
 
 declare(strict_types=1);
 
-namespace FotoGrids\Galleries;
+namespace FotoGrids\Migrations;
 
+use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Post_Types;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -21,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * @since 1.1.4
  */
-final class Item_Meta_Consolidation {
+final class Item_Meta_Consolidation implements Migration {
 
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
@@ -44,6 +46,16 @@ final class Item_Meta_Consolidation {
 	 * @since 1.1.4
 	 */
 	private const BATCH_SIZE = 500;
+
+	/**
+	 * Identifier recorded once the consolidation has run.
+	 *
+	 * @since  1.3.0
+	 * @return string
+	 */
+	public static function id(): string {
+		return '0001-item-meta-consolidation';
+	}
 
 	/**
 	 * Run the consolidation.

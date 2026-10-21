@@ -21,23 +21,31 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Copies the map in `fotogrids_gallery_defaults` to every collection type
  * with no defaults of its own, then deletes that option. The option is kept
- * when the copy cannot be written.
- *
- * Runs on upgrade, and from `Collection_Defaults_Store::all()` when the new
- * option does not exist yet.
+ * when the copy cannot be written, and the move stays pending.
  *
  * @package FotoGrids\Migrations
  * @since   1.3.0
  */
-final class Collection_Defaults_Split {
+final class Collection_Defaults_Split implements Migration {
 
 	const LEGACY_OPTION = 'fotogrids_gallery_defaults';
+
+	/**
+	 * Identifier recorded once the move has run.
+	 *
+	 * @since  1.3.0
+	 * @return string
+	 */
+	public static function id(): string {
+		return '0002-collection-defaults-split';
+	}
 
 	/**
 	 * Run the move.
 	 *
 	 * @since  1.3.0
 	 * @return void
+	 * @throws \RuntimeException When the copy could not be written.
 	 */
 	public static function run(): void {
 		$legacy = self::read_legacy();
@@ -63,7 +71,7 @@ final class Collection_Defaults_Split {
 			update_option( Collection_Defaults_Store::OPTION, $current );
 
 			if ( wp_json_encode( get_option( Collection_Defaults_Store::OPTION ) ) !== wp_json_encode( $current ) ) {
-				return;
+				throw new \RuntimeException( 'The collection defaults could not be written.' );
 			}
 		}
 

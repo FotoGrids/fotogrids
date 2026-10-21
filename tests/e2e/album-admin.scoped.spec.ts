@@ -224,6 +224,140 @@ test.describe("the album's Galleries box", () => {
 	);
 
 	test(
+		'ALB-17: a removed featured gallery stops being featured, and is not featured again when added back',
+		{
+			tag: '@admin',
+		},
+		async ({ page, context }) => {
+			const [a1, a2, b1, b2] = five();
+			const firstTitle = unique('Stays first');
+			const featuredTitle = unique('Leaves featured');
+			const featuredId = gallery(featuredTitle, [b1, b2]);
+			const parent = album([gallery(firstTitle, [a1, a2]), featuredId]);
+
+			const view = await context.newPage();
+			const sharedCover = async (attachmentId: number) => {
+				await view.goto(parent.view);
+				await expect(
+					view.locator('meta[property="og:image"]')
+				).toHaveAttribute('content', new RegExp(stem(attachmentId)));
+			};
+			const picked = () =>
+				wpEval(
+					`echo get_post_meta( ${parent.id}, 'fotogrids_featured_gallery', true );`
+				).trim();
+			const star = () =>
+				page
+					.locator(
+						'.fotogrids-assigned-galleries .fotogrids-gallery-item'
+					)
+					.filter({ hasText: featuredTitle })
+					.locator('.fotogrids-featured-button');
+
+			await openAlbum(page, parent.id);
+			await restWrite(page, `/album/${parent.id}/featured-gallery`, () =>
+				star().click()
+			);
+			await sharedCover(b1);
+
+			await restWrite(
+				page,
+				`/admin/albums/${parent.id}/galleries/${featuredId}`,
+				() =>
+					page
+						.locator(
+							'.fotogrids-assigned-galleries .fotogrids-gallery-item'
+						)
+						.filter({ hasText: featuredTitle })
+						.locator('.fg-action-button--remove')
+						.click()
+			);
+			expect(picked()).toBe('');
+			await sharedCover(a1);
+
+			await page
+				.locator('.fotogrids-available-section .fotogrids-search-input')
+				.fill(featuredTitle);
+			await restWrite(page, `/admin/albums/${parent.id}/galleries`, () =>
+				page
+					.locator(
+						'.fotogrids-available-galleries .fotogrids-gallery-item'
+					)
+					.filter({ hasText: featuredTitle })
+					.locator('.fg-action-button--add')
+					.click()
+			);
+			await expect(star()).toHaveAttribute('aria-pressed', 'false');
+
+			await openAlbum(page, parent.id);
+			await expect(star()).toHaveAttribute('aria-pressed', 'false');
+			expect(picked()).toBe('');
+			await sharedCover(a1);
+
+			await restWrite(page, `/album/${parent.id}/featured-gallery`, () =>
+				star().click()
+			);
+			await expect(star()).toHaveAttribute('aria-pressed', 'true');
+			await sharedCover(b1);
+
+			await view.close();
+		}
+	);
+
+	test(
+		'ALB-17: removing a gallery that is not featured keeps the featured one',
+		{
+			tag: '@admin',
+		},
+		async ({ page, context }) => {
+			const [a1, a2, b1, b2, c1] = five();
+			const featuredTitle = unique('Kept featured');
+			const leavingTitle = unique('Leaves plain');
+			const leavingId = gallery(leavingTitle, [b1, b2]);
+			const featuredId = gallery(featuredTitle, [c1]);
+			const parent = album([
+				gallery(unique('First'), [a1, a2]),
+				leavingId,
+				featuredId,
+			]);
+			wpEval(
+				`update_post_meta( ${parent.id}, 'fotogrids_featured_gallery', ${featuredId} );`
+			);
+
+			await openAlbum(page, parent.id);
+			await restWrite(
+				page,
+				`/admin/albums/${parent.id}/galleries/${leavingId}`,
+				() =>
+					page
+						.locator(
+							'.fotogrids-assigned-galleries .fotogrids-gallery-item'
+						)
+						.filter({ hasText: leavingTitle })
+						.locator('.fg-action-button--remove')
+						.click()
+			);
+
+			await openAlbum(page, parent.id);
+			await expect(
+				page
+					.locator(
+						'.fotogrids-assigned-galleries .fotogrids-gallery-item'
+					)
+					.filter({ hasText: featuredTitle })
+					.locator('.fotogrids-featured-button')
+			).toHaveAttribute('aria-pressed', 'true');
+
+			const view = await context.newPage();
+			await view.goto(parent.view);
+			await expect(
+				view.locator('meta[property="og:image"]')
+			).toHaveAttribute('content', new RegExp(stem(c1)));
+			await view.close();
+		}
+	);
+
+	test(
 		'ALB-17: a removed gallery leaves the album',
 		{
 			tag: '@admin',
