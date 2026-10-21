@@ -266,9 +266,10 @@ describe('random-sort', () => {
 
 		it('reveals the server items and drops a late response after the hold expires', async () => {
 			jest.useFakeTimers();
-			const { root } = makeCollection(['a', 'b', 'c'], {
+			const { collection, root } = makeCollection(['a', 'b', 'c'], {
 				mode: 'refetch',
 			});
+			const seedBefore = collection.dataset.fgRandomSeed;
 			const server = stubFetch({ html: itemsMarkup(['x', 'y', 'z']) });
 
 			loadModule();
@@ -282,6 +283,23 @@ describe('random-sort', () => {
 			await server.settle();
 
 			expect(orderOf(root)).toEqual(['a', 'b', 'c']);
+			expect(collection.dataset.fgRandomSeed).toBe(seedBefore);
+		});
+
+		it('drops the fresh set when the visitor filters before it lands, keeping the server seed', async () => {
+			const { collection, root } = makeCollection(['a', 'b', 'c'], {
+				mode: 'refetch',
+			});
+			const seedBefore = collection.dataset.fgRandomSeed;
+			const server = stubFetch({ html: itemsMarkup(['x', 'y', 'z']) });
+
+			loadModule();
+			window.FotoGrids.boot();
+			collection.dispatchEvent(new CustomEvent('fotogrids:filters_changed'));
+			await server.settle();
+
+			expect(orderOf(root)).toEqual(['a', 'b', 'c']);
+			expect(collection.dataset.fgRandomSeed).toBe(seedBefore);
 		});
 
 		it('sends the wrapper ID as the instance ID, and nothing for one the route would reject', () => {
@@ -307,16 +325,17 @@ describe('random-sort', () => {
 			).toBe('');
 		});
 
-		it('mints a fresh seed and sends it so later requests share the permutation', () => {
+		it('mints a fresh seed and sends it so later requests share the permutation', async () => {
 			const { collection } = makeCollection(['a', 'b', 'c'], {
 				mode: 'refetch',
 			});
-			stubFetch({ html: itemsMarkup(['x']) });
+			const server = stubFetch({ html: itemsMarkup(['x']) });
 
 			loadModule();
 			window.FotoGrids.boot();
 
 			const body = JSON.parse(window.fetch.mock.calls[0][1].body);
+			await server.settle();
 
 			expect(body.partial).toBe('items_only');
 			expect(body.page).toBe(1);

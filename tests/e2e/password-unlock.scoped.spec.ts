@@ -1,6 +1,6 @@
 import type { Page, Response } from '@playwright/test';
 import { test, expect } from './support/test';
-import { album, galleryPage, type Settings } from './support/collections';
+import { album, galleryPage, shortcodePage, type Settings } from './support/collections';
 import { fixture, twelveItems } from './support/fixtures';
 import { wpEval } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
@@ -446,5 +446,47 @@ test.describe( 'a Load More click as soon as the gallery appears', () => {
 		await submitLockForm( page, gallery );
 		await loadMoreAtOnce( gallery );
 		await expect( gallery.items() ).toHaveCount( 12 );
+	} );
+} );
+
+test.describe( 'an embed with shortcode attributes', () => {
+	test( "unlocks with the embed's cols and template", { tag: [ '@gate', '@layout' ] }, async ( { page } ) => {
+		const { id } = passwordGallery( { columns: { desktop: 3, tablet: 3, mobile: 3 } } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( shortcodePage( id, 'template="masonry" cols="2"' ).url );
+		await unlockThroughForm( page, gallery );
+
+		expect( await gallery.layout() ).toBe( 'masonry' );
+		expect( await gallery.cssVar( 'cols' ) ).toBe( '2' );
+	} );
+
+	test( 'unlocks with the saved cols and layout when the embed sets none', { tag: [ '@gate', '@layout' ] }, async ( {
+		page,
+	} ) => {
+		const { id } = passwordGallery( { columns: { desktop: 3, tablet: 3, mobile: 3 } } );
+		const gallery = new GalleryRender( page, id );
+
+		await page.goto( postWith( `[fotogrids_gallery id="${ id }"]` ) );
+		await unlockThroughForm( page, gallery );
+
+		expect( await gallery.layout() ).toBe( 'grid' );
+		expect( await gallery.cssVar( 'cols' ) ).toBe( '3' );
+	} );
+
+	test( 'the unlock route accepts only a registered layout and a positive column count', { tag: [ '@gate', '@api' ] }, async ( {
+		request,
+	} ) => {
+		const { id } = passwordGallery();
+		const unlock = ( data: Record< string, unknown > ) =>
+			request.post( unlockRoute( id ), { data: { password: PASSWORD, ...data } } );
+
+		expect( ( await unlock( { template: 'not-a-layout' } ) ).status() ).toBe( 400 );
+		expect( ( await unlock( { cols: -1 } ) ).status() ).toBe( 400 );
+		expect( ( await unlock( { cols: 'two' } ) ).status() ).toBe( 400 );
+
+		const accepted = await unlock( { template: 'masonry', cols: 2 } );
+		expect( accepted.status() ).toBe( 200 );
+		expect( ( await accepted.json() ).html as string ).toContain( 'data-fg-layout="masonry"' );
 	} );
 } );

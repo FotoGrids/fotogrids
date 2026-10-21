@@ -110,6 +110,7 @@ final class Module {
 		// the page-global asset bootstrap. Elementor stores its widget tree in
 		// post meta, which has_fotogrids_content() does not scan.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_elementor' ), 10, 2 );
+		add_filter( Filters_Page_Builders::EMBEDS, array( self::class, 'embeds_in_elementor' ), 10, 3 );
 
 		// Elementor's global lightbox hijacks any <a> whose href looks like an
 		// image; the opt-out has to sit on each anchor, since an ancestor opt-out
@@ -151,6 +152,74 @@ final class Module {
 
 		return strpos( $data, '"fotogrids-gallery"' ) !== false
 			|| strpos( $data, '"fotogrids-album"' ) !== false;
+	}
+
+	/**
+	 * Adds the gallery and album widgets in a post's Elementor data.
+	 *
+	 * Widgets whose ID comes from a dynamic tag are left to the render.
+	 *
+	 * @since 1.3.0
+	 * @param array         $embeds  Embeds found so far.
+	 * @param string        $content Post or widget content.
+	 * @param \WP_Post|null $post    Post the content belongs to.
+	 * @return array
+	 */
+	public static function embeds_in_elementor( $embeds, $content, $post ): array {
+		unset( $content );
+		$embeds = is_array( $embeds ) ? $embeds : array();
+		if ( ! $post instanceof \WP_Post ) {
+			return $embeds;
+		}
+
+		$data = get_post_meta( $post->ID, '_elementor_data', true );
+		if ( ! is_string( $data ) || false === strpos( $data, '"fotogrids-' ) ) {
+			return $embeds;
+		}
+
+		$elements = json_decode( $data, true );
+
+		return is_array( $elements ) ? array_merge( $embeds, self::elementor_embeds( $elements ) ) : $embeds;
+	}
+
+	/**
+	 * Returns the gallery and album widgets in an Elementor element tree.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, array> $elements Elementor elements.
+	 * @return array<int, array{type: string, atts: array}>
+	 */
+	private static function elementor_embeds( array $elements ): array {
+		$embeds = array();
+
+		foreach ( $elements as $element ) {
+			if ( ! is_array( $element ) ) {
+				continue;
+			}
+			$settings = is_array( $element['settings'] ?? null ) ? $element['settings'] : array();
+			$widget   = $element['widgetType'] ?? '';
+
+			if ( 'fotogrids-gallery' === $widget && 'dynamic' !== ( $settings['gallery_source'] ?? 'picker' ) && ! empty( $settings['gallery_id'] ) ) {
+				$embeds[] = array(
+					'type' => 'gallery',
+					'atts' => array(
+						'id'      => absint( $settings['gallery_id'] ),
+						'_source' => Request_Source::ELEMENTOR,
+					),
+				);
+			} elseif ( 'fotogrids-album' === $widget && ! empty( $settings['album_id'] ) ) {
+				$embeds[] = array(
+					'type' => 'album',
+					'atts' => array( 'id' => absint( $settings['album_id'] ) ),
+				);
+			}
+
+			if ( ! empty( $element['elements'] ) && is_array( $element['elements'] ) ) {
+				$embeds = array_merge( $embeds, self::elementor_embeds( $element['elements'] ) );
+			}
+		}
+
+		return $embeds;
 	}
 
 	/**

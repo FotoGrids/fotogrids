@@ -1,0 +1,33 @@
+{
+	"version": 1,
+	"profiles": {
+		"item_text": {
+			"elements": {
+				"strong": {},
+				"b": {},
+				"em": {},
+				"i": {},
+				"br": {},
+				"a": {
+					"attributes": {
+						"href": { "type": "url" },
+						"title": { "type": "text" },
+						"target": { "type": "enum", "values": [ "_blank", "_self" ] },
+						"rel": { "type": "tokens", "values": [ "nofollow", "sponsored", "ugc" ] }
+					}
+				}
+			},
+			"protocols": [ "http", "https", "mailto", "tel" ],
+			"breakBefore": [ "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "tr", "ul", "ol", "table", "pre", "figure", "figcaption", "section", "article", "header", "footer", "dd", "dt", "hr" ],
+			"dropWithContent": [ "template", "svg", "math", "select", "button", "object", "embed", "video", "audio", "picture", "canvas", "map" ]
+		}
+	},
+	"floor": {
+		"elements": [ "script", "style", "iframe", "frame", "frameset", "object", "embed", "form", "input", "button", "select", "option", "optgroup", "textarea", "label", "fieldset", "legend", "output", "base", "meta", "link", "template", "noscript", "svg", "math", "applet", "param", "html", "head", "body", "title", "xmp", "noembed", "noframes", "plaintext", "slot", "portal" ],
+		"attributePrefixes": [ "on", "data-", "aria-" ],
+		"attributes": [ "style", "class", "id", "srcdoc", "formaction", "ping", "is", "slot", "part", "nonce", "autofocus", "contenteditable", "draggable", "popover", "popovertarget", "form", "xmlns" ],
+		"urlAttributes": [ "action", "archive", "background", "cite", "classid", "codebase", "data", "dynsrc", "formaction", "href", "icon", "longdesc", "lowsrc", "manifest", "poster", "profile", "src", "srcset", "usemap", "xmlns", "itemtype" ],
+		"rawText": [ "script", "style", "textarea", "title", "xmp", "iframe", "noembed", "noframes", "noscript", "plaintext" ],
+		"linkRel": [ "nofollow", "sponsored", "ugc", "noreferrer", "noopener", "external" ]
+	}
+}

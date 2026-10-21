@@ -7,11 +7,16 @@
 
 declare(strict_types=1);
 
+use FotoGrids\Catalog\Catalog;
+use FotoGrids\Catalog\Catalog_Assembler;
 use FotoGrids\Catalog\Catalog_I18n;
 use PHPUnit\Framework\TestCase;
 
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/hooks/filters/class-filters-catalog.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-i18n.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expander.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog.php';
 
 /**
  * The catalog vocabulary lives in JSON, so these tests stand in for the
@@ -166,6 +171,35 @@ final class CatalogI18nTest extends TestCase {
 		);
 	}
 
+	public function test_escaped_markup_inside_code_survives_the_filter(): void {
+		$description = 'Emits <code>&lt;meta name="robots" content="noindex, nofollow"&gt;</code> on the page.';
+
+		$tree = Catalog_I18n::translate_tree(
+			array( 'tab' => array( 'settings' => array( array( 'description' => $description ) ) ) )
+		);
+
+		$this->assertSame( $description, $tree['tab']['settings'][0]['description'] );
+	}
+
+	public function test_every_shipped_html_string_survives_the_filter(): void {
+		Catalog::init();
+		$assembly  = ( new Catalog_Assembler() )->assemble( Catalog::raw_files() );
+		$html_keys = ( new \ReflectionClass( Catalog_I18n::class ) )->getConstant( 'HTML_KEYS' );
+
+		$shipped = array();
+		$this->collect_strings( $assembly['tree'], $html_keys, $shipped );
+
+		$filtered = array();
+		$this->collect_strings( Catalog_I18n::translate_tree( $assembly['tree'] ), $html_keys, $filtered );
+
+		$this->assertNotEmpty( $shipped );
+		$this->assertSame(
+			array(),
+			array_values( array_diff( $shipped, $filtered ) ),
+			'These catalog strings lose content to the HTML filter. Markup meant to be shown needs escaped entities.'
+		);
+	}
+
 	public function test_an_untranslated_locale_leaves_the_tree_unchanged(): void {
 		$tree = array(
 			'tab' => array(
@@ -199,5 +233,23 @@ final class CatalogI18nTest extends TestCase {
 		$tree = Catalog_I18n::translate_tree( array( 'tab' => array( 'label' => 'Carousel Speed' ) ) );
 
 		$this->assertSame( 'Karussell-Geschwindigkeit', $tree['tab']['label'] );
+	}
+
+	/**
+	 * Collects the values of the given keys from a catalog subtree.
+	 *
+	 * @param array<string, mixed> $node Subtree to walk.
+	 * @param array<int, string>   $keys Keys to collect.
+	 * @param array<int, string>   $out  Accumulator.
+	 * @return void
+	 */
+	private function collect_strings( array $node, array $keys, array &$out ): void {
+		foreach ( $node as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$this->collect_strings( $value, $keys, $out );
+			} elseif ( is_string( $value ) && in_array( $key, $keys, true ) ) {
+				$out[] = $value;
+			}
+		}
 	}
 }

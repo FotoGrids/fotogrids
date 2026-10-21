@@ -318,6 +318,32 @@ class Register_Admin_Routes {
 			)
 		);
 
+		// Gallery Items text formatting: GET / POST /admin/text-formatting
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/text-formatting',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_text_formatting_settings' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_text_formatting_settings' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+					'args'                => array(
+						'mode'           => array(
+							'type' => 'string',
+							'enum' => \FotoGrids\Settings\Text_Formatting_Settings_Store::MODES,
+						),
+						'links_new_tab'  => array( 'type' => 'boolean' ),
+						'links_nofollow' => array( 'type' => 'boolean' ),
+					),
+				),
+			)
+		);
+
 		// Watermark settings: GET / POST /admin/watermark-settings
 		register_rest_route(
 			'fotogrids/v1',

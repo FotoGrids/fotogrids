@@ -16,6 +16,7 @@ use FotoGrids\Render\Api\Render_Mode;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Sorter;
 use FotoGrids\Render\Features\Pagination\Page_Size_Resolver;
+use FotoGrids\Render\Layouts\Justified\Page_Cutter;
 use FotoGrids\Render\Layouts\Justified\Snap_Resolver;
 use FotoGrids\Render\Video\Video_Item_Helpers;
 use FotoGrids\Render\Video\Video_Poster_Resolver;
@@ -31,6 +32,11 @@ if ( ! defined( 'WPINC' ) ) {
  * @since   1.0.0
  */
 final class Context_Builder {
+
+	/**
+	 * Widest container page 1's overflow is sized for, in pixels.
+	 */
+	private const POOL_WIDTH = 2560.0;
 
 	private Instance_Id_Factory $instance_id_factory;
 	/**
@@ -123,6 +129,13 @@ final class Context_Builder {
 			isset( $meta_overrides['container_width'] ) && (int) $meta_overrides['container_width'] > 0
 									? (int) $meta_overrides['container_width']
 									: null,
+			null,
+			null,
+			isset( $meta_overrides['requested_offset'] ) ? max( 0, (int) $meta_overrides['requested_offset'] ) : null,
+			isset( $meta_overrides['requested_length'] ) && (int) $meta_overrides['requested_length'] > 0
+									? (int) $meta_overrides['requested_length']
+									: null,
+			! empty( $meta_overrides['with_aspects'] ),
 		);
 
 		// An explicit override wins over `fg_via`. Breadcrumb_Resolver validates
@@ -183,6 +196,10 @@ final class Context_Builder {
 		$total_item_count = $single_item_full_count ?? count( $loaded_items );
 		$render_meta      = $render_meta->with( array( 'total_item_count' => $total_item_count ) );
 
+		if ( $render_meta->with_aspects || self::is_slice_planned( $render_settings, $render_meta ) ) {
+			$render_meta = $render_meta->with( array( 'sequence_aspects' => self::aspects_of( $loaded_items ) ) );
+		}
+
 		[ $loaded_items, $render_meta ] = $this->apply_pagination_slice(
 			$loaded_items,
 			$render_settings,
@@ -237,19 +254,35 @@ final class Context_Builder {
 			: Page_Size_Resolver::resolve_page_size( $render_settings, $context );
 		$page              = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
 
-		if ( self::is_snap_pagination_active( $render_settings ) && Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
-			$snap         = self::resolve_justified_snap(
-				$loaded_items,
-				$page_size,
-				$page,
-				$render_settings,
-				$render_meta
-			);
-			$loaded_items = array_slice( $loaded_items, $snap['offset'], $snap['page_size'] );
+		if ( null !== $render_meta->requested_length && $render_meta->requested_length > 0 ) {
+			$offset       = min( $total_item_count, (int) $render_meta->requested_offset );
+			$loaded_items = array_slice( $loaded_items, $offset, $render_meta->requested_length );
 			$render_meta  = $render_meta->with(
 				array(
-					'pagination_page_size'   => $snap['page_size'],
-					'pagination_total_pages' => $snap['total_pages'],
+					'requested_offset'     => $offset,
+					'pagination_page_size' => count( $loaded_items ),
+				)
+			);
+		} elseif ( self::is_slice_planned( $render_settings, $render_meta ) && self::planned_should_paginate( $total_item_count, $page_size, $render_settings ) ) {
+			$aspects    = ! empty( $render_meta->sequence_aspects ) ? $render_meta->sequence_aspects : self::aspects_of( $loaded_items );
+			$pages      = self::cut_pages( $aspects, $page_size, $render_settings, $render_meta );
+			$page_index = min( $page, count( $pages ) ) - 1;
+			$current    = $pages[ $page_index ];
+			$length     = $current['size'];
+			$overflow   = null;
+			if ( 0 === $page_index ) {
+				$length   = max( $length, self::page_one_pool( $aspects, $page_size, $render_settings ) );
+				$overflow = $current['size'];
+			}
+			$loaded_items = array_slice( $loaded_items, $current['offset'], $length );
+			if ( null !== $overflow ) {
+				$loaded_items = self::mark_overflow( $loaded_items, $overflow );
+			}
+			$render_meta = $render_meta->with(
+				array(
+					'pagination_page_size'   => $current['size'],
+					'pagination_total_pages' => count( $pages ),
+					'overflow_from'          => null !== $overflow && $overflow < count( $loaded_items ) ? $overflow : null,
 				)
 			);
 		} elseif ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
@@ -854,6 +887,8 @@ final class Context_Builder {
 					continue;
 				}
 
+				Image_Size_Manager::ensure_dimensions( $attachment_id );
+
 				$resolved_thumb = Image_Size_Manager::resolve_size( $attachment_id, $thumb_size, 'thumbnail' );
 				$resolved_full  = Image_Size_Manager::resolve_size( $attachment_id, $full_size, 'full' );
 
@@ -914,7 +949,7 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Resolves caption_title and caption_description on every loaded item.
+	 * Resolves caption_title and caption_description, as plain text, on every loaded item.
 	 *
 	 * @since  1.0.0
 	 * @param  array<int, Item_View>  $items           Loaded items.
@@ -922,13 +957,6 @@ final class Context_Builder {
 	 * @return array<int, Item_View>
 	 */
 	private function resolve_captions( array $items, array $render_settings ): array {
-		// Image Viewer hides these settings in the admin; stored values must not apply.
-		$layout = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : '';
-		if ( 'image-viewer' === $layout ) {
-			$render_settings['caption_hide_description']   = true;
-			$render_settings['caption_limit_title_length'] = 'no';
-		}
-
 		$builder  = new Caption_Content_Builder();
 		$resolved = array();
 
@@ -1009,70 +1037,168 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Returns whether the layout is justified with page trailing row set to 'fill'.
+	 * Returns whether this render's layout cuts its own pages in the browser.
 	 *
-	 * @since 1.0.0
+	 * @since 1.3.0
 	 * @param array<string, mixed> $render_settings
+	 * @param Render_Meta          $render_meta
 	 * @return bool
 	 */
-	public static function is_snap_pagination_active( array $render_settings ): bool {
-		if ( ( $render_settings['layout'] ?? '' ) !== 'justified' ) {
-			return false;
-		}
-		if ( ( $render_settings['layout_justified_page_trailing_row'] ?? '' ) !== 'fill' ) {
-			return false;
-		}
-		return true;
+	public static function is_slice_planned( array $render_settings, Render_Meta $render_meta ): bool {
+		return ( $render_settings['layout'] ?? '' ) === 'justified'
+			&& ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
+			&& Collection_Kind::GALLERY === $render_meta->collection_kind;
 	}
 
 	/**
-	 * Resolves the justified snap page from item aspect ratios.
+	 * Whether a gallery that cuts its own pages needs pagination: when any
+	 * breakpoint's target is smaller than the item count, or Max Rows caps pages.
 	 *
-	 * @since 1.0.0
-	 * @param array<int, \FotoGrids\Render\Api\Item_View> $items
-	 * @param int                                          $target_page_size
-	 * @param int                                          $requested_page
-	 * @param array<string, mixed>                         $render_settings
-	 * @param \FotoGrids\Render\Api\Render_Meta            $render_meta
-	 * @return array{ page_size: int, offset: int, total_pages: int }
+	 * @since 1.3.0
+	 * @param int                  $total_item_count
+	 * @param int                  $page_size
+	 * @param array<string, mixed> $render_settings
+	 * @return bool
 	 */
-	private static function resolve_justified_snap(
-		array $items,
-		int $target_page_size,
-		int $requested_page,
-		array $render_settings,
-		Render_Meta $render_meta
-	): array {
+	public static function planned_should_paginate( int $total_item_count, int $page_size, array $render_settings ): bool {
+		if ( $total_item_count <= 1 ) {
+			return false;
+		}
+		if ( (int) ( $render_settings['layout_justified_max_rows'] ?? 0 ) > 0 ) {
+			return true;
+		}
+		$smallest = $page_size;
+		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $breakpoint ) {
+			$smallest = min( $smallest, Page_Size_Resolver::resolve_for_breakpoint( $render_settings, $breakpoint ) );
+		}
+		return Page_Size_Resolver::should_paginate( $total_item_count, $smallest );
+	}
+
+	/**
+	 * Aspect ratios (width / height) of the items, rounded to 4 decimals; 1.5 when unknown.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, mixed> $items Item_Views in sequence order.
+	 * @return array<int, float>
+	 */
+	public static function aspects_of( array $items ): array {
+		$aspects = array();
+		foreach ( $items as $item ) {
+			$w         = $item->width ?? null;
+			$h         = $item->height ?? null;
+			$aspects[] = ( is_int( $w ) && $w > 0 && is_int( $h ) && $h > 0 ) ? round( $w / $h, 4 ) : 1.5;
+		}
+		return $aspects;
+	}
+
+	/**
+	 * Cutting rules for a justified gallery at a page size.
+	 *
+	 * @since 1.3.0
+	 * @param int                  $page_size
+	 * @param array<string, mixed> $render_settings
+	 * @return array<string, mixed>
+	 */
+	public static function cut_rules( int $page_size, array $render_settings ): array {
+		$mode = ( $render_settings['layout_justified_page_trailing_row'] ?? 'fill' ) === 'match' ? 'match' : 'fill';
+		return array(
+			'mode'          => $mode,
+			'target'        => $page_size,
+			'window'        => (float) ( $render_settings['layout_justified_snap_window'] ?? 20 ),
+			'threshold'     => (float) ( $render_settings['layout_justified_snap_fill_threshold'] ?? 85 ),
+			'direction'     => (string) ( $render_settings['layout_justified_snap_direction'] ?? 'auto' ),
+			'max_rows'      => max( 0, (int) ( $render_settings['layout_justified_max_rows'] ?? 0 ) ),
+			'page_end_hide' => 'match' === $mode && ( $render_settings['layout_justified_last_row'] ?? '' ) === 'hide',
+		);
+	}
+
+	/**
+	 * Cuts the sequence into pages at the server's geometry: the client's
+	 * measured width when it sent one, otherwise the breakpoint's assumed width.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, float>    $aspects
+	 * @param int                  $page_size
+	 * @param array<string, mixed> $render_settings
+	 * @param Render_Meta          $render_meta
+	 * @return array<int, array{ offset: int, size: int }>
+	 */
+	private static function cut_pages( array $aspects, int $page_size, array $render_settings, Render_Meta $render_meta ): array {
 		$breakpoint = is_string( $render_meta->breakpoint ?? null ) && '' !== $render_meta->breakpoint
 			? $render_meta->breakpoint
 			: 'desktop';
 
-		$aspect_ratios = array();
-		foreach ( $items as $item ) {
-			$w               = $item->width ?? null;
-			$h               = $item->height ?? null;
-			$aspect_ratios[] = ( is_int( $w ) && $w > 0 && is_int( $h ) && $h > 0 )
-				? ( $w / $h )
-				: 1.5;
-		}
-
-		$container_width = null !== $render_meta->container_width && $render_meta->container_width > 0
+		$width = null !== $render_meta->container_width && $render_meta->container_width > 0
 			? (float) $render_meta->container_width
 			: Snap_Resolver::assumed_width_for( $breakpoint );
 
-		return Snap_Resolver::resolve(
+		$pages = Page_Cutter::cut(
+			$aspects,
 			array(
-				'aspect_ratios'     => $aspect_ratios,
-				'target_page_size'  => $target_page_size,
-				'requested_page'    => $requested_page,
-				'container_width'   => $container_width,
-				'gap'               => self::resolve_gap_for_breakpoint( $render_settings, $breakpoint ),
-				'target_row_height' => self::resolve_row_height_for_breakpoint( $render_settings, $breakpoint ),
-				'window_percent'    => (float) ( $render_settings['layout_justified_snap_window'] ?? 20 ),
-				'fill_threshold'    => (float) ( $render_settings['layout_justified_snap_fill_threshold'] ?? 60 ),
-				'direction'         => (string) ( $render_settings['layout_justified_snap_direction'] ?? 'auto' ),
-			)
+				'width'      => $width,
+				'gap'        => self::resolve_gap_for_breakpoint( $render_settings, $breakpoint ),
+				'row_height' => self::resolve_row_height_for_breakpoint( $render_settings, $breakpoint ),
+			),
+			self::cut_rules( $page_size, $render_settings )
 		);
+
+		if ( empty( $pages ) ) {
+			return array(
+				array(
+					'offset' => 0,
+					'size'   => 0,
+				),
+			);
+		}
+
+		return $pages;
+	}
+
+	/**
+	 * How many items page 1 renders so the browser can cut it at any geometry:
+	 * the largest target plus its window, plus the longest row any width can pack.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, float>    $aspects
+	 * @param int                  $page_size
+	 * @param array<string, mixed> $render_settings
+	 * @return int
+	 */
+	private static function page_one_pool( array $aspects, int $page_size, array $render_settings ): int {
+		$targets = array( $page_size );
+		$heights = array();
+		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $breakpoint ) {
+			$targets[] = Page_Size_Resolver::resolve_for_breakpoint( $render_settings, $breakpoint );
+			$heights[] = self::resolve_row_height_for_breakpoint( $render_settings, $breakpoint );
+		}
+		$target = max( $targets );
+		$window = (int) round( $target * (float) ( $render_settings['layout_justified_snap_window'] ?? 20 ) / 100.0 );
+
+		$longest = 1;
+		foreach ( Page_Cutter::pack( $aspects, self::POOL_WIDTH, 0.0, min( $heights ) ) as $row ) {
+			$longest = max( $longest, count( $row ) );
+		}
+
+		return min( count( $aspects ), $target + $window + $longest );
+	}
+
+	/**
+	 * Marks items from `$from` on as overflow.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, Item_View> $items
+	 * @param int                   $from
+	 * @return array<int, Item_View>
+	 */
+	private static function mark_overflow( array $items, int $from ): array {
+		foreach ( $items as $i => $item ) {
+			if ( $i >= $from ) {
+				$items[ $i ] = $item->with(
+					array( 'data_attrs' => array_merge( $item->data_attrs, array( 'data-fg-overflow' => '1' ) ) )
+				);
+			}
+		}
+		return $items;
 	}
 
 	/**
@@ -1084,23 +1210,22 @@ final class Context_Builder {
 	 * @return float
 	 */
 	private static function resolve_gap_for_breakpoint( array $render_settings, string $breakpoint ): float {
-		$spacing = $render_settings['item_spacing'] ?? null;
-		if ( ! is_array( $spacing ) ) {
-			return 10.0;
+		$spacing  = is_array( $render_settings['item_spacing'] ?? null ) ? $render_settings['item_spacing'] : array();
+		$fallback = array(
+			'desktop' => 10.0,
+			'tablet'  => 8.0,
+			'mobile'  => 5.0,
+		);
+
+		$value = $spacing[ $breakpoint ] ?? null;
+		if ( is_array( $value ) ) {
+			$value = $value['value'] ?? null;
+		}
+		if ( is_numeric( $value ) && (float) $value >= 0 ) {
+			return (float) $value;
 		}
 
-		$cascade = array( $breakpoint, 'tablet', 'desktop' );
-		foreach ( $cascade as $bp ) {
-			if ( ! isset( $spacing[ $bp ] ) ) {
-				continue;
-			}
-			$value = is_array( $spacing[ $bp ] ) ? ( $spacing[ $bp ]['value'] ?? null ) : $spacing[ $bp ];
-			if ( is_numeric( $value ) && (float) $value >= 0 ) {
-				return (float) $value;
-			}
-		}
-
-		return 10.0;
+		return $fallback[ $breakpoint ] ?? 10.0;
 	}
 
 	/**
@@ -1112,26 +1237,19 @@ final class Context_Builder {
 	 * @return float
 	 */
 	private static function resolve_row_height_for_breakpoint( array $render_settings, string $breakpoint ): float {
-		$row_height = $render_settings['layout_justified_row_height'] ?? null;
-		if ( ! is_array( $row_height ) ) {
-			return 220.0;
-		}
-
-		$cascade  = array( $breakpoint, 'tablet', 'desktop' );
-		$fallback = array(
+		$row_height = is_array( $render_settings['layout_justified_row_height'] ?? null ) ? $render_settings['layout_justified_row_height'] : array();
+		$fallback   = array(
 			'desktop' => 220.0,
 			'tablet'  => 180.0,
 			'mobile'  => 140.0,
 		);
 
-		foreach ( $cascade as $bp ) {
-			$raw = $row_height[ $bp ] ?? null;
-			if ( is_array( $raw ) ) {
-				$raw = $raw['value'] ?? null;
-			}
-			if ( is_numeric( $raw ) && (float) $raw > 0 ) {
-				return (float) $raw;
-			}
+		$raw = $row_height[ $breakpoint ] ?? null;
+		if ( is_array( $raw ) ) {
+			$raw = $raw['value'] ?? null;
+		}
+		if ( is_numeric( $raw ) && (float) $raw > 0 ) {
+			return (float) $raw;
 		}
 
 		return $fallback[ $breakpoint ] ?? 220.0;

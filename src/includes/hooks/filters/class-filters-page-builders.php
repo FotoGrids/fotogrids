@@ -43,6 +43,20 @@ final class Filters_Page_Builders {
 	public const HAS_CONTENT = 'fotogrids/page_builders/has_content';
 
 	/**
+	 * Galleries and albums a piece of content embeds, so their stylesheets
+	 * can be enqueued before the page head prints.
+	 *
+	 * Starts with the content's FotoGrids shortcodes. Builder sub-modules add
+	 * the collections their own markup or stored layout places.
+	 *
+	 * @since 1.3.0
+	 * @param array<int, array{type: string, atts: array}> $embeds  Embeds found so far; type is 'gallery' or 'album'.
+	 * @param string                                       $content Post or widget content.
+	 * @param \WP_Post|null                                $post    Post the content belongs to; null for widgets.
+	 */
+	public const EMBEDS = 'fotogrids/page_builders/embeds';
+
+	/**
 	 * Lets Pro and third parties mutate (or add fields to) a picker
 	 * item before it's returned by the shared `/picker/items` REST
 	 * endpoint. Common use: append a Pro Stats "Views" column.

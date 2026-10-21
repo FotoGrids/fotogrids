@@ -157,3 +157,7 @@
 .fotogrids-collection[data-fg-filter] .fg-item:hover .fg-item-media img {
     filter: var(--fg-thumb-filter-hover) var(--fg-hover-filter-hover, var(--fg-hover-filter, ));
 }
+
+.fotogrids-collection .fg-item[data-fg-overflow] {
+    display: none;
+}

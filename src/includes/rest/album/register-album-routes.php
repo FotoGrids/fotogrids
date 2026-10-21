@@ -104,6 +104,13 @@ class Register_Album_Routes {
 										&& \FotoGrids\Render\Internal\Instance_Id_Factory::matches( (int) $request['id'], $param ) );
 							},
 						),
+						'template'    => array(
+							'type'              => 'string',
+							'default'           => '',
+							'validate_callback' => function ( $param ) {
+								return '' === $param || \FotoGrids\Public_Render::is_layout_key( \FotoGrids\Public_Render::embed_template( $param ), 'album' );
+							},
+						),
 					),
 				),
 			)

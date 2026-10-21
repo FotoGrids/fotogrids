@@ -42,7 +42,7 @@ assert_eq no "$( role_has author edit_published_fotogrids_galleries )" \
 $WP option update fotogrids_caps_version 1.2 --quiet
 load
 
-assert_eq 1.4 "$( $WP option get fotogrids_caps_version )" "the stored version moved to the current one"
+assert_eq 1.5 "$( $WP option get fotogrids_caps_version )" "the stored version moved to the current one"
 
 assert_eq yes "$( role_has author edit_published_fotogrids_galleries )" \
 	"an author who can publish galleries can now edit published ones"

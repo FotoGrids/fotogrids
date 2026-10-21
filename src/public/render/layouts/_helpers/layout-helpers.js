@@ -249,11 +249,21 @@ export function revealItems(items) {
  *   trackSelector: string,
  *   readyKey: string,
  *   layoutFn: (trackEl: HTMLElement) => void,
+ *   signatureFn?: (trackEl: HTMLElement) => string,
  * }} opts
+ *        `signatureFn` returns the layout's breakpoint-driven inputs (gap,
+ *        row height); a window resize that changes it re-lays out even when
+ *        the track width stays the same.
  * @return {(collectionEl: HTMLElement) => void}
  */
 export function createLayoutAttach(opts) {
-	const { collectionSelector, trackSelector, readyKey, layoutFn } = opts;
+	const {
+		collectionSelector,
+		trackSelector,
+		readyKey,
+		layoutFn,
+		signatureFn,
+	} = opts;
 
 	/** @type {WeakMap<Element, { resizeTimer: number|null, observer: ResizeObserver|null, lastWidth: number }>} */
 	const trackState = new WeakMap();
@@ -330,7 +340,18 @@ export function createLayoutAttach(opts) {
 				}
 			});
 			state.observer.observe(trackEl);
-		} else {
+		}
+		if (typeof signatureFn === 'function') {
+			let signature = signatureFn(trackEl);
+			window.addEventListener('resize', () => {
+				const next = signatureFn(trackEl);
+				if (next !== signature) {
+					signature = next;
+					scheduleLayout(trackEl);
+				}
+			});
+		}
+		if (typeof window.ResizeObserver !== 'function') {
 			window.addEventListener('resize', () => {
 				scheduleLayout(trackEl);
 			});

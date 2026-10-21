@@ -26,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
  *                   field is only populated to keep Item_View shape).
  *   • title       = gallery's post_title
  *   • caption     = gallery's post_excerpt
- *   • description = gallery's post_content
+ *   • description = gallery's post_content, without block markup or shortcodes
  *
  * Click behaviour (where the item links to) is handled by the
  * Album_To_View_Page and Album_To_Gallery_Ajax decorators, not by this
@@ -75,7 +75,7 @@ final class Album_Item_Loader {
 				\FotoGrids\Collection_Title::label( $gallery_post ),
 				\FotoGrids\Collection_Title::label( $gallery_post ),
 				(string) $gallery_post->post_excerpt,
-				(string) $gallery_post->post_content,
+				strip_shortcodes( excerpt_remove_blocks( (string) $gallery_post->post_content ) ),
 				'',
 				'',
 				$thumb['width'],
