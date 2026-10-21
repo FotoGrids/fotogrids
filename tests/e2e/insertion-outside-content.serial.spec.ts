@@ -150,14 +150,14 @@ test(
 );
 
 /**
- * INS-21. A broken gallery in a block theme footer shows an editor the same
+ * INS-18. A broken gallery in a block theme footer shows an editor the same
  * styled error box as one in the post content.
  */
 test.describe('signed in as an administrator', () => {
 	test.use({ storageState: storageStateFor('administrator') });
 
 	test(
-		'INS-21: a missing gallery in a block theme footer shows a styled error box',
+		'INS-18: a missing gallery in a block theme footer shows a styled error box',
 		{ tag: '@layout' },
 		async ({ page }) => {
 			const content = Buffer.from(SHORTCODE_BLOCK(987654)).toString(
