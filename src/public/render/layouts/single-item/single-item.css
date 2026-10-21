@@ -1,8 +1,6 @@
 /* Single Item layout. The container holds exactly one item that fills the
-   available width. The fixed-box behavior (aspect-ratio + object-fit) and
-   the natural-ratio escape hatch are defined in base/collection-base.css
-   so they can be shared with Grid and Image Viewer; this file only
-   contributes the track shape. */
+   available width. The fixed item box (aspect-ratio + object-fit) comes
+   from base/collection-base.css through data-fg-item-box. */
 
 [data-fg-layout="single-item"] .fg-single-item-track {
     display: block;
@@ -12,6 +10,16 @@
 [data-fg-layout="single-item"] .fg-item {
     min-width: 0;
     width: 100%;
+}
+
+/* The "None" aspect ratio keeps the image's own shape. */
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media {
+    aspect-ratio: auto;
+}
+
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media :is(picture, img) {
+    height: auto;
+    object-fit: initial;
 }
 
 /* Animate Images (auto progress). The full set renders stacked: the active

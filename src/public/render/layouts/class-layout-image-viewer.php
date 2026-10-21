@@ -33,6 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Capabilities:
  *   - enforces_item_box  : --fg-item-aspect-ratio + --fg-item-fit
+ *   - base_item_box      : box (data-fg-item-box="box")
  *   - paginates          : false (the viewer IS the navigation)
  *   - filters            : true (filter UI still applies)
  *   - pointer_navigation : true
@@ -243,6 +244,7 @@ final class Layout_Image_Viewer implements Layout {
 	public function capabilities(): array {
 		return array(
 			'enforces_item_box'  => true,
+			'base_item_box'      => 'box',
 			'paginates'          => false,
 			// No filter bar: Image Viewer shows one image at a time, so a
 			// filter chrome on top makes no sense (and filtering is hidden in

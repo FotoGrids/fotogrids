@@ -540,3 +540,184 @@ test.describe('an unknown shortcode template', () => {
 		}
 	);
 });
+
+/**
+ * LAY-28 to LAY-31. The shared item box: which layouts opt in through
+ * data-fg-item-box, and the shape and fill the visitor gets.
+ */
+const ITEM_BOX: Record<string, 'box' | 'fill' | null> = {
+	grid: 'box',
+	'single-item': 'box',
+	'image-viewer': 'box',
+	'featured-item': 'fill',
+	slider: null,
+	'instant-photos': null,
+	masonry: null,
+	justified: null,
+};
+
+/** Media box and image geometry of every rendered item. */
+function itemGeometry(gallery: GalleryRender) {
+	return gallery.root.evaluate((root) =>
+		[...root.querySelectorAll('.fg-item')].flatMap((item) => {
+			const media = item.querySelector('.fg-item-media');
+			const img = media?.querySelector('img');
+			if (!media || !img) {
+				return [];
+			}
+			const box = media.getBoundingClientRect();
+			const shown = img.getBoundingClientRect();
+			if (box.width < 1 || box.height < 1) {
+				return [];
+			}
+			const width = Number(img.getAttribute('width')) || img.naturalWidth;
+			const height =
+				Number(img.getAttribute('height')) || img.naturalHeight;
+			return [
+				{
+					box: box.width / box.height,
+					image: width && height ? width / height : 0,
+					fit: getComputedStyle(img).objectFit,
+					fills:
+						Math.abs(shown.width - box.width) < 1.5 &&
+						Math.abs(shown.height - box.height) < 1.5,
+				},
+			];
+		})
+	);
+}
+
+const within = (actual: number, expected: number) =>
+	Math.abs(actual - expected) / expected < 0.02;
+
+test.describe('the shared item box', () => {
+	for (const [layout, marker] of Object.entries(ITEM_BOX)) {
+		test(
+			`LAY-28: ${layout} ${
+				marker
+					? `opts into the item box as ${marker}`
+					: 'sizes its own items'
+			}`,
+			{ tag: '@layout' },
+			async ({ page }) => {
+				const { id, url } = galleryPage({ layout });
+				const gallery = new GalleryRender(page, id);
+
+				await page.goto(url);
+				await gallery.waitFor();
+
+				expect(await gallery.attr('item-box')).toBe(marker);
+			}
+		);
+	}
+
+	for (const layout of ['grid', 'single-item', 'image-viewer']) {
+		for (const [ratio, value] of [
+			['16/9', 16 / 9],
+			['3/4', 3 / 4],
+		] as const) {
+			test(
+				`LAY-29: ${layout} items take the ${ratio} box and fill it`,
+				{ tag: '@layout' },
+				async ({ page }) => {
+					const { id, url } = galleryPage({
+						layout,
+						layout_item_aspect_ratio: ratio,
+						layout_item_object_fit: 'cover',
+					});
+					const gallery = new GalleryRender(page, id);
+
+					await page.goto(url);
+					await gallery.waitFor();
+
+					const items = await itemGeometry(gallery);
+					expect(items.length).toBeGreaterThan(0);
+					for (const item of items) {
+						expect(within(item.box, value)).toBe(true);
+						expect(item.fills).toBe(true);
+						expect(item.fit).toBe('cover');
+					}
+				}
+			);
+		}
+	}
+
+	for (const layout of ['masonry', 'justified']) {
+		test(
+			`LAY-29: ${layout} items keep their own shape whatever ratio is stored`,
+			{ tag: '@layout' },
+			async ({ page }) => {
+				const { id, url } = galleryPage({
+					layout,
+					layout_item_aspect_ratio: '16/9',
+				});
+				const gallery = new GalleryRender(page, id);
+
+				await page.goto(url);
+				await gallery.waitFor();
+				await expect(gallery.items().first()).not.toHaveClass(
+					/fg-item-hidden/
+				);
+
+				const items = await itemGeometry(gallery);
+				expect(items.length).toBeGreaterThan(0);
+				for (const item of items) {
+					expect(within(item.box, item.image)).toBe(true);
+				}
+			}
+		);
+	}
+
+	for (const layout of [
+		'grid',
+		'single-item',
+		'image-viewer',
+		'featured-item',
+	]) {
+		test(
+			`LAY-30: ${layout} applies the saved item fit`,
+			{ tag: '@layout' },
+			async ({ page }) => {
+				for (const fit of ['cover', 'contain']) {
+					const { id, url } = galleryPage({
+						layout,
+						layout_item_aspect_ratio: '16/9',
+						layout_item_object_fit: fit,
+					});
+					const gallery = new GalleryRender(page, id);
+
+					await page.goto(url);
+					await gallery.waitFor();
+
+					const items = await itemGeometry(gallery);
+					expect(items.length).toBeGreaterThan(0);
+					for (const item of items) {
+						expect(item.fit).toBe(fit);
+					}
+				}
+			}
+		);
+	}
+
+	test(
+		'LAY-31: single-item with no aspect ratio shows the image at its own shape',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id, url } = galleryPage({
+				layout: 'single-item',
+				layout_item_aspect_ratio: 'none',
+			});
+			const gallery = new GalleryRender(page, id);
+
+			await page.goto(url);
+			await gallery.waitFor();
+
+			const items = await itemGeometry(gallery);
+			expect(items.length).toBeGreaterThan(0);
+			for (const item of items) {
+				expect(within(item.box, item.image)).toBe(true);
+				expect(item.fit).not.toBe('cover');
+			}
+		}
+	);
+});

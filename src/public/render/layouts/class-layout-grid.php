@@ -18,6 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Opt-in capabilities:
  *   - enforces_item_box  : --fg-item-aspect-ratio + --fg-item-fit
+ *   - base_item_box      : box (data-fg-item-box="box")
  *   - uses_columns       : --fg-cols / --fg-col-min / --fg-col-max,
  *                          plus data-fg-columns-mode
  *   - uses_item_spacing  : --fg-gap
@@ -103,6 +104,7 @@ final class Layout_Grid implements Layout {
 	public function capabilities(): array {
 		return array(
 			'enforces_item_box' => true,
+			'base_item_box'     => 'box',
 			'uses_columns'      => true,
 			'uses_item_spacing' => true,
 		);

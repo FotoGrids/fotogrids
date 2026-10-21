@@ -39,6 +39,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Capabilities:
  *   - enforces_item_box : --fg-item-aspect-ratio + --fg-item-fit
+ *   - base_item_box     : fill (data-fg-item-box="fill")
  *   - paginates         : false (no pager; Show all replaces it)
  *   - filters           : false (a featured composition, not a browseable grid)
  *
@@ -395,6 +396,7 @@ final class Layout_Featured_Item implements Layout {
 	public function capabilities(): array {
 		return array(
 			'enforces_item_box' => true,
+			'base_item_box'     => 'fill',
 			'uses_item_spacing' => true,
 			'paginates'         => false,
 			'filters'           => false,
