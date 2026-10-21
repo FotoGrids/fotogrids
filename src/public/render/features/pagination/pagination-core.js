@@ -1276,6 +1276,28 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 	}
 
+	/**
+	 * Preload the page after the current one, when Preload Next Page is on and
+	 * there is one. For a module that settles page 1 itself without a request
+	 * through goToPage() or adopt().
+	 *
+	 * @param {Element} galleryEl
+	 */
+	function preloadNext(galleryEl) {
+		if (
+			galleryEl.dataset.fgPaginated !== 'true' ||
+			galleryEl.dataset.fgPaginationPreload !== 'true' ||
+			(galleryEl.dataset.fgSlicePlanned === 'true' &&
+				!plannerFor(galleryEl))
+		) {
+			return;
+		}
+		const s = readState(galleryEl);
+		if (s.hasMore) {
+			schedulePreload(galleryEl, s.page + 1);
+		}
+	}
+
 	function expose() {
 		const FG = window.FotoGrids;
 		if (!FG) {
@@ -1291,6 +1313,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			onChange,
 			swapToFilterState,
 			adopt,
+			preloadNext,
 			setSlicePlanner,
 			replan,
 			/**

@@ -221,13 +221,34 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
+	 * Tells pagination the server's page 1 stays, so it can preload page 2.
+	 *
+	 * @param {Element} collectionEl
+	 */
+	function keepServerOrder(collectionEl) {
+		const pagination =
+			window.FotoGrids &&
+			window.FotoGrids.modules &&
+			window.FotoGrids.modules.pagination;
+		if (
+			'true' !== collectionEl.dataset.fgPaginated ||
+			!pagination ||
+			typeof pagination.preloadNext !== 'function'
+		) {
+			return;
+		}
+		pagination.preloadNext(collectionEl);
+	}
+
+	/**
 	 * Requests a fresh random selection and swaps it in, holding the items
 	 * hidden until it lands.
 	 *
 	 * The minted seed is written onto the wrapper once its items are on
 	 * screen, so pagination and the Lightbox draw later requests from the
 	 * order the visitor sees. A late, failed, superseded or itemless response
-	 * leaves the server's seed with the server's order.
+	 * leaves the server's seed with the server's order, and pagination is told
+	 * when the hold ends.
 	 *
 	 * @param {Element} collectionEl
 	 * @param {Element} root
@@ -255,6 +276,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		}
 
 		let settled = false;
+		let swapped = false;
 		const release = function () {
 			if (settled) {
 				return;
@@ -263,6 +285,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			root.classList.remove(PENDING_CLASS);
 			if (inlineHold) {
 				root.style.visibility = '';
+			}
+			if (!swapped) {
+				keepServerOrder(collectionEl);
 			}
 		};
 
@@ -361,6 +386,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 				}
 				const inserted = applyItems(root, payload);
 				if (inserted) {
+					swapped = true;
 					collectionEl.dataset.fgRandomSeed = String(seed);
 					announceItems(collectionEl, inserted);
 					adoptIntoPagination(collectionEl, payload, breakpoint);
