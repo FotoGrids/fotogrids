@@ -114,7 +114,7 @@ The free version is a full kit on its own. **Pro layers on the rest** - more lay
 * **Full e-commerce kit** - sell prints, downloads, and licenses with WooCommerce and Easy Digital Downloads, with secure gallery downloads.
 * **Image protection** - text watermarking and password protection are free; Pro adds image watermarks and right-click protection.
 * **Comments, ratings & reviews**, advanced user permissions, security, and an activity log.
-* **Performance** - automatic image optimizer, advanced pagination, and smart preloading.
+* **Performance** - automatic image optimizer and advanced pagination.
 * **Integrations** - import from Google Photos, Dropbox, Instagram, Lightroom, and many more, with bulk import and editing.
 * **Agency tools** - white label, client proofing, multisite management, and many more for gallery management at scale.
 

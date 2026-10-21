@@ -208,6 +208,34 @@ class HeadStylesTest extends WP_UnitTestCase {
 		$this->assertSame( $this->rendered( $content ), $head );
 	}
 
+	public function test_a_gallery_shortcode_with_a_rejected_template_enqueues_its_saved_layout(): void {
+		$content = '[fotogrids_gallery id="' . $this->gallery( array( 'layout' => 'masonry' ) ) . '" template="kaleidoscope"]';
+
+		$head = $this->head_pass( get_permalink( $this->page( $content ) ) );
+
+		$this->assertContains( 'fotogrids-layout-masonry', $head );
+		$this->assertSame( $this->rendered( $content ), $head );
+	}
+
+	public function test_an_album_shortcode_with_a_gallery_only_template_enqueues_its_saved_layout(): void {
+		$album = self::factory()->post->create(
+			array(
+				'post_type'   => 'fotogrids_album',
+				'post_status' => 'publish',
+			)
+		);
+		update_post_meta( $album, 'fotogrids_layout', 'masonry' );
+		Gallery_Album_Relations::add_gallery_to_album( $this->gallery(), $album );
+		Gallery_Album_Relations::add_gallery_to_album( $this->gallery(), $album );
+		$content = '[fotogrids_album id="' . $album . '" template="slider"]';
+
+		$head = $this->head_pass( get_permalink( $this->page( $content ) ) );
+
+		$this->assertContains( 'fotogrids-layout-masonry', $head );
+		$this->assertNotContains( 'fotogrids-layout-slider', $head );
+		$this->assertSame( $this->rendered( $content ), $head );
+	}
+
 	public function test_a_view_page_enqueues_what_its_collection_render_enqueues(): void {
 		$gallery = $this->gallery();
 

@@ -149,6 +149,22 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		return method !== 'pages';
 	}
 
+	/**
+	 * Per-gallery preloaded page: the response promise of a prefetch(), keyed by
+	 * its exact request. A gallery holds one, and goToPage() uses it once.
+	 *
+	 * @type {WeakMap<Element, {key:string, promise:Promise<object>}>}
+	 */
+	const heldPages = new WeakMap();
+
+	/**
+	 * Per-gallery goToPage() request in flight, so a preload of the same request
+	 * waits on it instead of sending a second one.
+	 *
+	 * @type {WeakMap<Element, {key:string, promise:Promise<object>}>}
+	 */
+	const pendingRequests = new WeakMap();
+
 	function nextToken(galleryEl) {
 		const t = (inflightToken.get(galleryEl) || 0) + 1;
 		inflightToken.set(galleryEl, t);
@@ -358,8 +374,9 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
-	 * Fetch a page from the server. Resolves with { html, css, page,
-	 * totalPages, pageSize, hasMore } or rejects.
+	 * Build the render request for a page. Its key covers the body and the
+	 * unlock header, so two requests share a key only when they would return
+	 * the same page.
 	 *
 	 * @param {Element} galleryEl
 	 * @param {number}  page
@@ -367,9 +384,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
 	 *        An exact slice to request, and whether to return the sequence's
 	 *        aspect ratios.
-	 * @returns {Promise<object>}
+	 * @returns {{url:string, options:object, key:string}|null} Null when the
+	 *          gallery has no render context.
 	 */
-	function fetchPage(galleryEl, page, breakpoint, extra) {
+	function buildRequest(galleryEl, page, breakpoint, extra) {
 		const url =
 			galleryEl.dataset.fgRenderUrl ||
 			(window.fotogrids && window.fotogrids.renderUrl) ||
@@ -381,7 +399,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 		const galleryId = parseInt(galleryEl.dataset.fgGalleryId || '0', 10);
 
 		if (!url || !galleryId) {
-			return Promise.reject(new Error('pagination/no-render-context'));
+			return null;
 		}
 
 		const requestBreakpoint = breakpoint || viewBreakpoint(galleryEl);
@@ -441,12 +459,28 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			requestBody.with_aspects = true;
 		}
 
-		return fetch(url, {
-			method: 'POST',
-			headers,
-			credentials: 'same-origin',
-			body: JSON.stringify(requestBody),
-		}).then(function (response) {
+		const body = JSON.stringify(requestBody);
+
+		return {
+			url,
+			options: {
+				method: 'POST',
+				headers,
+				credentials: 'same-origin',
+				body,
+			},
+			key: (headers['X-FotoGrids-Unlock'] || '') + '\n' + body,
+		};
+	}
+
+	/**
+	 * Send a render request. Resolves with the response payload or rejects.
+	 *
+	 * @param {{url:string, options:object}} request
+	 * @returns {Promise<object>}
+	 */
+	function sendRequest(request) {
+		return fetch(request.url, request.options).then(function (response) {
 			if (!response.ok) {
 				throw new Error('pagination/http-' + response.status);
 			}
@@ -606,7 +640,8 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
-	 * Schedule an idle preload of the given page.
+	 * Schedule an idle preload of the given page. It is skipped if, by the time
+	 * it runs, the page is no longer the one after the current page.
 	 *
 	 * @param {Element} galleryEl
 	 * @param {number}  page
@@ -627,7 +662,11 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			return;
 		}
 		const run = function () {
-			fetchPage(
+			const s = readState(galleryEl);
+			if (s.page + 1 !== page || page > s.totalPages) {
+				return;
+			}
+			prefetch(
 				galleryEl,
 				page,
 				planner ? activeBreakpoint() : undefined,
@@ -785,6 +824,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			})
 		);
 
+		if (snap.hasMore && galleryEl.dataset.fgPaginationPreload === 'true') {
+			schedulePreload(galleryEl, snap.page + 1);
+		}
+
 		return { page: snap.page, hasMore: snap.hasMore };
 	}
 
@@ -914,7 +957,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			? { offset: slice.offset, length: slice.length }
 			: { withAspects: !!planner && newSequence };
 
-		return fetchPage(galleryEl, page, breakpoint, extra)
+		return requestPage(galleryEl, page, breakpoint, extra)
 			.then(function (payload) {
 				if (!isCurrentToken(galleryEl, capturedToken)) {
 					// Superseded by a newer request: resolve callers with the payload but
@@ -1090,13 +1133,84 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	}
 
 	/**
-	 * Prefetch a page (used by preload_next_page).
+	 * Request a page for goToPage(): the held page when it matches the request,
+	 * otherwise a fresh request. A held page that fails falls back to a fresh
+	 * request. Any held page is dropped, used or not.
 	 *
 	 * @param {Element} galleryEl
 	 * @param {number}  page
+	 * @param {string}  breakpoint
+	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
+	 * @returns {Promise<object>}
 	 */
-	function prefetch(galleryEl, page) {
-		return fetchPage(galleryEl, page);
+	function requestPage(galleryEl, page, breakpoint, extra) {
+		const request = buildRequest(galleryEl, page, breakpoint, extra);
+		const held = heldPages.get(galleryEl);
+		heldPages.delete(galleryEl);
+
+		if (!request) {
+			return Promise.reject(new Error('pagination/no-render-context'));
+		}
+
+		const promise =
+			held && held.key === request.key
+				? held.promise.catch(function () {
+						return sendRequest(request);
+					})
+				: sendRequest(request);
+
+		const entry = { key: request.key, promise };
+		pendingRequests.set(galleryEl, entry);
+		const settle = function () {
+			if (pendingRequests.get(galleryEl) === entry) {
+				pendingRequests.delete(galleryEl);
+			}
+		};
+		promise.then(settle, settle);
+
+		return promise;
+	}
+
+	/**
+	 * Prefetch a page and hold the response for the next goToPage() with the
+	 * same request. Used by preload_next_page. Reuses a held or in-flight
+	 * request for the same page instead of sending another; a newer prefetch
+	 * replaces the held one.
+	 *
+	 * @param {Element} galleryEl
+	 * @param {number}  page
+	 * @param {string}  [breakpoint] Defaults to the breakpoint of the current view.
+	 * @param {{offset?:number,length?:number,withAspects?:boolean}} [extra]
+	 * @returns {Promise<object>}
+	 */
+	function prefetch(galleryEl, page, breakpoint, extra) {
+		const request = buildRequest(
+			galleryEl,
+			page,
+			breakpoint || viewBreakpoint(galleryEl),
+			extra
+		);
+		if (!request) {
+			return Promise.reject(new Error('pagination/no-render-context'));
+		}
+
+		const pending = pendingRequests.get(galleryEl);
+		if (pending && pending.key === request.key) {
+			return pending.promise;
+		}
+		const held = heldPages.get(galleryEl);
+		if (held && held.key === request.key) {
+			return held.promise;
+		}
+
+		const entry = { key: request.key, promise: sendRequest(request) };
+		heldPages.set(galleryEl, entry);
+		entry.promise.catch(function () {
+			if (heldPages.get(galleryEl) === entry) {
+				heldPages.delete(galleryEl);
+			}
+		});
+		return entry.promise;
 	}
 
 	/**
@@ -1153,6 +1267,35 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			hasMore: !!payload.has_more,
 			reflow: true,
 		});
+
+		if (
+			payload.has_more &&
+			galleryEl.dataset.fgPaginationPreload === 'true'
+		) {
+			schedulePreload(galleryEl, (payload.page || 1) + 1);
+		}
+	}
+
+	/**
+	 * Preload the page after the current one, when Preload Next Page is on and
+	 * there is one. For a module that settles page 1 itself without a request
+	 * through goToPage() or adopt().
+	 *
+	 * @param {Element} galleryEl
+	 */
+	function preloadNext(galleryEl) {
+		if (
+			galleryEl.dataset.fgPaginated !== 'true' ||
+			galleryEl.dataset.fgPaginationPreload !== 'true' ||
+			(galleryEl.dataset.fgSlicePlanned === 'true' &&
+				!plannerFor(galleryEl))
+		) {
+			return;
+		}
+		const s = readState(galleryEl);
+		if (s.hasMore) {
+			schedulePreload(galleryEl, s.page + 1);
+		}
 	}
 
 	function expose() {
@@ -1170,6 +1313,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			onChange,
 			swapToFilterState,
 			adopt,
+			preloadNext,
 			setSlicePlanner,
 			replan,
 			/**
@@ -1208,7 +1352,8 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 
 		// Per paginated gallery: snapshot the server slice (cache strategy
 		// only), then re-page to the visitor's breakpoint or preload the next
-		// page. A random-sort refetch re-pages instead, and calls adopt().
+		// page. A random-sort refetch replaces page 1 instead, and calls adopt(),
+		// which preloads the next page of the new order.
 		window.FotoGrids.onGallery(function (gEl) {
 			if (gEl.dataset.fgPaginated !== 'true') {
 				return;
@@ -1226,10 +1371,10 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			if (planned) {
 				return;
 			}
-			if (
-				gEl.getAttribute('data-fg-random-mode') !== 'refetch' &&
-				needsReflow(gEl)
-			) {
+			if (gEl.getAttribute('data-fg-random-mode') === 'refetch') {
+				return;
+			}
+			if (needsReflow(gEl)) {
 				goToPage(gEl, 1, { mode: 'replace', reflow: true }).catch(
 					function () {
 						/* server render stands */

@@ -1,5 +1,5 @@
 import { test, expect } from './support/test';
-import { galleryPage, shortcodePage } from './support/collections';
+import { album, galleryPage, shortcodePage } from './support/collections';
 import { firstItem } from './support/fixtures';
 import { storageStateFor } from './support/roles';
 import { GalleryRender } from './support/gallery-render';
@@ -408,74 +408,135 @@ test.describe('the edges of a gallery', () => {
 });
 
 /**
- * LAY-15. A layout name nothing registered is a mistake in a saved setting or in
- * the shortcode's `template` attribute, which overrides it. Both reach the same
- * error, and the editor who can fix it sees the message while a visitor gets an
- * empty hidden element.
+ * LAY-15. A saved layout nothing registered - a Pro layout with Pro inactive,
+ * or one imported from a Pro site - cannot render. The editor who can fix it
+ * sees the message while a visitor gets an empty hidden element.
  */
-test.describe('an unknown layout', () => {
+test.describe('an unknown saved layout', () => {
 	const UNKNOWN = 'kaleidoscope';
 	const ERROR = '.fotogrids-error';
 
-	const ROUTES = [
-		{
-			name: 'saved as the gallery layout',
-			page: () => galleryPage({ layout: UNKNOWN }),
-		},
-		{
-			name: 'passed as the shortcode template',
-			page: () =>
-				shortcodePage(
-					galleryPage({ layout: 'grid' }).id,
-					`template="${UNKNOWN}"`
-				),
-		},
-	] as const;
-
 	// `_show_render_errors` is `current_user_can( 'edit_posts' )`, so the two
 	// halves of this row differ only in who is asking.
-	for (const route of ROUTES) {
+	test(
+		'LAY-15: saved as the gallery layout, an editor is shown the reason',
+		{ tag: '@layout' },
+		async ({ browser }) => {
+			const { url } = galleryPage({ layout: UNKNOWN });
+			const context = await browser.newContext({
+				storageState: storageStateFor('editor'),
+			});
+			const editor = await context.newPage();
+
+			try {
+				await editor.goto(url);
+
+				const error = editor.locator(ERROR);
+				await expect(error).toBeVisible();
+				await expect(error).toContainText(UNKNOWN);
+			} finally {
+				await context.close();
+			}
+		}
+	);
+
+	test(
+		'LAY-15: saved as the gallery layout, a visitor is shown nothing',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { url } = galleryPage({ layout: UNKNOWN });
+
+			await page.goto(url);
+
+			const error = page.locator(ERROR);
+			await expect(
+				error,
+				'the element is there, so the layout did fail'
+			).toBeAttached();
+			await expect(error).toBeHidden();
+			expect(
+				await error.textContent(),
+				'the reason leaked to a visitor'
+			).toBe('');
+		}
+	);
+});
+
+/**
+ * LAY-15. A shortcode `template` that names no registered layout, or a layout
+ * the collection type does not offer, is ignored, and the collection renders
+ * in its saved layout for everyone.
+ */
+test.describe('an unknown shortcode template', () => {
+	const UNKNOWN = 'kaleidoscope';
+	const SAVED = 'masonry';
+
+	for (const role of ['editor', 'visitor'] as const) {
 		test(
-			`LAY-15: ${route.name}, an editor is shown the reason`,
+			`LAY-15: passed as the shortcode template, ${role}s see the saved layout`,
 			{ tag: '@layout' },
 			async ({ browser }) => {
-				const { url } = route.page();
-				const context = await browser.newContext({
-					storageState: storageStateFor('editor'),
-				});
-				const editor = await context.newPage();
+				const { id } = galleryPage({ layout: SAVED });
+				const { url } = shortcodePage(id, `template="${UNKNOWN}"`);
+				const context = await browser.newContext(
+					'editor' === role
+						? { storageState: storageStateFor('editor') }
+						: {}
+				);
+				const page = await context.newPage();
 
 				try {
-					await editor.goto(url);
+					await page.goto(url);
 
-					const error = editor.locator(ERROR);
-					await expect(error).toBeVisible();
-					await expect(error).toContainText(UNKNOWN);
+					const gallery = new GalleryRender(page, id);
+					await gallery.waitFor();
+					expect(await gallery.layout()).toBe(SAVED);
+					await expect(
+						gallery.items().first(),
+						"the saved layout's script did not run"
+					).toBeVisible();
+					await expect(page.locator('.fotogrids-error')).toHaveCount(
+						0
+					);
 				} finally {
 					await context.close();
 				}
 			}
 		);
-
-		test(
-			`LAY-15: ${route.name}, a visitor is shown nothing`,
-			{ tag: '@layout' },
-			async ({ page }) => {
-				const { url } = route.page();
-
-				await page.goto(url);
-
-				const error = page.locator(ERROR);
-				await expect(
-					error,
-					'the element is there, so the layout did fail'
-				).toBeAttached();
-				await expect(error).toBeHidden();
-				expect(
-					await error.textContent(),
-					'the reason leaked to a visitor'
-				).toBe('');
-			}
-		);
 	}
+
+	test(
+		'LAY-15: passed as the album shortcode template, the saved layout renders',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id } = album([galleryPage().id, galleryPage().id], {
+				layout: SAVED,
+			});
+			const { url } = shortcodePage(id, `template="${UNKNOWN}"`, 'album');
+
+			await page.goto(url);
+
+			await expect(
+				page.locator(`.fotogrids-album[data-fg-album-id="${id}"]`)
+			).toHaveAttribute('data-fg-layout', SAVED);
+			await expect(page.locator('.fotogrids-error')).toHaveCount(0);
+		}
+	);
+
+	test(
+		'LAY-15: a gallery-only layout passed as the album shortcode template, the saved layout renders',
+		{ tag: '@layout' },
+		async ({ page }) => {
+			const { id } = album([galleryPage().id, galleryPage().id], {
+				layout: SAVED,
+			});
+			const { url } = shortcodePage(id, 'template="slider"', 'album');
+
+			await page.goto(url);
+
+			await expect(
+				page.locator(`.fotogrids-album[data-fg-album-id="${id}"]`)
+			).toHaveAttribute('data-fg-layout', SAVED);
+		}
+	);
 });

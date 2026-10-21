@@ -236,3 +236,53 @@ test(
 		).toHaveAttribute('data-fg-layout', 'masonry');
 	}
 );
+
+test(
+	'an album embed with an unknown template renders its saved layout after unlock and reload',
+	{ tag: ['@gate', '@layout'] },
+	async ({ page }) => {
+		const { id } = passwordAlbum({ layout: 'masonry' });
+		const wrapper = page.locator(
+			`.fotogrids-album[data-fg-album-id="${id}"]`
+		);
+		await page.goto(
+			shortcodePage(id, 'template="kaleidoscope"', 'album').url
+		);
+
+		await unlockThroughForm(page, id, PASSWORD);
+		await expect(page.locator(TILES)).toHaveCount(2, { timeout: 15000 });
+		await expect(wrapper).toHaveAttribute('data-fg-layout', 'masonry');
+
+		await page.reload();
+
+		await expect(page.locator(TILES)).toHaveCount(2);
+		await expect(wrapper).toHaveAttribute('data-fg-layout', 'masonry');
+		await expect(page.locator(GATE)).toHaveCount(0);
+	}
+);
+
+test(
+	'an album embed with a gallery-only template renders its saved layout after unlock and reload',
+	{ tag: ['@gate', '@layout'] },
+	async ({ page }) => {
+		const { id } = passwordAlbum({ layout: 'masonry' });
+		const wrapper = page.locator(
+			`.fotogrids-album[data-fg-album-id="${id}"]`
+		);
+		await page.goto(shortcodePage(id, 'template="slider"', 'album').url);
+
+		await expect(
+			page.locator(`.fg-lock-form[data-album-id="${id}"]`)
+		).not.toHaveAttribute('data-fg-embed-template', /.*/);
+
+		await unlockThroughForm(page, id, PASSWORD);
+		await expect(page.locator(TILES)).toHaveCount(2, { timeout: 15000 });
+		await expect(wrapper).toHaveAttribute('data-fg-layout', 'masonry');
+
+		await page.reload();
+
+		await expect(page.locator(TILES)).toHaveCount(2);
+		await expect(wrapper).toHaveAttribute('data-fg-layout', 'masonry');
+		await expect(page.locator(GATE)).toHaveCount(0);
+	}
+);
