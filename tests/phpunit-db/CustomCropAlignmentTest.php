@@ -104,14 +104,10 @@ class CustomCropAlignmentTest extends WP_UnitTestCase {
 
 	private function stripe_at_centre( string $path ): string {
 		$image = imagecreatefrompng( $path );
-		$rgb   = imagecolorat( $image, (int) ( imagesx( $image ) / 2 ), (int) ( imagesy( $image ) / 2 ) );
+		$color = imagecolorsforindex( $image, imagecolorat( $image, (int) ( imagesx( $image ) / 2 ), (int) ( imagesy( $image ) / 2 ) ) );
 		imagedestroy( $image );
 
-		$channels = array(
-			'red'   => ( $rgb >> 16 ) & 0xFF,
-			'green' => ( $rgb >> 8 ) & 0xFF,
-			'blue'  => $rgb & 0xFF,
-		);
+		$channels = array_intersect_key( $color, array_flip( array( 'red', 'green', 'blue' ) ) );
 		arsort( $channels );
 
 		return (string) array_key_first( $channels );
