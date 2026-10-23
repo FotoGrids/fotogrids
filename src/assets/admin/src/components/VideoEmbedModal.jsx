@@ -41,6 +41,15 @@ function extractVimeoId(url) {
 	return m ? m[1] : null;
 }
 
+/**
+ * FotoGrids sample videos, shown as the link placeholder and loaded when the
+ * link field is empty.
+ */
+const SAMPLE_VIDEO_URLS = {
+	youtube: 'https://youtu.be/nxehlC9adbg',
+	vimeo: 'https://vimeo.com/1238854752',
+};
+
 const SOURCES = [
 	{ value: 'youtube', label: 'YouTube' },
 	{ value: 'vimeo', label: 'Vimeo' },
@@ -418,6 +427,14 @@ const VideoEmbedModal = ({
 		[form.source, strings]
 	);
 
+	const loadVideo = useCallback(() => {
+		const url = urlDraft.trim() ? urlDraft : SAMPLE_VIDEO_URLS[form.source];
+		if (url !== urlDraft) {
+			setUrlDraft(url);
+		}
+		resolveUrl(url);
+	}, [urlDraft, form.source, resolveUrl]);
+
 	const handleAdd = useCallback(async () => {
 		if (!form.videoId) {
 			return;
@@ -639,7 +656,7 @@ const VideoEmbedModal = ({
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault();
-									resolveUrl(urlDraft);
+									loadVideo();
 								}
 							}}
 							onBlur={() => {
@@ -647,11 +664,7 @@ const VideoEmbedModal = ({
 									resolveUrl(urlDraft);
 								}
 							}}
-							placeholder={
-								form.source === 'youtube'
-									? 'https://www.youtube.com/watch?v=...'
-									: 'https://vimeo.com/...'
-							}
+							placeholder={SAMPLE_VIDEO_URLS[form.source]}
 							pattern={
 								form.source === 'youtube'
 									? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_\\-]{11}.*'
@@ -665,8 +678,8 @@ const VideoEmbedModal = ({
 						<Button
 							variant="secondary"
 							className="fotogrids-embed-resolve-btn"
-							onClick={() => resolveUrl(urlDraft)}
-							disabled={resolving || !urlDraft}
+							onClick={loadVideo}
+							disabled={resolving}
 							ariaLabel={strings.loadVideo || 'Load video'}
 							busy={resolving}
 							icon="link"
