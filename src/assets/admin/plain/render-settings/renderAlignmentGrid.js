@@ -21,24 +21,31 @@ window.FotoGridsRenderSettings.renderAlignmentGrid = (
 		? (setting.options || []).filter((option) => !option.isGlobalDefault)
 		: setting.options || [];
 
-	const gridOrder = [
-		'top-left',
-		'top-center',
-		'top-right',
-		'center-left',
-		'center',
-		'center-right',
-		'bottom-left',
-		'bottom-center',
-		'bottom-right',
-	];
+	const gridLabels = {
+		'top-left': __('Top left', 'fotogrids'),
+		'top-center': __('Top centre', 'fotogrids'),
+		'top-right': __('Top right', 'fotogrids'),
+		'center-left': __('Centre left', 'fotogrids'),
+		center: __('Centre', 'fotogrids'),
+		'center-right': __('Centre right', 'fotogrids'),
+		'bottom-left': __('Bottom left', 'fotogrids'),
+		'bottom-center': __('Bottom centre', 'fotogrids'),
+		'bottom-right': __('Bottom right', 'fotogrids'),
+	};
 
 	const optionsMap = {};
 	filteredOptions.forEach((option) => {
 		optionsMap[option.value] = option;
 	});
 
-	const orderedOptions = gridOrder.map((value) => optionsMap[value] || null);
+	const orderedOptions = Object.keys(gridLabels).map((value) =>
+		optionsMap[value]
+			? {
+					...optionsMap[value],
+					ariaLabel: optionsMap[value].label || gridLabels[value],
+				}
+			: null
+	);
 
 	const modifiedSetting = {
 		...setting,

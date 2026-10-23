@@ -9,6 +9,7 @@ use FotoGrids\Activator;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Galleries\Item_Meta;
 use FotoGrids\Migrations\Collection_Defaults_Split;
+use FotoGrids\Migrations\Custom_Crop_Size_Slugs;
 use FotoGrids\Migrations\Featured_Gallery_Repair;
 use FotoGrids\Migrations\Item_Meta_Consolidation;
 use FotoGrids\Migrations\List_Setting_Repair;
@@ -73,6 +74,7 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		'0002-collection-defaults-split',
 		'0003-list-setting-repair',
 		'0004-featured-gallery-repair',
+		'0006-custom-crop-size-slugs',
 	);
 
 	/** @var array<int, string> */
@@ -425,6 +427,7 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				Collection_Defaults_Split::class,
+				Custom_Crop_Size_Slugs::class,
 				Featured_Gallery_Repair::class,
 				Item_Meta_Consolidation::class,
 				List_Setting_Repair::class,
@@ -437,7 +440,7 @@ class MigrationRunnerTest extends WP_UnitTestCase {
 				static function ( string $migration ): string {
 					return $migration::id();
 				},
-				array( Item_Meta_Consolidation::class, Collection_Defaults_Split::class, List_Setting_Repair::class, Featured_Gallery_Repair::class )
+				array( Item_Meta_Consolidation::class, Collection_Defaults_Split::class, List_Setting_Repair::class, Featured_Gallery_Repair::class, Custom_Crop_Size_Slugs::class )
 			)
 		);
 	}
