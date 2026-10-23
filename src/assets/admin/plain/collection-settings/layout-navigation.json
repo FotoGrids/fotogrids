@@ -24,6 +24,7 @@
                     "settings": [
                         {
                             "key": "layout_loop",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Loop",
                             "description": "After the last item, return to the first.",
@@ -35,6 +36,7 @@
                         },
                         {
                             "key": "layout_show_counter",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Counter",
                             "description": "Show the current position indicator (for example 3 of 12).",
@@ -51,6 +53,7 @@
                             "settings": [
                                 {
                                     "key": "layout_autoplay",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Enable Autoplay",
                                     "description": "Automatically advance between items.",
@@ -112,6 +115,7 @@
                             "settings": [
                                 {
                                     "key": "layout_transition",
+                                    "modes": ["easy", "advanced"],
                                     "type": "button_group",
                                     "label": "Transition Between Items",
                                     "options": [
@@ -288,6 +292,7 @@
                     "settings": [
                         {
                             "key": "layout_show_arrows",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Arrows",
                             "description": "Show previous and next arrows.",
@@ -409,6 +414,7 @@
                         },
                         {
                             "key": "layout_arrows_location",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Arrows Location",
                             "description": "Where the arrows sit relative to the image edge.",
@@ -723,6 +729,7 @@
                     "settings": [
                         {
                             "key": "layout_show_bullets",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Bullets",
                             "description": "Show pagination dots that indicate the current item.",
@@ -761,6 +768,7 @@
                         },
                         {
                             "key": "layout_bullets_location",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Bullets Location",
                             "options": [
@@ -873,6 +881,7 @@
                     "settings": [
                         {
                             "key": "layout_thumbnails_show",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Thumbnails",
                             "description": "Show a strip of mini-images that scroll the slider when clicked.",
@@ -884,6 +893,7 @@
                         },
                         {
                             "key": "layout_thumbnails_location",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Thumbnails Location",
                             "options": [

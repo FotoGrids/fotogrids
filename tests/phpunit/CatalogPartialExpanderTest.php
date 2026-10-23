@@ -389,4 +389,73 @@ final class CatalogPartialExpanderTest extends TestCase {
 	public function test_missing_key_prefix_yields_nothing(): void {
 		$this->assertSame( array(), $this->expand( array( 'use' => 'typography' ) ) );
 	}
+
+	/**
+	 * Collect every array node that carries a `type` from a tree.
+	 *
+	 * @param mixed $node Tree.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function typed_nodes( $node ): array {
+		$out = array();
+		if ( is_array( $node ) ) {
+			if ( isset( $node['type'] ) && is_string( $node['type'] ) ) {
+				$out[] = $node;
+			}
+			foreach ( $node as $value ) {
+				$out = array_merge( $out, $this->typed_nodes( $value ) );
+			}
+		}
+		return $out;
+	}
+
+	public function test_modes_land_on_every_field_and_the_built_wrapper(): void {
+		$out = $this->expand(
+			array(
+				'use'        => 'aspect-ratio',
+				'key_prefix' => 'ar_',
+				'modes'      => array( 'easy', 'advanced' ),
+			)
+		);
+
+		$this->assertSame( array( 'ar_ratio', 'ar_ratio_w', 'ar_ratio_h' ), $this->keys( $out ) );
+
+		$wrapper = $this->find( $out, 'type', 'setting_group' );
+		$this->assertNotNull( $wrapper );
+
+		foreach ( $this->typed_nodes( $out ) as $node ) {
+			$this->assertSame( array( 'easy', 'advanced' ), $node['modes'] ?? null, (string) ( $node['key'] ?? $node['type'] ) );
+		}
+	}
+
+	public function test_modes_reach_composed_partials_and_state_subtabs(): void {
+		$out = $this->expand(
+			array(
+				'use'        => 'button-styling',
+				'key_prefix' => 'b_',
+				'modes'      => array( 'easy' ),
+			)
+		);
+
+		$nodes = $this->typed_nodes( $out );
+		$this->assertContains( 'b_font_family', $this->keys( $out ) );
+		$this->assertNotNull( $this->find( $out, 'type', 'setting_subtabs' ) );
+
+		foreach ( $nodes as $node ) {
+			$this->assertSame( array( 'easy' ), $node['modes'] ?? null, (string) ( $node['key'] ?? $node['type'] ) );
+		}
+	}
+
+	public function test_no_modes_on_use_node_adds_none(): void {
+		$out = $this->expand(
+			array(
+				'use'        => 'aspect-ratio',
+				'key_prefix' => 'ar_',
+			)
+		);
+
+		foreach ( $this->typed_nodes( $out ) as $node ) {
+			$this->assertArrayNotHasKey( 'modes', $node );
+		}
+	}
 }

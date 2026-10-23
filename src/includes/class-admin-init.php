@@ -30,6 +30,7 @@ class Admin_Init {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_chrome_styles' ) );
 
 		add_action( 'wp_ajax_fotogrids_update_plugin_setting', array( __CLASS__, 'ajax_update_plugin_setting' ) );
+		add_action( 'wp_ajax_fotogrids_update_user_preference', array( __CLASS__, 'ajax_update_user_preference' ) );
 
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-columns.php';
 		\FotoGrids\Admin\Admin_Columns::init();
@@ -310,31 +311,33 @@ class Admin_Init {
 			'fotogrids-admin',
 			'fotogridsAdmin',
 			array(
-				'nonce'              => wp_create_nonce( 'fotogrids_admin' ),
-				'restUrl'            => 'fotogrids/v1/',
-				'restNonce'          => wp_create_nonce( 'wp_rest' ),
-				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
-				'pluginUrl'          => FOTOGRIDS_PLUGIN_URL,
-				'apiUrl'             => rest_url(),
-				'generalSettings'    => self::get_general_settings(),
-				'sharingSettings'    => \FotoGrids\Settings\Sharing_Settings_Store::get(),
-				'watermarkSettings'  => \FotoGrids\Settings\Watermark_Settings_Store::get(),
-				'seoSettings'        => \FotoGrids\Settings\SEO_Settings_Store::get(),
-				'textFormatting'     => \FotoGrids\Settings\Text_Formatting_Settings_Store::get(),
-				'viewSettings'       => \FotoGrids\Settings\View_Settings_Store::get(),
-				'viewDefaults'       => \FotoGrids\Settings\View_Settings_Store::defaults(),
-				'shareStatistics'    => self::resolve_share_statistics_state(),
-				'marketingAllowed'   => (bool) get_option( 'fotogrids_marketing_allowed', false ),
-				'autosave'           => (bool) get_option( 'fotogrids_autosave', true ),
-				'settingsMode'       => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
-				'userPersona'        => (string) get_option( 'fotogrids_user_persona', '' ),
-				'settingsBaseUrl'    => admin_url( 'admin.php?page=fotogrids-settings' ),
-				'homeUrl'            => home_url(),
-				'permalinksUrl'      => admin_url( 'options-permalink.php' ),
-				'locationLibraryUrl' => admin_url( 'admin.php?page=fotogrids-library&tab=locations' ),
-				'permalinkStructure' => (string) get_option( 'permalink_structure' ),
-				'isFotoGridsPage'    => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
-				'capabilities'       => self::get_current_user_capabilities_snapshot(),
+				'nonce'               => wp_create_nonce( 'fotogrids_admin' ),
+				'restUrl'             => 'fotogrids/v1/',
+				'restNonce'           => wp_create_nonce( 'wp_rest' ),
+				'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
+				'pluginUrl'           => FOTOGRIDS_PLUGIN_URL,
+				'apiUrl'              => rest_url(),
+				'generalSettings'     => self::get_general_settings(),
+				'sharingSettings'     => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+				'watermarkSettings'   => \FotoGrids\Settings\Watermark_Settings_Store::get(),
+				'seoSettings'         => \FotoGrids\Settings\SEO_Settings_Store::get(),
+				'textFormatting'      => \FotoGrids\Settings\Text_Formatting_Settings_Store::get(),
+				'viewSettings'        => \FotoGrids\Settings\View_Settings_Store::get(),
+				'viewDefaults'        => \FotoGrids\Settings\View_Settings_Store::defaults(),
+				'shareStatistics'     => self::resolve_share_statistics_state(),
+				'marketingAllowed'    => (bool) get_option( 'fotogrids_marketing_allowed', false ),
+				'autosave'            => (bool) get_option( 'fotogrids_autosave', true ),
+				'settingsMode'        => \FotoGrids\Settings\Settings_Mode::resolve( get_current_user_id() ),
+				'siteSettingsMode'    => \FotoGrids\Settings\Settings_Mode::site_default(),
+				'showSettingsModeTip' => \FotoGrids\Settings\Settings_Mode::should_show_tip( get_current_user_id() ) ? '1' : '',
+				'userPersona'         => (string) get_option( 'fotogrids_user_persona', '' ),
+				'settingsBaseUrl'     => admin_url( 'admin.php?page=fotogrids-settings' ),
+				'homeUrl'             => home_url(),
+				'permalinksUrl'       => admin_url( 'options-permalink.php' ),
+				'locationLibraryUrl'  => admin_url( 'admin.php?page=fotogrids-library&tab=locations' ),
+				'permalinkStructure'  => (string) get_option( 'permalink_structure' ),
+				'isFotoGridsPage'     => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
+				'capabilities'        => self::get_current_user_capabilities_snapshot(),
 			)
 		);
 
@@ -700,6 +703,30 @@ class Admin_Init {
 	}
 
 	/**
+	 * Save a preference of the current user.
+	 *
+	 * @since  1.3.0
+	 * @return void
+	 */
+	public static function ajax_update_user_preference(): void {
+		check_ajax_referer( 'fotogrids_admin', 'nonce' );
+
+		$preference = isset( $_POST['preference'] ) ? sanitize_key( wp_unslash( $_POST['preference'] ) ) : '';
+		$value      = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
+		$result     = \FotoGrids\Settings\Settings_Mode::handle_preference_request( get_current_user_id(), current_user_can( 'read' ), $preference, $value );
+
+		if ( ! $result['ok'] ) {
+			$messages = array(
+				\FotoGrids\Settings\Settings_Mode::ERROR_FORBIDDEN => __( 'Insufficient permissions', 'fotogrids' ),
+				\FotoGrids\Settings\Settings_Mode::ERROR_INVALID   => __( 'Invalid value', 'fotogrids' ),
+			);
+			wp_send_json_error( array( 'message' => $messages[ $result['error'] ] ?? __( 'Failed to save setting', 'fotogrids' ) ) );
+		}
+
+		wp_send_json_success( array( 'value' => $result['value'] ) );
+	}
+
+	/**
 	 * Allowed-value list for each string-typed setting accepted by
 	 * ajax_update_plugin_setting().
 	 *
@@ -725,7 +752,7 @@ class Admin_Init {
 	 * @return bool
 	 */
 	private static function resolve_share_statistics_state(): bool {
-		$option_raw = get_option( 'fotogrids_share_statistics', null );
+		$option_raw  = get_option( 'fotogrids_share_statistics', null );
 		$option_bool = ! (
 			null === $option_raw ||
 			false === $option_raw ||

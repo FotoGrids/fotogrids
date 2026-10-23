@@ -52,6 +52,7 @@
                     "settings": [
                         {
                             "key": "lightbox_grid_theme",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Theme",
                             "options": [
@@ -181,10 +182,12 @@
                     "settings": [
                         {
                             "use": "lightbox-captions",
-                            "key_prefix": "lightbox_lite_caption_"
+                            "key_prefix": "lightbox_lite_caption_",
+                            "overrides": { "show": { "modes": ["easy", "advanced"] } }
                         },
                         {
                             "key": "lightbox_lite_caption_location",
+                            "modes": ["easy", "advanced"],
                             "type": "token_select",
                             "label": "Caption Location",
                             "description": "Where captions appear: in the grid tiles, in the full-size image view, or both.",

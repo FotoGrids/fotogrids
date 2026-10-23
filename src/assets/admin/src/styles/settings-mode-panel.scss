@@ -1,0 +1,114 @@
+// Settings > Defaults: site default setup mode.
+.fotogrids-settings-mode-panel {
+	&__heading {
+		margin: 0 0 4px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
+
+	&__description {
+		margin: 0 0 16px;
+		max-width: 64ch;
+		color: var(--fg-text-secondary);
+	}
+
+	&__options {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 12px;
+	}
+
+	&__card {
+		position: relative;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		align-items: start;
+		column-gap: 12px;
+		row-gap: 4px;
+		padding: 16px;
+		background: var(--fg-background-primary);
+		border: 1px solid var(--fg-border-secondary);
+		border-radius: 10px;
+		cursor: pointer;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
+
+		&:hover {
+			border-color: var(--fg-blue-light);
+		}
+
+		&.fg-is-active {
+			border-color: var(--fg-blue);
+			box-shadow: 0 0 0 1px var(--fg-blue) inset;
+		}
+
+		&:focus-within {
+			outline: 2px solid var(--fg-blue);
+			outline-offset: 2px;
+		}
+
+		&--readonly {
+			cursor: default;
+			opacity: 0.7;
+
+			&:hover {
+				border-color: var(--fg-border-secondary);
+			}
+		}
+	}
+
+	&__input {
+		position: absolute;
+		opacity: 0;
+		width: 1px;
+		height: 1px;
+		margin: 0;
+	}
+
+	&__radio {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		grid-row: span 2;
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		border: 2px solid var(--fg-border-secondary);
+		background: var(--fg-background-primary);
+	}
+
+	&__dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: transparent;
+		transform: scale(0);
+		transition:
+			transform 0.15s ease,
+			background-color 0.15s ease;
+	}
+
+	&__card.fg-is-active &__radio {
+		border-color: var(--fg-blue);
+	}
+
+	&__card.fg-is-active &__dot {
+		background: var(--fg-blue);
+		transform: scale(1);
+	}
+
+	&__title {
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
+
+	&__text {
+		color: var(--fg-text-secondary);
+	}
+
+	&__readonly-note {
+		margin: 12px 0 0;
+		color: var(--fg-text-secondary);
+	}
+}

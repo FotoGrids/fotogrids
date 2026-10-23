@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { persistSetting } from './persist-setting';
+import { persistSetting, persistUserPreference } from './persist-setting';
 
 /**
  * Step 3 - Setup mode (Easy vs Advanced).
  *
- * The pick is persisted immediately to `fotogrids_settings_mode` via the
- * shared AJAX setting endpoint and surfaced through
- * `window.fotogridsAdmin.settingsMode`.
+ * The pick is saved immediately as the site default and as the current
+ * user's own mode.
  */
 // Each mode's description is modelled as two paragraphs so it renders
 // with a real line break between the lead-in and the supporting copy.
@@ -45,11 +44,9 @@ const MODES = [
 ];
 
 const StepComplexity = () => {
-	// Initial value comes from the localized PHP payload so a reopened
-	// wizard remembers the user's pick. Default is "easy".
 	const initialMode =
-		window.fotogridsAdmin && window.fotogridsAdmin.settingsMode
-			? String(window.fotogridsAdmin.settingsMode)
+		window.fotogridsAdmin && window.fotogridsAdmin.siteSettingsMode
+			? String(window.fotogridsAdmin.siteSettingsMode)
 			: 'easy';
 	const [mode, setMode] = useState(
 		initialMode === 'advanced' ? 'advanced' : 'easy'
@@ -58,6 +55,7 @@ const StepComplexity = () => {
 	const handlePick = (id) => {
 		setMode(id);
 		persistSetting('fotogrids_settings_mode', id);
+		persistUserPreference('settings_mode', id);
 	};
 
 	return (

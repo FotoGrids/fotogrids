@@ -13,6 +13,7 @@
             "settings": [
                 {
                     "key": "lazy_load",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Enable Lazy Loading",
                     "description": "Load images only when they enter the viewport. Improves initial page load time.",
@@ -54,6 +55,7 @@
             "settings": [
                 {
                     "key": "enable_cache",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Enable {postType} Cache",
                     "description": "Cache rendered {postType.lower} HTML to improve performance on subsequent loads.",
@@ -86,6 +88,7 @@
                 },
                 {
                     "key": "cache_status",
+                    "modes": ["easy", "advanced"],
                     "type": "cache_status",
                     "label": "Cache Status",
                     "tier_required": "free",
@@ -120,6 +123,7 @@
         },
         {
             "key": "cdn_promotion",
+            "modes": ["easy", "advanced"],
             "type": "promo",
             "messages": [
                 {

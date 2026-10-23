@@ -36,6 +36,7 @@ final class Admin_Prompts extends Abstract_Option_Declaration {
 		return array(
 			'fotogrids_notice_bar_dismissed' => self::KEEP,
 			'fotogrids_review_stats'         => self::KEEP,
+			'fotogrids_settings_mode_tip'    => self::KEEP,
 		);
 	}
 }

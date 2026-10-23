@@ -63,6 +63,7 @@ final class Collection_Settings_Assets {
 		'renderCacheStatus',
 		'renderWatermarkStatus',
 		'renderImagePicker',
+		'renderPresetGroup',
 	);
 
 	/**
@@ -130,6 +131,7 @@ final class Collection_Settings_Assets {
 				'fotogrids-settings-loader',
 				'fotogrids-ui-state-manager',
 				'fotogrids-post-type-placeholders',
+				'fotogrids-settings-mode',
 			),
 			FOTOGRIDS_VERSION,
 			true
@@ -255,6 +257,14 @@ final class Collection_Settings_Assets {
 			'fotogrids-dynamic-options',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/dynamic-options.js',
 			array( 'wp-element' ),
+			FOTOGRIDS_VERSION,
+			true
+		);
+
+		wp_enqueue_script(
+			'fotogrids-settings-mode',
+			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/settings-mode.js',
+			array(),
 			FOTOGRIDS_VERSION,
 			true
 		);

@@ -10,6 +10,7 @@
             "settings": [
                 {
                     "key": "auto_clear_cache",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Auto Clear Cache",
                     "description": "Automatically clear cache when settings are updated.",
@@ -32,6 +33,7 @@
             "settings": [
                 {
                     "key": "enable_statistics",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Enable Statistics Tracking",
                     "description": "Track {postType.lower} views and interactions for analytics.",
@@ -99,6 +101,7 @@
             "settings": [
                 {
                     "key": "view_page_override_defaults",
+                    "modes": ["advanced"],
                     "type": "toggle",
                     "label": "Override Defaults",
                     "description": "Apply custom Max Width and Background Color to this {postType.lower}'s view page instead of the site defaults.",
@@ -110,6 +113,7 @@
                 },
                 {
                     "key": "view_page_max_width",
+                    "modes": ["advanced"],
                     "type": "responsive_range",
                     "label": "Max Width",
                     "description": "Cap the width of the gallery view page content area.",

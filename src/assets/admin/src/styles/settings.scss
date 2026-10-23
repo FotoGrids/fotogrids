@@ -10,6 +10,7 @@
 @use "./collection-settings/lightbox-subtabs.scss" as *;
 @use "./collection-settings/external-url-manager.scss" as *;
 @use "./collection-settings/permissions-manager.scss" as *;
+@use "./collection-settings/settings-mode.scss" as *;
 
 .fotogrids-defaults-tab {
 	display: flex;
@@ -765,6 +766,7 @@ $settings-sidebar-width: 200px;
 }
 
 .fotogrids-settings_pro-message {
+	position: relative;
 	border-color: var(--fg-yellow);
 	display: flex;
 	align-items: center;

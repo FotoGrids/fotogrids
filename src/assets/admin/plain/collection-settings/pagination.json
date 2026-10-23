@@ -14,6 +14,7 @@
     "settings": [
         {
             "key": "pagination_type",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Display Mode",
             "options": [
@@ -36,6 +37,7 @@
         },
         {
             "key": "items_per_page",
+            "modes": ["easy", "advanced"],
             "type": "responsive_range",
             "label": "Items Per Page",
             "responsive": {
@@ -85,6 +87,7 @@
         },
         {
             "key": "pagination_method",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Pagination Method",
             "options": [
@@ -182,6 +185,7 @@
                     "settings": [
                         {
                             "key": "load_more_button_text",
+                            "modes": ["easy", "advanced"],
                             "type": "text_input",
                             "label": "Button Text",
                             "default": "Load More",
@@ -297,6 +301,7 @@
                         },
                         {
                             "key": "pages_show_prev_next",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Previous/Next Buttons",
                             "default": true,
@@ -403,6 +408,7 @@
                         },
                         {
                             "key": "pages_show_numbers",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Page Numbers",
                             "default": true,

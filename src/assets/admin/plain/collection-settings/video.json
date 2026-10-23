@@ -9,6 +9,7 @@
     "settings": [
         {
             "key": "video_playback_mode",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Video Playback",
             "description": "Set how video items open when visitors click them.",
@@ -32,6 +33,7 @@
         },
         {
             "key": "video_playback_full_lightbox_notice",
+            "modes": ["easy", "advanced"],
             "type": "info_block",
             "subtitle": "Videos will use the gallery lightbox",
             "message": "Item Click Behavior is set to <strong>Open in Lightbox</strong>, so videos open in the same lightbox as your images, with its navigation, thumbnails and captions. The appearance settings below style the minimal video overlay, which this gallery does not use.",
@@ -70,6 +72,7 @@
                         {
                             "use": "lightbox-mini",
                             "key_prefix": "lightbox_mini_",
+                            "overrides": { "show_close": { "modes": ["easy", "advanced"] }, "show_arrows": { "modes": ["easy", "advanced"] }, "show_bullets": { "modes": ["easy", "advanced"] } },
                             "include": [
                                 "show_close",
                                 "show_arrows",
@@ -87,6 +90,7 @@
                         {
                             "use": "lightbox-mini",
                             "key_prefix": "lightbox_mini_",
+                            "overrides": { "show_overlay": { "modes": ["easy", "advanced"] }, "theme": { "modes": ["easy", "advanced"] } },
                             "include": [
                                 "show_overlay",
                                 "overlay_blur",
@@ -105,7 +109,8 @@
                     "settings": [
                         {
                             "use": "lightbox-captions",
-                            "key_prefix": "lightbox_lite_caption_"
+                            "key_prefix": "lightbox_lite_caption_",
+                            "overrides": { "show": { "modes": ["easy", "advanced"] } }
                         }
                     ]
                 }
@@ -128,6 +133,7 @@
             "settings": [
                 {
                     "key": "video_autoplay_on_open",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Autoplay When Lightbox Opens",
                     "description": "Automatically start playing the video when the lightbox opens on it.",
@@ -139,6 +145,7 @@
                 },
                 {
                     "key": "video_autoplay_on_slide",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Autoplay When Navigating to Video",
                     "description": "Automatically start playing a video when a visitor navigates to it inside the lightbox.",
@@ -150,6 +157,7 @@
                 },
                 {
                     "key": "video_advance_after_end",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Advance to Next Item After Video Ends",
                     "description": "Automatically move to the next gallery item when the current video finishes playing.",
@@ -167,6 +175,7 @@
         },
         {
             "key": "video_pro_features_promo",
+            "modes": ["easy", "advanced"],
             "type": "promo",
             "messages": [
                 {

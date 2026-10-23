@@ -18,6 +18,7 @@
     "settings": [
         {
             "key": "filtering_enabled",
+            "modes": ["easy", "advanced"],
             "type": "toggle",
             "label": "Enable Filtering",
             "description": "Allow visitors to filter {postType} items by selected criteria",
@@ -29,6 +30,7 @@
         },
         {
             "key": "filtering_multiple_enabled",
+            "modes": ["easy", "advanced"],
             "type": "toggle",
             "label": "Multiple Selection",
             "description": "When enabled, allows visitors to select multiple options within the same filter group",
@@ -40,6 +42,7 @@
         },
         {
             "key": "filter_by",
+            "modes": ["easy", "advanced"],
             "type": "token_select",
             "label": "Filter By",
             "description": "Which criteria visitors can filter items by",
@@ -62,6 +65,7 @@
         },
         {
             "key": "date_filter_type",
+            "modes": ["easy", "advanced"],
             "type": "button_group",
             "label": "Date Filter Type",
             "description": "Which date to use for filtering",
@@ -106,6 +110,7 @@
                     "settings": [
                         {
                             "key": "filter_ui_position",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Position",
                             "description": "Where to display the filter controls",
@@ -131,6 +136,7 @@
                         },
                         {
                             "key": "filter_display_mode",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Display",
                             "description": "Whether the filter bar is always visible or revealed by a toggle button",
@@ -162,6 +168,7 @@
                         },
                         {
                             "key": "filter_sidebar_side",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Sidebar Side",
                             "description": "Which side the filter sidebar appears on",
@@ -191,6 +198,7 @@
                         },
                         {
                             "key": "filter_ui_style",
+                            "modes": ["easy", "advanced"],
                             "type": "button_group",
                             "label": "Style",
                             "description": "How the filter controls are displayed",
@@ -251,6 +259,7 @@
                             "settings": [
                                 {
                                     "key": "filter_reset_btn_enabled",
+                                    "modes": ["easy", "advanced"],
                                     "type": "toggle",
                                     "label": "Show Reset Button",
                                     "default": true,
@@ -934,6 +943,7 @@
                     "settings": [
                         {
                             "key": "show_filter_count",
+                            "modes": ["easy", "advanced"],
                             "type": "toggle",
                             "label": "Show Item Count",
                             "description": "Display the number of matching items next to each filter option",
@@ -1119,6 +1129,7 @@
         },
         {
             "key": "advanced_filtering_promo",
+            "modes": ["easy", "advanced"],
             "type": "promo",
             "messages": [
                 {

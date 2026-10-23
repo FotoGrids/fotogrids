@@ -9,6 +9,7 @@
     "settings": [
         {
             "key": "woocommerce_integration",
+            "modes": ["easy", "advanced"],
             "title": "WooCommerce Integration",
             "description": "Full WooCommerce sync - automatically update galleries when products change. Dynamic product galleries that stay current.",
             "render_when_unlicensed": true,
@@ -17,6 +18,7 @@
         },
         {
             "key": "add_to_cart",
+            "modes": ["easy", "advanced"],
             "title": "Direct Add to Cart",
             "description": "Add 'Add to Cart' and 'View Product' buttons directly to gallery items. Turn viewers into buyers instantly.",
             "render_when_unlicensed": true,
@@ -25,6 +27,7 @@
         },
         {
             "key": "product_variations",
+            "modes": ["easy", "advanced"],
             "title": "Product Variations",
             "description": "Display and purchase product variations (colors, sizes, options) directly from the lightbox. Complete shopping experience.",
             "render_when_unlicensed": true,
@@ -33,6 +36,7 @@
         },
         {
             "key": "sale_badges",
+            "modes": ["easy", "advanced"],
             "title": "Sale Badges & Pricing",
             "description": "Eye-catching sale badges, discount ribbons, and dynamic pricing display. Show prices, stock status, and compare-at prices.",
             "render_when_unlicensed": true,
@@ -41,6 +45,7 @@
         },
         {
             "key": "product_categories",
+            "modes": ["easy", "advanced"],
             "title": "Product Category Filtering",
             "description": "Organize and filter gallery items by WooCommerce product categories. Create category-specific product showcases.",
             "render_when_unlicensed": true,
@@ -49,6 +54,7 @@
         },
         {
             "key": "seamless_checkout",
+            "modes": ["easy", "advanced"],
             "title": "Seamless Checkout Flow",
             "description": "Complete checkout integration - items added from galleries maintain all product data, variations, and pricing in cart and orders.",
             "render_when_unlicensed": true,

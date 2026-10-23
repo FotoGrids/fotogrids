@@ -5,6 +5,7 @@
     "settings": [
         {
             "key": "disable_right_click",
+            "modes": ["easy", "advanced"],
             "type": "toggle",
             "label": "Disable Right Click",
             "tier_required": "pro_starter",
@@ -19,6 +20,7 @@
             "settings": [
                 {
                     "key": "password_protect",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Password Protect {postType}",
                     "tier_required": "free",
@@ -28,6 +30,7 @@
                 },
                 {
                     "key": "password",
+                    "modes": ["easy", "advanced"],
                     "type": "password_input",
                     "label": "{postType} Password",
                     "default": "",
@@ -93,6 +96,7 @@
             "settings": [
                 {
                     "key": "watermark_global_off_notice",
+                    "modes": ["easy", "advanced"],
                     "type": "info_block",
                     "subtitle": "Watermarking is turned off site-wide",
                     "message": "Watermarks are disabled in FotoGrids settings. Turn them on under <a>FotoGrids → Settings → Watermark</a> to apply a watermark to this {postType.lower}.",
@@ -115,6 +119,7 @@
                 },
                 {
                     "key": "watermark_apply_to_collection",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Apply watermark to this {postType}",
                     "description": "The site-wide watermark is burned into this {postType.lower}'s images. Turn this off to leave this {postType.lower}'s images unwatermarked. Configure the watermark itself under <a>FotoGrids → Settings → Watermark</a>.",
@@ -135,6 +140,7 @@
                 },
                 {
                     "key": "watermark_status",
+                    "modes": ["easy", "advanced"],
                     "type": "watermark_status",
                     "tier_required": "free",
                     "render_when_unlicensed": true,

@@ -13,6 +13,7 @@
             "settings": [
                 {
                     "key": "use_ajax_from_album",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Smooth Album to Gallery Transitions",
                     "description": "When enabled, opening a Gallery from an Album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
@@ -35,6 +36,7 @@
             "settings": [
                 {
                     "key": "navigation_show_breadcrumbs",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Show Breadcrumbs",
                     "description": "Display a clickable trail (Album › Gallery) above the Gallery so visitors can navigate back to this Album.",
@@ -46,6 +48,7 @@
                 },
                 {
                     "key": "navigation_breadcrumbs_placements",
+                    "modes": ["easy", "advanced"],
                     "type": "token_select",
                     "label": "Show Breadcrumbs On",
                     "description": "Where the breadcrumb trail should appear when a visitor reaches a Gallery from this Album.",
@@ -155,6 +158,7 @@
             "settings": [
                 {
                     "key": "navigation_show_back_button",
+                    "modes": ["easy", "advanced"],
                     "type": "toggle",
                     "label": "Show \"Back to Album\" Button",
                     "description": "Display a prominent Back button above the Gallery so visitors can return to this Album in one click.",
@@ -187,6 +191,7 @@
         },
         {
             "key": "navigation_info_block",
+            "modes": ["easy", "advanced"],
             "type": "info_block",
             "subtitle": "When Breadcrumbs and the Back Button appear",
             "message": "The Breadcrumb trail and Back Button show up when a visitor reaches a Gallery from this Album. On direct visits to a Gallery they only appear if \"Show Breadcrumbs on Direct Visits\" is enabled AND that Gallery belongs to this Album only. If a Gallery is assigned to two or more Albums there is no single parent to point back to, so nothing is rendered on direct visits regardless of that setting.",

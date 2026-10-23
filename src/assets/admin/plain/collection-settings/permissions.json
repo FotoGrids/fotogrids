@@ -11,6 +11,7 @@
             "settings": [
                 {
                     "key": "who_can_edit",
+                    "modes": ["easy", "advanced"],
                     "type": "button_group",
                     "label": "Who can edit this {postType}?",
                     "options": [
@@ -50,7 +51,7 @@
                         {
                             "label": "Exclude",
                             "value": "exclude",
-                            "icon": "close",
+                            "icon": "x",
                             "tier_required": "free"
                         }
                     ],
@@ -69,6 +70,7 @@
                 },
                 {
                     "key": "edit_allowed_roles",
+                    "modes": ["easy", "advanced"],
                     "type": "multi_select",
                     "label": "Select roles",
                     "options": [
@@ -112,6 +114,7 @@
                 },
                 {
                     "key": "edit_allowed_users",
+                    "modes": ["easy", "advanced"],
                     "type": "user_select",
                     "label": "Select users",
                     "default": [],
@@ -140,6 +143,7 @@
             "settings": [
                 {
                     "key": "who_can_view",
+                    "modes": ["easy", "advanced"],
                     "type": "button_group",
                     "label": "Who can view this {postType}?",
                     "options": [
@@ -179,7 +183,7 @@
                         {
                             "label": "Exclude",
                             "value": "exclude",
-                            "icon": "close",
+                            "icon": "x",
                             "tier_required": "free"
                         }
                     ],
@@ -197,6 +201,7 @@
                 },
                 {
                     "key": "view_allowed_roles",
+                    "modes": ["easy", "advanced"],
                     "type": "multi_select",
                     "label": "Select roles",
                     "options": [

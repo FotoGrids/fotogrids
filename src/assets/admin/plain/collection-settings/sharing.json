@@ -5,6 +5,7 @@
     "settings": [
         {
             "key": "sharing_global_off_notice",
+            "modes": ["easy", "advanced"],
             "type": "info_block",
             "subtitle": "Sharing is turned off site-wide",
             "message": "Social sharing is disabled in FotoGrids settings. Turn it on under FotoGrids → Settings → Sharing to configure sharing for this {postType}.",
@@ -20,6 +21,36 @@
                 "dependsOn": "enable_social_sharing",
                 "values": [false]
             }
+        },
+        {
+            "id": "easy_sharing",
+            "type": "preset_group",
+            "label": "Sharing",
+            "modes": ["easy"],
+            "columns": 2,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            },
+            "options": [
+                {
+                    "value": "site",
+                    "label": "Use site settings",
+                    "icon": "sharing_site",
+                    "values": {
+                        "sharing_override": false
+                    }
+                },
+                {
+                    "value": "off",
+                    "label": "Off for this {postType}",
+                    "icon": "x",
+                    "values": {
+                        "sharing_override": true,
+                        "sharing_disabled_for_collection": true
+                    }
+                }
+            ]
         },
         {
             "key": "sharing_override",

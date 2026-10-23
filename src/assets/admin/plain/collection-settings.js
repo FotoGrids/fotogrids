@@ -265,7 +265,62 @@ const renderIcon = (iconName) => {
 	});
 };
 
+/**
+ * DOM content for the Easy mode upgrade tip shown in an fg-tooltip.
+ *
+ * @since 1.3.0
+ * @param {() => void} onDismiss Called when "Got it" is pressed.
+ * @returns {HTMLElement}
+ */
+const buildModeTipContent = (onDismiss) => {
+	const base = 'fotogrids-settings-mode-tip';
+	const make = (tag, className, text) => {
+		const node = document.createElement(tag);
+		node.className = className;
+		if (text) {
+			node.textContent = text;
+		}
+		return node;
+	};
+
+	const root = make('div', base);
+	root.setAttribute('role', 'dialog');
+	root.setAttribute('aria-labelledby', `${base}-title`);
+	root.setAttribute('aria-describedby', `${base}-body`);
+
+	const title = make(
+		'p',
+		`${base}__title`,
+		__('Settings are simpler now', 'fotogrids')
+	);
+	title.id = `${base}-title`;
+
+	const body = make(
+		'p',
+		`${base}__body`,
+		__(
+			'Easy editing mode shows only the essential controls. Switch to Advanced editing mode any time to see every setting.',
+			'fotogrids'
+		)
+	);
+	body.id = `${base}-body`;
+
+	const ok = make(
+		'button',
+		`fg-button fg-button--variant-primary fg-button--size-sm ${base}__ok`,
+		__('Got it', 'fotogrids')
+	);
+	ok.type = 'button';
+	ok.addEventListener('click', () => onDismiss());
+
+	root.append(title, body, ok);
+	return root;
+};
+
 window.FotoGridsCollectionSettings = window.FotoGridsCollectionSettings || {};
+
+/** Pixels the upgrade tip needs below the mode switch before it opens there. */
+const MODE_TIP_MIN_ROOM = 220;
 
 function CollectionSettings() {
 	const isDefaultsMode = window.fotogridsSettings?.isDefaultsMode || false;
@@ -325,11 +380,15 @@ function CollectionSettings() {
 	const [autosaveValue, setAutosaveValue] = useState(
 		autosaveIsOn(window.fotogridsAdmin?.autosave)
 	);
-	// The wizard's step 3 writes the same fotogrids_settings_mode option this
-	// Segmented control mirrors, so users can flip modes without reopening it.
+	// Resolved per-user mode; the segmented control saves the user's choice.
 	const [settingsMode, setSettingsMode] = useState(
 		window.fotogridsAdmin?.settingsMode === 'advanced' ? 'advanced' : 'easy'
 	);
+	const [showModeTip, setShowModeTip] = useState(() =>
+		Boolean(window.fotogridsAdmin?.showSettingsModeTip)
+	);
+	const [modeSwitchEl, setModeSwitchEl] = useState(null);
+	const dismissModeTipRef = useRef(() => {});
 	const isProActive = window.fotogridsSettings?.isProActive || false;
 	const galleryItems = window.fotogridsSettings?.galleryItems || [];
 	const canEditPosts = window.fotogridsSettings?.canEditPosts !== false;
@@ -359,6 +418,20 @@ function CollectionSettings() {
 	const rootRef = useRef(null);
 	const isFirstRender = useRef(true);
 
+	// SETTINGS_GROUPS keeps the full tree; the visible tree is derived from
+	// the mode so switching never reloads the catalog.
+	const visibleGroups = useMemo(() => {
+		if (!settingsLoaded) {
+			return {};
+		}
+		const modeHelpers = window.FotoGridsSettingsMode;
+		return modeHelpers?.filterTreeForMode
+			? modeHelpers.filterTreeForMode(SETTINGS_GROUPS, settingsMode)
+			: SETTINGS_GROUPS;
+	}, [settingsLoaded, settingsMode]);
+	const visibleGroupsRef = useRef(visibleGroups);
+	visibleGroupsRef.current = visibleGroups;
+
 	useEffect(() => {
 		if (isFirstRender.current) {
 			isFirstRender.current = false;
@@ -380,7 +453,7 @@ function CollectionSettings() {
 			if (
 				typeof tabId !== 'string' ||
 				tabId === '' ||
-				!SETTINGS_GROUPS[tabId]
+				!visibleGroupsRef.current[tabId]
 			) {
 				return;
 			}
@@ -880,6 +953,22 @@ function CollectionSettings() {
 		} catch (_e) {
 			// findSettingByKey is best-effort; never block a save on this.
 		}
+	};
+
+	/**
+	 * Write several settings in one state update, persisting each key
+	 * through the same path as updateSetting.
+	 *
+	 * @since 1.3.0
+	 * @param {Object} values Key to value.
+	 */
+	const updateSettings = (values) => {
+		const keys = Object.keys(values || {});
+		if (keys.length === 0) {
+			return;
+		}
+		setSettings((prev) => ({ ...prev, ...values }));
+		keys.forEach((key) => saveSetting(key, values[key]));
 	};
 
 	// Updates React state only - does not persist to the form or trigger autosave.
@@ -1942,6 +2031,41 @@ function CollectionSettings() {
 				);
 				break;
 
+			case 'preset_group': {
+				const modeHelpers = window.FotoGridsSettingsMode;
+				const defaults = window.fotogridsSettings?.defaults || {};
+				const presetValues = {};
+				(modeHelpers?.presetKeys
+					? modeHelpers.presetKeys(setting)
+					: []
+				).forEach((presetKey) => {
+					presetValues[presetKey] =
+						settings[presetKey] !== undefined
+							? settings[presetKey]
+							: defaults[presetKey];
+				});
+				control = window.FotoGridsRenderSettings?.renderPresetGroup?.(
+					setting,
+					presetValues,
+					isDisabled,
+					{
+						applyPreset: (values) =>
+							updateSettings(
+								modeHelpers?.applyPresetValues
+									? modeHelpers.applyPresetValues(
+											values,
+											presetValues
+										)
+									: values
+							),
+						getFieldState,
+						renderIcon,
+						__,
+					}
+				);
+				break;
+			}
+
 			case 'info_block':
 				control = window.FotoGridsRenderSettings?.renderInfoBlock(
 					setting,
@@ -1980,9 +2104,10 @@ function CollectionSettings() {
 		return h(
 			'div',
 			{
-				key: setting.key,
-				'data-fg-setting': setting.key,
-				className: `fotogrids-setting ${isDisabled ? 'fotogrids-setting--disabled' : ''}`,
+				key: setting.key || setting.id,
+				'data-fg-setting': setting.key || setting.id,
+				'data-fg-setting-type': setting.type,
+				className: `fotogrids-setting${isDisabled ? 'fotogrids-setting--disabled' : ''}`,
 			},
 			[
 				gatedControl,
@@ -1997,6 +2122,7 @@ function CollectionSettings() {
 	// Structural entries such as `side_by_side` carry no key of their own.
 	const settingBoundaryKey = (setting) =>
 		setting.key ||
+		setting.id ||
 		(Array.isArray(setting.settings)
 			? setting.settings.map((child) => child?.key).join('+')
 			: setting.type);
@@ -2011,6 +2137,133 @@ function CollectionSettings() {
 			() => renderSettingControl(setting)
 		);
 
+	const postUserPreference = (preference, value) => {
+		const formData = new FormData();
+		formData.append('action', 'fotogrids_update_user_preference');
+		formData.append('nonce', window.fotogridsAdmin?.nonce || '');
+		formData.append('preference', preference);
+		formData.append('value', value);
+
+		return fetch(window.fotogridsAdmin?.ajaxUrl || window.ajaxurl, {
+			method: 'POST',
+			body: formData,
+		}).then((response) => {
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return response.json();
+		});
+	};
+
+	const dismissModeTip = () => {
+		if (!showModeTip) {
+			return;
+		}
+		setShowModeTip(false);
+		if (window.fotogridsAdmin) {
+			window.fotogridsAdmin.showSettingsModeTip = '';
+		}
+		postUserPreference('settings_mode_tip_dismissed', '1').catch(
+			(error) => {
+				console.warn('FotoGrids: Error dismissing mode tip:', error);
+			}
+		);
+	};
+
+	// Saves the current user's Easy / Advanced choice and rolls back on failure.
+	const handleModeChange = (nextMode) => {
+		if (
+			(nextMode !== 'easy' && nextMode !== 'advanced') ||
+			nextMode === settingsMode
+		) {
+			return;
+		}
+
+		const previousMode = settingsMode;
+		setSettingsMode(nextMode);
+		dismissModeTip();
+
+		const fail = (message) => {
+			setSettingsMode(previousMode);
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(
+					message || __('Failed to update setup mode', 'fotogrids')
+				);
+			}
+		};
+
+		postUserPreference('settings_mode', nextMode)
+			.then((data) => {
+				if (data?.success) {
+					if (window.fotogridsAdmin) {
+						window.fotogridsAdmin.settingsMode = nextMode;
+					}
+					return;
+				}
+				fail(data?.data?.message);
+			})
+			.catch((error) => {
+				console.error(
+					'FotoGrids: Error updating settings_mode:',
+					error
+				);
+				fail();
+			});
+	};
+
+	dismissModeTipRef.current = dismissModeTip;
+
+	// Upgrade tip: an interactive fg-tooltip anchored to the mode switch. Any
+	// close (Got it, Esc, outside click, mode switch) records the dismissal.
+	useEffect(() => {
+		const tooltip = window.FgTooltip;
+		if (
+			!showModeTip ||
+			!modeSwitchEl ||
+			typeof tooltip?.showInteractive !== 'function'
+		) {
+			return undefined;
+		}
+		const content = buildModeTipContent(() => dismissModeTipRef.current());
+		// Open on the side of the switch that has room for the tip.
+		const roomBelow =
+			(window.innerHeight || 0) -
+			modeSwitchEl.getBoundingClientRect().bottom;
+		const dir = roomBelow >= MODE_TIP_MIN_ROOM ? 'below' : 'above';
+		if (!tooltip.showInteractive(modeSwitchEl, content, { dir })) {
+			return undefined;
+		}
+		let seen = false;
+		let observer = null;
+		const watch = () => {
+			if (content.isConnected) {
+				seen = true;
+				return;
+			}
+			if (seen) {
+				observer?.disconnect();
+				dismissModeTipRef.current();
+			}
+		};
+		const tipEl = document.getElementById('fg-tooltip');
+		if (tipEl && typeof MutationObserver === 'function') {
+			observer = new MutationObserver(watch);
+			observer.observe(tipEl, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['hidden'],
+			});
+		}
+		watch();
+		return () => {
+			observer?.disconnect();
+			if (content.isConnected || !seen) {
+				tooltip.hideInteractive?.();
+			}
+		};
+	}, [showModeTip, modeSwitchEl]);
+
 	const renderDocumentationStrip = () => {
 		const defaultsUrl = window.fotogridsSettings?.defaultsUrl || '';
 		const documentationUrl =
@@ -2024,71 +2277,6 @@ function CollectionSettings() {
 			'<a>',
 			`<a href="${documentationUrl}" target="_blank" class="fotogrids-settings-docs-strip__link">`
 		);
-
-		// Save the new "Easy" / "Advanced" mode to the
-		// fotogrids_settings_mode option via the shared AJAX endpoint
-		// and mirror it into the localized globals so other components
-		// that re-render later see the new value.
-		const handleModeChange = (nextMode) => {
-			if (
-				(nextMode !== 'easy' && nextMode !== 'advanced') ||
-				nextMode === settingsMode
-			) {
-				return;
-			}
-
-			const previousMode = settingsMode;
-			setSettingsMode(nextMode);
-
-			const formData = new FormData();
-			formData.append('action', 'fotogrids_update_plugin_setting');
-			formData.append('nonce', window.fotogridsAdmin?.nonce || '');
-			formData.append('setting', 'fotogrids_settings_mode');
-			formData.append('value', nextMode);
-
-			fetch(window.fotogridsAdmin?.ajaxUrl || window.ajaxurl, {
-				method: 'POST',
-				body: formData,
-			})
-				.then((response) => {
-					if (!response.ok) {
-						throw new Error(
-							`HTTP error! status: ${response.status}`
-						);
-					}
-					return response.json();
-				})
-				.then((data) => {
-					if (data.success) {
-						if (window.fotogridsAdmin) {
-							window.fotogridsAdmin.settingsMode = nextMode;
-						}
-					} else {
-						setSettingsMode(previousMode);
-						if (window.fotogridsToast) {
-							window.fotogridsToast.error(
-								data.data?.message ||
-									__(
-										'Failed to update setup mode',
-										'fotogrids'
-									)
-							);
-						}
-					}
-				})
-				.catch((error) => {
-					setSettingsMode(previousMode);
-					console.error(
-						'FotoGrids: Error updating settings_mode:',
-						error
-					);
-					if (window.fotogridsToast) {
-						window.fotogridsToast.error(
-							__('Failed to update setup mode', 'fotogrids')
-						);
-					}
-				});
-		};
 
 		const handleAutosaveToggle = (e) => {
 			e.preventDefault();
@@ -2247,6 +2435,7 @@ function CollectionSettings() {
 									'div',
 									{
 										key: 'segmented',
+										ref: setModeSwitchEl,
 										className:
 											'fotogrids-segmented fotogrids-segmented--size-small fotogrids-segmented--variant-rounded',
 										role: 'radiogroup',
@@ -2261,11 +2450,11 @@ function CollectionSettings() {
 											? null
 											: m === 'advanced'
 												? __(
-														'Switch to Advanced for fine-grained controls',
+														'Switch to Advanced editing mode for fine-grained controls',
 														'fotogrids'
 													)
 												: __(
-														'Switch to Easy to show only the essential controls',
+														'Switch to Easy editing mode to show only the essential controls',
 														'fotogrids'
 													);
 
@@ -2367,7 +2556,7 @@ function CollectionSettings() {
 	};
 
 	const renderTabContent = (groupId) => {
-		const group = SETTINGS_GROUPS[groupId];
+		const group = visibleGroups[groupId];
 		if (!group || !shouldDisplayTab(group)) {
 			return null;
 		}
@@ -2842,6 +3031,14 @@ function CollectionSettings() {
 		);
 	}
 
+	const resolvedActiveTab = window.FotoGridsSettingsMode?.resolveActiveTab
+		? window.FotoGridsSettingsMode.resolveActiveTab(
+				visibleGroups,
+				activeTab,
+				shouldDisplayTab
+			)
+		: activeTab;
+
 	return h(
 		'div',
 		{
@@ -2862,7 +3059,7 @@ function CollectionSettings() {
 							key: 'tabs',
 							className: 'fotogrids-settings-tabs',
 						},
-						Object.values(SETTINGS_GROUPS)
+						Object.values(visibleGroups)
 							.filter((group) => shouldDisplayTab(group))
 							.map((group) =>
 								h(
@@ -2870,7 +3067,7 @@ function CollectionSettings() {
 									{
 										key: group.id,
 										type: 'button',
-										className: `fotogrids-settings-tab ${activeTab === group.id ? 'fg-is-active' : ''} ${!isFreeTier(group) && !isProActive ? 'is-pro' : ''}`,
+										className: `fotogrids-settings-tab ${resolvedActiveTab === group.id ? 'fg-is-active' : ''} ${!isFreeTier(group) && !isProActive ? 'is-pro' : ''}`,
 										onClick: (e) => {
 											e.preventDefault();
 											e.stopPropagation();
@@ -2944,10 +3141,10 @@ function CollectionSettings() {
 					key: 'content',
 				},
 				(() => {
-					const tabContent = renderTabContent(activeTab);
-					return Array.isArray(tabContent)
-						? tabContent
-						: [tabContent];
+					const tabContent = renderTabContent(resolvedActiveTab);
+					return (
+						Array.isArray(tabContent) ? tabContent : [tabContent]
+					).filter(Boolean);
 				})()
 			),
 

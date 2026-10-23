@@ -4,6 +4,7 @@ import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import ResponsivenessTab from '../plugin-settings/tabs/ResponsivenessTab';
 import DefaultsTab from '../plugin-settings/tabs/DefaultsTab';
+import SetupModePanel from '../plugin-settings/setup-mode/SetupModePanel';
 import AdvancedTab from '../plugin-settings/tabs/AdvancedTab';
 import MaintenanceTab from '../plugin-settings/tabs/MaintenanceTab';
 import PermissionsManagerTab from '../plugin-settings/tabs/PermissionsManagerTab';
@@ -384,6 +385,7 @@ const PluginSettingsPage = () => {
 			case 'defaults':
 				return (
 					<>
+						<SetupModePanel />
 						<Panel
 							title={__('Defaults', 'fotogrids')}
 							description={__(
