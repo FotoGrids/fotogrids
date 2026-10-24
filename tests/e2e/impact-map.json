@@ -48,6 +48,7 @@
 		"src/includes/admin/**": "@admin",
 		"src/includes/metaboxes/**": "@admin",
 		"src/includes/modules/Metaboxes/**": "@admin",
+		"src/includes/modules/Walkthrough/**": "@admin",
 		"src/includes/class-admin-init.php": "@admin",
 		"src/assets/admin/**": "@admin",
 		"src/includes/watermark/**": "*",

@@ -7,11 +7,17 @@
 
 declare( strict_types=1 );
 
+use FotoGrids\Admin\User_Preferences;
+use FotoGrids\Hooks\Filters_Admin;
+use FotoGrids\Hooks\Filters_Settings;
 use FotoGrids\Migrations\Settings_Mode_Tip;
 use FotoGrids\Settings\Settings_Mode;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/stubs/wp-options.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/hooks/filters/class-filters-admin.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/hooks/filters/class-filters-settings.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-user-preferences.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-mode.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/interface-migration.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/migrations/class-settings-mode-tip.php';
@@ -22,10 +28,13 @@ final class SettingsModeTest extends TestCase {
 		$GLOBALS['fotogrids_test_options']     = array();
 		$GLOBALS['fotogrids_test_user_meta']   = array();
 		$GLOBALS['fotogrids_test_fail_writes'] = false;
+		$GLOBALS['fotogrids_test_filters']     = array(
+			Filters_Admin::USER_PREFERENCES => array( Settings_Mode::class, 'register_preferences' ),
+		);
 	}
 
 	protected function tearDown(): void {
-		unset( $GLOBALS['fotogrids_test_options'], $GLOBALS['fotogrids_test_user_meta'], $GLOBALS['fotogrids_test_fail_writes'] );
+		unset( $GLOBALS['fotogrids_test_options'], $GLOBALS['fotogrids_test_user_meta'], $GLOBALS['fotogrids_test_fail_writes'], $GLOBALS['fotogrids_test_filters'] );
 	}
 
 	private function set_site_mode( $value ): void {
@@ -251,17 +260,17 @@ final class SettingsModeTest extends TestCase {
 		$this->assertSame(
 			array(
 				'ok'    => false,
-				'error' => Settings_Mode::ERROR_FORBIDDEN,
+				'error' => User_Preferences::ERROR_FORBIDDEN,
 			),
-			Settings_Mode::handle_preference_request( 0, true, 'settings_mode', 'advanced' )
+			User_Preferences::handle_request( 0, true, 'settings_mode', 'advanced' )
 		);
 		$this->assertSame( array(), $GLOBALS['fotogrids_test_user_meta'] );
 	}
 
 	public function test_preference_request_rejects_a_user_without_read(): void {
-		$result = Settings_Mode::handle_preference_request( 5, false, 'settings_mode', 'advanced' );
+		$result = User_Preferences::handle_request( 5, false, 'settings_mode', 'advanced' );
 
-		$this->assertSame( Settings_Mode::ERROR_FORBIDDEN, $result['error'] );
+		$this->assertSame( User_Preferences::ERROR_FORBIDDEN, $result['error'] );
 		$this->assertFalse( $result['ok'] );
 		$this->assertSame( array(), $GLOBALS['fotogrids_test_user_meta'] );
 	}
@@ -275,9 +284,9 @@ final class SettingsModeTest extends TestCase {
 		$this->assertSame(
 			array(
 				'ok'    => false,
-				'error' => Settings_Mode::ERROR_INVALID,
+				'error' => User_Preferences::ERROR_INVALID,
 			),
-			Settings_Mode::handle_preference_request( 5, true, $preference, $value )
+			User_Preferences::handle_request( 5, true, $preference, $value )
 		);
 		$this->assertSame( array(), $GLOBALS['fotogrids_test_user_meta'] );
 	}
@@ -296,9 +305,9 @@ final class SettingsModeTest extends TestCase {
 	public function test_preference_request_reports_a_failed_write(): void {
 		$GLOBALS['fotogrids_test_fail_writes'] = true;
 
-		$result = Settings_Mode::handle_preference_request( 5, true, 'settings_mode', 'advanced' );
+		$result = User_Preferences::handle_request( 5, true, 'settings_mode', 'advanced' );
 
-		$this->assertSame( Settings_Mode::ERROR_FAILED, $result['error'] );
+		$this->assertSame( User_Preferences::ERROR_FAILED, $result['error'] );
 	}
 
 	public function test_preference_request_writes_only_that_users_meta(): void {
@@ -309,14 +318,14 @@ final class SettingsModeTest extends TestCase {
 				'ok'    => true,
 				'value' => 'advanced',
 			),
-			Settings_Mode::handle_preference_request( 5, true, 'settings_mode', 'advanced' )
+			User_Preferences::handle_request( 5, true, 'settings_mode', 'advanced' )
 		);
 		$this->assertSame(
 			array(
 				'ok'    => true,
 				'value' => '1',
 			),
-			Settings_Mode::handle_preference_request( 5, true, 'settings_mode_tip_dismissed', '1' )
+			User_Preferences::handle_request( 5, true, 'settings_mode_tip_dismissed', '1' )
 		);
 
 		$this->assertSame(
@@ -329,5 +338,40 @@ final class SettingsModeTest extends TestCase {
 			$GLOBALS['fotogrids_test_user_meta']
 		);
 		$this->assertSame( 'easy', $GLOBALS['fotogrids_test_options']['fotogrids_settings_mode'] );
+	}
+
+	public function test_tip_follows_the_show_filter(): void {
+		$GLOBALS['fotogrids_test_options']['fotogrids_settings_mode_tip'] = '1';
+		$GLOBALS['fotogrids_test_filters'][ Filters_Settings::MODE_TIP_SHOW ] = static function () {
+			return false;
+		};
+
+		$this->assertFalse( Settings_Mode::should_show_tip( 5 ) );
+	}
+
+	public function test_tip_ignores_a_non_boolean_filter_result(): void {
+		$GLOBALS['fotogrids_test_options']['fotogrids_settings_mode_tip'] = '1';
+		$GLOBALS['fotogrids_test_filters'][ Filters_Settings::MODE_TIP_SHOW ] = static function () {
+			return 'yes';
+		};
+
+		$this->assertFalse( Settings_Mode::should_show_tip( 5 ) );
+	}
+
+	public function test_register_preferences_keeps_other_handlers(): void {
+		$other    = array(
+			'validate' => 'strval',
+			'save'     => '__return_true',
+		);
+		$handlers = Settings_Mode::register_preferences( array( 'other' => $other ) );
+
+		$this->assertSame( array( 'other', 'settings_mode', 'settings_mode_tip_dismissed' ), array_keys( $handlers ) );
+		$this->assertSame( $other, $handlers['other'] );
+		$this->assertSame( 'advanced', call_user_func( $handlers['settings_mode']['validate'], 'advanced' ) );
+		$this->assertNull( call_user_func( $handlers['settings_mode_tip_dismissed']['validate'], '0' ) );
+	}
+
+	public function test_register_preferences_replaces_a_non_array(): void {
+		$this->assertSame( array( 'settings_mode', 'settings_mode_tip_dismissed' ), array_keys( Settings_Mode::register_preferences( null ) ) );
 	}
 }

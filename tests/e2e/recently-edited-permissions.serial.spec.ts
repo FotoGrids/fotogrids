@@ -58,6 +58,7 @@ function fg_recent_make( $login, $type, $status, $title, $age ) {
 foreach ( array( '${ VIEWER }' => 'subscriber', '${ AUTHOR }' => 'author' ) as $login => $role ) {
 	$id = username_exists( $login ) ?: wp_insert_user( array( 'user_login' => $login, 'user_pass' => '${ PASSWORD }', 'user_email' => "$login@example.com", 'role' => $role ) );
 	wp_set_password( '${ PASSWORD }', $id );
+	update_user_meta( $id, 'fotogrids_walkthroughs', array( 'gallery' => 'done', 'album' => 'done', 'dashboard' => 'done' ) );
 	( new WP_User( $id ) )->add_cap( 'manage_fotogrids' );
 }
 ( new WP_User( username_exists( '${ AUTHOR }' ) ) )->add_cap( 'view_fotogrids_stats' );
@@ -65,6 +66,7 @@ foreach ( array( '${ VIEWER }' => 'subscriber', '${ AUTHOR }' => 'author' ) as $
 foreach ( array( '${ STATS_ONLY }' => array( 'view_fotogrids_stats' ), '${ GALLERY_ONLY }' => array( 'edit_fotogrids_galleries', 'edit_fotogrids_gallery', 'read_fotogrids_gallery' ) ) as $login => $caps ) {
 	$id = username_exists( $login ) ?: wp_insert_user( array( 'user_login' => $login, 'user_pass' => '${ PASSWORD }', 'user_email' => "$login@example.com", 'role' => 'subscriber' ) );
 	wp_set_password( '${ PASSWORD }', $id );
+	update_user_meta( $id, 'fotogrids_walkthroughs', array( 'gallery' => 'done', 'album' => 'done', 'dashboard' => 'done' ) );
 	foreach ( $caps as $cap ) {
 		( new WP_User( $id ) )->add_cap( $cap );
 	}

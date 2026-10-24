@@ -33,6 +33,7 @@ const MetaboxHeader = ({
 			<button
 				type="button"
 				className={`fotogrids-gallery-tab ${activeTab === 'manage' ? 'fotogrids-gallery-tab--active' : ''}`}
+				data-fg-walkthrough="gallery-tab-manage"
 				onClick={() => onTabSwitch('manage')}
 			>
 				<span className="fotogrids-icon" data-icon="edit"></span>
@@ -41,6 +42,7 @@ const MetaboxHeader = ({
 			<button
 				type="button"
 				className={`fotogrids-gallery-tab ${activeTab === 'preview' ? 'fotogrids-gallery-tab--active' : ''}`}
+				data-fg-walkthrough="gallery-tab-preview"
 				onClick={() => onTabSwitch('preview')}
 			>
 				<span className="fotogrids-icon" data-icon="preview"></span>

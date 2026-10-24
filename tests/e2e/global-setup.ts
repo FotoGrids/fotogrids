@@ -188,6 +188,12 @@ async function globalSetup(): Promise< void > {
 	const adminPass = process.env.WP_ADMIN_PASS ?? 'password';
 	const logins = ensureUsers( adminUser );
 
+	// Tours open by themselves for first-time users and would cover the
+	// controls other specs click. The walkthrough spec uses fresh users.
+	wpEval(
+		"foreach ( get_users( array( 'fields' => 'ID' ) ) as $fg_id ) { update_user_meta( $fg_id, 'fotogrids_walkthroughs', array( 'gallery' => 'done', 'album' => 'done', 'dashboard' => 'done' ) ); }"
+	);
+
 	const roles: Partial< Record< Role, RoleSession > > = {};
 	for ( const role of ROLES ) {
 		roles[ role ] = await captureSession(

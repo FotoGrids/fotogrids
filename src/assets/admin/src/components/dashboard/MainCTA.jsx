@@ -33,7 +33,10 @@ const CtaReason = () =>
 const MainCTA = ({ galleriesCount, itemsCount }) => {
 	if (galleriesCount === 0) {
 		return (
-			<div className="fotogrids-admin-block-card fg-abc-main-cta">
+			<div
+				className="fotogrids-admin-block-card fg-abc-main-cta"
+				data-fg-walkthrough="dashboard-start"
+			>
 				<div className="fotogrids-admin-block-card-content">
 					<h3>
 						<span>{__('Create Your', 'fotogrids')} </span>
@@ -58,7 +61,10 @@ const MainCTA = ({ galleriesCount, itemsCount }) => {
 	}
 
 	return (
-		<div className="fotogrids-admin-block-card fg-abc-main-cta">
+		<div
+			className="fotogrids-admin-block-card fg-abc-main-cta"
+			data-fg-walkthrough="dashboard-start"
+		>
 			<div className="fotogrids-admin-block-card-content">
 				<h3>{__('Grow Your Gallery', 'fotogrids')}</h3>
 				<p>

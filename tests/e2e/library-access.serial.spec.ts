@@ -236,7 +236,8 @@ test.describe( 'without the filter', () => {
 add_role( 'fg_library_manage_only', 'FG manage only', array( 'read' => true, 'manage_fotogrids' => true ) );
 $id = username_exists( 'fg-library-manage' ) ?: wp_insert_user( array( 'user_login' => 'fg-library-manage', 'user_pass' => '${ PASSWORD }', 'user_email' => 'fg-library-manage@example.com' ) );
 ( new WP_User( $id ) )->set_role( 'fg_library_manage_only' );
-wp_set_password( '${ PASSWORD }', $id );` );
+wp_set_password( '${ PASSWORD }', $id );
+update_user_meta( $id, 'fotogrids_walkthroughs', array( 'gallery' => 'done', 'album' => 'done', 'dashboard' => 'done' ) );` );
 		} );
 
 		test.afterAll( () => {

@@ -2384,6 +2384,32 @@ function CollectionSettings() {
 					[
 						!isDefaultsMode &&
 							h(
+								'button',
+								{
+									key: 'tour',
+									type: 'button',
+									className:
+										'fotogrids-settings-docs-strip__link fotogrids-settings-docs-strip__tour',
+									'data-fg-tooltip': __(
+										'Take a tour of this screen',
+										'fotogrids'
+									),
+									'data-fg-tooltip-dir': 'below',
+									'aria-label': __(
+										'Take a tour of this screen',
+										'fotogrids'
+									),
+									onClick: () =>
+										document.dispatchEvent(
+											new CustomEvent(
+												'fotogrids:walkthrough:start'
+											)
+										),
+								},
+								__('Tour', 'fotogrids')
+							),
+						!isDefaultsMode &&
+							h(
 								'a',
 								{
 									key: 'defaults-link',
@@ -3067,6 +3093,7 @@ function CollectionSettings() {
 									{
 										key: group.id,
 										type: 'button',
+										'data-fg-settings-tab': group.id,
 										className: `fotogrids-settings-tab ${resolvedActiveTab === group.id ? 'fg-is-active' : ''} ${!isFreeTier(group) && !isProActive ? 'is-pro' : ''}`,
 										onClick: (e) => {
 											e.preventDefault();

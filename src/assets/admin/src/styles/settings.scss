@@ -238,6 +238,12 @@ $settings-sidebar-width: 200px;
 		}
 	}
 
+	&__tour {
+		background: transparent;
+		font-family: inherit;
+		cursor: pointer;
+	}
+
 	&__buttons {
 		flex: 1;
 		display: flex;

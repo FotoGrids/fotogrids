@@ -61,7 +61,10 @@ const CreateOption = ({ href, icon, label, access }) => {
 
 const CreateOptions = () => {
 	return (
-		<div className="fotogrids-admin-block-card fg-abc-create-options">
+		<div
+			className="fotogrids-admin-block-card fg-abc-create-options"
+			data-fg-walkthrough="dashboard-create"
+		>
 			<div className="fotogrids-admin-block-card-header">
 				<Icon
 					name="plus_square"

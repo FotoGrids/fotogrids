@@ -1,0 +1,131 @@
+// Walkthrough step bubble and target ring. Same surface as the fg-tooltip
+// interactive popover.
+
+.fotogrids-walkthrough-bubble {
+	--fotogrids-walkthrough-bg: rgba(20, 20, 20, 0.94);
+	--fotogrids-walkthrough-color: #ffffff;
+	--fotogrids-walkthrough-muted: rgba(255, 255, 255, 0.72);
+	--fotogrids-walkthrough-arrow-size: 7px;
+
+	position: fixed;
+	z-index: 99998;
+	box-sizing: border-box;
+	padding: 14px 16px 12px;
+	border-radius: 8px;
+	background: var(--fotogrids-walkthrough-bg);
+	color: var(--fotogrids-walkthrough-color);
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+	font-size: 13px;
+	line-height: 1.5;
+	text-align: start;
+	opacity: 0;
+
+	&.is-placed {
+		opacity: 1;
+	}
+
+	&::before {
+		content: "";
+		position: absolute;
+		left: var(--fotogrids-walkthrough-arrow);
+		width: 0;
+		height: 0;
+		border: var(--fotogrids-walkthrough-arrow-size) solid transparent;
+		transform: translateX(-50%);
+	}
+
+	&[data-placement="below"]::before {
+		bottom: 100%;
+		border-bottom-color: var(--fotogrids-walkthrough-bg);
+	}
+
+	&[data-placement="above"]::before {
+		top: 100%;
+		border-top-color: var(--fotogrids-walkthrough-bg);
+	}
+
+	&__count {
+		margin: 0 0 4px;
+		color: var(--fotogrids-walkthrough-muted);
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+	}
+
+	&__title {
+		margin: 0 0 6px;
+		padding: 0;
+		color: inherit;
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.35;
+
+		&:focus {
+			outline: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--fg-blue-light);
+			outline-offset: 2px;
+		}
+	}
+
+	&__body {
+		margin: 0 0 12px;
+		color: inherit;
+		font-size: 13px;
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+
+	&__nav {
+		display: flex;
+		gap: 8px;
+		margin-inline-start: auto;
+	}
+
+	.fotogrids-walkthrough-bubble__skip.fg-button {
+		padding-inline: 0;
+		color: var(--fotogrids-walkthrough-muted);
+
+		&:hover,
+		&:focus-visible {
+			color: var(--fotogrids-walkthrough-color);
+		}
+	}
+
+	.fotogrids-walkthrough-bubble__back.fg-button {
+		border-color: rgba(255, 255, 255, 0.35);
+		background: transparent;
+		color: var(--fotogrids-walkthrough-color);
+
+		&:hover,
+		&:focus-visible {
+			border-color: var(--fotogrids-walkthrough-color);
+			background: rgba(255, 255, 255, 0.08);
+			color: var(--fotogrids-walkthrough-color);
+		}
+	}
+}
+
+.fotogrids-walkthrough-spotlight {
+	position: fixed;
+	z-index: 99997;
+	box-sizing: border-box;
+	border: 2px solid var(--fg-blue);
+	border-radius: 6px;
+	box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.fotogrids-walkthrough-bubble {
+		transition: opacity 140ms ease;
+	}
+}

@@ -74,6 +74,7 @@ const FileUploader = ({ onUploadComplete }) => {
 
 	return (
 		<div
+			data-fg-walkthrough="dashboard-upload"
 			className={`fotogrids-admin-block-card fg-abc-uploader${
 				canCreate ? '' : ' is-disabled'
 			}`}
