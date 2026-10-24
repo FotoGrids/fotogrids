@@ -34,6 +34,7 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 	const MODE_ATTR = 'data-fg-random-mode';
 	const MODE_REFETCH = 'refetch';
 	const MODE_REORDER = 'reorder';
+	const SEQUENCE_ATTR = 'data-fg-sequence-index';
 
 	/**
 	 * How long the items stay hidden waiting for the fetch. Past this the
@@ -122,6 +123,31 @@ import { injectMissingStyles } from '../../_helpers/stylesheets.js';
 			root.insertBefore(order[i], slots[i]);
 			root.removeChild(slots[i]);
 		}
+
+		renumberSequence(order);
+	}
+
+	/**
+	 * Hands the sequence indices the nodes carry back out in their new DOM
+	 * order, so the Lightbox walks the order on screen. The set of indices is
+	 * unchanged, which keeps slides fetched for unloaded pages in place.
+	 *
+	 * @param {Element[]} nodes In DOM order.
+	 */
+	function renumberSequence(nodes) {
+		const numbered = nodes.filter(function (node) {
+			return node.hasAttribute(SEQUENCE_ATTR);
+		});
+		const indices = numbered
+			.map(function (node) {
+				return parseInt(node.getAttribute(SEQUENCE_ATTR), 10);
+			})
+			.sort(function (a, b) {
+				return a - b;
+			});
+		numbered.forEach(function (node, i) {
+			node.setAttribute(SEQUENCE_ATTR, String(indices[i]));
+		});
 	}
 
 	/**
