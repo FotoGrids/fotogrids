@@ -213,6 +213,24 @@ class CustomCropAlignmentTest extends WP_UnitTestCase {
 		$this->assertSame( 'blue', $this->stripe_at_centre( $path ) );
 	}
 
+	public function test_srcset_offers_only_crops_taken_at_the_same_position(): void {
+		$this->cropped_gallery( 100, 100, 'center' );
+		$this->cropped_gallery( 100, 100, 'top-left' );
+		$this->cropped_gallery( 200, 200, 'top-left' );
+		$attachment = $this->striped_image( 'fg-crop-srcset', true );
+
+		$off_centre = (string) wp_get_attachment_image_srcset( $attachment, 'fotogrids_custom_100x100_crop_top_left' );
+		$this->assertStringContainsString( '-200x200-top-left.png 200w', $off_centre );
+		$this->assertStringNotContainsString( '-100x100.png', $off_centre );
+		$this->assertStringNotContainsString( '-150x150.png', $off_centre );
+
+		foreach ( array( 'fotogrids_custom_100x100_crop', 'thumbnail' ) as $centred ) {
+			$srcset = (string) wp_get_attachment_image_srcset( $attachment, $centred );
+			$this->assertStringContainsString( '-150x150.png 150w', $srcset, $centred );
+			$this->assertStringNotContainsString( '-top-left', $srcset, $centred );
+		}
+	}
+
 	public function test_a_size_registered_by_someone_else_keeps_the_core_file_name(): void {
 		add_image_size( 'theme_top_crop', 120, 120, array( 'center', 'top' ) );
 		$attachment = $this->striped_image( 'fg-crop-theme', false );

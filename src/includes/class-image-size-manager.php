@@ -82,6 +82,7 @@ final class Image_Size_Manager {
 		add_action( 'updated_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
 		add_action( 'deleted_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
 		add_filter( 'wp_image_editors', array( __CLASS__, 'filter_image_editors' ) );
+		add_filter( 'wp_calculate_image_srcset_meta', array( __CLASS__, 'filter_srcset_meta' ), 10, 3 );
 	}
 
 	/**
@@ -476,6 +477,47 @@ final class Image_Size_Manager {
 			},
 			$editors
 		);
+	}
+
+	/**
+	 * Keep only the sub-sizes cropped at the same position as the `src` image as srcset candidates.
+	 *
+	 * WordPress offers every sub-size with the image's aspect ratio, so a centre
+	 * crop and an off-centre crop of the same dimensions would stand in for each other.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed  $image_meta Attachment metadata.
+	 * @param  mixed  $size_array Width and height of the image.
+	 * @param  string $image_src  URL of the image in the src attribute.
+	 * @return mixed
+	 */
+	public static function filter_srcset_meta( $image_meta, $size_array, $image_src ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		if ( ! is_array( $image_meta ) || empty( $image_meta['sizes'] ) || ! is_array( $image_meta['sizes'] ) ) {
+			return $image_meta;
+		}
+
+		$position = self::file_crop_position( (string) $image_src );
+
+		foreach ( $image_meta['sizes'] as $slug => $size ) {
+			if ( is_array( $size ) && isset( $size['file'] ) && self::file_crop_position( (string) $size['file'] ) !== $position ) {
+				unset( $image_meta['sizes'][ $slug ] );
+			}
+		}
+
+		return $image_meta;
+	}
+
+	/**
+	 * Crop position named in a FotoGrids sub-size file name or URL.
+	 *
+	 * @since  1.3.0
+	 * @param  string $file File name, path or URL.
+	 * @return string 'top-left', 'center-right', … ; empty when the name carries none.
+	 */
+	private static function file_crop_position( string $file ): string {
+		$path = (string) strtok( $file, '?#' );
+
+		return preg_match( '/-\d+x\d+-((?:top|center|bottom)-(?:left|center|right))(?:-fgwm)?\.[a-z0-9]+$/i', $path, $match ) ? strtolower( $match[1] ) : '';
 	}
 
 	/**
