@@ -81,6 +81,8 @@ final class Image_Size_Manager {
 		add_action( 'added_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
 		add_action( 'updated_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
 		add_action( 'deleted_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
+		add_filter( 'wp_image_editors', array( __CLASS__, 'filter_image_editors' ) );
+		add_filter( 'wp_calculate_image_srcset_meta', array( __CLASS__, 'filter_srcset_meta' ), 10, 3 );
 	}
 
 	/**
@@ -321,7 +323,15 @@ final class Image_Size_Manager {
 		if ( 'custom' === $setting_value && null !== $custom_slug ) {
 			// Custom size: try the specific slug first, then the role fallback chain
 			$fallback = 'full' === $role ? self::FALLBACK_FULL : self::FALLBACK_THUMBNAIL;
-			return array_merge( array( $custom_slug ), $fallback );
+			$own      = array( $custom_slug );
+
+			// Off-centre crops generated before 1.3.0 are filed under the slug without the alignment.
+			$legacy = preg_replace( '/^(' . self::CUSTOM_SLUG_PREFIX . '\d+x\d+_crop)_[a-z_]+$/', '$1', $custom_slug );
+			if ( is_string( $legacy ) && $legacy !== $custom_slug ) {
+				$own[] = $legacy;
+			}
+
+			return array_merge( $own, $fallback );
 		}
 
 		if ( self::SLUG_THUMBNAIL === $setting_value ) {
@@ -362,20 +372,152 @@ final class Image_Size_Manager {
 	/**
 	 * Compute the deterministic slug for a gallery-custom size.
 	 *
-	 * Format: fotogrids_custom_{W}x{H}_{crop_flag}
+	 * Format: fotogrids_custom_{W}x{H}_{crop_flag}[_{alignment}]
 	 * Examples:
-	 *   400×300 hard-crop  → fotogrids_custom_400x300_crop
-	 *   800×0 no-crop      → fotogrids_custom_800x0_nocrop
+	 *   400×300 hard-crop, centre    → fotogrids_custom_400x300_crop
+	 *   400×300 hard-crop, top left  → fotogrids_custom_400x300_crop_top_left
+	 *   800×0 no-crop                → fotogrids_custom_800x0_nocrop
 	 *
 	 * @since  1.0.0
+	 * @since  1.3.0 Added the `$alignment` parameter.
 	 * @param  int    $width
 	 * @param  int    $height
 	 * @param  bool   $crop
+	 * @param  string $alignment Crop alignment, e.g. 'center', 'top-left'.
 	 * @return string
 	 */
-	public static function compute_custom_slug( int $width, int $height, bool $crop ): string {
+	public static function compute_custom_slug( int $width, int $height, bool $crop, string $alignment = 'center' ): string {
 		$crop_flag = $crop ? 'crop' : 'nocrop';
-		return self::CUSTOM_SLUG_PREFIX . "{$width}x{$height}_{$crop_flag}";
+		$slug      = self::CUSTOM_SLUG_PREFIX . "{$width}x{$height}_{$crop_flag}";
+		$suffix    = self::crop_suffix( self::build_crop_param( $crop, $alignment ) );
+
+		return '' === $suffix ? $slug : $slug . '_' . str_replace( '-', '_', $suffix );
+	}
+
+	/**
+	 * Name of an off-centre crop position, as used in sub-size file names.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $crop WP crop parameter: bool or array( x, y ).
+	 * @return string 'top-left', 'center-right', … ; empty for no crop or a centred crop.
+	 */
+	public static function crop_suffix( $crop ): string {
+		if ( ! is_array( $crop ) || 2 !== count( $crop ) ) {
+			return '';
+		}
+
+		list( $x, $y ) = array_values( $crop );
+		if ( 'center' === $x && 'center' === $y ) {
+			return '';
+		}
+
+		return $y . '-' . $x;
+	}
+
+	/**
+	 * File name suffix for a sub-size that matches an off-centre FotoGrids crop size.
+	 *
+	 * WordPress names every sub-size file after its dimensions alone, so two sizes
+	 * with equal dimensions and different crop positions would share one file.
+	 *
+	 * @since  1.3.0
+	 * @param  array<string, mixed> $size_data Sub-size data passed to WP_Image_Editor::make_subsize().
+	 * @return string Crop position to append, or empty to keep the core file name.
+	 */
+	public static function subsize_file_suffix( array $size_data ): string {
+		$crop = $size_data['crop'] ?? false;
+		if ( '' === self::crop_suffix( $crop ) ) {
+			return '';
+		}
+
+		$width  = (int) ( $size_data['width'] ?? 0 );
+		$height = (int) ( $size_data['height'] ?? 0 );
+
+		foreach ( wp_get_registered_image_subsizes() as $slug => $registered ) {
+			if ( 0 === strpos( (string) $slug, 'fotogrids_' )
+				&& (int) $registered['width'] === $width
+				&& (int) $registered['height'] === $height
+				&& $registered['crop'] === $crop ) {
+				return self::crop_suffix( $crop );
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Replace core's GD and Imagick editors with subclasses that name off-centre crop files apart.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed $editors Image editor class names.
+	 * @return mixed
+	 */
+	public static function filter_image_editors( $editors ) {
+		if ( ! is_array( $editors ) ) {
+			return $editors;
+		}
+
+		$available = array(
+			'WP_Image_Editor_GD'      => array( Image_Editors\Image_Editor_GD::class, 'class-image-editor-gd.php' ),
+			'WP_Image_Editor_Imagick' => array( Image_Editors\Image_Editor_Imagick::class, 'class-image-editor-imagick.php' ),
+		);
+
+		$replacements = array();
+		foreach ( $available as $core => $editor ) {
+			if ( in_array( $core, $editors, true ) && class_exists( $core, false ) ) {
+				require_once __DIR__ . '/image-editors/trait-crop-suffix.php';
+				require_once __DIR__ . '/image-editors/' . $editor[1];
+				$replacements[ $core ] = $editor[0];
+			}
+		}
+
+		return array_map(
+			static function ( $editor ) use ( $replacements ) {
+				return is_string( $editor ) && isset( $replacements[ $editor ] ) ? $replacements[ $editor ] : $editor;
+			},
+			$editors
+		);
+	}
+
+	/**
+	 * Keep only the sub-sizes cropped at the same position as the `src` image as srcset candidates.
+	 *
+	 * WordPress offers every sub-size with the image's aspect ratio, so a centre
+	 * crop and an off-centre crop of the same dimensions would stand in for each other.
+	 *
+	 * @since  1.3.0
+	 * @param  mixed  $image_meta Attachment metadata.
+	 * @param  mixed  $size_array Width and height of the image.
+	 * @param  string $image_src  URL of the image in the src attribute.
+	 * @return mixed
+	 */
+	public static function filter_srcset_meta( $image_meta, $size_array, $image_src ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		if ( ! is_array( $image_meta ) || empty( $image_meta['sizes'] ) || ! is_array( $image_meta['sizes'] ) ) {
+			return $image_meta;
+		}
+
+		$position = self::file_crop_position( (string) $image_src );
+
+		foreach ( $image_meta['sizes'] as $slug => $size ) {
+			if ( is_array( $size ) && isset( $size['file'] ) && self::file_crop_position( (string) $size['file'] ) !== $position ) {
+				unset( $image_meta['sizes'][ $slug ] );
+			}
+		}
+
+		return $image_meta;
+	}
+
+	/**
+	 * Crop position named in a FotoGrids sub-size file name or URL.
+	 *
+	 * @since  1.3.0
+	 * @param  string $file File name, path or URL.
+	 * @return string 'top-left', 'center-right', … ; empty when the name carries none.
+	 */
+	private static function file_crop_position( string $file ): string {
+		$path = (string) strtok( $file, '?#' );
+
+		return preg_match( '/-\d+x\d+-((?:top|center|bottom)-(?:left|center|right))(?:-fgwm)?\.[a-z0-9]+$/i', $path, $match ) ? strtolower( $match[1] ) : '';
 	}
 
 	/**
@@ -533,7 +675,7 @@ final class Image_Size_Manager {
 	): string {
 		_deprecated_function( __METHOD__, '1.1.4', 'FotoGrids\\Image_Size_Manager::resolve_setting_slugs()' );
 
-		$slug       = self::compute_custom_slug( $width, $height, $crop );
+		$slug       = self::compute_custom_slug( $width, $height, $crop, $alignment );
 		$crop_param = self::build_crop_param( $crop, $alignment );
 
 		add_image_size( $slug, $width, $height, $crop_param );
@@ -653,12 +795,14 @@ final class Image_Size_Manager {
 	 * @return array{slug: string, width: int, height: int, crop: bool, alignment: string}
 	 */
 	private static function custom_size_spec( int $width, int $height, bool $crop, $alignment ): array {
+		$alignment = is_string( $alignment ) ? $alignment : 'center';
+
 		return array(
-			'slug'      => self::compute_custom_slug( $width, $height, $crop ),
+			'slug'      => self::compute_custom_slug( $width, $height, $crop, $alignment ),
 			'width'     => $width,
 			'height'    => $height,
 			'crop'      => $crop,
-			'alignment' => is_string( $alignment ) ? $alignment : 'center',
+			'alignment' => $alignment,
 		);
 	}
 
@@ -785,8 +929,9 @@ final class Image_Size_Manager {
 	 *   - true                → center-center crop
 	 *   - ['left','top']      → positional crop
 	 *
-	 * FotoGrids alignment values: 'center', 'top', 'bottom', 'left', 'right',
-	 * 'top-left', 'top-right', 'bottom-left', 'bottom-right'.
+	 * FotoGrids alignment values: 'center', 'top-left', 'top-center', 'top-right',
+	 * 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right',
+	 * and the plugin Media settings' 'top', 'bottom', 'left', 'right'.
 	 *
 	 * @since  1.0.0
 	 * @param  bool   $crop
@@ -799,15 +944,19 @@ final class Image_Size_Manager {
 		}
 
 		$map = array(
-			'center'       => array( 'center', 'center' ),
-			'top'          => array( 'center', 'top' ),
-			'bottom'       => array( 'center', 'bottom' ),
-			'left'         => array( 'left', 'center' ),
-			'right'        => array( 'right', 'center' ),
-			'top-left'     => array( 'left', 'top' ),
-			'top-right'    => array( 'right', 'top' ),
-			'bottom-left'  => array( 'left', 'bottom' ),
-			'bottom-right' => array( 'right', 'bottom' ),
+			'center'        => array( 'center', 'center' ),
+			'top'           => array( 'center', 'top' ),
+			'top-center'    => array( 'center', 'top' ),
+			'bottom'        => array( 'center', 'bottom' ),
+			'bottom-center' => array( 'center', 'bottom' ),
+			'left'          => array( 'left', 'center' ),
+			'center-left'   => array( 'left', 'center' ),
+			'right'         => array( 'right', 'center' ),
+			'center-right'  => array( 'right', 'center' ),
+			'top-left'      => array( 'left', 'top' ),
+			'top-right'     => array( 'right', 'top' ),
+			'bottom-left'   => array( 'left', 'bottom' ),
+			'bottom-right'  => array( 'right', 'bottom' ),
 		);
 
 		return $map[ $alignment ] ?? array( 'center', 'center' );

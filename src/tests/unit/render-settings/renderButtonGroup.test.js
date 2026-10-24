@@ -27,9 +27,9 @@ describe('renderButtonGroup', () => {
 		);
 		const buttons = container.querySelectorAll('.fg-button-group__button');
 		expect(buttons).toHaveLength(2);
-		expect(
-			container.querySelector('.fg-is-active').textContent
-		).toContain('B');
+		expect(container.querySelector('.fg-is-active').textContent).toContain(
+			'B'
+		);
 		expect(container.textContent).toContain('Pick');
 	});
 
@@ -153,5 +153,41 @@ describe('renderButtonGroup', () => {
 			container.querySelector('.fotogrids-setting__description b')
 				.textContent
 		).toBe('hint');
+	});
+
+	it('announces the pressed state of each button', () => {
+		const { container } = renderElement(
+			build({ key: 'k', options: OPTIONS }, 'a', false)
+		);
+		const buttons = container.querySelectorAll('.fg-button-group__button');
+		expect(buttons[0].getAttribute('aria-pressed')).toBe('true');
+		expect(buttons[1].getAttribute('aria-pressed')).toBe('false');
+	});
+
+	it('names a button from ariaLabel when it has no visible label', () => {
+		const { container } = renderElement(
+			build(
+				{
+					key: 'k',
+					options: [{ value: 'x', icon: 'star', ariaLabel: 'Star' }],
+				},
+				'x',
+				false
+			)
+		);
+		const button = container.querySelector('.fg-button-group__button');
+		expect(button.getAttribute('aria-label')).toBe('Star');
+		expect(button.getAttribute('title')).toBe('Star');
+	});
+
+	it('adds no aria-label when the option has no ariaLabel', () => {
+		const { container } = renderElement(
+			build({ key: 'k', options: OPTIONS }, 'a', false)
+		);
+		expect(
+			container
+				.querySelector('.fg-button-group__button')
+				.hasAttribute('aria-label')
+		).toBe(false);
 	});
 });

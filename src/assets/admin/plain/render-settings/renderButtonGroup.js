@@ -89,12 +89,12 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 							? getOptionState(setting.key, option.value)
 							: 'editable';
 					const isPro = optionState !== 'editable';
+					const isActive =
+						String(currentValue) === String(option.value);
 					const buttonClassName = [
 						`${baseClass}__button`,
 						isPro ? `${baseClass}__button__pro` : '',
-						String(currentValue) === String(option.value)
-							? 'fg-is-active'
-							: '',
+						isActive ? 'fg-is-active' : '',
 					]
 						.filter(Boolean)
 						.join(' ');
@@ -109,7 +109,9 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 								!isDisabled &&
 								updateSetting(setting.key, option.value),
 							disabled: isDisabled || isPro,
-							title: option.label || '',
+							title: option.label || option.ariaLabel || '',
+							'aria-label': option.ariaLabel,
+							'aria-pressed': isActive,
 						},
 						[
 							option.icon &&

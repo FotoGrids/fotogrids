@@ -88,4 +88,87 @@ describe('renderAlignmentGrid', () => {
 			container.querySelectorAll('.fg-button-group__button--empty')
 		).toHaveLength(7);
 	});
+
+	describe('the nine catalog cells (icon only)', () => {
+		const CATALOG = [
+			['top-left', 'Top left'],
+			['top-center', 'Top centre'],
+			['top-right', 'Top right'],
+			['center-left', 'Centre left'],
+			['center', 'Centre'],
+			['center-right', 'Centre right'],
+			['bottom-left', 'Bottom left'],
+			['bottom-center', 'Bottom centre'],
+			['bottom-right', 'Bottom right'],
+		];
+		const options = CATALOG.map(([value]) => ({
+			value,
+			icon: `dots_grid_${value.replace('-', '_')}`,
+		}));
+
+		it('names every cell, in grid order, by aria-label and title', () => {
+			const { container } = renderElement(
+				build({ key: 'align', options }, 'center', false)
+			);
+			const buttons = container.querySelectorAll(
+				'.fg-button-group__button'
+			);
+			expect(buttons).toHaveLength(9);
+			buttons.forEach((button, index) => {
+				expect(button.getAttribute('aria-label')).toBe(
+					CATALOG[index][1]
+				);
+				expect(button.getAttribute('title')).toBe(CATALOG[index][1]);
+			});
+		});
+
+		it.each(CATALOG.map(([value]) => value))(
+			'announces only %s as pressed when it is the value',
+			(value) => {
+				const { container } = renderElement(
+					build({ key: 'align', options }, value, false)
+				);
+				const pressed = container.querySelectorAll(
+					'.fg-button-group__button[aria-pressed="true"]'
+				);
+				expect(pressed).toHaveLength(1);
+				expect(pressed[0].getAttribute('aria-label')).toBe(
+					CATALOG.find(([v]) => v === value)[1]
+				);
+				expect(
+					container.querySelectorAll(
+						'.fg-button-group__button[aria-pressed="false"]'
+					)
+				).toHaveLength(8);
+			}
+		);
+
+		it('translates the cell names through __', () => {
+			const translate = jest.fn((t) => `tr:${t}`);
+			const { container } = renderElement(
+				build({ key: 'align', options }, 'center', false, {
+					__: translate,
+				})
+			);
+			expect(translate).toHaveBeenCalledWith('Top left', 'fotogrids');
+			expect(
+				container
+					.querySelector('.fg-button-group__button')
+					.getAttribute('aria-label')
+			).toBe('tr:Top left');
+		});
+	});
+
+	it('keeps an option label as the name when the catalog gives one', () => {
+		const { container } = renderElement(
+			build(
+				{ key: 'align', options: [{ value: 'top-left', label: 'TL' }] },
+				'top-left',
+				false
+			)
+		);
+		const button = container.querySelector('.fg-button-group__button');
+		expect(button.getAttribute('aria-label')).toBe('TL');
+		expect(button.getAttribute('title')).toBe('TL');
+	});
 });

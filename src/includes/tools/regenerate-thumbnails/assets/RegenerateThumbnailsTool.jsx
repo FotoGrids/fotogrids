@@ -597,9 +597,18 @@ const RegenerateThumbnailsTool = () => {
 											{customSizes.map((slug) => (
 												<th
 													key={slug}
-													className={`${baseClass}__col-size`}
+													className={`${baseClass}__col-size ${baseClass}__col-size--custom`}
 												>
-													{niceSlug(slug)}
+													{niceSlug(slug)
+														.split(' ')
+														.map((part, index) => (
+															<span
+																key={index}
+																className={`${baseClass}__col-size-part`}
+															>
+																{part}
+															</span>
+														))}
 												</th>
 											))}
 											{otherSizes.length > 0 && (
@@ -779,7 +788,7 @@ const RegenerateThumbnailsTool = () => {
 													{customSizes.map((slug) => (
 														<td
 															key={slug}
-															className={`${baseClass}__col-size`}
+															className={`${baseClass}__col-size ${baseClass}__col-size--custom`}
 														>
 															<SizeStatus
 																status={

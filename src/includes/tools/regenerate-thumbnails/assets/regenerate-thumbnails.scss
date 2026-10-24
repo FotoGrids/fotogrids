@@ -143,6 +143,26 @@
             text-align: center;
             white-space: nowrap;
         }
+
+        th#{&}__col-size--custom,
+        td#{&}__col-size--custom {
+            white-space: normal;
+        }
+
+        th#{&}__col-size--custom {
+            padding-inline: 2px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        #{&}__col-size-part {
+            display: block;
+        }
+
+        td#{&}__col-size--custom #{&}__status {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
     }
 
     &__status {
