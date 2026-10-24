@@ -32,6 +32,9 @@ class Admin_Init {
 		add_action( 'wp_ajax_fotogrids_update_plugin_setting', array( __CLASS__, 'ajax_update_plugin_setting' ) );
 		add_action( 'wp_ajax_fotogrids_update_user_preference', array( __CLASS__, 'ajax_update_user_preference' ) );
 
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-user-preferences.php';
+		add_filter( \FotoGrids\Hooks\Filters_Admin::USER_PREFERENCES, array( \FotoGrids\Settings\Settings_Mode::class, 'register_preferences' ) );
+
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-columns.php';
 		\FotoGrids\Admin\Admin_Columns::init();
 
@@ -713,12 +716,12 @@ class Admin_Init {
 
 		$preference = isset( $_POST['preference'] ) ? sanitize_key( wp_unslash( $_POST['preference'] ) ) : '';
 		$value      = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
-		$result     = \FotoGrids\Settings\Settings_Mode::handle_preference_request( get_current_user_id(), current_user_can( 'read' ), $preference, $value );
+		$result     = \FotoGrids\Admin\User_Preferences::handle_request( get_current_user_id(), current_user_can( 'read' ), $preference, $value );
 
 		if ( ! $result['ok'] ) {
 			$messages = array(
-				\FotoGrids\Settings\Settings_Mode::ERROR_FORBIDDEN => __( 'Insufficient permissions', 'fotogrids' ),
-				\FotoGrids\Settings\Settings_Mode::ERROR_INVALID   => __( 'Invalid value', 'fotogrids' ),
+				\FotoGrids\Admin\User_Preferences::ERROR_FORBIDDEN => __( 'Insufficient permissions', 'fotogrids' ),
+				\FotoGrids\Admin\User_Preferences::ERROR_INVALID   => __( 'Invalid value', 'fotogrids' ),
 			);
 			wp_send_json_error( array( 'message' => $messages[ $result['error'] ] ?? __( 'Failed to save setting', 'fotogrids' ) ) );
 		}

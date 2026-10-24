@@ -24,7 +24,10 @@ const ADD_OPTIONS = [
  * @return {JSX.Element}
  */
 const AddNewDropdown = ({ isOpen, onToggle, onSelect, strings }) => (
-	<div className="fotogrids-add-new-dropdown">
+	<div
+		className="fotogrids-add-new-dropdown"
+		data-fg-walkthrough="gallery-add-items"
+	>
 		<Button
 			variant="primary"
 			size="sm"

@@ -106,7 +106,10 @@ const Checklist = ({
 	);
 
 	return (
-		<div className="fotogrids-admin-block-card fg-abc-checklist">
+		<div
+			className="fotogrids-admin-block-card fg-abc-checklist"
+			data-fg-walkthrough="dashboard-setup"
+		>
 			<div className="fotogrids-admin-block-card-header">
 				<Icon
 					name="list"

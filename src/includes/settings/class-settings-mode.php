@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Settings;
 
+use FotoGrids\Hooks\Filters_Settings;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -35,10 +37,6 @@ final class Settings_Mode {
 
 	const PREFERENCE_MODE          = 'settings_mode';
 	const PREFERENCE_TIP_DISMISSED = 'settings_mode_tip_dismissed';
-
-	const ERROR_FORBIDDEN = 'forbidden';
-	const ERROR_INVALID   = 'invalid';
-	const ERROR_FAILED    = 'failed';
 
 	/**
 	 * Whether a value is a known mode.
@@ -114,7 +112,11 @@ final class Settings_Mode {
 			return false;
 		}
 
-		return '1' !== (string) get_user_meta( $user_id, self::TIP_DISMISSED_META, true );
+		if ( '1' === (string) get_user_meta( $user_id, self::TIP_DISMISSED_META, true ) ) {
+			return false;
+		}
+
+		return true === apply_filters( Filters_Settings::MODE_TIP_SHOW, true, $user_id );
 	}
 
 	/**
@@ -178,41 +180,26 @@ final class Settings_Mode {
 	}
 
 	/**
-	 * Validate and store a preference request for a user.
+	 * Add this class's preferences to the per-user preference handlers.
 	 *
 	 * @since  1.3.0
-	 * @param  int    $user_id    Requesting user ID.
-	 * @param  bool   $can_read   Whether the user has the `read` capability.
-	 * @param  string $preference Submitted preference.
-	 * @param  string $value      Submitted value.
-	 * @return array{ok:bool,value?:string,error?:string} `error` is one of the `ERROR_*` constants.
+	 * @param  mixed $handlers Handlers registered so far.
+	 * @return array<string, array{validate: callable, save: callable}>
 	 */
-	public static function handle_preference_request( int $user_id, bool $can_read, string $preference, string $value ): array {
-		if ( $user_id <= 0 || ! $can_read ) {
-			return array(
-				'ok'    => false,
-				'error' => self::ERROR_FORBIDDEN,
+	public static function register_preferences( $handlers ): array {
+		$handlers = is_array( $handlers ) ? $handlers : array();
+
+		foreach ( array( self::PREFERENCE_MODE, self::PREFERENCE_TIP_DISMISSED ) as $preference ) {
+			$handlers[ $preference ] = array(
+				'validate' => static function ( string $value ) use ( $preference ): ?string {
+					return self::validate_preference( $preference, $value );
+				},
+				'save'     => static function ( int $user_id, string $value ) use ( $preference ): bool {
+					return self::save_preference( $user_id, $preference, $value );
+				},
 			);
 		}
 
-		$validated = self::validate_preference( $preference, $value );
-		if ( null === $validated ) {
-			return array(
-				'ok'    => false,
-				'error' => self::ERROR_INVALID,
-			);
-		}
-
-		if ( ! self::save_preference( $user_id, $preference, $validated ) ) {
-			return array(
-				'ok'    => false,
-				'error' => self::ERROR_FAILED,
-			);
-		}
-
-		return array(
-			'ok'    => true,
-			'value' => $validated,
-		);
+		return $handlers;
 	}
 }

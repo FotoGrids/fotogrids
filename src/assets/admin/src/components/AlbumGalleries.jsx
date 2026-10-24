@@ -489,7 +489,10 @@ const AlbumGalleries = () => {
 			</div>
 
 			{/* Available Galleries Section */}
-			<div className="fotogrids-available-section">
+			<div
+				className="fotogrids-available-section"
+				data-fg-walkthrough="album-available-galleries"
+			>
 				<h4>{config.strings.availableGalleries}</h4>
 
 				<div className="fotogrids-gallery-search">

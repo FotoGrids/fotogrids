@@ -90,4 +90,14 @@ final class Filters_Settings {
 	 * @param array<string, mixed> $existing Existing saved settings.
 	 */
 	public const EDIT_GATE = 'fotogrids/settings/edit_gate';
+
+	/**
+	 * Whether the one-time Easy / Advanced upgrade tip shows for a user on
+	 * this page load.
+	 *
+	 * @since 1.3.0
+	 * @param bool $show    Whether the tip shows.
+	 * @param int  $user_id User ID.
+	 */
+	public const MODE_TIP_SHOW = 'fotogrids/settings/mode_tip/show';
 }

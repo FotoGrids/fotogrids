@@ -827,4 +827,42 @@ describe('CollectionSettings Easy mode', () => {
 			).toBe('On');
 		});
 	});
+
+	describe('walkthrough hooks', () => {
+		it('marks each settings tab with its group id', async () => {
+			const { container } = mount();
+			await flush();
+			expect(
+				container.querySelector('[data-fg-settings-tab="layout"]')
+			).not.toBeNull();
+		});
+
+		it('starts the screen tour from the Tour button', async () => {
+			const listener = jest.fn();
+			document.addEventListener('fotogrids:walkthrough:start', listener);
+			const { container } = mount();
+			await flush();
+			const tour = container.querySelector(
+				'.fotogrids-settings-docs-strip__tour'
+			);
+			expect(tour.getAttribute('aria-label')).toBe(
+				'Take a tour of this screen'
+			);
+			click(tour);
+			document.removeEventListener(
+				'fotogrids:walkthrough:start',
+				listener
+			);
+			expect(listener).toHaveBeenCalledTimes(1);
+		});
+
+		it('has no Tour button on Settings > Defaults', async () => {
+			window.fotogridsSettings.isDefaultsMode = true;
+			const { container } = mount();
+			await flush();
+			expect(
+				container.querySelector('.fotogrids-settings-docs-strip__tour')
+			).toBeNull();
+		});
+	});
 });

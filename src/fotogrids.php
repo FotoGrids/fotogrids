@@ -233,11 +233,13 @@ add_action(
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/Templates/Module.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ViewCollections/Module.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/PageBuilders/Module.php';
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/Walkthrough/Module.php';
 
 		\FotoGrids\Modules\Module_Registry::register( new \FotoGrids\Modules\Metaboxes\Module() );
 		\FotoGrids\Modules\Module_Registry::register( new \FotoGrids\Modules\Templates\Module() );
 		\FotoGrids\Modules\Module_Registry::register( new \FotoGrids\Modules\ViewCollections\Module() );
 		\FotoGrids\Modules\Module_Registry::register( new \FotoGrids\Modules\PageBuilders\Module() );
+		\FotoGrids\Modules\Module_Registry::register( new \FotoGrids\Modules\Walkthrough\Module() );
 	},
 	10
 );

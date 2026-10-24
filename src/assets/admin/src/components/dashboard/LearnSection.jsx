@@ -6,9 +6,15 @@ import { __ } from '@wordpress/i18n';
 import Icon from '../shared/Icon';
 import { fgGoUrl } from '../../utils/go-url';
 
+const startTour = () =>
+	document.dispatchEvent(new CustomEvent('fotogrids:walkthrough:start'));
+
 const LearnSection = () => {
 	return (
-		<div className="fotogrids-admin-block-card fg-abc-learn">
+		<div
+			className="fotogrids-admin-block-card fg-abc-learn"
+			data-fg-walkthrough="dashboard-learn"
+		>
 			<div className="fotogrids-admin-block-card-header">
 				<Icon
 					name="book"
@@ -17,6 +23,18 @@ const LearnSection = () => {
 				<h3>{__('Learn & Get Inspired', 'fotogrids')}</h3>
 			</div>
 			<div className="fg-abc-learn-options">
+				<button
+					type="button"
+					className="fg-abc-learn-option"
+					data-icon-color="blue"
+					onClick={startTour}
+				>
+					<Icon
+						name="play"
+						className="fotogrids-admin-block-card-icon"
+					/>
+					{__('Take the tour', 'fotogrids')}
+				</button>
 				<a
 					href={fgGoUrl(
 						'getting-started',

@@ -266,6 +266,7 @@ foreach ( array( 'gallery' => 'galleries', 'album' => 'albums' ) as $one => $man
 	$id = username_exists( "fg-menu-{$one}" ) ?: wp_insert_user( array( 'user_login' => "fg-menu-{$one}", 'user_pass' => '${ PASSWORD }', 'user_email' => "fg-menu-{$one}@example.com" ) );
 	( new WP_User( $id ) )->set_role( "fg_menu_{$one}_only" );
 	wp_set_password( '${ PASSWORD }', $id );
+	update_user_meta( $id, 'fotogrids_walkthroughs', array( 'gallery' => 'done', 'album' => 'done', 'dashboard' => 'done' ) );
 }` );
 	} );
 

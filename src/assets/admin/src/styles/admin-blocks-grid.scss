@@ -538,6 +538,15 @@
 					font-size: 13px;
 					transition: all 0.2s ease;
 
+					&:is(button) {
+						width: 100%;
+						border: 0;
+						background: transparent;
+						font-family: inherit;
+						text-align: start;
+						cursor: pointer;
+					}
+
 					span {
 						font-size: 1rem;
 						line-height: 1;
