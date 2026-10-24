@@ -74,6 +74,21 @@ function makeItem(id) {
 	return figure;
 }
 
+/** Stamps data-fg-sequence-index on each item, starting at `from`. */
+function stampSequence(items, from = 0) {
+	items.forEach((el, i) => {
+		el.setAttribute('data-fg-sequence-index', String(from + i));
+	});
+}
+
+/** Item ids keyed by their sequence index, in DOM order. */
+function sequenceOf(root) {
+	return Array.from(root.querySelectorAll(':scope > .fg-item')).map((el) => [
+		el.dataset.fgSequenceIndex,
+		el.dataset.fgItemId,
+	]);
+}
+
 function orderOf(root) {
 	return Array.from(root.querySelectorAll(':scope > .fg-item')).map(
 		(el) => el.dataset.fgItemId
@@ -219,6 +234,94 @@ describe('random-sort', () => {
 			expect(finalOrder.slice(4)).toEqual(['f', 'g', 'h', 'e']);
 		});
 
+		it('renumbers the sequence indices to follow the shuffled order', () => {
+			const { root } = makeCollection(['a', 'b', 'c', 'd']);
+			stampSequence(Array.from(root.children));
+			stubRandom(0);
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			expect(sequenceOf(root)).toEqual([
+				['0', 'b'],
+				['1', 'c'],
+				['2', 'd'],
+				['3', 'a'],
+			]);
+		});
+
+		it('renumbers an inserted batch within its own indices', () => {
+			const { collection, root } = makeCollection(['a', 'b', 'c', 'd']);
+			stampSequence(Array.from(root.children));
+			stubRandom(0);
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			const inserted = ['e', 'f', 'g', 'h'].map((id) => {
+				const el = makeItem(id);
+				root.appendChild(el);
+				return el;
+			});
+			stampSequence(inserted, 4);
+
+			collection.dispatchEvent(
+				new CustomEvent('fotogrids:items_inserted', {
+					detail: { items: inserted, galleryEl: collection },
+				})
+			);
+
+			expect(sequenceOf(root)).toEqual([
+				['0', 'b'],
+				['1', 'c'],
+				['2', 'd'],
+				['3', 'a'],
+				['4', 'f'],
+				['5', 'g'],
+				['6', 'h'],
+				['7', 'e'],
+			]);
+		});
+
+		it('keeps the indices a later page arrived with', () => {
+			const { collection, root } = makeCollection([]);
+			stubRandom(0);
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			const inserted = ['m', 'n', 'o'].map((id) => {
+				const el = makeItem(id);
+				root.appendChild(el);
+				return el;
+			});
+			stampSequence(inserted, 24);
+
+			collection.dispatchEvent(
+				new CustomEvent('fotogrids:items_inserted', {
+					detail: { items: inserted, galleryEl: collection },
+				})
+			);
+
+			expect(sequenceOf(root)).toEqual([
+				['24', 'n'],
+				['25', 'o'],
+				['26', 'm'],
+			]);
+		});
+
+		it('leaves items without a sequence index unnumbered', () => {
+			const { root } = makeCollection(['a', 'b', 'c', 'd']);
+			stubRandom(0);
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			Array.from(root.children).forEach((el) => {
+				expect(el.hasAttribute('data-fg-sequence-index')).toBe(false);
+			});
+		});
+
 		it('sends no request', () => {
 			window.fetch = jest.fn();
 			makeCollection(['a', 'b', 'c', 'd']);
@@ -295,7 +398,9 @@ describe('random-sort', () => {
 
 			loadModule();
 			window.FotoGrids.boot();
-			collection.dispatchEvent(new CustomEvent('fotogrids:filters_changed'));
+			collection.dispatchEvent(
+				new CustomEvent('fotogrids:filters_changed')
+			);
 			await server.settle();
 
 			expect(orderOf(root)).toEqual(['a', 'b', 'c']);
