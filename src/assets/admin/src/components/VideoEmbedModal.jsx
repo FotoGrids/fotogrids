@@ -230,6 +230,10 @@ const VideoEmbedModal = ({
 	// link and options that were already entered for that source.
 	const sourceDrafts = useRef({});
 
+	// Set synchronously, so a blur fired when the link field is disabled for
+	// loading cannot start a second request.
+	const resolvingRef = useRef(false);
+
 	// The form as it stood when the modal opened, so an edit-mode prefill is
 	// not mistaken for something the visitor typed.
 	const baseline = useRef(snapshot(DEFAULT_STATE, ''));
@@ -324,7 +328,7 @@ const VideoEmbedModal = ({
 	const resolveUrl = useCallback(
 		async (rawUrl) => {
 			const url = rawUrl.trim();
-			if (!url) {
+			if (!url || resolvingRef.current) {
 				return;
 			}
 
@@ -345,6 +349,7 @@ const VideoEmbedModal = ({
 			}
 
 			setResolveError('');
+			resolvingRef.current = true;
 			setResolving(true);
 
 			try {
@@ -421,6 +426,7 @@ const VideoEmbedModal = ({
 					);
 				}
 			} finally {
+				resolvingRef.current = false;
 				setResolving(false);
 			}
 		},

@@ -155,6 +155,40 @@ describe('VideoEmbedModal sample link', () => {
 		handle.unmount();
 	});
 
+	it('sends one request when the link field blurs while Enter is loading', async () => {
+		let finish;
+		global.fetch.mockImplementation(
+			() =>
+				new Promise((resolve) => {
+					finish = () =>
+						resolve({
+							ok: true,
+							json: () =>
+								Promise.resolve({
+									video_id: 'nxehlC9adbg',
+									title: 'Sample',
+								}),
+						});
+				})
+		);
+		const handle = render();
+
+		await dispatchAsync(
+			urlInput(),
+			new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+		);
+		await dispatchAsync(
+			urlInput(),
+			new window.FocusEvent('focusout', { bubbles: true })
+		);
+		await act(async () => finish());
+
+		expect(resolveRequests()).toEqual([
+			{ source: 'video_youtube', url: YOUTUBE_SAMPLE },
+		]);
+		handle.unmount();
+	});
+
 	it('loads a typed link instead of the sample', async () => {
 		const handle = render();
 		const typed = 'https://www.youtube.com/watch?v=bbbbbbbbbbb';
