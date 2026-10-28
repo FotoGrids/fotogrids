@@ -56,7 +56,7 @@
     "@wordpress/element": "5.12.2",
     "@wordpress/i18n": "4.35.2",
     "@wordpress/media-utils": "4.26.2",
-    "chart.js": "^4.5.0",
+    "chart.js": "^4.6.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
